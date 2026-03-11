@@ -23,6 +23,7 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.0">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="SixLabors.ImageSharp" Version="2.1.3" />
   </ItemGroup>
 
   <!-- Exclude test sources kept under the repository tests/ folder from the main project build -->

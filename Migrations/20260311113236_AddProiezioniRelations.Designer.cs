@@ -4,6 +4,7 @@ using CognomeNomeAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CognomeNomeAPI.Migrations
 {
     [DbContext(typeof(FilmDbContext))]
-    partial class FilmDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260311113236_AddProiezioniRelations")]
+    partial class AddProiezioniRelations
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

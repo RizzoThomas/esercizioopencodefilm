@@ -26,6 +26,7 @@ builder.Services.AddDbContext<FilmDbContext>(
 // Register services
 builder.Services.AddSingleton<CognomeNomeAPI.Services.IAIAdapter, CognomeNomeAPI.Services.MockAIAdapter>();
 builder.Services.AddSingleton<CognomeNomeAPI.Services.Scoring.IScoringService, CognomeNomeAPI.Services.Scoring.MockScoringService>();
+builder.Services.AddSingleton<CognomeNomeAPI.Services.ImageProcessor>();
 
 var app = builder.Build();
 
@@ -308,6 +309,29 @@ app.MapGet("/proiezioni", async (FilmDbContext db) =>
         }).ToListAsync();
 
     return Results.Ok(list);
+});
+
+// Analytics endpoints (basic, aggregated)
+app.MapGet("/analytics/summary", async (FilmDbContext db) =>
+{
+    var filmsPerRegista = await db.Films.GroupBy(f => f.RegistaId).Select(g => new { RegistaId = g.Key, Count = g.Count(), AvgDuration = g.Average(f => f.Durata) }).ToListAsync();
+    var proiezPerDay = await db.Proiezioni.GroupBy(p => p.Data.Date).Select(g => new { Day = g.Key, Count = g.Count() }).ToListAsync();
+    return Results.Ok(new { filmsPerRegista, proiezPerDay });
+});
+
+app.MapPost("/api/images/upload", async (IFormFile file, CognomeNomeAPI.Services.ImageProcessor proc) =>
+{
+    if (file == null || file.Length == 0) return Results.BadRequest(new { error = "File required" });
+    using var s = file.OpenReadStream();
+    var url = proc.SaveUploaded(s, Path.GetExtension(file.FileName).TrimStart('.'));
+    return Results.Ok(new { url });
+});
+
+app.MapPost("/api/images/upscale", async (string url, int scale, CognomeNomeAPI.Services.ImageProcessor proc) =>
+{
+    if (string.IsNullOrWhiteSpace(url)) return Results.BadRequest(new { error = "url required" });
+    var up = proc.Upscale(url, scale);
+    return Results.Ok(new { url = up });
 });
 
 // Update a proiezione

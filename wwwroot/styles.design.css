@@ -1,0 +1,20 @@
+:root{
+  --brand:#0b6cf6; --accent:#f97316; --bg:#071029; --card:#061022; --muted:#9aa4b2; --success:#16a34a;
+  --font-display: 'Poppins'; --font-body: 'Inter';
+}
+@font-face{font-family: 'Inter'; src: url('/fonts/Inter-Regular.woff2') format('woff2'); font-weight:400; font-style:normal; font-display:swap}
+@font-face{font-family: 'Poppins'; src: url('/fonts/Poppins-Regular.woff2') format('woff2'); font-weight:400; font-style:normal; font-display:swap}
+body{font-family:var(--font-body);background:linear-gradient(180deg,var(--bg) 0%, #081426 60%);color:#e6eef6;margin:0}
+.header{display:flex;align-items:center;gap:16px;padding:18px 28px;background:linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));box-shadow:0 3px 10px rgba(0,0,0,0.4)}
+.logo{display:flex;align-items:center}
+.nav{margin-left:auto;display:flex;gap:12px}
+.container{padding:24px;display:grid;grid-template-columns:300px 1fr;gap:18px}
+.panel{background:var(--card);padding:16px;border-radius:10px;box-shadow:0 6px 18px rgba(2,6,23,0.6)}
+.panel h3{margin:0 0 8px 0;font-family:var(--font-display)}
+.small{font-size:13px;color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.table{width:100%;border-collapse:collapse}
+.table th,.table td{padding:8px;border-bottom:1px solid rgba(255,255,255,0.03);font-size:14px}
+.btn{background:var(--brand);color:white;padding:8px 12px;border-radius:8px;border:0;cursor:pointer}
+.icon{width:18px;height:18px;vertical-align:middle}
+.editor-canvas{border:1px dashed rgba(255,255,255,0.06);border-radius:6px;padding:8px}
