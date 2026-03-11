@@ -186,3 +186,9 @@ app.MapPost("/proiezioni", async (DatiProiezioneDTO dto, FilmDbContext db) =>
 });
 
 app.Run();
+
+// expose Program type for WebApplicationFactory in integration tests
+namespace CognomeNomeAPI
+{
+    public partial class Program { }
+}
