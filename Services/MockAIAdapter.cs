@@ -11,6 +11,6 @@ public class MockAIAdapter : IAIAdapter
         DateTime? due = null;
         var m = Regex.Match(text, @"by\s+(\d{4}-\d{2}-\d{2})");
         if (m.Success && DateTime.TryParse(m.Groups[1].Value, out var d)) due = d;
-        return Task.FromResult((Title: title.Length > 100 ? title.Substring(0, 100) : title, Description: text, DueDate: due));
+        return Task.FromResult((Title: title.Length > 100 ? title.Substring(0, 100) : title, Description: (string?)text, DueDate: due));
     }
 }

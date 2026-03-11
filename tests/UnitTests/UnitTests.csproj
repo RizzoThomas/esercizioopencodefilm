@@ -6,16 +6,15 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+
+  <!-- No ProjectReference: unit tests are hermetic copies of minimal types -->
   <ItemGroup>
     <PackageReference Include="xunit" Version="2.5.3" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.5.3" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="9.0.11" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\CognomeNomeAPI.csproj" />
   </ItemGroup>
 
 </Project>

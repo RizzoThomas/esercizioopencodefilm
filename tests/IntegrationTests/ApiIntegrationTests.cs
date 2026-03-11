@@ -4,7 +4,7 @@ using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Threading.Tasks;
-using FluentAssertions;
+// FluentAssertions removed from tests to avoid runtime dependency issues in this environment
 using Xunit;
 
 namespace IntegrationTests;

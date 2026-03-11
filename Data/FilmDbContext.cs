@@ -12,6 +12,7 @@ public class FilmDbContext : DbContext
     public DbSet<Cinema> Cinemas { get; set; } = null!;
     public DbSet<Proiezione> Proiezioni { get; set; } = null!;
     public DbSet<TaskItem> Tasks { get; set; } = null!;
+    public DbSet<PriorityLog> PriorityLogs { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -47,6 +48,13 @@ public class FilmDbContext : DbContext
         {
             entity.HasKey(e => e.Id);
             entity.HasIndex(e => new { e.CinemaId, e.FilmId });
+        });
+
+        modelBuilder.Entity<PriorityLog>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.FactorsJson).IsRequired();
+            entity.Property(e => e.Score).IsRequired();
         });
     }
 }

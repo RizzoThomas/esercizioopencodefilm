@@ -25,6 +25,7 @@ builder.Services.AddDbContext<FilmDbContext>(
 
 // Register services
 builder.Services.AddSingleton<CognomeNomeAPI.Services.IAIAdapter, CognomeNomeAPI.Services.MockAIAdapter>();
+builder.Services.AddSingleton<CognomeNomeAPI.Services.Scoring.IScoringService, CognomeNomeAPI.Services.Scoring.MockScoringService>();
 
 var app = builder.Build();
 
@@ -102,6 +103,39 @@ app.MapPatch("/tasks/{id}", async (int id, TaskItem dto, FilmDbContext db) =>
     t.UpdatedAt = DateTime.UtcNow;
     await db.SaveChangesAsync();
     return Results.Ok(t);
+});
+
+// Compute and persist priority score for a task
+app.MapPost("/tasks/{id}/score", async (int id, FilmDbContext db, CognomeNomeAPI.Services.Scoring.IScoringService scoring) =>
+{
+    var t = await db.Tasks.FindAsync(id);
+    if (t is null) return Results.NotFound();
+
+    // simple dependency depth provider that walks ParentTaskId
+    int DepthProvider(int? parentId)
+    {
+        var depth = 0;
+        var cur = parentId;
+        while (cur.HasValue)
+        {
+            var p = db.Tasks.Find(cur.Value);
+            if (p == null) break;
+            depth++;
+            cur = p.ParentTaskId;
+            if (depth > 50) break; // guard
+        }
+        return depth;
+    }
+
+    var (score, factorsJson) = scoring.ComputePriority(t, DepthProvider);
+    t.PriorityScore = score;
+    t.UpdatedAt = DateTime.UtcNow;
+
+    var log = new PriorityLog { TaskId = t.Id, Score = score, FactorsJson = factorsJson };
+    db.PriorityLogs.Add(log);
+    await db.SaveChangesAsync();
+
+    return Results.Ok(new { TaskId = t.Id, PriorityScore = t.PriorityScore, PriorityLogId = log.Id });
 });
 
 app.MapGet("/tasks", async (int? team_id, string? sort, FilmDbContext db) =>
