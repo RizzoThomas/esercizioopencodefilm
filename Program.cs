@@ -296,7 +296,7 @@ app.MapGet("/proiezioni", async (FilmDbContext db) =>
     var list = await db.Proiezioni
         .Join(db.Films, p => p.FilmId, f => f.Id, (p, f) => new { p, f })
         .Join(db.Cinemas, pf => pf.p.CinemaId, c => c.Id, (pf, c) => new { pf.p, pf.f, c })
-        .Select(x => new DTO.ProiezioneViewDTO
+        .Select(x => new ProiezioneViewDTO
         {
             Id = x.p.Id,
             FilmId = x.f.Id,
@@ -308,6 +308,33 @@ app.MapGet("/proiezioni", async (FilmDbContext db) =>
         }).ToListAsync();
 
     return Results.Ok(list);
+});
+
+// Update a proiezione
+app.MapPut("/proiezioni/{id}", async (int id, DatiProiezioneDTO dto, FilmDbContext db) =>
+{
+    var p = await db.Proiezioni.FindAsync(id);
+    if (p is null) return Results.NotFound();
+    if (dto.Data == default || dto.Ora == default) return Results.BadRequest(new { error = "Data and Ora are required." });
+    var filmExists = await db.Films.AnyAsync(f => f.Id == dto.FilmId);
+    var cinemaExists = await db.Cinemas.AnyAsync(c => c.Id == dto.CinemaId);
+    if (!filmExists || !cinemaExists) return Results.BadRequest(new { error = "FilmId or CinemaId do not exist" });
+    p.FilmId = dto.FilmId;
+    p.CinemaId = dto.CinemaId;
+    p.Data = dto.Data;
+    p.Ora = dto.Ora;
+    await db.SaveChangesAsync();
+    return Results.Ok(p);
+});
+
+// Delete a proiezione
+app.MapDelete("/proiezioni/{id}", async (int id, FilmDbContext db) =>
+{
+    var p = await db.Proiezioni.FindAsync(id);
+    if (p is null) return Results.NotFound();
+    db.Proiezioni.Remove(p);
+    await db.SaveChangesAsync();
+    return Results.NoContent();
 });
 
 app.Run();
