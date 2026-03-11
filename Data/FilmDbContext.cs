@@ -48,6 +48,14 @@ public class FilmDbContext : DbContext
         {
             entity.HasKey(e => e.Id);
             entity.HasIndex(e => new { e.CinemaId, e.FilmId });
+            entity.HasOne<Cinema>()
+                .WithMany()
+                .HasForeignKey(p => p.CinemaId)
+                .OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne<Film>()
+                .WithMany()
+                .HasForeignKey(p => p.FilmId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
 
         modelBuilder.Entity<PriorityLog>(entity =>

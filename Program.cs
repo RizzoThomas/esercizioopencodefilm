@@ -39,6 +39,10 @@ if (app.Environment.IsDevelopment())
     });
 }
 
+// Serve a simple static UI from wwwroot (open /index.html)
+app.UseDefaultFiles();
+app.UseStaticFiles();
+
 // Apply EF migrations at startup (development convenience)
 using (var scope = app.Services.CreateScope())
 {
@@ -284,6 +288,26 @@ app.MapPost("/proiezioni", async (DatiProiezioneDTO dto, FilmDbContext db) =>
     db.Proiezioni.Add(p);
     await db.SaveChangesAsync();
     return Results.Created($"/proiezioni/{p.Id}", p);
+});
+
+// GET proiezioni with joined film and cinema data
+app.MapGet("/proiezioni", async (FilmDbContext db) =>
+{
+    var list = await db.Proiezioni
+        .Join(db.Films, p => p.FilmId, f => f.Id, (p, f) => new { p, f })
+        .Join(db.Cinemas, pf => pf.p.CinemaId, c => c.Id, (pf, c) => new { pf.p, pf.f, c })
+        .Select(x => new DTO.ProiezioneViewDTO
+        {
+            Id = x.p.Id,
+            FilmId = x.f.Id,
+            FilmTitolo = x.f.Titolo,
+            CinemaId = x.c.Id,
+            CinemaNome = x.c.Nome,
+            Data = x.p.Data,
+            Ora = x.p.Ora
+        }).ToListAsync();
+
+    return Results.Ok(list);
 });
 
 app.Run();

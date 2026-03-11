@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>TaskFlow - Task Viewer</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <h1>TaskFlow — Interfaccia</h1>
+    <p class="muted">Interagisci con l'API locale per creare, vedere e calcolare lo score dei task.</p>
+  </header>
+
+  <main class="wrap">
+    <section class="card">
+      <h2>Registi</h2>
+      <form id="regista-form">
+        <div class="row"><label>Nome<input id="reg-nome" required></label></div>
+        <div class="row"><label>Cognome<input id="reg-cognome" required></label></div>
+        <div class="row"><label>Nazionalità<input id="reg-nazionalita"></label></div>
+        <div class="row"><button type="submit">Crea Regista</button></div>
+      </form>
+      <table id="registi-table"><thead><tr><th>#</th><th>Nome</th><th>Cognome</th><th>Nazionalità</th><th>Azioni</th></tr></thead><tbody></tbody></table>
+    </section>
+
+    <section class="card">
+      <h2>Film</h2>
+      <form id="film-form">
+        <div class="row"><label>Titolo<input id="film-titolo" required></label></div>
+        <div class="row"><label>Data Produzione<input id="film-data" type="date"></label></div>
+        <div class="row"><label>Durata (min)<input id="film-durata" type="number" min="1"></label></div>
+        <div class="row"><label>Regista<select id="film-regista"></select></label></div>
+        <div class="row"><button type="submit">Crea Film</button></div>
+      </form>
+      <table id="films-table"><thead><tr><th>#</th><th>Titolo</th><th>Data</th><th>Durata</th><th>RegistaId</th><th>Azioni</th></tr></thead><tbody></tbody></table>
+    </section>
+
+    <section class="card">
+      <h2>Cinema</h2>
+      <form id="cinema-form">
+        <div class="row"><label>Nome<input id="cinema-nome" required></label></div>
+        <div class="row"><label>Indirizzo<input id="cinema-indirizzo"></label></div>
+        <div class="row"><label>Città<input id="cinema-citta"></label></div>
+        <div class="row"><button type="submit">Crea Cinema</button></div>
+      </form>
+      <table id="cinemas-table"><thead><tr><th>#</th><th>Nome</th><th>Indirizzo</th><th>Città</th></tr></thead><tbody></tbody></table>
+    </section>
+
+    <section class="card wide">
+      <h2>Proiezioni</h2>
+      <form id="proiezione-form">
+        <div class="row"><label>Film<select id="proj-film"></select></label></div>
+        <div class="row"><label>Cinema<select id="proj-cinema"></select></label></div>
+        <div class="row"><label>Data<input id="proj-data" type="date"></label></div>
+        <div class="row"><label>Ora<input id="proj-ora" type="time"></label></div>
+        <div class="row"><button type="submit">Crea Proiezione</button></div>
+      </form>
+      <table id="proiezioni-table"><thead><tr><th>#</th><th>FilmId</th><th>CinemaId</th><th>Data</th><th>Ora</th></tr></thead><tbody></tbody></table>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <small>API Swagger: <a href="/swagger/index.html">/swagger</a></small>
+  </footer>
+
+  <script src="/app.js"></script>
+</body>
+</html>
