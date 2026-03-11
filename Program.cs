@@ -23,6 +23,9 @@ builder.Services.AddDbContext<FilmDbContext>(
         .EnableDetailedErrors()
 );
 
+// Register services
+builder.Services.AddSingleton<CognomeNomeAPI.Services.IAIAdapter, CognomeNomeAPI.Services.MockAIAdapter>();
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -42,8 +45,8 @@ using (var scope = app.Services.CreateScope())
     try
     {
         var db = scope.ServiceProvider.GetRequiredService<FilmDbContext>();
-        db.Database.Migrate();
-        logger.LogInformation("Database migrated successfully.");
+    db.Database.Migrate();
+    logger.LogInformation("Database migrated successfully.");
     }
     catch (Exception ex)
     {
@@ -51,6 +54,70 @@ using (var scope = app.Services.CreateScope())
         // In production you'd normally not swallow this error
     }
 }
+
+// Tasks endpoints (PRD minimal)
+app.MapPost("/tasks", async (TaskItem dto, FilmDbContext db) =>
+{
+    if (string.IsNullOrWhiteSpace(dto.Title)) return Results.BadRequest(new { error = "Title required" });
+    var t = new TaskItem
+    {
+        Title = dto.Title,
+        Description = dto.Description,
+        AssigneeId = dto.AssigneeId,
+        CreatorId = dto.CreatorId,
+        TeamId = dto.TeamId,
+        PriorityScore = dto.PriorityScore,
+        Status = dto.Status,
+        DueDate = dto.DueDate,
+        ParentTaskId = dto.ParentTaskId
+    };
+    db.Tasks.Add(t);
+    await db.SaveChangesAsync();
+    return Results.Created($"/tasks/{t.Id}", t);
+});
+
+// Natural language task creation (mock parser)
+app.MapPost("/tasks/nl", async (NaturalLanguageTaskDTO dto, FilmDbContext db) =>
+{
+    if (string.IsNullOrWhiteSpace(dto.Text)) return Results.BadRequest(new { error = "Text required" });
+    var ai = app.Services.GetRequiredService<CognomeNomeAPI.Services.IAIAdapter>();
+    var parsed = await ai.ParseTaskAsync(dto.Text);
+
+    var t = new TaskItem { Title = parsed.Title, Description = parsed.Description, CreatorId = dto.CreatorId, TeamId = dto.TeamId, DueDate = parsed.DueDate };
+    db.Tasks.Add(t);
+    await db.SaveChangesAsync();
+    return Results.Created($"/tasks/{t.Id}", t);
+});
+
+app.MapPatch("/tasks/{id}", async (int id, TaskItem dto, FilmDbContext db) =>
+{
+    var t = await db.Tasks.FindAsync(id);
+    if (t is null) return Results.NotFound();
+    t.Title = dto.Title ?? t.Title;
+    t.Description = dto.Description ?? t.Description;
+    t.AssigneeId = dto.AssigneeId ?? t.AssigneeId;
+    t.Status = dto.Status ?? t.Status;
+    t.PriorityScore = dto.PriorityScore;
+    t.DueDate = dto.DueDate ?? t.DueDate;
+    t.UpdatedAt = DateTime.UtcNow;
+    await db.SaveChangesAsync();
+    return Results.Ok(t);
+});
+
+app.MapGet("/tasks", async (int? team_id, string? sort, FilmDbContext db) =>
+{
+    var q = db.Tasks.AsQueryable();
+    if (team_id.HasValue) q = q.Where(t => t.TeamId == team_id.Value);
+    if (sort == "priority") q = q.OrderByDescending(t => t.PriorityScore);
+    return Results.Ok(await q.ToListAsync());
+});
+
+app.MapGet("/tasks/{id}", async (int id, FilmDbContext db) =>
+{
+    var t = await db.Tasks.FindAsync(id);
+    return t is null ? Results.NotFound() : Results.Ok(t);
+});
+
 
 app.MapGet("/registi", async (FilmDbContext db) =>
 {

@@ -11,6 +11,7 @@ public class FilmDbContext : DbContext
     public DbSet<Film> Films { get; set; } = null!;
     public DbSet<Cinema> Cinemas { get; set; } = null!;
     public DbSet<Proiezione> Proiezioni { get; set; } = null!;
+    public DbSet<TaskItem> Tasks { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
