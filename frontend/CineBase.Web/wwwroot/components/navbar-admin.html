@@ -1,0 +1,116 @@
+<nav class="bg-black/90 backdrop-blur-xl border-b border-cyan-400/20 sticky top-0 z-40">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between h-14">
+      <div class="flex items-center gap-8">
+        <a href="/index.html" class="flex items-center gap-2 group">
+          <div class="w-8 h-8 rounded-lg bg-cyan-400/10 border border-cyan-400/40 flex items-center justify-center text-cyan-400 group-hover:bg-cyan-400/20 transition-all">
+            <i class="fa-solid fa-film text-xs"></i>
+          </div>
+          <span class="font-cyber text-sm font-bold tracking-wider text-cyan-400">CINE<span class="text-white">BASE</span></span>
+        </a>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <div class="hidden sm:flex items-center gap-2 text-xs font-mono text-cyan-400/60 border border-cyan-400/20 rounded-full px-3 py-1">
+          <span class="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></span>
+          LIVE
+        </div>
+        
+        <!-- User Dropdown (minimal admin) -->
+        <div class="relative" id="user-dropdown-container">
+          <button id="user-dropdown-btn" class="flex items-center gap-2 px-3 py-2 text-sm text-slate-300 hover:text-cyan-400 rounded-lg hover:bg-cyan-400/5 transition-colors">
+            <div class="w-8 h-8 rounded-full bg-purple-400/20 border border-purple-400/40 flex items-center justify-center text-purple-400">
+              <i class="fa-solid fa-shield-halved text-xs"></i>
+            </div>
+            <span id="user-name">Admin</span>
+            <i class="fa-solid fa-chevron-down text-xs"></i>
+          </button>
+          <div id="user-dropdown" class="hidden absolute right-0 mt-2 w-56 bg-black/90 border border-cyan-400/20 rounded-lg shadow-xl backdrop-blur-xl">
+            <div class="py-1">
+              <div class="px-4 py-2 text-xs text-slate-500" id="admin-role">Ruolo: Admin</div>
+              <!-- Dashboard submenu -->
+              <div class="border-b border-cyan-400/10 pb-2 mb-2">
+                <div class="px-4 py-2 text-xs text-slate-500 font-mono">DASHBOARD</div>
+                <a href="/films.html" class="block px-4 py-1.5 text-sm text-slate-300 hover:text-cyan-400 hover:bg-cyan-400/10">
+                  <i class="fa-solid fa-film mr-2 w-4"></i> Film
+                </a>
+                <a href="/registi.html" class="block px-4 py-1.5 text-sm text-slate-300 hover:text-cyan-400 hover:bg-cyan-400/10">
+                  <i class="fa-solid fa-user mr-2 w-4"></i> Registi
+                </a>
+                <a href="/proiezioni.html" class="block px-4 py-1.5 text-sm text-slate-300 hover:text-cyan-400 hover:bg-cyan-400/10">
+                  <i class="fa-solid fa-clock mr-2 w-4"></i> Proiezioni
+                </a>
+                <a href="/cinemas.html" id="dropdown-cinema-link" class="block px-4 py-1.5 text-sm text-slate-300 hover:text-cyan-400 hover:bg-cyan-400/10">
+                  <i class="fa-solid fa-building mr-2 w-4"></i> Cinema
+                </a>
+              </div>
+              <a href="/area-personale.html" class="block px-4 py-2 text-sm text-slate-300 hover:text-cyan-400 hover:bg-cyan-400/10">
+                <i class="fa-solid fa-user mr-2"></i> Profilo
+              </a>
+              <div class="border-t border-cyan-400/10 my-1"></div>
+              <button id="logout-btn" class="w-full text-left px-4 py-2 text-sm text-red-400 hover:text-red-300 hover:bg-red-400/10">
+                <i class="fa-solid fa-sign-out-alt mr-2"></i> Logout
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <button id="mobile-menu-toggle" class="md:hidden p-2 text-slate-400 hover:text-cyan-400">
+          <i class="fa-solid fa-bars text-lg"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="mobile-menu" class="hidden md:hidden border-t border-cyan-400/10 bg-black/90 backdrop-blur-xl">
+    <div class="px-4 py-3 space-y-1">
+      <a href="/films.html" class="block px-3 py-2 text-slate-300 hover:text-cyan-400 rounded-lg text-sm"><i class="fa-solid fa-film mr-2"></i>Film</a>
+      <a href="/registi.html" class="block px-3 py-2 text-slate-300 hover:text-cyan-400 rounded-lg text-sm"><i class="fa-solid fa-user mr-2"></i>Registi</a>
+      <a href="/cinemas.html" id="mobile-nav-admin-cinemas" class="block px-3 py-2 text-slate-300 hover:text-cyan-400 rounded-lg text-sm"><i class="fa-solid fa-building mr-2"></i>Cinema</a>
+      <a href="/proiezioni.html" class="block px-3 py-2 text-slate-300 hover:text-cyan-400 rounded-lg text-sm"><i class="fa-solid fa-clock mr-2"></i>Proiezioni</a>
+      <div class="border-t border-cyan-400/10 my-2"></div>
+      <a href="/area-personale.html" class="block px-3 py-2 text-cyan-400 bg-cyan-400/10 rounded-lg text-sm"><i class="fa-solid fa-user mr-2"></i>Area Personale</a>
+      <button id="mobile-logout-btn" class="w-full text-left px-3 py-2 text-red-400 hover:text-red-300 rounded-lg text-sm">
+        <i class="fa-solid fa-sign-out-alt mr-2"></i> Logout
+      </button>
+    </div>
+  </div>
+</nav>
+
+<script>
+  (function() {
+    document.getElementById('mobile-menu-toggle')?.addEventListener('click', function() {
+      document.getElementById('mobile-menu')?.classList.toggle('hidden');
+    });
+    
+    document.getElementById('user-dropdown-btn')?.addEventListener('click', function(e) {
+      e.stopPropagation();
+      document.getElementById('user-dropdown')?.classList.toggle('hidden');
+    });
+    
+    document.addEventListener('click', function() {
+      document.getElementById('user-dropdown')?.classList.add('hidden');
+    });
+
+    document.getElementById('logout-btn')?.addEventListener('click', function() {
+      if (typeof Auth !== 'undefined') {
+        Auth.logout().then(() => window.location.href = '/index.html');
+      }
+    });
+
+    document.getElementById('mobile-logout-btn')?.addEventListener('click', function() {
+      if (typeof Auth !== 'undefined') {
+        Auth.logout().then(() => window.location.href = '/index.html');
+      }
+    });
+
+    const path = window.location.pathname;
+    document.querySelectorAll('.nav-link').forEach(function(link) {
+      const page = link.getAttribute('data-page');
+      if (path.includes(page + '.html')) {
+        link.classList.add('text-cyan-400', 'bg-cyan-400/10', 'border', 'border-cyan-400/30');
+        link.classList.remove('text-slate-400');
+      }
+    });
+  })();
+</script>

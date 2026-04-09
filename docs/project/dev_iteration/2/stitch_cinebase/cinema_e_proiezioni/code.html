@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Cinema &amp; Screening Manager</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ec5b13",
+                        "background-light": "#f8f6f6",
+                        "background-dark": "#221610",
+                    },
+                    fontFamily: {
+                        "display": ["Public Sans"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen">
+<div class="flex h-screen overflow-hidden">
+<!-- Sidebar -->
+<aside class="w-64 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 flex flex-col">
+<div class="p-6 flex items-center gap-3">
+<div class="bg-primary p-2 rounded-lg text-white">
+<span class="material-symbols-outlined block">movie_filter</span>
+</div>
+<h2 class="text-xl font-bold tracking-tight">CineManager</h2>
+</div>
+<nav class="flex-1 px-4 space-y-2 mt-4">
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-900 transition-colors" href="#">
+<span class="material-symbols-outlined text-slate-500">dashboard</span>
+<span class="font-medium">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl bg-primary/10 text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">theater_comedy</span>
+<span class="font-medium">Cinemas</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-900 transition-colors" href="#">
+<span class="material-symbols-outlined text-slate-500">calendar_month</span>
+<span class="font-medium">Screenings</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-900 transition-colors" href="#">
+<span class="material-symbols-outlined text-slate-500">movie</span>
+<span class="font-medium">Movies</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-900 transition-colors" href="#">
+<span class="material-symbols-outlined text-slate-500">analytics</span>
+<span class="font-medium">Reports</span>
+</a>
+</nav>
+<div class="p-4 border-t border-slate-200 dark:border-slate-800">
+<div class="flex items-center gap-3 px-2">
+<div class="size-10 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold">JD</div>
+<div class="flex-1 min-w-0">
+<p class="text-sm font-semibold truncate">John Doe</p>
+<p class="text-xs text-slate-500 truncate">Administrator</p>
+</div>
+<span class="material-symbols-outlined text-slate-400">settings</span>
+</div>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 flex flex-col overflow-hidden">
+<!-- Top Navigation -->
+<header class="h-16 border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-950/80 backdrop-blur-md flex items-center justify-between px-8 z-10">
+<div class="flex items-center gap-4 flex-1">
+<div class="relative w-full max-w-md">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xl">search</span>
+<input class="w-full pl-10 pr-4 py-2 bg-slate-100 dark:bg-slate-900 border-none rounded-xl focus:ring-2 focus:ring-primary/50 text-sm" placeholder="Search cinemas, movies or dates..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-900 relative">
+<span class="material-symbols-outlined text-slate-600 dark:text-slate-400">notifications</span>
+<span class="absolute top-2 right-2 size-2 bg-primary rounded-full"></span>
+</button>
+<div class="h-8 w-px bg-slate-200 dark:border-slate-800 mx-2"></div>
+<button class="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition-all shadow-sm shadow-primary/20">
+<span class="material-symbols-outlined text-lg">add</span>
+                    New Entry
+                </button>
+</div>
+</header>
+<!-- Content Area -->
+<div class="flex-1 overflow-y-auto p-8 space-y-8">
+<!-- Page Header -->
+<div class="flex flex-col gap-2">
+<h1 class="text-3xl font-black tracking-tight">Management Console</h1>
+<p class="text-slate-500 dark:text-slate-400">Configure your theaters and movie schedules.</p>
+</div>
+<!-- Cinema Section -->
+<section class="space-y-4">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">location_on</span>
+<h2 class="text-xl font-bold">Cinemas</h2>
+</div>
+<button class="text-primary text-sm font-semibold hover:underline">View All</button>
+</div>
+<div class="bg-white dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-slate-50 dark:bg-slate-900/50 border-b border-slate-200 dark:border-slate-800">
+<th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">ID</th>
+<th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">Nome (Name)</th>
+<th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">Indirizzo (Address)</th>
+<th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">Citta (City)</th>
+<th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-100 dark:divide-slate-900">
+<tr class="hover:bg-slate-50/50 dark:hover:bg-slate-900/30 transition-colors">
+<td class="px-6 py-4 text-sm text-slate-500">#C-101</td>
+<td class="px-6 py-4 text-sm font-semibold">Grand Rex</td>
+<td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">1 Boulevard Poissonnière</td>
+<td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">Paris</td>
+<td class="px-6 py-4 text-right">
+<button class="p-1 hover:text-primary transition-colors"><span class="material-symbols-outlined">edit</span></button>
+<button class="p-1 hover:text-red-500 transition-colors ml-2"><span class="material-symbols-outlined">delete</span></button>
+</td>
+</tr>
+<tr class="hover:bg-slate-50/50 dark:hover:bg-slate-900/30 transition-colors">
+<td class="px-6 py-4 text-sm text-slate-500">#C-102</td>
+<td class="px-6 py-4 text-sm font-semibold">AMC Empire 25</td>
+<td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">234 W 42nd St</td>
+<td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">New York</td>
+<td class="px-6 py-4 text-right">
+<button class="p-1 hover:text-primary transition-colors"><span class="material-symbols-outlined">edit</span></button>
+<button class="p-1 hover:text-red-500 transition-colors ml-2"><span class="material-symbols-outlined">delete</span></button>
+</td>
+</tr>
+<tr class="hover:bg-slate-50/50 dark:hover:bg-slate-900/30 transition-colors">
+<td class="px-6 py-4 text-sm text-slate-500">#C-103</td>
+<td class="px-6 py-4 text-sm font-semibold">Odeon Luxe</td>
+<td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">Leicester Square</td>
+<td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">London</td>
+<td class="px-6 py-4 text-right">
+<button class="p-1 hover:text-primary transition-colors"><span class="material-symbols-outlined">edit</span></button>
+<button class="p-1 hover:text-red-500 transition-colors ml-2"><span class="material-symbols-outlined">delete</span></button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<!-- Screenings Section -->
+<section class="space-y-4">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">schedule</span>
+<h2 class="text-xl font-bold">Proiezioni (Screenings)</h2>
+</div>
+<div class="flex gap-2">
+<select class="text-xs bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 rounded-lg py-1 px-3">
+<option>All Dates</option>
+<option>Today</option>
+<option>Tomorrow</option>
+</select>
+</div>
+</div>
+<div class="grid grid-cols-1 gap-6">
+<div class="bg-white dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-slate-50 dark:bg-slate-900/50 border-b border-slate-200 dark:border-slate-800">
+<th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">ID</th>
+<th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">Cinema</th>
+<th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">Film (Movie)</th>
+<th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">Data (Date)</th>
+<th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">Ora (Time)</th>
+<th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 text-right">Status</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-100 dark:divide-slate-900">
+<tr class="hover:bg-slate-50/50 dark:hover:bg-slate-900/30 transition-colors">
+<td class="px-6 py-4 text-sm text-slate-500">#P-5001</td>
+<td class="px-6 py-4">
+<div class="flex flex-col">
+<span class="text-sm font-medium">Grand Rex</span>
+<span class="text-xs text-slate-400">ID: C-101</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="size-10 bg-primary/10 rounded overflow-hidden flex-shrink-0">
+<div class="w-full h-full bg-slate-200 dark:bg-slate-800" data-alt="Cinematic movie poster abstract gradient"></div>
+</div>
+<div class="flex flex-col">
+<span class="text-sm font-semibold">Dune: Part Two</span>
+<span class="text-xs text-slate-400">ID: F-88</span>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 text-sm">Oct 12, 2023</td>
+<td class="px-6 py-4 text-sm font-mono font-bold text-primary">20:30</td>
+<td class="px-6 py-4 text-right">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
+                                                Active
+                                            </span>
+</td>
+</tr>
+<tr class="hover:bg-slate-50/50 dark:hover:bg-slate-900/30 transition-colors">
+<td class="px-6 py-4 text-sm text-slate-500">#P-5002</td>
+<td class="px-6 py-4">
+<div class="flex flex-col">
+<span class="text-sm font-medium">Odeon Luxe</span>
+<span class="text-xs text-slate-400">ID: C-103</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="size-10 bg-primary/10 rounded overflow-hidden flex-shrink-0">
+<div class="w-full h-full bg-slate-200 dark:bg-slate-800" data-alt="Cinematic movie poster abstract gradient"></div>
+</div>
+<div class="flex flex-col">
+<span class="text-sm font-semibold">Oppenheimer</span>
+<span class="text-xs text-slate-400">ID: F-42</span>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 text-sm">Oct 12, 2023</td>
+<td class="px-6 py-4 text-sm font-mono font-bold text-primary">18:00</td>
+<td class="px-6 py-4 text-right">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
+                                                Active
+                                            </span>
+</td>
+</tr>
+<tr class="hover:bg-slate-50/50 dark:hover:bg-slate-900/30 transition-colors">
+<td class="px-6 py-4 text-sm text-slate-500">#P-5003</td>
+<td class="px-6 py-4">
+<div class="flex flex-col">
+<span class="text-sm font-medium">AMC Empire 25</span>
+<span class="text-xs text-slate-400">ID: C-102</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="size-10 bg-primary/10 rounded overflow-hidden flex-shrink-0">
+<div class="w-full h-full bg-slate-200 dark:bg-slate-800" data-alt="Cinematic movie poster abstract gradient"></div>
+</div>
+<div class="flex flex-col">
+<span class="text-sm font-semibold">Poor Things</span>
+<span class="text-xs text-slate-400">ID: F-19</span>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 text-sm">Oct 13, 2023</td>
+<td class="px-6 py-4 text-sm font-mono font-bold text-primary">21:15</td>
+<td class="px-6 py-4 text-right">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-800 dark:bg-slate-900 dark:text-slate-400">
+                                                Upcoming
+                                            </span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Footer / Quick Stats -->
+<footer class="p-6 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 flex gap-8">
+<div class="flex items-center gap-3">
+<div class="p-2 bg-primary/10 rounded-lg text-primary">
+<span class="material-symbols-outlined">confirmation_number</span>
+</div>
+<div>
+<p class="text-xs text-slate-500 uppercase font-bold tracking-wider">Today's Tickets</p>
+<p class="text-lg font-bold">1,284</p>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<div class="p-2 bg-primary/10 rounded-lg text-primary">
+<span class="material-symbols-outlined">trending_up</span>
+</div>
+<div>
+<p class="text-xs text-slate-500 uppercase font-bold tracking-wider">Revenue (24h)</p>
+<p class="text-lg font-bold">$14,520</p>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<div class="p-2 bg-primary/10 rounded-lg text-primary">
+<span class="material-symbols-outlined">person_add</span>
+</div>
+<div>
+<p class="text-xs text-slate-500 uppercase font-bold tracking-wider">New Members</p>
+<p class="text-lg font-bold">48</p>
+</div>
+</div>
+</footer>
+</main>
+</div>
+</body></html>

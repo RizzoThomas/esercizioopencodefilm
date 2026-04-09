@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CineBase — Gestione Cinema</title>
+  <script src="/js/early-route-guard.js"></script>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script>
+    tailwind.config = {
+      theme: { extend: { colors: { cyber: { dark: '#030712', cyan: '#00f5ff', purple: '#a855f7', pink: '#ff0080', green: '#39ff14' }}}}
+    }
+  </script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="/css/styles.css" rel="stylesheet">
+</head>
+<body class="bg-[#030712] text-slate-200 font-sans cyber-scanlines cyber-hex-bg">
+  <div id="navbar-container"></div>
+
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
+      <div class="flex items-center gap-3">
+        <div class="w-1 h-8 bg-pink-400 rounded-full shadow-[0_0_10px_rgba(255,0,128,0.5)]"></div>
+        <div>
+          <h1 class="font-cyber text-xl font-bold tracking-wider text-white">GESTIONE SALE</h1>
+          <p class="text-xs text-slate-600 font-mono mt-0.5">Cinema e locations</p>
+        </div>
+      </div>
+      <button onclick="openModal('cinema-modal', 'AGGIUNGI CINEMA')" class="cyber-btn cyber-btn-danger text-xs py-2 px-4">
+        <i class="fa-solid fa-plus mr-1"></i>Nuovo Cinema
+      </button>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+      <div class="cyber-stat">
+        <div class="cyber-stat-value text-pink-400" style="text-shadow:0 0 20px rgba(255,0,128,0.4)" id="total-cinemas">-</div>
+        <div class="cyber-stat-label">Cinema Totali</div>
+      </div>
+      <div class="cyber-stat">
+        <div class="cyber-stat-value text-purple-400" style="text-shadow:0 0 20px rgba(168,85,247,0.4)" id="total-cities">-</div>
+        <div class="cyber-stat-label">Citta</div>
+      </div>
+      <div class="cyber-stat">
+        <div class="cyber-stat-value text-cyan-400">-</div>
+        <div class="cyber-stat-label">Attive</div>
+      </div>
+    </div>
+
+    <div class="glass-panel overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="cyber-table">
+          <thead>
+            <tr>
+              <th>ID</th><th>NOME</th><th>INDIRIZZO</th><th>CITTA</th><th>CAPIENZA</th><th>AZIONI</th>
+            </tr>
+          </thead>
+          <tbody id="cinemas-table-body">
+            <tr><td colspan="6" class="text-center text-slate-600 font-mono text-sm py-8">
+              <i class="fa-solid fa-spinner fa-spin text-cyan-400/40 text-lg mb-2 block"></i>Caricamento...
+            </td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <div id="footer-container"></div>
+  <div id="toast-container" class="fixed bottom-4 right-4 z-50"></div>
+
+  <div id="cinema-modal" class="fixed inset-0 z-50 hidden">
+    <div class="fixed inset-0 cyber-modal-backdrop" onclick="closeModal('cinema-modal')"></div>
+    <div class="fixed inset-0 z-10 overflow-y-auto">
+      <div class="flex min-h-full items-center justify-center p-4">
+        <div class="cyber-modal w-full max-w-md relative">
+          <div class="cyber-modal-header flex items-center justify-between">
+            <span id="cinema-modal-title" class="font-cyber text-sm font-bold tracking-wider text-pink-400">AGGIUNGI CINEMA</span>
+            <button onclick="closeModal('cinema-modal')" class="text-slate-500 hover:text-cyan-400"><i class="fa-solid fa-xmark text-lg"></i></button>
+          </div>
+          <div class="p-6">
+            <form id="cinema-form" class="space-y-4">
+              <div>
+                <label class="block text-xs font-mono text-slate-500 mb-1 uppercase">Nome Cinema</label>
+                <input type="text" name="nome" required class="cyber-input text-sm" placeholder="Es. Cinema Roma">
+              </div>
+              <div>
+                <label class="block text-xs font-mono text-slate-500 mb-1 uppercase">Indirizzo</label>
+                <input type="text" name="indirizzo" required class="cyber-input text-sm" placeholder="Es. Via Roma 1">
+              </div>
+              <div>
+                <label class="block text-xs font-mono text-slate-500 mb-1 uppercase">Citta</label>
+                <input type="text" name="citta" required class="cyber-input text-sm" placeholder="Es. Roma">
+              </div>
+              <div>
+                <label class="block text-xs font-mono text-slate-500 mb-1 uppercase">Capienza Totale</label>
+                <input type="number" name="capienzaTotale" min="20" max="500" required class="cyber-input text-sm" placeholder="Es. 120">
+              </div>
+            </form>
+          </div>
+          <div class="cyber-modal-footer flex justify-end gap-3">
+            <button type="button" onclick="closeModal('cinema-modal')" class="cyber-btn text-xs py-2 px-4 border-cyan-400/30 text-slate-400">Annulla</button>
+            <button type="submit" form="cinema-form" class="cyber-btn cyber-btn-danger text-xs py-2 px-4">Salva</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="delete-modal" class="fixed inset-0 z-50 hidden">
+    <div class="fixed inset-0 cyber-modal-backdrop"></div>
+    <div class="fixed inset-0 z-10 overflow-y-auto">
+      <div class="flex min-h-full items-center justify-center p-4">
+        <div class="cyber-modal w-full max-w-md relative">
+          <div class="p-6">
+            <div class="flex items-center gap-4">
+              <div class="w-12 h-12 rounded-xl bg-pink-500/10 border border-pink-500/30 flex items-center justify-center">
+                <i class="fa-solid fa-triangle-exclamation text-pink-400 text-xl"></i>
+              </div>
+              <div>
+                <h3 class="font-cyber text-sm font-bold text-white tracking-wider">CONFERMA ELIMINAZIONE</h3>
+                <p class="text-sm text-slate-400 mt-1" id="delete-message"></p>
+              </div>
+            </div>
+          </div>
+          <div class="cyber-modal-footer flex justify-end gap-3">
+            <button type="button" onclick="closeDeleteModal()" class="cyber-btn text-xs py-2 px-4 border-cyan-400/30 text-slate-400">Annulla</button>
+            <button type="button" id="confirm-delete-btn" class="cyber-btn cyber-btn-danger text-xs py-2 px-4">Elimina</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/utils.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/router.js"></script>
+  <script src="/js/template-loader.js"></script>
+  <script src="/js/navbar.js"></script>
+  <script>
+    var allCinemas = [];
+    function normalizeCollection(data) {
+      if (Array.isArray(data)) return data;
+      if (data && Array.isArray(data.$values)) return data.$values;
+      if (data && Array.isArray(data.items)) return data.items;
+      return [];
+    }
+    document.addEventListener('DOMContentLoaded', async function() {
+      await loadComponent('navbar-container', '/components/navbar-admin.html');
+      await loadComponent('footer-container', '/components/footer-admin.html');
+      await loadCinemas();
+      setupFormSubmit();
+    });
+    async function loadCinemas() {
+      var tbody = document.getElementById('cinemas-table-body');
+      if (!tbody) return;
+      try {
+        var cinemas = normalizeCollection(await API.getCinemas());
+        allCinemas = cinemas;
+        renderCinemas(cinemas);
+        updateStats(cinemas);
+      } catch(e) { handleApiError(e); tbody.innerHTML = '<tr><td colspan="6" class="text-center text-pink-400 font-mono text-sm py-4">Errore di connessione</td></tr>'; }
+    }
+    function renderCinemas(cinemas) {
+      var tbody = document.getElementById('cinemas-table-body');
+      if (!tbody) return;
+      if (!cinemas.length) { tbody.innerHTML = '<tr><td colspan="6" class="text-center text-slate-600 font-mono text-sm py-8">Nessun cinema nel sistema</td></tr>'; return; }
+      tbody.innerHTML = cinemas.map(function(c) {
+        return '<tr>' +
+          '<td class="font-mono text-xs text-slate-600">' + c.id + '</td>' +
+          '<td class="text-white text-sm font-medium">' + c.nome + '</td>' +
+          '<td class="text-slate-400 text-sm font-mono">' + c.indirizzo + '</td>' +
+          '<td><span class="cyber-badge cyber-badge-pink text-[9px]">' + c.citta + '</span></td>' +
+          '<td class="text-cyan-400 text-xs font-mono">' + (c.capienzaTotale || 0) + '</td>' +
+          '<td>' +
+            '<button onclick="editCinema(' + c.id + ')" class="text-cyan-400/60 hover:text-cyan-400 mr-3"><i class="fa-solid fa-pencil text-xs"></i></button>' +
+            '<button onclick="deleteCinema(' + c.id + ', \'' + c.nome.replace(/'/g, "\\'") + '\')" class="text-pink-400/60 hover:text-pink-400"><i class="fa-solid fa-trash text-xs"></i></button>' +
+          '</td></tr>';
+      }).join('');
+    }
+    function updateStats(cinemas) {
+      var el = document.getElementById('total-cinemas');
+      if (el) el.textContent = cinemas.length;
+      var cities = {};
+      cinemas.forEach(function(c) { if (c.citta) cities[c.citta] = true; });
+      var el2 = document.getElementById('total-cities');
+      if (el2) el2.textContent = Object.keys(cities).length;
+    }
+    function setupFormSubmit() {
+      var form = document.getElementById('cinema-form');
+      if (!form) return;
+      form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        var data = {};
+        new FormData(form).forEach(function(v, k) { data[k] = v; });
+        data.capienzaTotale = Number(data.capienzaTotale);
+        var editId = form.dataset.editId;
+        try {
+          if (editId) { await API.updateCinema(editId, data); showToast('Cinema aggiornato', 'success'); }
+          else { await API.createCinema(data); showToast('Cinema creato', 'success'); }
+          closeModal('cinema-modal');
+          loadCinemas();
+        } catch(err) { handleApiError(err); }
+      });
+    }
+    async function editCinema(id) {
+      try {
+        var c = await API.getCinema(id);
+        openModal('cinema-modal', 'MODIFICA CINEMA');
+        var form = document.getElementById('cinema-form');
+        form.dataset.editId = id;
+        form.querySelector('[name="nome"]').value = c.nome || '';
+        form.querySelector('[name="indirizzo"]').value = c.indirizzo || '';
+        form.querySelector('[name="citta"]').value = c.citta || '';
+        form.querySelector('[name="capienzaTotale"]').value = c.capienzaTotale || 120;
+      } catch(err) { handleApiError(err); }
+    }
+    async function deleteCinema(id, name) {
+      document.getElementById('delete-message').textContent = 'Eliminare "' + name + '" dal sistema?';
+      document.getElementById('delete-modal').classList.remove('hidden');
+      document.getElementById('confirm-delete-btn').onclick = async function() {
+        try { await API.deleteCinema(id); showToast('Cinema eliminato', 'success'); closeDeleteModal(); loadCinemas(); }
+        catch(err) { handleApiError(err); }
+      };
+    }
+    function openModal(id, title) {
+      var m = document.getElementById(id);
+      if (m) m.classList.remove('hidden');
+      var titleEl = document.getElementById(id + '-title');
+      if (titleEl) titleEl.textContent = title;
+      var form = document.getElementById(id.replace('-modal', '-form'));
+      if (form) { form.reset(); form.dataset.editId = ''; }
+    }
+    function closeModal(id) { var m = document.getElementById(id); if (m) m.classList.add('hidden'); }
+    function closeDeleteModal() { var m = document.getElementById('delete-modal'); if (m) m.classList.add('hidden'); }
+  </script>
+</body>
+</html>

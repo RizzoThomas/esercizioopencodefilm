@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CineBase — Gestione Proiezioni</title>
+  <script src="/js/early-route-guard.js"></script>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script>
+    tailwind.config = {
+      theme: { extend: { colors: { cyber: { dark: '#030712', cyan: '#00f5ff', purple: '#a855f7', pink: '#ff0080', green: '#39ff14' }}}}
+    }
+  </script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="/css/styles.css" rel="stylesheet">
+</head>
+<body class="bg-[#030712] text-slate-200 font-sans cyber-scanlines cyber-hex-bg">
+  <div id="navbar-container"></div>
+
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
+      <div class="flex items-center gap-3">
+        <div class="w-1 h-8 bg-green-400 rounded-full shadow-[0_0_10px_rgba(57,255,20,0.5)]"></div>
+        <div>
+          <h1 class="font-cyber text-xl font-bold tracking-wider text-white">GESTIONE PROIEZIONI</h1>
+          <p class="text-xs text-slate-600 font-mono mt-0.5">Schedule e programmazione</p>
+        </div>
+      </div>
+      <button onclick="openModal('proiezione-modal', 'NUOVA PROIEZIONE')" class="cyber-btn text-xs py-2 px-4" style="border-color:#39ff14;color:#39ff14">
+        <i class="fa-solid fa-plus mr-1"></i>Nuova Proiezione
+      </button>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+      <div class="cyber-stat">
+        <div class="cyber-stat-value text-green-400" style="text-shadow:0 0 20px rgba(57,255,20,0.4)" id="total-proiezioni">-</div>
+        <div class="cyber-stat-label">Proiezioni Totali</div>
+      </div>
+      <div class="cyber-stat">
+        <div class="cyber-stat-value text-cyan-400">-</div>
+        <div class="cyber-stat-label">Film Programmati</div>
+      </div>
+      <div class="cyber-stat">
+        <div class="cyber-stat-value text-pink-400" style="text-shadow:0 0 20px rgba(255,0,128,0.4)">-</div>
+        <div class="cyber-stat-label">Cinema Attivi</div>
+      </div>
+    </div>
+
+    <div class="glass-panel overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="cyber-table">
+          <thead>
+            <tr>
+              <th>ID</th><th>FILM</th><th>CINEMA</th><th>DATA</th><th>ORA</th><th>AZIONI</th>
+            </tr>
+          </thead>
+          <tbody id="proiezioni-table-body">
+            <tr><td colspan="6" class="text-center text-slate-600 font-mono text-sm py-8">
+              <i class="fa-solid fa-spinner fa-spin text-cyan-400/40 text-lg mb-2 block"></i>Caricamento...
+            </td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <div id="footer-container"></div>
+  <div id="toast-container" class="fixed bottom-4 right-4 z-50"></div>
+
+  <div id="proiezione-modal" class="fixed inset-0 z-50 hidden">
+    <div class="fixed inset-0 cyber-modal-backdrop" onclick="closeModal('proiezione-modal')"></div>
+    <div class="fixed inset-0 z-10 overflow-y-auto">
+      <div class="flex min-h-full items-center justify-center p-4">
+        <div class="cyber-modal w-full max-w-md relative">
+          <div class="cyber-modal-header flex items-center justify-between">
+            <span id="proiezione-modal-title" class="font-cyber text-sm font-bold tracking-wider text-green-400">NUOVA PROIEZIONE</span>
+            <button onclick="closeModal('proiezione-modal')" class="text-slate-500 hover:text-cyan-400"><i class="fa-solid fa-xmark text-lg"></i></button>
+          </div>
+          <div class="p-6">
+            <form id="proiezione-form" class="space-y-4">
+              <div>
+                <label class="block text-xs font-mono text-slate-500 mb-1 uppercase">Film</label>
+                <select id="film-select" name="filmId" required class="cyber-select text-sm"><option value="">Seleziona film...</option></select>
+              </div>
+              <div>
+                <label class="block text-xs font-mono text-slate-500 mb-1 uppercase">Cinema</label>
+                <select id="cinema-select" name="cinemaId" required class="cyber-select text-sm"><option value="">Seleziona cinema...</option></select>
+              </div>
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-xs font-mono text-slate-500 mb-1 uppercase">Data</label>
+                  <input type="date" name="data" required class="cyber-input text-sm">
+                </div>
+                <div>
+                  <label class="block text-xs font-mono text-slate-500 mb-1 uppercase">Ora</label>
+                  <input type="time" name="ora" required class="cyber-input text-sm">
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="cyber-modal-footer flex justify-end gap-3">
+            <button type="button" onclick="closeModal('proiezione-modal')" class="cyber-btn text-xs py-2 px-4 border-cyan-400/30 text-slate-400">Annulla</button>
+            <button type="submit" form="proiezione-form" class="cyber-btn text-xs py-2 px-4" style="border-color:#39ff14;color:#39ff14">Salva</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="delete-modal" class="fixed inset-0 z-50 hidden">
+    <div class="fixed inset-0 cyber-modal-backdrop"></div>
+    <div class="fixed inset-0 z-10 overflow-y-auto">
+      <div class="flex min-h-full items-center justify-center p-4">
+        <div class="cyber-modal w-full max-w-md relative">
+          <div class="p-6">
+            <div class="flex items-center gap-4">
+              <div class="w-12 h-12 rounded-xl bg-pink-500/10 border border-pink-500/30 flex items-center justify-center">
+                <i class="fa-solid fa-triangle-exclamation text-pink-400 text-xl"></i>
+              </div>
+              <div>
+                <h3 class="font-cyber text-sm font-bold text-white tracking-wider">CONFERMA ELIMINAZIONE</h3>
+                <p class="text-sm text-slate-400 mt-1" id="delete-message"></p>
+              </div>
+            </div>
+          </div>
+          <div class="cyber-modal-footer flex justify-end gap-3">
+            <button type="button" onclick="closeDeleteModal()" class="cyber-btn text-xs py-2 px-4 border-cyan-400/30 text-slate-400">Annulla</button>
+            <button type="button" id="confirm-delete-btn" class="cyber-btn cyber-btn-danger text-xs py-2 px-4">Elimina</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/utils.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/router.js"></script>
+  <script src="/js/template-loader.js"></script>
+  <script src="/js/navbar.js"></script>
+  <script>
+    var allProiezioni = [], allFilms = [], allCinemas = [];
+    function normalizeCollection(data) {
+      if (Array.isArray(data)) return data;
+      if (data && Array.isArray(data.$values)) return data.$values;
+      if (data && Array.isArray(data.items)) return data.items;
+      return [];
+    }
+    document.addEventListener('DOMContentLoaded', async function() {
+      await loadComponent('navbar-container', '/components/navbar-admin.html');
+      await loadComponent('footer-container', '/components/footer-admin.html');
+      await Promise.all([loadData(), loadSelects()]);
+      setupFormSubmit();
+    });
+    async function loadData() {
+      var tbody = document.getElementById('proiezioni-table-body');
+      if (!tbody) return;
+      try {
+        var res = await Promise.all([API.getProiezioni(), API.getFilms(), API.getCinemas()]);
+        allProiezioni = normalizeCollection(res[0]);
+        allFilms = normalizeCollection(res[1]);
+        allCinemas = normalizeCollection(res[2]);
+        renderProiezioni(allProiezioni);
+        updateStats(allProiezioni);
+      } catch(e) { handleApiError(e); tbody.innerHTML = '<tr><td colspan="6" class="text-center text-pink-400 font-mono text-sm py-4">Errore di connessione</td></tr>'; }
+    }
+    async function loadSelects() {
+      var filmSel = document.getElementById('film-select');
+      var cinemaSel = document.getElementById('cinema-select');
+      try {
+        var films = normalizeCollection(await API.getFilms());
+        var cinemas = normalizeCollection(await API.getCinemas());
+        allFilms = films;
+        allCinemas = cinemas;
+        if (filmSel) {
+          filmSel.innerHTML = '<option value="">Seleziona film...</option>';
+          films.forEach(function(f) {
+            var opt = document.createElement('option');
+            opt.value = String(f.id);
+            opt.textContent = f.titolo;
+            filmSel.appendChild(opt);
+          });
+        }
+        if (cinemaSel) {
+          cinemaSel.innerHTML = '<option value="">Seleziona cinema...</option>';
+          cinemas.forEach(function(c) {
+            var opt = document.createElement('option');
+            opt.value = String(c.id);
+            opt.textContent = c.nome + ' - ' + c.citta;
+            cinemaSel.appendChild(opt);
+          });
+        }
+      } catch(e) { console.error(e); }
+    }
+    function renderProiezioni(proiezioni) {
+      var tbody = document.getElementById('proiezioni-table-body');
+      if (!tbody) return;
+      if (!proiezioni.length) { tbody.innerHTML = '<tr><td colspan="6" class="text-center text-slate-600 font-mono text-sm py-8">Nessuna proiezione programmata</td></tr>'; return; }
+      tbody.innerHTML = proiezioni.map(function(p) {
+        var film = allFilms.find(function(f) { return f.id == p.filmId; });
+        var cinema = allCinemas.find(function(c) { return c.id == p.cinemaId; });
+        return '<tr>' +
+          '<td class="font-mono text-xs text-slate-600">' + p.id + '</td>' +
+          '<td class="text-white text-sm font-medium">' + (film ? film.titolo : 'ID ' + p.filmId) + '</td>' +
+          '<td><span class="cyber-badge cyber-badge-pink text-[9px]">' + (cinema ? cinema.nome : 'ID ' + p.cinemaId) + '</span></td>' +
+          '<td class="text-slate-400 text-sm font-mono">' + (p.data ? new Date(p.data).toLocaleDateString('it-IT') : '---') + '</td>' +
+          '<td class="text-green-400 text-sm font-mono cyber-glow-pulse rounded px-2 py-0.5">' + (p.ora ? p.ora.substring(0,5) : '---') + '</td>' +
+          '<td>' +
+            '<button onclick="editProiezione(' + p.id + ')" class="text-cyan-400/60 hover:text-cyan-400 mr-3"><i class="fa-solid fa-pencil text-xs"></i></button>' +
+            '<button onclick="deleteProiezione(' + p.id + ')" class="text-pink-400/60 hover:text-pink-400"><i class="fa-solid fa-trash text-xs"></i></button>' +
+          '</td></tr>';
+      }).join('');
+    }
+    function updateStats(proiezioni) {
+      var el = document.getElementById('total-proiezioni');
+      if (el) el.textContent = proiezioni.length;
+    }
+    function setupFormSubmit() {
+      var form = document.getElementById('proiezione-form');
+      if (!form) return;
+      form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        var data = {};
+        new FormData(form).forEach(function(v, k) { data[k] = v; });
+        if (data.filmId) data.filmId = Number(data.filmId);
+        if (data.cinemaId) data.cinemaId = Number(data.cinemaId);
+        var editId = form.dataset.editId;
+        try {
+          if (editId) { await API.updateProiezione(editId, data); showToast('Proiezione aggiornata', 'success'); }
+          else { await API.createProiezione(data); showToast('Proiezione creata', 'success'); }
+          closeModal('proiezione-modal');
+          loadData();
+        } catch(err) { handleApiError(err); }
+      });
+    }
+    async function editProiezione(id) {
+      try {
+        var p = await API.getProiezione(id);
+        openModal('proiezione-modal', 'MODIFICA PROIEZIONE');
+        var form = document.getElementById('proiezione-form');
+        form.dataset.editId = id;
+        form.querySelector('[name="filmId"]').value = p.filmId || '';
+        form.querySelector('[name="cinemaId"]').value = p.cinemaId || '';
+        form.querySelector('[name="data"]').value = p.data ? p.data.split('T')[0] : '';
+        form.querySelector('[name="ora"]').value = p.ora ? p.ora.substring(0,5) : '';
+      } catch(err) { handleApiError(err); }
+    }
+    async function deleteProiezione(id) {
+      document.getElementById('delete-message').textContent = 'Eliminare questa proiezione dal sistema?';
+      document.getElementById('delete-modal').classList.remove('hidden');
+      document.getElementById('confirm-delete-btn').onclick = async function() {
+        try { await API.deleteProiezione(id); showToast('Proiezione eliminata', 'success'); closeDeleteModal(); loadData(); }
+        catch(err) { handleApiError(err); }
+      };
+    }
+    function openModal(id, title) {
+      var m = document.getElementById(id);
+      if (m) m.classList.remove('hidden');
+      var titleEl = document.getElementById(id + '-title');
+      if (titleEl) titleEl.textContent = title;
+      var form = document.getElementById(id.replace('-modal', '-form'));
+      if (form) { form.reset(); form.dataset.editId = ''; }
+    }
+    function closeModal(id) { var m = document.getElementById(id); if (m) m.classList.add('hidden'); }
+    function closeDeleteModal() { var m = document.getElementById('delete-modal'); if (m) m.classList.add('hidden'); }
+  </script>
+</body>
+</html>

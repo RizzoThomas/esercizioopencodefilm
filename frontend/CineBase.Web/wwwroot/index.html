@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CineBase — La Tua Rete Cinematografica</title>
+
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            cyber: {
+              dark: '#030712',
+              cyan: '#00f5ff',
+              purple: '#a855f7',
+              pink: '#ff0080',
+              green: '#39ff14',
+              border: 'rgba(0, 245, 255, 0.2)',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="/css/styles.css" rel="stylesheet">
+</head>
+<body class="bg-[#030712] text-slate-200 font-sans cyber-scanlines cyber-hex-bg">
+  <div id="navbar-container"></div>
+
+  <!-- Hero -->
+  <section class="cyber-hero relative min-h-[85vh] flex items-center overflow-hidden">
+    <div class="cyber-particle" style="top:20%;left:10%;animation-delay:0s"></div>
+    <div class="cyber-particle" style="top:60%;left:30%;animation-delay:1s;background:#a855f7;box-shadow:0 0 6px #a855f7"></div>
+    <div class="cyber-particle" style="top:30%;left:70%;animation-delay:2s"></div>
+    <div class="cyber-particle" style="top:70%;left:85%;animation-delay:0.5s;background:#ff0080;box-shadow:0 0 6px #ff0080"></div>
+    <div class="cyber-particle" style="top:15%;left:50%;animation-delay:1.5s"></div>
+
+    <div class="absolute inset-0 bg-gradient-to-br from-cyan-400/[0.03] via-transparent to-purple-600/[0.03]"></div>
+    <div class="absolute inset-0 bg-gradient-to-t from-[#030712] via-transparent to-transparent z-10"></div>
+    <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=1920')] bg-cover bg-center opacity-10"></div>
+
+    <div class="relative z-20 container mx-auto px-4 max-w-7xl">
+      <div class="max-w-3xl">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-cyan-400/30 bg-cyan-400/5 text-cyan-400 text-xs font-mono mb-6">
+          <span class="w-1.5 h-1.5 bg-cyan-400 rounded-full animate-pulse"></span>
+          SISTEMA OPERATIVO // v2.0
+        </div>
+        <h1 class="text-4xl md:text-6xl lg:text-7xl font-cyber font-black mb-6 leading-tight">
+          <span class="text-white">La Tua Rete </span><br>
+          <span class="cyber-glow-text">Cinematografica</span><br>
+          <span class="text-slate-400 text-3xl md:text-4xl lg:text-5xl">-digitale-</span>
+        </h1>
+        <p class="text-lg text-slate-400 mb-10 max-w-xl leading-relaxed font-mono text-sm">
+          Piattaforma neurale per la gestione centralizzata di cinema, film, registi e proiezioni.
+          Interfaccia di nuova generazione.
+        </p>
+        <div class="flex flex-wrap gap-4">
+          <a href="/dashboard.html" id="hero-enter-system" class="cyber-btn cyber-btn-primary py-3 px-8 text-sm">
+            <i class="fa-solid fa-shield-halved mr-2"></i>Entra nel Sistema
+          </a>
+          <a href="#programmazione" class="cyber-btn py-3 px-8 text-sm border-cyan-400/40 text-slate-400 hover:text-cyan-400">
+            <i class="fa-solid fa-play mr-2"></i>Programmazione
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Film in Programmazione -->
+  <section id="programmazione" class="py-20">
+    <div class="container mx-auto px-4 max-w-7xl">
+      <div class="flex items-center gap-4 mb-2">
+        <div class="w-1 h-8 bg-cyan-400 rounded-full shadow-[0_0_15px_rgba(0,245,255,0.5)]"></div>
+        <h2 class="font-cyber text-2xl font-bold tracking-wider text-white">FILM IN PROGRAMMAZIONE</h2>
+        <span class="font-mono text-xs text-slate-600">// ATTIVE</span>
+      </div>
+      <div class="cyber-divider-cyan mb-10"></div>
+
+      <div class="flex flex-wrap gap-3 mb-8">
+        <select class="cyber-select text-sm py-2 max-w-[180px]" id="filter-citta">
+          <option value="">Tutte le citta</option>
+          <option value="roma">Roma</option>
+          <option value="milano">Milano</option>
+          <option value="napoli">Napoli</option>
+          <option value="torino">Torino</option>
+        </select>
+        <select class="cyber-select text-sm py-2 max-w-[180px]" id="filter-data">
+          <option value="">Tutte le date</option>
+          <option value="oggi">Oggi</option>
+          <option value="domani">Domani</option>
+          <option value="settimana">Questa settimana</option>
+        </select>
+      </div>
+
+      <div id="films-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div class="col-span-full text-center py-16 text-slate-600 font-mono text-sm">
+          <i class="fa-solid fa-spinner fa-spin text-2xl mb-3 text-cyan-400/40"></i>
+          <p>Caricamento dati in corso...</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div id="footer-container"></div>
+  <div id="toast-container" class="fixed bottom-4 right-4 z-50"></div>
+
+<script src="/js/utils.js"></script>
+<script src="/js/api.js"></script>
+<script src="/js/auth.js"></script>
+<script src="/js/router.js"></script>
+<script src="/js/navbar.js"></script>
+<script src="/js/template-loader.js"></script>
+<script>
+let savedProiezioniIds = new Set();
+
+document.addEventListener('DOMContentLoaded', async function() {
+  if (typeof Router !== 'undefined' && !Router.checkAccess()) {
+    return;
+  }
+
+  await loadComponent('navbar-container', '/components/navbar-landing.html');
+  await loadComponent('footer-container', '/components/footer-landing.html');
+  updateNavbarForAuth();
+
+  const enterSystemBtn = document.getElementById('hero-enter-system');
+  if (enterSystemBtn && typeof Auth !== 'undefined') {
+    if (!Auth.isAuthenticated()) {
+      enterSystemBtn.setAttribute('href', '/login.html?redirect=%2Fdashboard.html');
+    } else if (Auth.canAccessAdmin()) {
+      enterSystemBtn.setAttribute('href', '/dashboard.html');
+    } else {
+      enterSystemBtn.setAttribute('href', '/area-personale.html');
+    }
+  }
+
+  await loadSavedProiezioniIds();
+
+  await loadProgrammazione();
+});
+
+    function normalizeCollection(data) {
+      if (Array.isArray(data)) return data;
+      if (Array.isArray(data && data.$values)) return data.$values;
+      if (Array.isArray(data && data.items)) return data.items;
+      return [];
+    }
+
+    async function loadProgrammazione() {
+      var grid = document.getElementById('films-grid');
+      if (!grid) return;
+      try {
+        var res = await Promise.all([API.getFilms(), API.getProiezioni(), API.getCinemas()]);
+        var films = normalizeCollection(res[0]);
+        var proiezioni = normalizeCollection(res[1]);
+        var cinemas = normalizeCollection(res[2]);
+
+        renderProgrammazione(proiezioni, films, cinemas);
+      } catch(e) {
+        handleApiError(e);
+        grid.innerHTML = '<p class="col-span-full text-center py-16 text-pink-400 font-mono text-sm">Errore di connessione al sistema</p>';
+      }
+    }
+
+    async function loadSavedProiezioniIds() {
+      savedProiezioniIds = new Set();
+
+      if (typeof Auth === 'undefined' || !Auth.isAuthenticated()) {
+        return;
+      }
+
+      try {
+        var saved = await API.getSavedProiezioni();
+        var savedItems = normalizeCollection(saved);
+        savedItems.forEach(function(item) {
+          if (item && item.proiezioneId) {
+            savedProiezioniIds.add(Number(item.proiezioneId));
+          }
+        });
+      } catch (_) {
+        // non bloccare la pagina in caso di errore del servizio salvati
+      }
+    }
+
+    function setSaveButtonState(proiezioneId, isSaved) {
+      var btn = document.getElementById('save-btn-' + proiezioneId);
+      if (!btn) return;
+
+      if (isSaved) {
+        btn.disabled = true;
+        btn.className = 'cyber-btn text-[10px] py-1.5 px-3 border-cyan-400/20 text-cyan-400/70 cursor-not-allowed opacity-75';
+        btn.innerHTML = '<i class="fa-solid fa-check mr-1"></i>Gia salvata';
+      } else {
+        btn.disabled = false;
+        btn.className = 'cyber-btn text-[10px] py-1.5 px-3 border-cyan-400/30 text-slate-400 hover:text-cyan-400';
+        btn.innerHTML = '<i class="fa-solid fa-bookmark mr-1"></i>Salva';
+      }
+    }
+
+    function renderProgrammazione(proiezioni, films, cinemas) {
+      var grid = document.getElementById('films-grid');
+      if (!proiezioni || !proiezioni.length) {
+        grid.innerHTML = '<p class="col-span-full text-center py-16 text-slate-600 font-mono text-sm">Nessuna proiezione in programmazione</p>';
+        return;
+      }
+
+      var filmById = {};
+      films.forEach(function(f) { filmById[String(f.id)] = f; });
+      var cinemaById = {};
+      cinemas.forEach(function(c) { cinemaById[String(c.id)] = c; });
+
+      proiezioni.sort(function(a, b) {
+        var da = new Date(a.data || 0).getTime();
+        var db = new Date(b.data || 0).getTime();
+        return da - db;
+      });
+
+      grid.innerHTML = proiezioni.map(function(p) {
+        var f = filmById[String(p.filmId)] || {};
+        var c = cinemaById[String(p.cinemaId)] || {};
+        var isSaved = savedProiezioniIds.has(Number(p.id));
+        var saveBtnClass = isSaved
+          ? 'cyber-btn text-[10px] py-1.5 px-3 border-cyan-400/20 text-cyan-400/70 cursor-not-allowed opacity-75'
+          : 'cyber-btn text-[10px] py-1.5 px-3 border-cyan-400/30 text-slate-400 hover:text-cyan-400';
+        var saveBtnLabel = isSaved
+          ? '<i class="fa-solid fa-check mr-1"></i>Gia salvata'
+          : '<i class="fa-solid fa-bookmark mr-1"></i>Salva';
+        return         '<div class="cyber-card cyber-card-3d group animate-fade-in-up">' +
+          '<div class="aspect-[2/3] bg-slate-900/80 relative overflow-hidden rounded-t-2xl">' +
+            '<img src="' + (f.copertinaPath || 'https://via.placeholder.com/300x450/1a1a2e/00f5ff?text=NO+IMAGE') + '" onclick="goToPrenotazione(' + p.id + ')"' +
+             ' alt="' + f.titolo + '" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" onerror="this.src=\'https://via.placeholder.com/300x450/1a1a2e/00f5ff?text=NO+IMAGE\'">' +
+            '<div class="absolute inset-0 bg-gradient-to-t from-[#030712] via-transparent to-transparent"></div>' +
+            '<div class="absolute top-3 left-3">' +
+              '<span class="cyber-badge cyber-badge-cyan text-[10px]">' + (f.durata || 0) + ' MIN</span>' +
+            '</div>' +
+            '<div class="absolute top-3 right-3">' +
+              '<span class="cyber-badge cyber-badge-purple text-[10px]">HD</span>' +
+            '</div>' +
+          '</div>' +
+          '<div class="p-4">' +
+            '<h3 class="font-cyber text-sm font-bold text-white mb-1 truncate tracking-wide">' + f.titolo + '</h3>' +
+            '<p class="text-xs text-slate-500 font-mono mb-2"><i class="fa-solid fa-location-dot mr-1"></i>' + (c.nome || 'Cinema') + (c.citta ? (', ' + c.citta) : '') + '</p>' +
+            '<p class="text-xs text-slate-500 font-mono mb-3"><i class="fa-regular fa-calendar mr-1"></i>' + (p.data ? new Date(p.data).toLocaleDateString('it-IT') : '--/--/----') + ' <i class="fa-regular fa-clock ml-2 mr-1"></i>' + (p.ora ? p.ora.substring(0,5) : '--:--') + '</p>' +
+            '<div class="flex items-center justify-between gap-2">' +
+              '<button id="save-btn-' + p.id + '" ' + (isSaved ? 'disabled ' : '') + 'onclick="saveProiezione(' + p.id + ')" class="' + saveBtnClass + '">' +
+                saveBtnLabel +
+              '</button>' +
+              '<button onclick="goToPrenotazione(' + p.id + ')" class="cyber-btn cyber-btn-primary text-[10px] py-1.5 px-3">' +
+                '<i class="fa-solid fa-ticket mr-1"></i>Prenota' +
+              '</button>' +
+            '</div>' +
+          '</div>' +
+        '</div>';
+      }).join('');
+    }
+
+    async function saveProiezione(proiezioneId) {
+      if (typeof Auth === 'undefined' || !Auth.isAuthenticated()) {
+        window.location.href = '/login.html?redirect=' + encodeURIComponent('/index.html#programmazione');
+        return;
+      }
+
+      try {
+        await API.saveProiezione({ proiezioneId: proiezioneId });
+        savedProiezioniIds.add(Number(proiezioneId));
+        setSaveButtonState(proiezioneId, true);
+        showToast('Proiezione salvata nell\'area personale', 'success');
+      } catch (e) {
+        if (e && e.status === 409) {
+          savedProiezioniIds.add(Number(proiezioneId));
+          setSaveButtonState(proiezioneId, true);
+          showToast('Proiezione gia salvata', 'warning');
+          return;
+        }
+        handleApiError(e);
+      }
+    }
+
+    function goToPrenotazione(proiezioneId) {
+      if (typeof Auth === 'undefined' || !Auth.isAuthenticated()) {
+        window.location.href = '/login.html?redirect=' + encodeURIComponent('/prenotazione.html?proiezioneId=' + proiezioneId);
+        return;
+      }
+
+      window.location.href = '/prenotazione.html?proiezioneId=' + encodeURIComponent(String(proiezioneId));
+    }
+  </script>
+</body>
+</html>

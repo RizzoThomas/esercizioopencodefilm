@@ -1,0 +1,291 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ec5b13",
+                        "background-light": "#f8f6f6",
+                        "background-dark": "#221610",
+                    },
+                    fontFamily: {
+                        "display": ["Public Sans", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<title>Movie Admin - Film Management</title>
+</head>
+<body class="font-display bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 antialiased">
+<div class="relative flex h-auto min-h-screen w-full flex-col overflow-x-hidden">
+<div class="layout-container flex h-full grow flex-col">
+<!-- Top Navigation Bar -->
+<header class="flex items-center justify-between whitespace-nowrap border-b border-slate-200 dark:border-slate-800 px-6 md:px-10 py-4 bg-white dark:bg-background-dark/50 sticky top-0 z-50 backdrop-blur-md">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-3 text-primary">
+<div class="size-8 flex items-center justify-center bg-primary rounded-lg text-white">
+<span class="material-symbols-outlined" style="">movie</span>
+</div>
+<h2 class="text-slate-900 dark:text-slate-100 text-xl font-bold leading-tight tracking-tight" style="">CineBase</h2>
+</div>
+<div class="hidden md:flex">
+<label class="flex flex-col min-w-40 h-10 w-64" style="">
+<div class="flex w-full flex-1 items-stretch rounded-xl h-full border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50">
+<div class="text-slate-400 flex items-center justify-center pl-4 rounded-l-xl">
+<span class="material-symbols-outlined text-lg" style="">search</span>
+</div>
+<input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-slate-900 dark:text-slate-100 focus:outline-0 focus:ring-0 border-none bg-transparent placeholder:text-slate-400 px-4 pl-2 text-sm font-normal" placeholder="Search film title..." value="">
+</div>
+</label>
+</div>
+</div>
+<div class="flex flex-1 justify-end gap-4 items-center">
+<button class="hidden sm:flex min-w-[100px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 px-4 bg-primary text-white text-sm font-bold transition-all hover:bg-primary/90" style="">
+<span class="truncate" style="">Add Movie</span>
+</button>
+<div class="flex gap-2">
+<button class="p-2 text-slate-500 hover:text-primary transition-colors" style="">
+<span class="material-symbols-outlined" style="">notifications</span>
+</button>
+<button class="p-2 text-slate-500 hover:text-primary transition-colors" style="">
+<span class="material-symbols-outlined" style="">settings</span>
+</button>
+</div>
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 border-2 border-primary/20" data-alt="User profile avatar circle" style="background-image: url(&quot;https://lh3.googleusercontent.com/aida-public/AB6AXuAS_ffPXfGKpQTy5-2WKfUeVxVMUbLEAk4WXi96jsYz8y2sF79PS9FVP3UHGYKt7rHoCENLxZ3NX6HpYNXpWr2SuKpiYLU_NuhvyCfc5IosFxJVvF2dqwR1s-882pAhb_fpxzCD2TJnNiwqt-KzMOK2Q6uDjafjeMcV9pBaSXo6E6qs5bEB5V_64_jT6UJP10bYosJeUi2pXB0g9VxE5oTTaJt1LD6Z2qyCw5rAoEymYJlal6xTHHlGmzKMHCXCkeO4Tjo8UnvlDbs&quot;);"></div>
+</div>
+</header>
+<main class="flex-1 px-6 md:px-10 py-8 max-w-[1440px] mx-auto w-full">
+<!-- Header Section -->
+<div class="flex flex-wrap justify-between items-end gap-4 mb-8">
+<div class="flex flex-col gap-1">
+<h1 class="text-slate-900 dark:text-slate-100 text-4xl font-black leading-tight tracking-tight" style="">Movies Management</h1>
+<p class="text-slate-500 dark:text-slate-400 text-base font-normal" style="">Manage your film catalog and production details for <span class="text-primary font-semibold" style="">Film Database</span></p>
+</div>
+<div class="flex gap-3">
+<button class="flex items-center gap-2 px-4 py-2 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-semibold text-sm hover:bg-slate-50 transition-colors" style="">
+<span class="material-symbols-outlined text-lg" style="">filter_list</span>
+                        Filter
+                    </button>
+<button class="flex items-center gap-2 px-4 py-2 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-semibold text-sm hover:bg-slate-50 transition-colors" style="">
+<span class="material-symbols-outlined text-lg" style="">file_download</span>
+                        Export
+                    </button>
+</div>
+</div>
+<!-- Stats Overview -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+<div class="p-4 bg-white dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-800">
+<p class="text-slate-500 text-sm font-medium" style="">Total Films</p>
+<p class="text-2xl font-bold mt-1" style="">1,284</p>
+</div>
+<div class="p-4 bg-white dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-800">
+<p class="text-slate-500 text-sm font-medium" style="">Active Production</p>
+<p class="text-2xl font-bold mt-1" style="">12</p>
+</div>
+<div class="p-4 bg-white dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-800">
+<p class="text-slate-500 text-sm font-medium" style="">Avg. Duration</p>
+<p class="text-2xl font-bold mt-1" style="">118 min</p>
+</div>
+<div class="p-4 bg-white dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-800">
+<p class="text-slate-500 text-sm font-medium" style="">New this month</p>
+<p class="text-2xl font-bold mt-1 text-primary" style="">+24</p>
+</div>
+</div>
+<!-- Data Table Container -->
+<div class="@container">
+<div class="overflow-hidden rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800">
+<th class="px-6 py-4 text-slate-500 dark:text-slate-400 text-xs font-bold uppercase tracking-wider" style="">ID</th>
+<th class="px-6 py-4 text-slate-500 dark:text-slate-400 text-xs font-bold uppercase tracking-wider" style="">Titolo (Title)</th>
+<th class="px-6 py-4 text-slate-500 dark:text-slate-400 text-xs font-bold uppercase tracking-wider" style="">Data Produzione</th>
+<th class="px-6 py-4 text-slate-500 dark:text-slate-400 text-xs font-bold uppercase tracking-wider" style="">Regista ID / Name</th>
+<th class="px-6 py-4 text-slate-500 dark:text-slate-400 text-xs font-bold uppercase tracking-wider" style="">Durata</th>
+<th class="px-6 py-4 text-slate-500 dark:text-slate-400 text-xs font-bold uppercase tracking-wider text-right" style="">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+<!-- Row 1 -->
+<tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
+<td class="px-6 py-4 text-slate-500 dark:text-slate-400 text-sm font-mono" style="">#1024</td>
+<td class="px-6 py-4" style="">
+<div class="flex items-center gap-3">
+<div class="w-10 h-14 bg-slate-200 dark:bg-slate-700 rounded overflow-hidden flex-shrink-0" data-alt="Film poster thumbnail" style="background-image: url(&quot;https://lh3.googleusercontent.com/aida-public/AB6AXuBwPNiQG_axmjTpdYrl8vgDQymvuOi_Q69p6iVZ1Uj661xOn4H58aqrYWvYgMnGZ8yQpUM4h1acZRHFcsd3CAPoxKTKS8IyaX0rpVX3VK1BHIMoZdiexv2b2HqMZSgjRX9h3x3sLISrHRTO4NLGHeAhBV73cSkcabrn_m2VyX7kBBKRXX_q3wJpauSGRMrcNKjIDffe73SyJRYfgmvFI4tDLUljMZ1YSomYb-qQkmghbo8G0374uJEnQBT5XU0ztQAKFib2oY5JtWc&quot;);"></div>
+<span class="text-slate-900 dark:text-white font-semibold" style="">Oppenheimer</span>
+</div>
+</td>
+<td class="px-6 py-4 text-slate-600 dark:text-slate-300 text-sm" style="">2023-07-21</td>
+<td class="px-6 py-4" style="">
+<div class="flex flex-col">
+<span class="text-slate-900 dark:text-slate-100 font-medium" style="">Christopher Nolan</span>
+<span class="text-slate-500 text-xs" style="">ID: R-459</span>
+</div>
+</td>
+<td class="px-6 py-4" style="">
+<span class="px-2 py-1 rounded bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-medium" style="">180 min</span>
+</td>
+<td class="px-6 py-4 text-right" style="">
+<div class="flex justify-end gap-2">
+<button class="p-2 text-slate-400 hover:text-primary hover:bg-primary/10 rounded-lg transition-all" title="Edit" style="">
+<span class="material-symbols-outlined text-[20px]" style="">edit</span>
+</button>
+<button class="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all" title="Delete" style="">
+<span class="material-symbols-outlined text-[20px]" style="">delete</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
+<td class="px-6 py-4 text-slate-500 dark:text-slate-400 text-sm font-mono" style="">#1025</td>
+<td class="px-6 py-4" style="">
+<div class="flex items-center gap-3">
+<div class="w-10 h-14 bg-slate-200 dark:bg-slate-700 rounded overflow-hidden flex-shrink-0" data-alt="Film poster thumbnail" style="background-image: url(&quot;https://lh3.googleusercontent.com/aida-public/AB6AXuAvzAfQs3ZFV6ZximOHp6jYXT58FQKjsJiv5QJvgJDr9ilvFBTLeBGzBipOKFlaVmpI-YP3k0re-f9WQtddWsEAK-9yhvNjUO0R_sx6OUTpAiADG3GrQA7zY9ma5EgUWyNpyDKuc2-gZEL4-RwN90a1z2V7HSlJ6txETcRSMtYEPN4PG2K1MzmQwD2H26gIq0hvgnujpHKiy1asTz5SewB1jn0U2IUfqyRDRF9mP2pDuw8WzkU-n6ENsOwXOxE9mrEzPB9OFps0eWI&quot;);"></div>
+<span class="text-slate-900 dark:text-white font-semibold" style="">Dune: Part Two</span>
+</div>
+</td>
+<td class="px-6 py-4 text-slate-600 dark:text-slate-300 text-sm" style="">2024-03-01</td>
+<td class="px-6 py-4" style="">
+<div class="flex flex-col">
+<span class="text-slate-900 dark:text-slate-100 font-medium" style="">Denis Villeneuve</span>
+<span class="text-slate-500 text-xs" style="">ID: R-722</span>
+</div>
+</td>
+<td class="px-6 py-4" style="">
+<span class="px-2 py-1 rounded bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-medium" style="">166 min</span>
+</td>
+<td class="px-6 py-4 text-right" style="">
+<div class="flex justify-end gap-2">
+<button class="p-2 text-slate-400 hover:text-primary hover:bg-primary/10 rounded-lg transition-all" title="Edit" style="">
+<span class="material-symbols-outlined text-[20px]" style="">edit</span>
+</button>
+<button class="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all" title="Delete" style="">
+<span class="material-symbols-outlined text-[20px]" style="">delete</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
+<td class="px-6 py-4 text-slate-500 dark:text-slate-400 text-sm font-mono" style="">#1026</td>
+<td class="px-6 py-4" style="">
+<div class="flex items-center gap-3">
+<div class="w-10 h-14 bg-slate-200 dark:bg-slate-700 rounded overflow-hidden flex-shrink-0" data-alt="Film poster thumbnail" style="background-image: url(&quot;https://lh3.googleusercontent.com/aida-public/AB6AXuDbLnlKDzwrSXhVpwXJF1x8Ac_ili4e23vlGl7WDaXU7G16i2Giqxdyll5C6LAiX3v2oQ1ZNaqLJM456a9Y3Qmge1RXItfaXubevmToJKRH_-LZ6EI6xrWrHk7SrGvH44ebLQFrifEX4-TN1alyGxgxZ_jnZ7TZ12vI0V-uBUcqua-GStFgr_2iALsYQf6TbsycKxWI8HQBoTRdjaHbBz-trAIy47h6sLM6jyZ4lZiqyBX2xUNehd_dxwsMg78TEnWQHeQxhFuCqWI&quot;);"></div>
+<span class="text-slate-900 dark:text-white font-semibold" style="">Poor Things</span>
+</div>
+</td>
+<td class="px-6 py-4 text-slate-600 dark:text-slate-300 text-sm" style="">2023-12-08</td>
+<td class="px-6 py-4" style="">
+<div class="flex flex-col">
+<span class="text-slate-900 dark:text-slate-100 font-medium" style="">Yorgos Lanthimos</span>
+<span class="text-slate-500 text-xs" style="">ID: R-118</span>
+</div>
+</td>
+<td class="px-6 py-4" style="">
+<span class="px-2 py-1 rounded bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-medium" style="">141 min</span>
+</td>
+<td class="px-6 py-4 text-right" style="">
+<div class="flex justify-end gap-2">
+<button class="p-2 text-slate-400 hover:text-primary hover:bg-primary/10 rounded-lg transition-all" title="Edit" style="">
+<span class="material-symbols-outlined text-[20px]" style="">edit</span>
+</button>
+<button class="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all" title="Delete" style="">
+<span class="material-symbols-outlined text-[20px]" style="">delete</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
+<td class="px-6 py-4 text-slate-500 dark:text-slate-400 text-sm font-mono" style="">#1027</td>
+<td class="px-6 py-4" style="">
+<div class="flex items-center gap-3">
+<div class="w-10 h-14 bg-slate-200 dark:bg-slate-700 rounded overflow-hidden flex-shrink-0" data-alt="Film poster thumbnail" style="background-image: url(&quot;https://lh3.googleusercontent.com/aida-public/AB6AXuD8nzc9bPpgT2yUzQq24PJPxZznrJaWJlzA88YksP2pYOqBSgGo-VHEpJx7tA2t8IKZMy4b7lwHklVTsO-qP-31xfN3gFp2Kzcvxlnq-CKWKIxbyeOWksBvyAaq62wP9zhB_LTynv5xZz31eMsqbLlUW4cc_v7h31cUxScg7VRMAWgIFKTmeKl1qAOJGrxJSHc6MyQOHmoruLOLln66IkF3OAFofsyKPDvkSodQg7rFfIF3pRa5lFVhJZhmW3f3FdU_lXJTOa4stYY&quot;);"></div>
+<span class="text-slate-900 dark:text-white font-semibold" style="">The Zone of Interest</span>
+</div>
+</td>
+<td class="px-6 py-4 text-slate-600 dark:text-slate-300 text-sm" style="">2023-12-15</td>
+<td class="px-6 py-4" style="">
+<div class="flex flex-col">
+<span class="text-slate-900 dark:text-slate-100 font-medium" style="">Jonathan Glazer</span>
+<span class="text-slate-500 text-xs" style="">ID: R-085</span>
+</div>
+</td>
+<td class="px-6 py-4" style="">
+<span class="px-2 py-1 rounded bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-medium" style="">105 min</span>
+</td>
+<td class="px-6 py-4 text-right" style="">
+<div class="flex justify-end gap-2">
+<button class="p-2 text-slate-400 hover:text-primary hover:bg-primary/10 rounded-lg transition-all" title="Edit" style="">
+<span class="material-symbols-outlined text-[20px]" style="">edit</span>
+</button>
+<button class="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all" title="Delete" style="">
+<span class="material-symbols-outlined text-[20px]" style="">delete</span>
+</button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<!-- Pagination & Footer Actions -->
+<div class="flex flex-col md:flex-row items-center justify-between gap-6 mt-6">
+<div class="flex items-center gap-2">
+<span class="text-slate-500 text-sm" style="">Showing 1 to 4 of 1,284 entries</span>
+<select class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm px-2 py-1 focus:ring-primary outline-none">
+<option>10</option>
+<option>25</option>
+<option>50</option>
+</select>
+</div>
+<div class="flex items-center gap-1">
+<a class="flex size-10 items-center justify-center rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 transition-colors" href="#" style="">
+<span class="material-symbols-outlined" style="">chevron_left</span>
+</a>
+<a class="text-sm font-bold flex size-10 items-center justify-center text-white rounded-xl bg-primary shadow-sm shadow-primary/30" href="#" style="">1</a>
+<a class="text-sm font-normal flex size-10 items-center justify-center text-slate-600 dark:text-slate-400 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" href="#" style="">2</a>
+<a class="text-sm font-normal flex size-10 items-center justify-center text-slate-600 dark:text-slate-400 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" href="#" style="">3</a>
+<span class="text-slate-400 px-2" style="">...</span>
+<a class="text-sm font-normal flex size-10 items-center justify-center text-slate-600 dark:text-slate-400 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" href="#" style="">128</a>
+<a class="flex size-10 items-center justify-center rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 transition-colors" href="#" style="">
+<span class="material-symbols-outlined" style="">chevron_right</span>
+</a>
+</div>
+<div class="flex justify-end">
+<button class="group flex items-center gap-3 h-12 px-6 bg-primary text-white rounded-xl font-bold shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all" style="">
+<span class="material-symbols-outlined group-hover:rotate-90 transition-transform" style="">add</span>
+<span class="" style="">Add New Movie</span>
+</button>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="mt-auto py-6 px-10 border-t border-slate-200 dark:border-slate-800 flex flex-col md:flex-row justify-between items-center gap-4 text-slate-400 text-sm">
+<p class="" style="">© 2024 CineBase Systems. All rights reserved.</p>
+<div class="flex gap-6">
+<a class="hover:text-primary transition-colors" href="#" style="">Privacy Policy</a>
+<a class="hover:text-primary transition-colors" href="#" style="">API Docs</a>
+<a class="hover:text-primary transition-colors" href="#" style="">Support</a>
+</div>
+</footer>
+</div>
+</div>
+</body></html>

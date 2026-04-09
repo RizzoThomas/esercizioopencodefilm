@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CineBase — Gestione Registi</title>
+  <script src="/js/early-route-guard.js"></script>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script>
+    tailwind.config = {
+      theme: { extend: { colors: { cyber: { dark: '#030712', cyan: '#00f5ff', purple: '#a855f7', pink: '#ff0080', green: '#39ff14' }}}}
+    }
+  </script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="/css/styles.css" rel="stylesheet">
+</head>
+<body class="bg-[#030712] text-slate-200 font-sans cyber-scanlines cyber-hex-bg">
+  <div id="navbar-container"></div>
+
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
+      <div class="flex items-center gap-3">
+        <div class="w-1 h-8 bg-purple-400 rounded-full shadow-[0_0_10px_rgba(168,85,247,0.5)]"></div>
+        <div>
+          <h1 class="font-cyber text-xl font-bold tracking-wider text-white">GESTIONE REGISTI</h1>
+          <p class="text-xs text-slate-600 font-mono mt-0.5">Direttori creativi</p>
+        </div>
+      </div>
+      <button onclick="openModal('regista-modal', 'AGGIUNGI REGISTA')" class="cyber-btn cyber-btn-purple text-xs py-2 px-4">
+        <i class="fa-solid fa-plus mr-1"></i>Nuovo Regista
+      </button>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+      <div class="cyber-stat">
+        <div class="cyber-stat-value" id="total-registi">-</div>
+        <div class="cyber-stat-label">Registi Totali</div>
+      </div>
+      <div class="cyber-stat">
+        <div class="cyber-stat-value text-purple-400" style="text-shadow:0 0 20px rgba(168,85,247,0.4)" id="total-nationalities">-</div>
+        <div class="cyber-stat-label">Nazionalita</div>
+      </div>
+      <div class="cyber-stat">
+        <div class="cyber-stat-value text-green-400" style="text-shadow:0 0 20px rgba(57,255,20,0.4)">-</div>
+        <div class="cyber-stat-label">Attivi</div>
+      </div>
+    </div>
+
+    <div class="glass-panel p-4 mb-6">
+      <div class="relative max-w-md">
+        <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-cyan-400/40 text-sm"></i>
+        <input type="text" id="search-input" placeholder="Cerca regista..." class="cyber-input pl-10 text-sm">
+      </div>
+    </div>
+
+    <div class="glass-panel overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="cyber-table">
+          <thead>
+            <tr>
+              <th>ID</th><th>NOME</th><th>COGNOME</th><th>NAZIONALITA</th><th>FILM</th><th>AZIONI</th>
+            </tr>
+          </thead>
+          <tbody id="registi-table-body">
+            <tr><td colspan="6" class="text-center text-slate-600 font-mono text-sm py-8">
+              <i class="fa-solid fa-spinner fa-spin text-cyan-400/40 text-lg mb-2 block"></i>Caricamento...
+            </td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <div id="footer-container"></div>
+  <div id="toast-container" class="fixed bottom-4 right-4 z-50"></div>
+
+  <div id="regista-modal" class="fixed inset-0 z-50 hidden">
+    <div class="fixed inset-0 cyber-modal-backdrop" onclick="closeModal('regista-modal')"></div>
+    <div class="fixed inset-0 z-10 overflow-y-auto">
+      <div class="flex min-h-full items-center justify-center p-4">
+        <div class="cyber-modal w-full max-w-md relative">
+          <div class="cyber-modal-header flex items-center justify-between">
+            <span id="regista-modal-title" class="font-cyber text-sm font-bold tracking-wider text-purple-400">AGGIUNGI REGISTA</span>
+            <button onclick="closeModal('regista-modal')" class="text-slate-500 hover:text-cyan-400"><i class="fa-solid fa-xmark text-lg"></i></button>
+          </div>
+          <div class="p-6">
+            <form id="regista-form" class="space-y-4">
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-xs font-mono text-slate-500 mb-1 uppercase">Nome</label>
+                  <input type="text" name="nome" required class="cyber-input text-sm">
+                </div>
+                <div>
+                  <label class="block text-xs font-mono text-slate-500 mb-1 uppercase">Cognome</label>
+                  <input type="text" name="cognome" required class="cyber-input text-sm">
+                </div>
+              </div>
+              <div>
+                <label class="block text-xs font-mono text-slate-500 mb-1 uppercase">Nazionalita</label>
+                <input type="text" name="nazionalita" class="cyber-input text-sm" placeholder="Es. Italia, USA">
+              </div>
+            </form>
+          </div>
+          <div class="cyber-modal-footer flex justify-end gap-3">
+            <button type="button" onclick="closeModal('regista-modal')" class="cyber-btn text-xs py-2 px-4 border-cyan-400/30 text-slate-400">Annulla</button>
+            <button type="submit" form="regista-form" class="cyber-btn cyber-btn-purple text-xs py-2 px-4">Salva</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="delete-modal" class="fixed inset-0 z-50 hidden">
+    <div class="fixed inset-0 cyber-modal-backdrop"></div>
+    <div class="fixed inset-0 z-10 overflow-y-auto">
+      <div class="flex min-h-full items-center justify-center p-4">
+        <div class="cyber-modal w-full max-w-md relative">
+          <div class="p-6">
+            <div class="flex items-center gap-4">
+              <div class="w-12 h-12 rounded-xl bg-pink-500/10 border border-pink-500/30 flex items-center justify-center">
+                <i class="fa-solid fa-triangle-exclamation text-pink-400 text-xl"></i>
+              </div>
+              <div>
+                <h3 class="font-cyber text-sm font-bold text-white tracking-wider">CONFERMA ELIMINAZIONE</h3>
+                <p class="text-sm text-slate-400 mt-1" id="delete-message"></p>
+              </div>
+            </div>
+          </div>
+          <div class="cyber-modal-footer flex justify-end gap-3">
+            <button type="button" onclick="closeDeleteModal()" class="cyber-btn text-xs py-2 px-4 border-cyan-400/30 text-slate-400">Annulla</button>
+            <button type="button" id="confirm-delete-btn" class="cyber-btn cyber-btn-danger text-xs py-2 px-4">Elimina</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/utils.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/router.js"></script>
+  <script src="/js/template-loader.js"></script>
+  <script src="/js/navbar.js"></script>
+  <script>
+    var allRegisti = [];
+    function normalizeCollection(data) {
+      if (Array.isArray(data)) return data;
+      if (data && Array.isArray(data.$values)) return data.$values;
+      if (data && Array.isArray(data.items)) return data.items;
+      return [];
+    }
+    document.addEventListener('DOMContentLoaded', async function() {
+      await loadComponent('navbar-container', '/components/navbar-admin.html');
+      await loadComponent('footer-container', '/components/footer-admin.html');
+      bindSearch();
+      await loadRegisti();
+      setupFormSubmit();
+    });
+    async function loadRegisti() {
+      var tbody = document.getElementById('registi-table-body');
+      if (!tbody) return;
+      try {
+        var registi = normalizeCollection(await API.getRegisti());
+        allRegisti = registi;
+        renderRegisti(registi);
+        updateStats(registi);
+      } catch(e) { handleApiError(e); tbody.innerHTML = '<tr><td colspan="6" class="text-center text-pink-400 font-mono text-sm py-4">Errore di connessione</td></tr>'; }
+    }
+    function renderRegisti(registi) {
+      var tbody = document.getElementById('registi-table-body');
+      if (!tbody) return;
+      if (!registi.length) { tbody.innerHTML = '<tr><td colspan="6" class="text-center text-slate-600 font-mono text-sm py-8">Nessun regista nel sistema</td></tr>'; return; }
+      tbody.innerHTML = registi.map(function(r) {
+        return '<tr>' +
+          '<td class="font-mono text-xs text-slate-600">' + r.id + '</td>' +
+          '<td class="text-white text-sm font-medium">' + r.nome + '</td>' +
+          '<td class="text-white text-sm">' + r.cognome + '</td>' +
+          '<td><span class="cyber-badge cyber-badge-purple text-[9px]">' + (r.nazionalita || '---') + '</span></td>' +
+          '<td class="text-slate-400 text-sm font-mono">' + (r.filmCount || 0) + '</td>' +
+          '<td>' +
+            '<button onclick="editRegista(' + r.id + ')" class="text-cyan-400/60 hover:text-cyan-400 mr-3"><i class="fa-solid fa-pencil text-xs"></i></button>' +
+            '<button onclick="deleteRegista(' + r.id + ', \'' + (r.nome + ' ' + r.cognome).replace(/'/g, "\\'") + '\')" class="text-pink-400/60 hover:text-pink-400"><i class="fa-solid fa-trash text-xs"></i></button>' +
+          '</td></tr>';
+      }).join('');
+    }
+    function updateStats(registi) {
+      var el = document.getElementById('total-registi');
+      if (el) el.textContent = registi.length;
+      var nationalities = {};
+      registi.forEach(function(r) { if (r.nazionalita) nationalities[r.nazionalita] = true; });
+      var el2 = document.getElementById('total-nationalities');
+      if (el2) el2.textContent = Object.keys(nationalities).length;
+    }
+    function bindSearch() {
+      var search = document.getElementById('search-input');
+      if (!search) return;
+      search.addEventListener('input', function(e) {
+        var q = e.target.value.trim().toLowerCase();
+        if (!q) { renderRegisti(allRegisti); return; }
+        var filtered = allRegisti.filter(function(r) {
+          return (r.nome && r.nome.toLowerCase().includes(q)) || (r.cognome && r.cognome.toLowerCase().includes(q)) || (r.nazionalita && r.nazionalita.toLowerCase().includes(q));
+        });
+        renderRegisti(filtered);
+      });
+    }
+    function setupFormSubmit() {
+      var form = document.getElementById('regista-form');
+      if (!form) return;
+      form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        var data = {};
+        new FormData(form).forEach(function(v, k) { data[k] = v; });
+        var editId = form.dataset.editId;
+        try {
+          if (editId) { await API.updateRegista(editId, data); showToast('Regista aggiornato', 'success'); }
+          else { await API.createRegista(data); showToast('Regista creato', 'success'); }
+          closeModal('regista-modal');
+          loadRegisti();
+        } catch(err) { handleApiError(err); }
+      });
+    }
+    async function editRegista(id) {
+      try {
+        var r = await API.getRegista(id);
+        openModal('regista-modal', 'MODIFICA REGISTA');
+        var form = document.getElementById('regista-form');
+        form.dataset.editId = id;
+        form.querySelector('[name="nome"]').value = r.nome || '';
+        form.querySelector('[name="cognome"]').value = r.cognome || '';
+        form.querySelector('[name="nazionalita"]').value = r.nazionalita || '';
+      } catch(err) { handleApiError(err); }
+    }
+    async function deleteRegista(id, name) {
+      document.getElementById('delete-message').textContent = 'Eliminare "' + name + '" dal sistema?';
+      document.getElementById('delete-modal').classList.remove('hidden');
+      document.getElementById('confirm-delete-btn').onclick = async function() {
+        try { await API.deleteRegista(id); showToast('Regista eliminato', 'success'); closeDeleteModal(); loadRegisti(); }
+        catch(err) { handleApiError(err); }
+      };
+    }
+    function openModal(id, title) {
+      var m = document.getElementById(id);
+      if (m) m.classList.remove('hidden');
+      var titleEl = document.getElementById(id + '-title');
+      if (titleEl) titleEl.textContent = title;
+      var form = document.getElementById(id.replace('-modal', '-form'));
+      if (form) { form.reset(); form.dataset.editId = ''; }
+    }
+    function closeModal(id) { var m = document.getElementById(id); if (m) m.classList.add('hidden'); }
+    function closeDeleteModal() { var m = document.getElementById('delete-modal'); if (m) m.classList.add('hidden'); }
+  </script>
+</body>
+</html>
