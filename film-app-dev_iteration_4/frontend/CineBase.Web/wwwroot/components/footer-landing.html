@@ -1,0 +1,112 @@
+<!-- Footer Ferrari Design — footer-dark -->
+<footer class="bg-canvas border-t border-hairline pt-16 pb-8">
+  <div class="container mx-auto px-4">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
+      <!-- Brand Info -->
+      <div class="space-y-4">
+        <a href="/index.html" class="text-2xl font-bold text-ferrari-primary tracking-tight flex items-center gap-2">
+          🎬 CineBase
+        </a>
+        <p class="text-body leading-relaxed">
+          La piattaforma leader per la gestione centralizzata delle sale cinematografiche.
+        </p>
+      </div>
+      
+      <!-- Quick Links -->
+      <div>
+        <h4 class="text-lg font-bold mb-6 text-ink">Navigazione</h4>
+        <ul class="space-y-3 text-body">
+          <li><a href="/index.html" class="hover:text-ferrari-primary transition-colors">Home</a></li>
+          <li><a href="/programmazione.html" class="hover:text-ferrari-primary transition-colors">Programmazione</a></li>
+          <li><a href="/login.html" id="footer-login-link" class="hover:text-ferrari-primary transition-colors">Login</a></li>
+          <li><a href="/registrazione.html" id="footer-register-link" class="hover:text-ferrari-primary transition-colors">Registrati</a></li>
+          <li><a href="/profilo.html" id="footer-profile-link" class="hidden hover:text-ferrari-primary transition-colors">Profilo</a></li>
+          <li><a href="/prenotazioni.html" id="footer-bookings-link" class="hidden hover:text-ferrari-primary transition-colors">Prenotazioni</a></li>
+          <li><a href="/films.html" id="footer-films-link" class="hidden hover:text-ferrari-primary transition-colors admin-only">Film</a></li>
+          <li><a href="/cinemas.html" id="footer-cinemas-link" class="hidden hover:text-ferrari-primary transition-colors admin-only">Cinema</a></li>
+          <li><a href="/dashboard.html" id="footer-admin-link" class="hidden hover:text-ferrari-primary transition-colors admin-only">Area Admin</a></li>
+        </ul>
+      </div>
+      
+      <!-- Support -->
+      <div>
+        <h4 class="text-lg font-bold mb-6 text-ink">Supporto</h4>
+        <ul class="space-y-3 text-body">
+          <li><a href="#" class="hover:text-ferrari-primary transition-colors">Centro Assistenza</a></li>
+          <li><a href="#" class="hover:text-ferrari-primary transition-colors">Termini e Condizioni</a></li>
+          <li><a href="#" class="hover:text-ferrari-primary transition-colors">Privacy</a></li>
+        </ul>
+      </div>
+      
+      <!-- Social -->
+      <div>
+        <h4 class="text-lg font-bold mb-6 text-ink">Seguici</h4>
+        <div class="flex gap-4 mb-6">
+          <a href="#" class="w-10 h-10 bg-canvas-elevated flex items-center justify-center hover:bg-ferrari-primary transition-colors">
+            <i class="fa-brands fa-facebook text-ink"></i>
+          </a>
+          <a href="#" class="w-10 h-10 bg-canvas-elevated flex items-center justify-center hover:bg-ferrari-primary transition-colors">
+            <i class="fa-brands fa-instagram text-ink"></i>
+          </a>
+          <a href="#" class="w-10 h-10 bg-canvas-elevated flex items-center justify-center hover:bg-ferrari-primary transition-colors">
+            <i class="fa-brands fa-twitter text-ink"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Footer Bottom -->
+    <div class="border-t border-hairline pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-body">
+      <p>Sviluppato con ASP.NET Core + Tailwind CSS per scopo didattico.</p>
+      <p>© 2026 CineBase. Tutti i diritti riservati.</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function () {
+  const loginLink = document.getElementById('footer-login-link');
+  const registerLink = document.getElementById('footer-register-link');
+  const profileLink = document.getElementById('footer-profile-link');
+  const bookingsLink = document.getElementById('footer-bookings-link');
+
+  function normalizeRole(role) {
+    if (role == null) return '';
+    const value = String(role).trim().toLowerCase();
+    if (value === '2' || value === 'admin') return 'admin';
+    if (value === '1' || value === 'poweruser') return 'poweruser';
+    if (value === '0' || value === 'user') return 'user';
+    return value;
+  }
+
+  function updateFooterAuthUI() {
+    const isLoggedIn = Auth?.isLoggedIn?.() ?? false;
+    const role = normalizeRole(isLoggedIn ? (Auth?.getUserRole?.() ?? null) : null);
+    const isAdminOrPowerUser = role === 'admin' || role === 'poweruser';
+
+    if (isLoggedIn) {
+      if (loginLink) loginLink.classList.add('hidden');
+      if (registerLink) registerLink.classList.add('hidden');
+      if (profileLink) profileLink.classList.remove('hidden');
+      if (bookingsLink) bookingsLink.classList.remove('hidden');
+    } else {
+      if (loginLink) loginLink.classList.remove('hidden');
+      if (registerLink) registerLink.classList.remove('hidden');
+      if (profileLink) profileLink.classList.add('hidden');
+      if (bookingsLink) bookingsLink.classList.add('hidden');
+    }
+
+    document.querySelectorAll('footer .admin-only').forEach((el) => {
+      if (isAdminOrPowerUser) {
+        el.classList.remove('hidden');
+      } else {
+        el.classList.add('hidden');
+      }
+    });
+  }
+
+  updateFooterAuthUI();
+  document.addEventListener('components:loaded', updateFooterAuthUI);
+  window.updateFooterAuthUI = updateFooterAuthUI;
+})();
+</script>

@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="it-IT" class="dark">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CINEBASE — Ricerca Film TMDB</title>
+
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script src="/js/tailwind-config.js"></script>
+
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="/css/styles.css?v=2" rel="stylesheet">
+  <script src="/js/route-guard.js"></script>
+  <style>
+    .movie-poster {
+      aspect-ratio: 2/3;
+      object-fit: cover;
+    }
+    .truncate-2 {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+  </style>
+</head>
+
+<body class="bg-black text-white font-sans min-h-screen">
+  <div id="navbar-container"></div>
+
+  <main class="pt-24 pb-12">
+    <div class="container-lambo">
+      <!-- Header -->
+      <div class="mb-8">
+        <h1 class="text-3xl font-normal uppercase tracking-wider text-white mb-2">Ricerca Film</h1>
+        <p class="text-ash">Cerca film su The Movie Database (TMDB) e importali nel catalogo</p>
+      </div>
+
+      <!-- Search Box -->
+      <div class="bg-charcoal border border-white/10 p-6 mb-8">
+        <div class="flex flex-col md:flex-row gap-4">
+          <div class="flex-1">
+            <input 
+              type="text" 
+              id="search-input" 
+              class="input-dark w-full px-4 py-3"
+              placeholder="Cerca un film (es. Oppenheimer, Barbie, Dune...)"
+              autocomplete="off">
+          </div>
+          <button id="search-btn" class="btn btn-primary px-8 py-3 uppercase tracking-wider">
+            <i class="fa-solid fa-magnifying-glass mr-2"></i>Cerca
+          </button>
+        </div>
+        
+        <!-- Filters -->
+        <div class="flex flex-wrap gap-4 mt-4">
+          <button id="btn-popular" class="btn btn-tertiary text-sm">
+            <i class="fa-solid fa-fire mr-2"></i>Popolari
+          </button>
+          <button id="btn-upcoming" class="btn btn-tertiary text-sm">
+            <i class="fa-solid fa-calendar mr-2"></i>In Uscita
+          </button>
+          <button id="btn-now-playing" class="btn btn-tertiary text-sm">
+            <i class="fa-solid fa-ticket mr-2"></i>Al Cinema
+          </button>
+        </div>
+      </div>
+
+      <!-- Loading State -->
+      <div id="loading-state" class="hidden text-center py-12">
+        <i class="fa-solid fa-spinner fa-spin text-4xl text-gold mb-4"></i>
+        <p class="text-ash">Ricerca in corso...</p>
+      </div>
+
+      <!-- Error State -->
+      <div id="error-state" class="hidden bg-red-900/20 border border-red-500/30 text-red-400 px-4 py-3 mb-6">
+        <i class="fa-solid fa-circle-exclamation mr-2"></i>
+        <span id="error-message"></span>
+      </div>
+
+      <!-- Results Grid -->
+      <div id="results-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+        <!-- Movies will be inserted here -->
+      </div>
+
+      <!-- No Results -->
+      <div id="no-results" class="hidden text-center py-12">
+        <i class="fa-solid fa-film text-6xl text-ash mb-4"></i>
+        <p class="text-ash text-lg">Nessun film trovato</p>
+        <p class="text-steel text-sm mt-2">Prova a cercare con termini diversi</p>
+      </div>
+
+      <!-- Pagination -->
+      <div id="pagination" class="hidden flex justify-center gap-2 mt-8">
+        <button id="prev-page" class="btn btn-tertiary px-4 py-2" disabled>
+          <i class="fa-solid fa-chevron-left mr-2"></i>Precedente
+        </button>
+        <span id="page-info" class="text-ash py-2 px-4">Pagina 1</span>
+        <button id="next-page" class="btn btn-tertiary px-4 py-2">
+          Successiva<i class="fa-solid fa-chevron-right ml-2"></i>
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <!-- Movie Detail Modal -->
+  <div id="movie-modal" class="hidden fixed inset-0 z-50 bg-black/90 overflow-y-auto">
+    <div class="min-h-screen px-4 py-8">
+      <div class="max-w-4xl mx-auto bg-charcoal border border-white/10">
+        <!-- Modal Header -->
+        <div class="flex justify-between items-center p-6 border-b border-white/10">
+          <h2 id="modal-title" class="text-2xl font-normal uppercase tracking-wider">Dettagli Film</h2>
+          <button id="close-modal" class="text-white hover:text-gold transition-colors">
+            <i class="fa-solid fa-xmark text-2xl"></i>
+          </button>
+        </div>
+        
+        <!-- Modal Content -->
+        <div class="p-6">
+          <div class="flex flex-col md:flex-row gap-6">
+            <!-- Poster -->
+            <div class="w-full md:w-1/3">
+              <img id="modal-poster" src="" alt="" class="movie-poster w-full">
+            </div>
+            
+            <!-- Info -->
+            <div class="flex-1">
+              <h3 id="modal-movie-title" class="text-2xl font-normal text-white mb-2"></h3>
+              <div class="flex flex-wrap gap-2 mb-4">
+                <span id="modal-year" class="text-ash text-sm"></span>
+                <span class="text-ash">•</span>
+                <span id="modal-runtime" class="text-ash text-sm"></span>
+                <span class="text-ash">•</span>
+                <span id="modal-rating" class="text-gold text-sm"></span>
+              </div>
+              
+              <p id="modal-overview" class="text-ash mb-4 leading-relaxed"></p>
+              
+              <div class="mb-4">
+                <span class="text-steel text-xs uppercase tracking-wider">Genere</span>
+                <p id="modal-genres" class="text-white mt-1"></p>
+              </div>
+              
+              <div class="mb-4">
+                <span class="text-steel text-xs uppercase tracking-wider">Regista</span>
+                <p id="modal-director" class="text-white mt-1"></p>
+              </div>
+              
+              <div class="mb-4">
+                <span class="text-steel text-xs uppercase tracking-wider">Cast</span>
+                <p id="modal-cast" class="text-white mt-1"></p>
+              </div>
+              
+              <div id="modal-trailer" class="hidden mb-4">
+                <a href="" target="_blank" class="btn btn-tertiary text-sm inline-flex items-center">
+                  <i class="fa-brands fa-youtube mr-2 text-red-500"></i>Guarda Trailer
+                </a>
+              </div>
+              
+              <div class="flex gap-4 mt-6">
+                <button id="import-btn" class="btn btn-primary flex-1 py-3 uppercase tracking-wider">
+                  <i class="fa-solid fa-download mr-2"></i>Importa Film
+                </button>
+                <button id="cancel-btn" class="btn btn-tertiary flex-1 py-3">
+                  Annulla
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Import Loading Modal -->
+  <div id="import-loading" class="hidden fixed inset-0 z-50 bg-black/90 flex items-center justify-center">
+    <div class="text-center">
+      <i class="fa-solid fa-spinner fa-spin text-5xl text-gold mb-4"></i>
+      <p class="text-white text-lg">Importazione in corso...</p>
+      <p class="text-ash text-sm mt-2">Sto recuperando i dati da TMDB</p>
+    </div>
+  </div>
+
+  <!-- Success Modal -->
+  <div id="success-modal" class="hidden fixed inset-0 z-50 bg-black/90 flex items-center justify-center">
+    <div class="bg-charcoal border border-white/10 p-8 max-w-md mx-4 text-center">
+      <i class="fa-solid fa-check-circle text-5xl text-green-400 mb-4"></i>
+      <h3 class="text-2xl font-normal text-white mb-2">Film Importato!</h3>
+      <p id="success-message" class="text-ash mb-6"></p>
+      <div class="flex gap-4">
+        <a href="/films.html" class="btn btn-primary flex-1 py-3 uppercase tracking-wider">
+          Vai ai Film
+        </a>
+        <button id="continue-search" class="btn btn-tertiary flex-1 py-3">
+          Continua Ricerca
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="footer-container"></div>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/template-loader.js"></script>
+  <script src="/js/navbar.js"></script>
+  <script src="/js/pages/tmdb-search.js"></script>
+</body>
+
+</html>
+

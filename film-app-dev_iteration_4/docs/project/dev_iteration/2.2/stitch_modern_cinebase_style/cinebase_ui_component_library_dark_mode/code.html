@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CineBase UI Component Library</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "outline-variant": "#d0c5af",
+                        "on-secondary": "#ffffff",
+                        "primary-fixed-dim": "#e9c349",
+                        "secondary-fixed-dim": "#c5c4de",
+                        "surface-container": "#1A1B2E",
+                        "primary-container": "#d4af37",
+                        "error-container": "#ffdad6",
+                        "tertiary-container": "#00c7c7",
+                        "on-primary": "#ffffff",
+                        "surface-variant": "#e1e0fb",
+                        "on-error": "#ffffff",
+                        "on-tertiary-fixed-variant": "#004f4f",
+                        "on-surface": "#f1efff",
+                        "primary-fixed": "#ffe088",
+                        "secondary-container": "#e1e0fb",
+                        "on-tertiary": "#ffffff",
+                        "on-primary-fixed": "#241a00",
+                        "inverse-on-surface": "#f1efff",
+                        "outline": "#7f7663",
+                        "on-tertiary-container": "#004e4e",
+                        "on-primary-fixed-variant": "#574500",
+                        "primary": "#D4AF37",
+                        "on-secondary-fixed": "#191a2d",
+                        "error": "#ba1a1a",
+                        "surface-bright": "#fbf8ff",
+                        "background": "#1A1B2E",
+                        "surface-dim": "#d9d8f2",
+                        "tertiary-fixed-dim": "#00dddd",
+                        "surface": "#1A1B2E",
+                        "tertiary-fixed": "#00fbfb",
+                        "surface-tint": "#735c00",
+                        "secondary-fixed": "#e1e0fb",
+                        "secondary": "#5c5c73",
+                        "on-background": "#f1efff",
+                        "inverse-primary": "#e9c349",
+                        "surface-container-lowest": "#24253d",
+                        "on-surface-variant": "#d0c5af",
+                        "on-secondary-fixed-variant": "#44455a",
+                        "on-secondary-container": "#e1e0fb",
+                        "surface-container-highest": "#31324d",
+                        "on-tertiary-fixed": "#002020",
+                        "on-primary-container": "#554300",
+                        "tertiary": "#00FFFF",
+                        "surface-container-low": "#1F2036",
+                        "surface-container-high": "#282942",
+                        "on-error-container": "#93000a",
+                        "inverse-surface": "#f1efff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Inter"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            line-height: 1;
+        }
+        .glass-panel {
+            background: rgba(49, 50, 77, 0.4);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        .tonal-layering {
+            background: radial-gradient(circle at top left, rgba(212, 175, 55, 0.03) 0%, transparent 40%),
+                        radial-gradient(circle at bottom right, rgba(0, 255, 255, 0.02) 0%, transparent 40%);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body min-h-screen tonal-layering selection:bg-primary-container selection:text-on-primary-container">
+<!-- Sidebar (Shared Component Logic) -->
+<aside class="fixed h-full w-64 left-0 top-0 bg-[#1A1B2E] flex flex-col py-12 px-6 shadow-[0px_10px_30px_rgba(25,26,45,0.06)] z-50">
+<div class="mb-12">
+<div class="text-2xl font-bold tracking-tighter text-[#D4AF37] uppercase">CineBase</div>
+<div class="text-[0.65rem] tracking-[0.2em] text-slate-500 uppercase mt-1">The Digital Curator</div>
+</div>
+<nav class="flex-1 space-y-2">
+<a class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-white hover:bg-[#D4AF37]/10 transition-colors duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-[0.75rem] font-inter uppercase tracking-widest">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-white hover:bg-[#D4AF37]/10 transition-colors duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined">movie</span>
+<span class="text-[0.75rem] font-inter uppercase tracking-widest">Film Library</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-white hover:bg-[#D4AF37]/10 transition-colors duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined">theater_comedy</span>
+<span class="text-[0.75rem] font-inter uppercase tracking-widest">Production</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-white hover:bg-[#D4AF37]/10 transition-colors duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined">monitoring</span>
+<span class="text-[0.75rem] font-inter uppercase tracking-widest">Analytics</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-[#D4AF37] font-bold border-l-2 border-[#D4AF37] bg-white/5 rounded-r-lg" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-[0.75rem] font-inter uppercase tracking-widest">Settings</span>
+</a>
+</nav>
+<div class="pt-8 mt-8 border-t border-white/5 space-y-2">
+<a class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-white transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">help</span>
+<span class="text-[0.75rem] font-inter uppercase tracking-widest">Support</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-white transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">logout</span>
+<span class="text-[0.75rem] font-inter uppercase tracking-widest">Log Out</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="ml-64 p-12 min-h-screen">
+<!-- Header Section -->
+<header class="mb-16">
+<h1 class="text-[3.5rem] font-extrabold tracking-[-0.02em] text-on-surface leading-none mb-4">
+                Dark Mode UI Library
+            </h1>
+<p class="text-xl text-slate-400 font-light max-w-2xl">
+                The visual framework for cinematic authority, adapted for high-depth environments. Professionalism through tonal hierarchy.
+            </p>
+</header>
+<div class="grid grid-cols-12 gap-8">
+<!-- Left Column: Foundations & Forms -->
+<div class="col-span-12 lg:col-span-7 space-y-12">
+<!-- Button Foundations -->
+<section>
+<h2 class="text-[0.75rem] font-bold tracking-[0.2em] text-[#D4AF37] uppercase mb-8">Button Foundations</h2>
+<div class="grid grid-cols-2 md:grid-cols-3 gap-6">
+<!-- Primary States -->
+<div class="space-y-4">
+<button class="w-full bg-[#D4AF37] hover:bg-[#735c00] text-[#1A1B2E] font-bold py-3 px-6 rounded-xl transition-all duration-200 active:scale-95 text-sm uppercase tracking-wider">
+                                Primary Action
+                            </button>
+<button class="w-full bg-[#D4AF37]/50 text-[#1A1B2E]/60 font-bold py-3 px-6 rounded-xl cursor-not-allowed text-sm uppercase tracking-wider">
+                                Primary Disabled
+                            </button>
+</div>
+<!-- Secondary States -->
+<div class="space-y-4">
+<button class="w-full border border-[#D4AF37]/30 hover:border-[#D4AF37] hover:bg-[#D4AF37]/5 text-[#D4AF37] font-medium py-3 px-6 rounded-xl transition-all duration-200 active:scale-95 text-sm uppercase tracking-wider">
+                                Outline Gold
+                            </button>
+<button class="w-full border border-[#D4AF37]/10 text-[#D4AF37]/30 font-medium py-3 px-6 rounded-xl cursor-not-allowed text-sm uppercase tracking-wider">
+                                Outline Disabled
+                            </button>
+</div>
+<!-- Technical States -->
+<div class="space-y-4">
+<button class="w-full bg-[#00FFFF]/10 hover:bg-[#00FFFF]/20 text-[#00FFFF] border border-[#00FFFF]/20 font-medium py-3 px-6 rounded-xl transition-all duration-200 active:scale-95 text-sm uppercase tracking-wider flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm">terminal</span>
+                                Technical
+                            </button>
+<button class="w-full text-slate-400 hover:text-white transition-colors py-3 px-6 text-sm uppercase tracking-wider font-medium flex items-center justify-center gap-2">
+                                Ghost Action
+                            </button>
+</div>
+</div>
+</section>
+<!-- Form Architecture -->
+<section>
+<h2 class="text-[0.75rem] font-bold tracking-[0.2em] text-[#D4AF37] uppercase mb-8">Form Architecture</h2>
+<div class="bg-surface-container-low p-8 rounded-xl space-y-6">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="space-y-2">
+<label class="text-[0.65rem] font-bold tracking-widest text-slate-500 uppercase ml-1">Project Name</label>
+<input class="w-full bg-surface-container-highest border border-white/5 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-[#D4AF37] transition-all placeholder:text-slate-500" placeholder="Enter production title..." type="text"/>
+</div>
+<div class="space-y-2">
+<label class="text-[0.65rem] font-bold tracking-widest text-slate-500 uppercase ml-1">Curator Role</label>
+<select class="w-full bg-surface-container-highest border border-white/5 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-[#D4AF37] appearance-none transition-all">
+<option>Executive Producer</option>
+<option>Lead Editor</option>
+<option>Cinematographer</option>
+</select>
+</div>
+</div>
+<div class="flex flex-wrap gap-8 py-4">
+<label class="flex items-center gap-3 cursor-pointer group">
+<div class="relative flex items-center justify-center">
+<input checked="" class="peer hidden" type="checkbox"/>
+<div class="w-5 h-5 border-2 border-slate-700 rounded peer-checked:bg-[#00FFFF] peer-checked:border-[#00FFFF] transition-all group-hover:border-[#00FFFF]/50"></div>
+<span class="material-symbols-outlined text-white text-[1rem] absolute peer-checked:block hidden">check</span>
+</div>
+<span class="text-sm text-slate-300 group-hover:text-white transition-colors">Auto-Archive</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<div class="relative flex items-center justify-center">
+<input checked="" class="peer hidden" name="status" type="radio"/>
+<div class="w-5 h-5 border-2 border-slate-700 rounded-full peer-checked:border-[#D4AF37] transition-all group-hover:border-[#D4AF37]/50"></div>
+<div class="w-2 h-2 bg-[#D4AF37] rounded-full absolute peer-checked:block hidden"></div>
+</div>
+<span class="text-sm text-slate-300 group-hover:text-white transition-colors">Public Preview</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<div class="relative flex items-center justify-center">
+<input class="peer hidden" name="status" type="radio"/>
+<div class="w-5 h-5 border-2 border-slate-700 rounded-full peer-checked:border-[#D4AF37] transition-all group-hover:border-[#D4AF37]/50"></div>
+<div class="w-2 h-2 bg-[#D4AF37] rounded-full absolute peer-checked:block hidden"></div>
+</div>
+<span class="text-sm text-slate-300 group-hover:text-white transition-colors">Internal Only</span>
+</label>
+</div>
+</div>
+</section>
+<!-- Navigation & State -->
+<section>
+<h2 class="text-[0.75rem] font-bold tracking-[0.2em] text-[#D4AF37] uppercase mb-8">Navigation &amp; State</h2>
+<div class="space-y-10">
+<!-- Breadcrumbs -->
+<nav class="flex items-center gap-3 text-sm text-slate-500">
+<a class="hover:text-[#D4AF37] transition-colors" href="#">Library</a>
+<span class="material-symbols-outlined text-[1rem]">chevron_right</span>
+<a class="hover:text-[#D4AF37] transition-colors" href="#">Europe 2024</a>
+<span class="material-symbols-outlined text-[1rem]">chevron_right</span>
+<span class="text-white font-medium">B-Roll Masters</span>
+</nav>
+<!-- Tabs -->
+<div class="border-b border-white/5 flex gap-8">
+<button class="pb-4 text-sm font-bold tracking-widest uppercase text-[#D4AF37] border-b-2 border-[#D4AF37]">Overview</button>
+<button class="pb-4 text-sm font-medium tracking-widest uppercase text-slate-500 hover:text-slate-300 transition-colors">Assets</button>
+<button class="pb-4 text-sm font-medium tracking-widest uppercase text-slate-500 hover:text-slate-300 transition-colors">Timeline</button>
+<button class="pb-4 text-sm font-medium tracking-widest uppercase text-slate-500 hover:text-slate-300 transition-colors">Collaborators</button>
+</div>
+<!-- Status Indicators -->
+<div class="flex flex-wrap gap-4">
+<div class="px-4 py-1.5 rounded-full bg-[#10B981]/10 text-[#10B981] border border-[#10B981]/20 text-[0.65rem] font-bold uppercase tracking-widest flex items-center gap-2">
+<span class="w-1.5 h-1.5 rounded-full bg-[#10B981]"></span>
+                                Active
+                            </div>
+<div class="px-4 py-1.5 rounded-full bg-[#D4AF37]/10 text-[#D4AF37] border border-[#D4AF37]/20 text-[0.65rem] font-bold uppercase tracking-widest flex items-center gap-2">
+<span class="w-1.5 h-1.5 rounded-full bg-[#D4AF37]"></span>
+                                Pending Review
+                            </div>
+<div class="px-4 py-1.5 rounded-full bg-[#ba1a1a]/10 text-[#ba1a1a] border border-[#ba1a1a]/20 text-[0.65rem] font-bold uppercase tracking-widest flex items-center gap-2">
+<span class="w-1.5 h-1.5 rounded-full bg-[#ba1a1a]"></span>
+                                Blocked
+                            </div>
+<div class="px-4 py-1.5 rounded-full bg-[#00FFFF]/10 text-[#00FFFF] border border-[#00FFFF]/20 text-[0.65rem] font-bold uppercase tracking-widest flex items-center gap-2">
+<span class="w-1.5 h-1.5 rounded-full bg-[#00FFFF] animate-pulse"></span>
+                                Syncing
+                            </div>
+</div>
+</div>
+</section>
+</div>
+<!-- Right Column: Cinematic Layouts -->
+<div class="col-span-12 lg:col-span-5 space-y-12">
+<section>
+<h2 class="text-[0.75rem] font-bold tracking-[0.2em] text-[#D4AF37] uppercase mb-8">Cinematic Layouts</h2>
+<div class="space-y-8">
+<!-- Featured Project Card -->
+<div class="group relative rounded-2xl overflow-hidden shadow-2xl transition-transform duration-500 hover:-translate-y-1">
+<img alt="Featured Project" class="w-full aspect-[4/5] object-cover" data-alt="atmospheric film set in silhouette with high contrast noir lighting and cinematic fog" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB3LUGttpH8OM3OXca8MJyG252cLYnzg2h9XtthCk0VpRy5N2XLikZR0lFy2Nj40uD0HkXUP8DjcvSri5UJOKVRM_OE7KeGupAISpDenVyPY-9Tmw9rqKad36eRYgSJGOVhCu3aHHLhdCVDod8VXRvOr5527uBsLKZ2bee-uMS0HGqa8xSZ5B6lLjwwDROF-M78B7LtLURfgBw4uUnkGdMSGMAnAwvaimgT0S0M4AQ0RVU39MJPzop-OCaGQck2wJn7ofgM-FjVxBQ"/>
+<div class="absolute inset-0 bg-gradient-to-t from-[#1A1B2E] via-[#1A1B2E]/60 to-transparent"></div>
+<div class="absolute bottom-0 left-0 p-8 w-full">
+<div class="text-[#D4AF37] text-[0.65rem] font-bold tracking-[0.3em] uppercase mb-3">Cinema Masterclass</div>
+<h3 class="text-3xl font-bold text-white mb-2 leading-tight">Shadows of the Forgotten</h3>
+<p class="text-slate-300 text-sm font-light mb-6 line-clamp-2">Exploring the depths of 1940s noir aesthetics through modern digital cinematography and tonal control.</p>
+<div class="flex items-center justify-between">
+<div class="flex -space-x-3">
+<div class="w-8 h-8 rounded-full border-2 border-[#1A1B2E] bg-slate-800 flex items-center justify-center text-[0.6rem] font-bold">JD</div>
+<div class="w-8 h-8 rounded-full border-2 border-[#1A1B2E] bg-slate-700 flex items-center justify-center text-[0.6rem] font-bold">AK</div>
+<div class="w-8 h-8 rounded-full border-2 border-[#1A1B2E] bg-slate-600 flex items-center justify-center text-[0.6rem] font-bold">+3</div>
+</div>
+<button class="bg-white/10 hover:bg-white/20 backdrop-blur-md text-white px-5 py-2 rounded-lg text-xs font-bold uppercase tracking-widest transition-all">
+                                        View Project
+                                    </button>
+</div>
+</div>
+</div>
+<!-- Glassmorphism Stats Grid -->
+<div class="grid grid-cols-2 gap-4">
+<div class="glass-panel p-6 rounded-2xl border border-white/5">
+<div class="flex items-center gap-3 text-[#D4AF37] mb-3">
+<span class="material-symbols-outlined text-[1.2rem]">video_library</span>
+<span class="text-[0.6rem] font-bold tracking-widest uppercase">Storage</span>
+</div>
+<div class="text-2xl font-bold text-white">4.2 TB</div>
+<div class="w-full bg-white/5 h-1 rounded-full mt-4 overflow-hidden">
+<div class="bg-[#D4AF37] h-full w-[65%]"></div>
+</div>
+</div>
+<div class="glass-panel p-6 rounded-2xl border border-white/5">
+<div class="flex items-center gap-3 text-[#00FFFF] mb-3">
+<span class="material-symbols-outlined text-[1.2rem]">speed</span>
+<span class="text-[0.6rem] font-bold tracking-widest uppercase">Bandwidth</span>
+</div>
+<div class="text-2xl font-bold text-white">892 MB/s</div>
+<div class="w-full bg-white/5 h-1 rounded-full mt-4 overflow-hidden">
+<div class="bg-[#00FFFF] h-full w-[42%]"></div>
+</div>
+</div>
+</div>
+<!-- Technical List (No Borders) -->
+<div class="bg-surface-container-low rounded-2xl p-6">
+<h4 class="text-[0.65rem] font-bold tracking-[0.2em] text-slate-500 uppercase mb-6">Recent Render Tasks</h4>
+<div class="space-y-4">
+<div class="flex items-center justify-between p-3 rounded-xl hover:bg-white/5 transition-colors cursor-pointer group">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-lg bg-[#D4AF37]/10 flex items-center justify-center text-[#D4AF37]">
+<span class="material-symbols-outlined">output</span>
+</div>
+<div>
+<div class="text-sm font-medium text-white group-hover:text-[#D4AF37] transition-colors">final_cut_hdr_v2.mp4</div>
+<div class="text-[0.6rem] text-slate-500 uppercase tracking-tighter">4K ProRes 4444 • 12.4 GB</div>
+</div>
+</div>
+<span class="material-symbols-outlined text-slate-600 group-hover:text-white transition-colors">more_vert</span>
+</div>
+<div class="flex items-center justify-between p-3 rounded-xl hover:bg-white/5 transition-colors cursor-pointer group">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-lg bg-[#00FFFF]/10 flex items-center justify-center text-[#00FFFF]">
+<span class="material-symbols-outlined">data_object</span>
+</div>
+<div>
+<div class="text-sm font-medium text-white group-hover:text-[#00FFFF] transition-colors">metadata_sync_log</div>
+<div class="text-[0.6rem] text-slate-500 uppercase tracking-tighter">JSON Payload • 2.1 MB</div>
+</div>
+</div>
+<span class="material-symbols-outlined text-slate-600 group-hover:text-white transition-colors">more_vert</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+</div>
+</div>
+</main>
+<!-- Global Top Bar (Shared Component Logic) -->
+<nav class="fixed top-0 right-0 w-[calc(100%-16rem)] bg-[#1A1B2E]/85 backdrop-blur-xl flex justify-between items-center h-16 px-8 z-40">
+<div class="flex items-center gap-6 w-1/2">
+<div class="relative w-full max-w-md group">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-[#D4AF37] transition-colors">search</span>
+<input class="w-full bg-white/5 border-none rounded-full pl-12 pr-4 py-2 text-sm focus:ring-1 focus:ring-[#D4AF37] transition-all" placeholder="Search components, tokens, assets..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-4 text-slate-300">
+<button class="p-2 hover:text-[#D4AF37] transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-2 hover:text-[#D4AF37] transition-colors">
+<span class="material-symbols-outlined">grid_view</span>
+</button>
+</div>
+<div class="h-8 w-[1px] bg-white/10"></div>
+<div class="flex items-center gap-3 pl-2">
+<div class="text-right">
+<div class="text-xs font-bold text-white uppercase tracking-tighter">A. Curator</div>
+<div class="text-[0.6rem] text-[#D4AF37] uppercase tracking-widest">Admin Access</div>
+</div>
+<img alt="Curator Profile" class="w-9 h-9 rounded-full object-cover border border-[#D4AF37]/30" data-alt="portrait of a professional creative director with thoughtful expression in soft studio lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCAPNL47g29y5CDX1uTYkNWfoHPQ62qB6XAZxYrX9ORIaOw-u4aAuDYrk2s-AEuM-VM2N152koELa19GlkTKD4HfF7N7q6NDZwf8j9KfP5H7UwpDt9kpltmK53ewiX4b4jdbkUoWJbzuIsWaAHABoJ9BSYI-pSP_gDTJVQFcQmkswnnnIQulst6hkQOuopX_xEzZJnZ13kX3A4Zl5A-nathDT5dEvFJc1W62f0fBzmUvxCYplMmsVn05VVVpEWFZtMSKD_6C0GmJk0"/>
+</div>
+</div>
+</nav>
+</body></html>

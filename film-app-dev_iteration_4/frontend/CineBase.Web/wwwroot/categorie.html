@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="it-IT">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CineBase - Gestione Categorie</title>
+
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
+  <script src="/js/tailwind-config.js"></script>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="/css/styles.css?v=2" rel="stylesheet">
+  <script src="/js/route-guard.js"></script>
+</head>
+
+<body class="bg-canvas text-ink font-sans">
+  <div id="navbar-container"></div>
+
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Page Header -->
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
+      <div>
+        <h1 class="text-2xl font-bold text-ink">Gestione Categorie</h1>
+        <p class="text-sm text-body mt-1">Gestisci le categorie dei film</p>
+      </div>
+      <div class="mt-4 md:mt-0">
+        <button onclick="openModal('categoria-modal', 'Aggiungi Categoria')"
+          class="btn-primary text-white px-4 py-2 text-sm font-medium">
+          <i class="fa-solid fa-plus mr-2"></i>Aggiungi Categoria
+        </button>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="card-ferrari overflow-x-auto">
+      <table class="min-w-full divide-y divide-hairline">
+        <thead class="bg-canvas-elevated">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-medium label-caps">ID</th>
+            <th class="px-6 py-3 text-left text-xs font-medium label-caps">Nome</th>
+            <th class="px-6 py-3 text-left text-xs font-medium label-caps">Azioni</th>
+          </tr>
+        </thead>
+        <tbody id="categorie-table-body" class="bg-canvas divide-y divide-hairline">
+          <tr>
+            <td colspan="3" class="px-6 py-4 text-center text-body">Caricamento...</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <div id="footer-container"></div>
+
+  <!-- Toast Container -->
+  <div id="toast-container" class="fixed bottom-4 right-4 z-50"></div>
+
+  <!-- Modal -->
+  <div id="categoria-modal" class="fixed inset-0 z-50 hidden">
+    <div class="fixed inset-0 bg-gray-500/75 modal-backdrop"></div>
+    <div class="fixed inset-0 z-10 overflow-y-auto">
+      <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+        <div
+          class="relative transform overflow-hidden bg-canvas-elevated-lowest text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-md">
+          <div class="bg-canvas-elevated-lowest px-6 pt-6 pb-4">
+            <h3 class="text-lg font-bold text-ink" id="modal-title">Aggiungi Categoria</h3>
+            <button type="button"
+              class="absolute top-4 right-4 text-body hover:text-ink"
+              onclick="closeModal('categoria-modal')" title="Chiudi" aria-label="Chiudi modal">
+              <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+          </div>
+          <div class="bg-canvas-elevated-lowest px-6 pb-4">
+            <form id="categoria-form" class="space-y-4">
+              <input type="hidden" name="id" value="">
+              <div>
+                <label for="categoria-nome" class="block text-sm font-medium text-ink mb-1">Nome</label>
+                <input type="text" id="categoria-nome" name="nome" required placeholder="Nome categoria"
+                  class="input-ferrari w-full px-4 py-2">
+              </div>
+            </form>
+          </div>
+          <div class="bg-canvas-elevated-low px-6 py-4 flex justify-end gap-3">
+            <button type="button" class="btn-outline px-4 py-2 text-sm font-medium"
+              onclick="closeModal('categoria-modal')">Annulla</button>
+            <button type="submit" form="categoria-form" class="btn-primary">Salva</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Modal -->
+  <div id="delete-modal" class="fixed inset-0 z-50 hidden">
+    <div class="fixed inset-0 bg-gray-500/75 modal-backdrop"></div>
+    <div class="fixed inset-0 z-10 overflow-y-auto">
+      <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+        <div
+          class="relative transform overflow-hidden bg-canvas-elevated-lowest text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-md">
+          <div class="bg-canvas-elevated-lowest px-6 pt-6 pb-4">
+            <div class="flex items-center gap-4">
+              <div class="flex-shrink-0 flex items-center justify-center h-12 w-12 bg-red-100">
+                <i class="fa-solid fa-triangle-exclamation text-red-600 text-xl"></i>
+              </div>
+              <div>
+                <h3 class="text-lg font-bold text-ink">Conferma Eliminazione</h3>
+                <p class="text-sm text-body mt-1" id="delete-message">Sei sicuro di voler eliminare
+                  questa categoria?</p>
+              </div>
+            </div>
+          </div>
+          <div class="bg-canvas-elevated-low px-6 py-4 flex justify-end gap-3">
+            <button type="button" class="btn-outline px-4 py-2 text-sm font-medium"
+              onclick="closeDeleteModal()">Annulla</button>
+            <button type="button"
+              class="px-4 py-2 bg-red-600 text-white text-sm font-medium hover:bg-red-700"
+              id="confirm-delete-btn">Elimina</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/utils.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/template-loader.js"></script>
+  <script src="/js/admin-shell.js"></script>
+  <script src="/js/form-handlers.js"></script>
+  <script src="/js/navbar.js"></script>
+  <script src="/js/pages/categorie.js"></script>
+  <script>
+    function openModal(modalId, title = 'Aggiungi') {
+      document.getElementById('modal-title').textContent = title;
+      document.getElementById(modalId).classList.remove('hidden');
+      document.getElementById('categoria-form').reset();
+      document.getElementById('categoria-form').dataset.editId = '';
+    }
+
+    function closeModal(modalId) {
+      document.getElementById(modalId).classList.add('hidden');
+    }
+
+    function openDeleteModal(itemName, callback) {
+      document.getElementById('delete-message').textContent = `Sei sicuro di voler eliminare la categoria "${itemName}"?`;
+      document.getElementById('delete-modal').classList.remove('hidden');
+      document.getElementById('confirm-delete-btn').onclick = () => {
+        callback();
+        closeDeleteModal();
+      };
+    }
+
+    function closeDeleteModal() {
+      document.getElementById('delete-modal').classList.add('hidden');
+    }
+  </script>
+</body>
+
+</html>
+
+
+

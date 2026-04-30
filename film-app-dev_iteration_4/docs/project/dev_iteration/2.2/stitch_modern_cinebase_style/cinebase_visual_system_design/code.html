@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CineBase | Visual System &amp; UI Kit</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "error-container": "#ffdad6",
+                        "primary-container": "#d4af37",
+                        "on-primary": "#ffffff",
+                        "tertiary-container": "#00c7c7",
+                        "secondary-fixed-dim": "#c5c4de",
+                        "surface-container": "#eeecff",
+                        "on-secondary": "#ffffff",
+                        "primary-fixed-dim": "#e9c349",
+                        "outline-variant": "#d0c5af",
+                        "on-secondary-fixed": "#191a2d",
+                        "primary": "#735c00",
+                        "inverse-on-surface": "#f1efff",
+                        "on-primary-fixed-variant": "#574500",
+                        "on-tertiary-container": "#004e4e",
+                        "outline": "#7f7663",
+                        "on-primary-fixed": "#241a00",
+                        "on-tertiary": "#ffffff",
+                        "secondary-container": "#e1e0fb",
+                        "on-surface": "#191a2d",
+                        "primary-fixed": "#ffe088",
+                        "on-tertiary-fixed-variant": "#004f4f",
+                        "surface-variant": "#e1e0fb",
+                        "on-error": "#ffffff",
+                        "inverse-primary": "#e9c349",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary": "#5c5c73",
+                        "on-background": "#191a2d",
+                        "surface-tint": "#735c00",
+                        "secondary-fixed": "#e1e0fb",
+                        "surface": "#fbf8ff",
+                        "tertiary-fixed": "#00fbfb",
+                        "surface-dim": "#d9d8f2",
+                        "tertiary-fixed-dim": "#00dddd",
+                        "surface-bright": "#fbf8ff",
+                        "background": "#fbf8ff",
+                        "error": "#ba1a1a",
+                        "inverse-surface": "#2e2f43",
+                        "on-error-container": "#93000a",
+                        "surface-container-high": "#e7e6ff",
+                        "surface-container-low": "#f5f2ff",
+                        "tertiary": "#006a6a",
+                        "on-primary-container": "#554300",
+                        "on-tertiary-fixed": "#002020",
+                        "surface-container-highest": "#e1e0fb",
+                        "on-secondary-fixed-variant": "#44455a",
+                        "on-secondary-container": "#626279",
+                        "on-surface-variant": "#4d4635"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Inter"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-panel {
+            background: rgba(251, 248, 255, 0.85);
+            backdrop-filter: blur(20px);
+        }
+        .no-line-rule > * {
+            border: none !important;
+        }
+    </style>
+</head>
+<body class="bg-surface-container-low text-on-surface font-body selection:bg-primary-container/30">
+<!-- Top Navigation Anchor -->
+<header class="fixed top-0 w-full z-50 bg-slate-50/85 dark:bg-[#1A1B2E]/85 backdrop-blur-xl shadow-[0px_10px_30px_rgba(25,26,45,0.06)]">
+<div class="flex justify-between items-center w-full px-8 py-4 max-w-[1920px] mx-auto">
+<div class="flex items-center gap-8">
+<span class="text-2xl font-black tracking-tighter text-[#735c00] dark:text-[#D4AF37] uppercase">CineBase</span>
+<nav class="hidden md:flex gap-6 font-['Inter'] tracking-tight font-medium">
+<a class="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 transition-all duration-300" href="#">Dashboard</a>
+<a class="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 transition-all duration-300" href="#">Archive</a>
+<a class="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 transition-all duration-300" href="#">Talent</a>
+<a class="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 transition-all duration-300" href="#">Analytics</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 rounded-full hover:bg-slate-200/50 dark:hover:bg-[#1A1B2E]/50 transition-all duration-300 active:opacity-80 scale-95">
+<span class="material-symbols-outlined text-slate-500">notifications</span>
+</button>
+<button class="p-2 rounded-full hover:bg-slate-200/50 dark:hover:bg-[#1A1B2E]/50 transition-all duration-300 active:opacity-80 scale-95">
+<span class="material-symbols-outlined text-slate-500">settings</span>
+</button>
+<div class="w-10 h-10 rounded-full overflow-hidden bg-surface-container-highest">
+<img alt="Administrator profile" data-alt="professional headshot of a creative director in a studio setting with soft cinematic rim lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCeHwdplJnhZlP0nzssTry0QHktgOPYg3ZF7ow2vdU77wGcYu4L85VP0QvEZvpai86rHR7e47M18PfuWDMccL7QbuuqjMXxnSTZ4LDMuSU8AnRmm0pk3GqYzajTNQOjLEs0vpvYPTIyO3IFN7t459jmbdwYTnc6OtK_n_yy4zZ1sFR4UIcd98s0doP5MchaB8vOdcTVgHeMjh7IeM_aQWyubps8OxozTypmuhWuZGo4kBTAu5VOL0tVtedwnvxbZkF5wl7brOM5J5Q"/>
+</div>
+</div>
+</div>
+</header>
+<main class="pt-24 pb-12 px-8 max-w-[1920px] mx-auto flex gap-8">
+<!-- Side Navigation Anchor -->
+<aside class="hidden lg:flex flex-col pt-12 pb-8 h-[calc(100vh-6rem)] w-64 sticky top-24 bg-[#1A1B2E] dark:bg-[#0F101A] shadow-2xl rounded-xl no-line-rule overflow-hidden">
+<div class="px-6 mb-8">
+<h2 class="text-xl font-black text-white">CineBase</h2>
+<p class="font-['Inter'] uppercase tracking-widest text-[0.75rem] font-bold text-[#D4AF37]">Studio Edition</p>
+</div>
+<nav class="flex-1">
+<a class="flex items-center gap-4 text-slate-400 hover:text-[#D4AF37] py-3 px-6 my-1 transition-colors hover:bg-white/5 translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined">movie_filter</span>
+<span class="font-['Inter'] uppercase tracking-widest text-[0.75rem] font-bold">Production</span>
+</a>
+<a class="flex items-center gap-4 text-slate-400 hover:text-[#D4AF37] py-3 px-6 my-1 transition-colors hover:bg-white/5 translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined">auto_stories</span>
+<span class="font-['Inter'] uppercase tracking-widest text-[0.75rem] font-bold">Catalog</span>
+</a>
+<a class="flex items-center gap-4 bg-gradient-to-r from-[#D4AF37] to-[#735c00] text-white rounded-r-xl py-3 px-6 my-1 transition-colors translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined">description</span>
+<span class="font-['Inter'] uppercase tracking-widest text-[0.75rem] font-bold">Contracts</span>
+</a>
+<a class="flex items-center gap-4 text-slate-400 hover:text-[#D4AF37] py-3 px-6 my-1 transition-colors hover:bg-white/5 translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined">language</span>
+<span class="font-['Inter'] uppercase tracking-widest text-[0.75rem] font-bold">Distribution</span>
+</a>
+<a class="flex items-center gap-4 text-slate-400 hover:text-[#D4AF37] py-3 px-6 my-1 transition-colors hover:bg-white/5 translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined">tune</span>
+<span class="font-['Inter'] uppercase tracking-widest text-[0.75rem] font-bold">Settings</span>
+</a>
+</nav>
+<div class="mt-auto px-6 border-t border-white/5 pt-8">
+<a class="flex items-center gap-4 text-slate-400 hover:text-[#D4AF37] py-2 transition-colors" href="#">
+<span class="material-symbols-outlined">help</span>
+<span class="font-['Inter'] uppercase tracking-widest text-[0.75rem] font-bold">Support</span>
+</a>
+<a class="flex items-center gap-4 text-slate-400 hover:text-error py-2 transition-colors" href="#">
+<span class="material-symbols-outlined">logout</span>
+<span class="font-['Inter'] uppercase tracking-widest text-[0.75rem] font-bold">Sign Out</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Area: UI Kit Visual System -->
+<section class="flex-1 space-y-12">
+<!-- Hero Header -->
+<div class="bg-on-secondary-fixed text-white p-16 rounded-xl shadow-2xl relative overflow-hidden flex flex-col justify-end min-h-[400px]">
+<div class="absolute inset-0 z-0 opacity-40">
+<img alt="cinema aesthetic background" class="w-full h-full object-cover" data-alt="high contrast black and white film grain texture with anamorphic lens flares and deep shadows" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCfZAuO_KeLbADn3Oo-8o_LaBZKm0Sh2AuVIlql0fd5P44YG4XE8sgqd9tbmPgQhgXaTPefOOdamJsl452EJX2Xnto10126ky14j3DH97H-xwlaBve4e-Ly1DudrC7oEP2SuHPz_TWS-WB_-ofg0NbI6ozOtLEyoJhe5pabloZCMwu1ZQ5_ahEKkYh_LtazSa1-57Tn_vqij2Q41f-7wGz-C7fmww-j2J9KM1U6yQbIk3v_sSPbQ9LC7nted4P56LOFqPiLjFQUkHs"/>
+<div class="absolute inset-0 bg-gradient-to-t from-on-secondary-fixed via-on-secondary-fixed/60 to-transparent"></div>
+</div>
+<div class="relative z-10">
+<span class="font-['Inter'] uppercase tracking-widest text-[0.875rem] font-bold text-primary-container mb-4 block">Design System Foundation</span>
+<h1 class="text-[3.5rem] font-black tracking-tight leading-none mb-6">The Digital Curator</h1>
+<p class="max-w-2xl text-lg text-slate-300 leading-relaxed">A cinematic visual language designed for prestige, authority, and depth. This system transforms data management into a premium storytelling environment.</p>
+</div>
+</div>
+<!-- Bento Grid - Color Palette & Typography -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+<!-- Color Palette Card -->
+<div class="md:col-span-2 bg-surface-container-lowest p-10 rounded-xl shadow-[0px_10px_30px_rgba(25,26,45,0.06)]">
+<div class="mb-8">
+<span class="font-['Inter'] uppercase tracking-widest text-[0.75rem] font-bold text-secondary mb-2 block">01. Color Palette</span>
+<h2 class="text-2xl font-bold tracking-tight">The Light &amp; Shadow</h2>
+</div>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+<div class="space-y-3">
+<div class="h-32 bg-primary rounded-lg shadow-inner"></div>
+<div>
+<p class="text-sm font-bold uppercase tracking-wider">Primary Gold</p>
+<p class="text-xs text-secondary">#735c00</p>
+</div>
+</div>
+<div class="space-y-3">
+<div class="h-32 bg-[#1A1B2E] rounded-lg shadow-inner"></div>
+<div>
+<p class="text-sm font-bold uppercase tracking-wider">Indigo Depth</p>
+<p class="text-xs text-secondary">#1A1B2E</p>
+</div>
+</div>
+<div class="space-y-3">
+<div class="h-32 bg-tertiary rounded-lg shadow-inner"></div>
+<div>
+<p class="text-sm font-bold uppercase tracking-wider">Technical Cyan</p>
+<p class="text-xs text-secondary">#006a6a</p>
+</div>
+</div>
+<div class="space-y-3">
+<div class="h-32 bg-secondary-fixed rounded-lg shadow-inner"></div>
+<div>
+<p class="text-sm font-bold uppercase tracking-wider">Surface Slate</p>
+<p class="text-xs text-secondary">#e1e0fb</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Typography Card -->
+<div class="bg-on-secondary-fixed text-white p-10 rounded-xl shadow-[0px_10px_30px_rgba(25,26,45,0.06)] flex flex-col justify-between">
+<div>
+<span class="font-['Inter'] uppercase tracking-widest text-[0.75rem] font-bold text-primary-container mb-2 block">02. Typography</span>
+<h2 class="text-2xl font-bold tracking-tight mb-8 text-white">The Title Sequence</h2>
+</div>
+<div class="space-y-6">
+<div>
+<p class="text-4xl font-black tracking-tighter">Aa</p>
+<p class="text-sm text-slate-400">Inter Black (-0.02em)</p>
+</div>
+<div>
+<p class="text-2xl font-bold tracking-tight">Headline</p>
+<p class="text-sm text-slate-400">Inter Bold</p>
+</div>
+<div>
+<p class="text-base leading-relaxed">Body Text</p>
+<p class="text-sm text-slate-400">Inter Regular (1.6 LH)</p>
+</div>
+<div>
+<p class="font-['Inter'] uppercase tracking-widest text-[0.75rem] font-bold">Metadata Label</p>
+<p class="text-sm text-slate-400">Inter Bold (0.05em)</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Components & Interactive Elements -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+<!-- Buttons & Actions -->
+<div class="bg-surface-container-lowest p-10 rounded-xl shadow-[0px_10px_30px_rgba(25,26,45,0.06)]">
+<div class="mb-10">
+<span class="font-['Inter'] uppercase tracking-widest text-[0.75rem] font-bold text-secondary mb-2 block">03. Interactive Components</span>
+<h2 class="text-2xl font-bold tracking-tight">Prestige Controls</h2>
+</div>
+<div class="space-y-10">
+<div class="flex flex-wrap gap-4 items-center">
+<button class="px-8 py-3 bg-gradient-to-b from-primary-container to-primary text-white font-bold rounded-xl shadow-lg hover:brightness-110 active:scale-95 transition-all">
+                                PRIMARY ACTION
+                            </button>
+<button class="px-8 py-3 border-2 border-outline text-secondary font-bold rounded-xl hover:bg-surface-container transition-all">
+                                SECONDARY ACTION
+                            </button>
+<button class="px-4 py-2 text-primary font-bold flex items-center gap-2 hover:bg-primary-container/10 rounded-lg transition-all">
+<span class="material-symbols-outlined">visibility</span>
+                                VIEW DETAILS
+                            </button>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="space-y-2">
+<label class="font-['Inter'] uppercase tracking-widest text-[0.65rem] font-bold text-secondary">Asset Name</label>
+<input class="w-full bg-surface-container-highest border-none rounded-xl py-3 px-4 focus:ring-0 focus:border-l-4 focus:border-primary transition-all text-on-surface" placeholder="e.g. Blade Runner 2049" type="text"/>
+</div>
+<div class="space-y-2 relative">
+<label class="font-['Inter'] uppercase tracking-widest text-[0.65rem] font-bold text-secondary">Status Filter</label>
+<select class="w-full bg-surface-container-highest border-none rounded-xl py-3 px-4 focus:ring-0 appearance-none cursor-pointer">
+<option>In Production</option>
+<option>Archived</option>
+<option>Released</option>
+</select>
+</div>
+</div>
+</div>
+</div>
+<!-- Indicators & Elevation -->
+<div class="bg-surface-container-lowest p-10 rounded-xl shadow-[0px_10px_30px_rgba(25,26,45,0.06)]">
+<div class="mb-10">
+<span class="font-['Inter'] uppercase tracking-widest text-[0.75rem] font-bold text-secondary mb-2 block">04. Status &amp; Depth</span>
+<h2 class="text-2xl font-bold tracking-tight">Narrative Indicators</h2>
+</div>
+<div class="space-y-12">
+<div class="flex flex-wrap gap-4">
+<span class="px-4 py-1.5 rounded-full bg-tertiary-container text-on-tertiary-container font-bold text-[0.65rem] uppercase tracking-wider flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-on-tertiary-container"></span>
+                                Active Production
+                            </span>
+<span class="px-4 py-1.5 rounded-full bg-secondary-container text-on-secondary-container font-bold text-[0.65rem] uppercase tracking-wider flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-on-secondary-container"></span>
+                                Pending Review
+                            </span>
+<span class="px-4 py-1.5 rounded-full bg-error-container text-on-error-container font-bold text-[0.65rem] uppercase tracking-wider flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-error"></span>
+                                Flagged Asset
+                            </span>
+</div>
+<div class="grid grid-cols-3 gap-6 pt-4">
+<div class="space-y-4">
+<div class="w-full aspect-square bg-surface-container-low rounded-xl shadow-none border border-outline/10 flex items-center justify-center text-[0.65rem] font-bold text-secondary text-center px-4">SURFACE BASE</div>
+<p class="text-[0.65rem] font-bold text-center uppercase tracking-widest">No Shadow</p>
+</div>
+<div class="space-y-4">
+<div class="w-full aspect-square bg-surface-container-lowest rounded-xl shadow-[0px_4px_10px_rgba(25,26,45,0.04)] flex items-center justify-center text-[0.65rem] font-bold text-secondary text-center px-4 uppercase">Soft Lift</div>
+<p class="text-[0.65rem] font-bold text-center uppercase tracking-widest">Tonal Layer</p>
+</div>
+<div class="space-y-4">
+<div class="w-full aspect-square bg-white rounded-xl shadow-[0px_10px_30px_rgba(25,26,45,0.06)] flex items-center justify-center text-[0.65rem] font-bold text-secondary text-center px-4 uppercase">Floating</div>
+<p class="text-[0.65rem] font-bold text-center uppercase tracking-widest">Ambient Depth</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Grid & Guidelines -->
+<div class="bg-on-secondary-fixed text-white p-10 rounded-xl shadow-2xl relative overflow-hidden">
+<div class="absolute inset-0 opacity-10 pointer-events-none" style="background-image: linear-gradient(to right, white 1px, transparent 1px), linear-gradient(to bottom, white 1px, transparent 1px); background-size: 40px 40px;"></div>
+<div class="relative z-10">
+<div class="mb-10">
+<span class="font-['Inter'] uppercase tracking-widest text-[0.75rem] font-bold text-primary-container mb-2 block">05. Layout Principles</span>
+<h2 class="text-2xl font-bold tracking-tight">The 1/3 Curatorial Split</h2>
+</div>
+<div class="grid grid-cols-12 gap-6 h-64">
+<div class="col-span-4 bg-primary/20 rounded-lg border-2 border-primary-container/30 border-dashed flex items-center justify-center font-bold text-sm text-primary-container">METADATA (1/3)</div>
+<div class="col-span-8 bg-tertiary/20 rounded-lg border-2 border-tertiary-container/30 border-dashed flex items-center justify-center font-bold text-sm text-tertiary-container">PRIMARY CANVAS (2/3)</div>
+</div>
+<div class="mt-8 flex gap-12 text-sm font-medium text-slate-400">
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 bg-primary rounded-full"></span>
+                            Asymmetric Balance
+                        </div>
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 bg-tertiary rounded-full"></span>
+                            Breathable Padding (32px+)
+                        </div>
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 bg-secondary rounded-full"></span>
+                            Layered Hierarchy
+                        </div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Bottom Navigation (Mobile Only) -->
+<footer class="md:hidden fixed bottom-0 left-0 w-full bg-slate-50/85 backdrop-blur-xl z-50 flex justify-around items-center py-4 px-6 shadow-[0px_-10px_30px_rgba(25,26,45,0.06)]">
+<button class="flex flex-col items-center gap-1 text-primary">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-[0.65rem] font-bold uppercase">Home</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-slate-400">
+<span class="material-symbols-outlined">movie</span>
+<span class="text-[0.65rem] font-bold uppercase">Assets</span>
+</button>
+<div class="bg-primary p-3 rounded-full -mt-12 shadow-xl">
+<span class="material-symbols-outlined text-white">add</span>
+</div>
+<button class="flex flex-col items-center gap-1 text-slate-400">
+<span class="material-symbols-outlined">analytics</span>
+<span class="text-[0.65rem] font-bold uppercase">Stats</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-slate-400">
+<span class="material-symbols-outlined">person</span>
+<span class="text-[0.65rem] font-bold uppercase">Profile</span>
+</button>
+</footer>
+</body></html>

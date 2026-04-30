@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="it-IT">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CineBase - Il Mio Profilo</title>
+
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
+  <script src="/js/tailwind-config.js"></script>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="/css/styles.css?v=2" rel="stylesheet">
+  <script src="/js/route-guard.js"></script>
+</head>
+
+<body class="bg-canvas text-ink font-sans">
+  <div id="navbar-container"></div>
+
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold text-ink">Il Mio Profilo</h1>
+      <p class="text-sm text-body mt-1">Gestisci i tuoi dati, biglietti, ordini e credito</p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <!-- Dati Personali -->
+      <div class="card-ferrari p-6">
+        <h2 class="text-xl font-bold text-ink mb-6">
+          <i class="fa-solid fa-user text-ferrari-primary mr-2"></i>Dati Personali
+        </h2>
+        <form id="profilo-form" class="space-y-4">
+          <div>
+            <label for="profilo-email" class="block text-sm font-medium text-ink mb-1">Email</label>
+<input type="email" id="profilo-email"
+              class="input-ferrari w-full px-4 py-2 cursor-not-allowed" readonly
+              aria-readonly="true">
+          </div>
+          <div>
+            <label for="profilo-nome" class="block text-sm font-medium text-ink mb-1">Nome</label>
+            <input type="text" id="profilo-nome" class="input-ferrari w-full px-4 py-2" required maxlength="100">
+          </div>
+          <div>
+            <label for="profilo-cognome" class="block text-sm font-medium text-ink mb-1">Cognome</label>
+            <input type="text" id="profilo-cognome" class="input-ferrari w-full px-4 py-2" required maxlength="100">
+          </div>
+          <div>
+            <label for="profilo-telefono" class="block text-sm font-medium text-ink mb-1">Telefono</label>
+            <input type="tel" id="profilo-telefono" class="input-ferrari w-full px-4 py-2" maxlength="20"
+              placeholder="Opzionale">
+          </div>
+          <div class="flex items-center gap-4 pt-2">
+            <button type="submit" class="btn-primary px-6 py-2">
+              <i class="fa-solid fa-floppy-disk mr-2"></i>Salva Modifiche
+            </button>
+            <span id="profilo-saved" class="hidden text-emerald-500 text-sm">
+              <i class="fa-solid fa-check mr-1"></i>Salvato
+            </span>
+          </div>
+        </form>
+      </div>
+
+      <!-- Cinema Preferito + Credito -->
+      <div class="space-y-8">
+        <!-- Cinema Preferito -->
+        <div class="card-ferrari p-6">
+          <h2 class="text-xl font-bold text-ink mb-4">
+            <i class="fa-solid fa-location-dot text-ferrari-primary mr-2"></i>Cinema Preferito
+          </h2>
+          <div id="cinema-preferito-content">
+            <div class="text-center py-4 text-body">
+              <i class="fa-solid fa-spinner fa-spin text-xl mb-2"></i>
+              <p class="text-sm">Caricamento...</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Credito -->
+        <div class="card-ferrari p-6">
+          <h2 class="text-xl font-bold text-ink mb-4">
+            <i class="fa-solid fa-wallet text-ferrari-primary mr-2"></i>Credito Piattaforma
+          </h2>
+          <div id="credito-content">
+            <div class="text-center py-4 text-body">
+              <i class="fa-solid fa-spinner fa-spin text-xl mb-2"></i>
+              <p class="text-sm">Caricamento...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ordini -->
+    <div class="mt-8 card-ferrari p-6">
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="text-xl font-bold text-ink">
+          <i class="fa-solid fa-receipt text-ferrari-primary mr-2"></i>I Miei Ordini
+        </h2>
+      </div>
+      <div id="ordini-list">
+        <div class="text-center py-8 text-body">
+          <i class="fa-solid fa-spinner fa-spin text-3xl mb-3"></i>
+          <p>Caricamento ordini...</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Biglietti -->
+    <div class="mt-8 card-ferrari p-6">
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="text-xl font-bold text-ink">
+          <i class="fa-solid fa-ticket text-ferrari-primary mr-2"></i>I Miei Biglietti
+        </h2>
+      </div>
+      <div id="biglietti-list">
+        <div class="text-center py-8 text-body">
+          <i class="fa-solid fa-spinner fa-spin text-3xl mb-3"></i>
+          <p>Caricamento biglietti...</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Prenotazioni Legacy (deprecate) -->
+    <div class="mt-8 card-ferrari p-6 opacity-60">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-lg font-bold text-ink">
+          <i class="fa-solid fa-clock-rotate-left text-body mr-2"></i>Prenotazioni (legacy)
+        </h2>
+      </div>
+      <div id="prenotazioni-list">
+        <div class="text-center py-4 text-body">
+          <i class="fa-solid fa-spinner fa-spin text-xl mb-2"></i>
+          <p class="text-sm">Caricamento...</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Topup Modal -->
+  <div id="topup-modal" class="fixed inset-0 z-50 hidden">
+    <div class="fixed inset-0 bg-black/70" onclick="closeTopupModal()"></div>
+    <div class="fixed inset-0 z-10 overflow-y-auto">
+      <div class="flex min-h-full items-center justify-center p-4">
+        <div class="bg-canvas-elevated p-8 w-full max-w-md">
+          <h3 class="text-xl font-bold text-ink mb-6">Ricarica Credito</h3>
+          <p class="text-sm text-body mb-4">Scegli un importo o inserisci un valore personalizzato</p>
+          <div class="grid grid-cols-2 gap-3 mb-4">
+            <button onclick="selectTopupAmount(5)" class="topup-amount-btn border border-hairline px-4 py-3 text-center text-ink hover:border-ferrari-primary transition-colors" data-amount="5">5 €</button>
+            <button onclick="selectTopupAmount(10)" class="topup-amount-btn border border-hairline px-4 py-3 text-center text-ink hover:border-ferrari-primary transition-colors" data-amount="10">10 €</button>
+            <button onclick="selectTopupAmount(20)" class="topup-amount-btn border border-hairline px-4 py-3 text-center text-ink hover:border-ferrari-primary transition-colors" data-amount="20">20 €</button>
+            <button onclick="selectTopupAmount(50)" class="topup-amount-btn border border-hairline px-4 py-3 text-center text-ink hover:border-ferrari-primary transition-colors" data-amount="50">50 €</button>
+          </div>
+          <div class="mb-4">
+            <label class="block text-sm text-body mb-2">Importo personalizzato</label>
+            <input type="number" id="custom-topup-amount" class="input-ferrari w-full" placeholder="Inserisci importo" min="1" step="0.50" oninput="onCustomTopupChange()">
+          </div>
+          <div class="flex items-center justify-between mb-6 p-4 border border-hairline">
+            <span class="text-body">Totale:</span>
+            <span id="selected-topup-amount" class="text-2xl font-bold text-ink">0,00 €</span>
+          </div>
+          <div class="flex gap-3">
+            <button onclick="closeTopupModal()" class="btn-outline flex-1">Annulla</button>
+            <button id="btn-topup-pay" onclick="payTopup()" class="btn-primary flex-1" disabled>Aggiungi Credito</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<div id="footer-container"></div>
+
+  <!-- Biglietto Detail Modal -->
+  <div id="biglietto-modal" class="fixed inset-0 z-50 hidden">
+    <div class="fixed inset-0 bg-black/70" onclick="chiudiBigliettoModal()"></div>
+    <div class="fixed inset-0 z-10 overflow-y-auto">
+      <div class="flex min-h-full items-center justify-center p-4">
+        <div class="bg-canvas-elevated p-6 w-full max-w-lg">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-bold text-ink">
+              <i class="fa-solid fa-ticket text-ferrari-primary mr-2"></i>Dettaglio Biglietto
+            </h3>
+            <button onclick="chiudiBigliettoModal()" class="text-body hover:text-ink transition-colors">
+              <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+          </div>
+          <div id="biglietto-modal-content"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast-container" class="fixed bottom-4 right-4 z-50"></div>
+
+  <script src="/js/utils.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/template-loader.js"></script>
+  <script src="/js/navbar.js"></script>
+  <script src="/js/pages/profilo.js"></script>
+</body>
+
+</html>
+

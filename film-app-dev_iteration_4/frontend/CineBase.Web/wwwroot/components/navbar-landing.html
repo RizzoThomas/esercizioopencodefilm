@@ -1,0 +1,145 @@
+<!-- Ferrari Style Navbar — top-nav-on-dark, 64px -->
+<nav class="fixed top-0 left-0 right-0 z-50 bg-canvas">
+  <div class="max-w-[1440px] mx-auto px-10 h-14 flex items-center justify-between">
+    <!-- Left: MENU + hamburger -->
+    <button id="mobile-menu-toggle" class="flex items-center gap-2 text-ink uppercase text-sm tracking-widest font-normal">
+      <i class="fa-solid fa-bars text-xl"></i>
+      <span>MENU</span>
+    </button>
+
+    <!-- Center: Logo -->
+    <a href="/index.html" class="absolute left-1/2 -translate-x-1/2">
+      <span class="text-2xl font-normal tracking-[4px] uppercase text-ink">CINEBASE</span>
+    </a>
+
+    <!-- Right: Actions -->
+    <div class="flex items-center gap-6">
+      <a href="/tmdb-search.html" class="text-ink hover:text-ferrari-primary transition-colors" title="Cerca film">
+        <i class="fa-solid fa-magnifying-glass text-lg"></i>
+      </a>
+      
+      <div id="user-dropdown" class="hidden relative">
+        <button id="user-menu-toggle" class="text-ink hover:text-ferrari-primary transition-colors">
+          <i class="fa-solid fa-user text-lg"></i>
+        </button>
+        <div id="user-menu" class="hidden absolute right-0 mt-4 w-48 bg-canvas-elevated border border-hairline py-2 z-50">
+          <a href="/profilo.html" class="block px-4 py-2 text-sm text-ink hover:text-ferrari-primary hover:bg-white/5">
+            <i class="fa-solid fa-user mr-2"></i>Profilo
+          </a>
+          <a href="/profilo.html#prenotazioni" class="block px-4 py-2 text-sm text-ink hover:text-ferrari-primary hover:bg-white/5">
+            <i class="fa-solid fa-ticket mr-2"></i>Prenotazioni
+          </a>
+          <hr class="my-2 border-hairline">
+          <button id="logout-btn" class="w-full text-left px-4 py-2 text-sm text-ferrari-semantic-warning hover:bg-white/5">
+            <i class="fa-solid fa-sign-out-alt mr-2"></i>Logout
+          </button>
+        </div>
+      </div>
+      
+      <a href="/login.html" id="login-btn" class="text-ink hover:text-ferrari-primary transition-colors">
+        <i class="fa-solid fa-user text-lg"></i>
+      </a>
+      <a href="/dashboard.html" id="admin-area-btn" class="hidden text-ferrari-primary hover:text-ferrari-primary-hover text-sm uppercase tracking-widest admin-only">
+        ADMIN
+      </a>
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile Menu — Full Screen Dark -->
+<div id="mobile-menu" class="hidden fixed left-0 top-0 bottom-0 w-1/2 sm:w-1/3 lg:w-1/4 z-[60] bg-canvas border-r border-hairline overflow-y-auto">
+  <div class="flex flex-col h-full">
+    <div class="flex items-center justify-between px-8 py-6 border-b border-hairline">
+      <span class="text-xl tracking-[4px] uppercase text-ink">MENU</span>
+      <button id="mobile-menu-close" class="text-ink hover:text-ferrari-primary transition-colors">
+        <i class="fa-solid fa-xmark text-2xl"></i>
+      </button>
+    </div>
+    <div class="flex-1 flex flex-col justify-center px-8">
+      <a href="/index.html" class="mobile-nav-link py-4 text-3xl uppercase tracking-wider text-ink hover:text-ferrari-primary transition-colors border-b border-hairline">Home</a>
+      <a href="/programmazione.html" class="mobile-nav-link py-4 text-3xl uppercase tracking-wider text-ink hover:text-ferrari-primary transition-colors border-b border-hairline">Programmazione</a>
+      <a href="/my-cinemas.html" class="mobile-nav-link py-4 text-3xl uppercase tracking-wider text-ink hover:text-ferrari-primary transition-colors border-b border-hairline">Cinema</a>
+      <a href="/profilo.html" class="mobile-nav-link py-4 text-3xl uppercase tracking-wider text-ink hover:text-ferrari-primary transition-colors border-b border-hairline">Profilo</a>
+      <a href="/dashboard.html" id="mobile-admin-area-btn" class="hidden mobile-nav-link py-4 text-3xl uppercase tracking-wider text-ferrari-primary hover:text-ferrari-primary-hover transition-colors border-b border-hairline admin-only">Area Admin</a>
+    </div>
+    <div class="px-8 py-6 border-t border-hairline">
+      <div id="mobile-auth-links" class="space-y-4">
+        <a href="/login.html" class="btn-tertiary w-full text-center">ACCEDI</a>
+        <a href="/registrazione.html" class="btn-primary w-full text-center">REGISTRATI</a>
+      </div>
+      <div id="mobile-user-menu" class="hidden space-y-4">
+        <p id="mobile-user-name" class="text-ferrari-primary text-lg uppercase tracking-wider"></p>
+        <button id="mobile-logout-btn" class="btn-tertiary w-full text-center text-ferrari-semantic-warning">LOGOUT</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  const loginBtn = document.getElementById('login-btn');
+  const userDropdown = document.getElementById('user-dropdown');
+  const userMenuToggle = document.getElementById('user-menu-toggle');
+  const userMenu = document.getElementById('user-menu');
+  const logoutBtn = document.getElementById('logout-btn');
+  const mobileAuthLinks = document.getElementById('mobile-auth-links');
+  const mobileUserMenu = document.getElementById('mobile-user-menu');
+  const mobileUserName = document.getElementById('mobile-user-name');
+  const mobileLogoutBtn = document.getElementById('mobile-logout-btn');
+  const mobileMenuClose = document.getElementById('mobile-menu-close');
+  const mobileMenu = document.getElementById('mobile-menu');
+  const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+
+  function normalizeRole(role) {
+    if (role == null) return '';
+    var value = String(role).trim().toLowerCase();
+    if (value === '2' || value === 'admin') return 'admin';
+    if (value === '1' || value === 'poweruser') return 'poweruser';
+    if (value === '0' || value === 'user') return 'user';
+    return value;
+  }
+
+  function updateAuthUI() {
+    if (typeof Auth === 'undefined' || !Auth) {
+      document.querySelectorAll('.admin-only').forEach(function(el) { el.classList.add('hidden'); });
+      return;
+    }
+    var isLoggedIn = Auth.isLoggedIn();
+    var role = normalizeRole(isLoggedIn ? (Auth.getUserRole() || null) : null);
+    var isAdminOrPowerUser = role === 'admin' || role === 'poweruser';
+
+    if (isLoggedIn && Auth.getUser()) {
+      var user = Auth.getUser();
+      if (loginBtn) loginBtn.classList.add('hidden');
+      if (userDropdown) userDropdown.classList.remove('hidden');
+      if (mobileAuthLinks) mobileAuthLinks.classList.add('hidden');
+      if (mobileUserMenu) { mobileUserMenu.classList.remove('hidden'); mobileUserName.textContent = user.nome || user.email || 'UTENTE'; }
+    } else {
+      if (loginBtn) loginBtn.classList.remove('hidden');
+      if (userDropdown) userDropdown.classList.add('hidden');
+      if (mobileAuthLinks) mobileAuthLinks.classList.remove('hidden');
+      if (mobileUserMenu) mobileUserMenu.classList.add('hidden');
+    }
+    document.querySelectorAll('.admin-only').forEach(function(el) {
+      if (isAdminOrPowerUser) el.classList.remove('hidden'); else el.classList.add('hidden');
+    });
+  }
+
+  if (userMenuToggle) userMenuToggle.addEventListener('click', function() { if (userMenu) userMenu.classList.toggle('hidden'); });
+  if (logoutBtn) logoutBtn.addEventListener('click', function() { Auth && Auth.logout().then(function() { window.location.href = '/index.html'; }).catch(function() { window.location.href = '/index.html'; }); });
+  if (mobileLogoutBtn) mobileLogoutBtn.addEventListener('click', function() { Auth && Auth.logout().then(function() { window.location.href = '/index.html'; }).catch(function() { window.location.href = '/index.html'; }); });
+  if (mobileMenuClose) mobileMenuClose.addEventListener('click', function() { if (mobileMenu) mobileMenu.classList.add('hidden'); });
+  // mobile-menu-toggle e' gestito da navbar.js
+
+  document.addEventListener('click', function(e) {
+    if (userMenuToggle && userMenu && !userMenuToggle.contains(e.target) && !userMenu.contains(e.target)) { userMenu.classList.add('hidden'); }
+  });
+
+  window.updateAuthUI = updateAuthUI;
+  window.updateNavbarCinema = function() {};
+  if (typeof window.initializeNavbar === 'function') { var orig = window.initializeNavbar; window.initializeNavbar = function() { orig(); updateAuthUI(); }; }
+  else { window.initializeNavbar = updateAuthUI; }
+  updateAuthUI();
+  document.addEventListener('components:loaded', updateAuthUI);
+})();
+</script>

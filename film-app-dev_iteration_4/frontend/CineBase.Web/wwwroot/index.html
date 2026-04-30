@@ -1,0 +1,83 @@
+﻿<!DOCTYPE html>
+<html lang="it-IT">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CineBase - La Tua Rete Cinematografica</title>
+
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
+  <script src="/js/tailwind-config.js"></script>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="/css/styles.css?v=2" rel="stylesheet">
+  <script src="/js/route-guard.js"></script>
+</head>
+
+<body class="bg-canvas text-ink font-sans">
+  <div id="navbar-container"></div>
+
+  <!-- Hero Section — Ferrari Full-bleed Cinematic -->
+  <section class="hero-cinema mt-14">
+    <div class="hero-cinema-overlay"></div>
+    <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=1920')] bg-cover bg-center">
+    </div>
+    <div class="hero-cinema-content">
+      <h1 class="hero-cinema-title mb-4">
+        CineBase, <span class="text-ferrari-primary">piattaforma completa per la gestione di sale cinematografiche</span>
+      </h1>
+      <p class="text-body text-lg md:text-xl max-w-2xl mb-8">
+        Centralizza operazioni, catalogo film, programmazione e controllo della rete cinema in un'unica soluzione.
+        Progettata per estendersi con prenotazione e acquisto biglietti per offrire un ecosistema end-to-end.
+      </p>
+      <div class="flex gap-4">
+        <a href="/programmazione.html" class="btn-primary">Vedi Programmazione</a>
+        <a href="/registrazione.html" class="btn-outline">Registrati</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Film in Evidenza -->
+  <section id="featured" class="py-16 bg-canvas">
+    <div class="container mx-auto px-4">
+      <div class="flex items-center gap-4 mb-8">
+        <h2 class="text-3xl ferrari-display-lg text-ink">In Evidenza Questa Settimana</h2>
+        <div class="h-0.5 flex-1 bg-ferrari-primary"></div>
+      </div>
+
+      <div class="mb-8 flex flex-wrap items-center justify-between gap-4">
+        <p class="text-body max-w-2xl">
+          Una selezione dei titoli piu rilevanti del momento, scelti in base alla programmazione della settimana e alle nuove uscite.
+        </p>
+        <a href="/programmazione.html" class="btn-outline">
+          <i class="fa-solid fa-calendar-days mr-2"></i>Vai alla Programmazione
+        </a>
+      </div>
+
+      <!-- Featured Layout -->
+      <div id="featured-grid" class="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-4">
+        <div class="lg:col-span-3 text-center py-12 text-body">
+          <i class="fa-solid fa-film text-4xl mb-4"></i>
+          <p>Caricamento film in evidenza...</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div id="footer-container"></div>
+
+  <!-- Toast Container -->
+  <div id="toast-container" class="fixed bottom-4 right-4 z-50"></div>
+
+  <script src="/js/utils.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/template-loader.js"></script>
+  <script src="/js/navbar.js"></script>
+  <script src="/js/pages/home.js"></script>
+</body>
+
+</html>

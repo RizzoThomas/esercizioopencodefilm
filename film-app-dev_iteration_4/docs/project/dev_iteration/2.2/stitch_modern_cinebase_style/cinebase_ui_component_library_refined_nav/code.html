@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CineBase | UI Component Library</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-dim": "#d9d8f2",
+                    "secondary": "#5c5c73",
+                    "on-error": "#ffffff",
+                    "secondary-container": "#e1e0fb",
+                    "on-tertiary-container": "#004e4e",
+                    "on-surface-variant": "#4d4635",
+                    "tertiary": "#006a6a",
+                    "surface-container-high": "#e7e6ff",
+                    "secondary-fixed-dim": "#c5c4de",
+                    "surface-container-highest": "#e1e0fb",
+                    "surface": "#fbf8ff",
+                    "error-container": "#ffdad6",
+                    "outline-variant": "#d0c5af",
+                    "on-tertiary-fixed": "#002020",
+                    "on-secondary": "#ffffff",
+                    "primary-fixed-dim": "#e9c349",
+                    "surface-container": "#eeecff",
+                    "surface-bright": "#fbf8ff",
+                    "primary-fixed": "#ffe088",
+                    "on-secondary-container": "#626279",
+                    "tertiary-container": "#00c7c7",
+                    "outline": "#7f7663",
+                    "surface-variant": "#e1e0fb",
+                    "on-tertiary": "#ffffff",
+                    "surface-container-lowest": "#ffffff",
+                    "tertiary-fixed-dim": "#00dddd",
+                    "on-primary-fixed-variant": "#574500",
+                    "on-primary-fixed": "#241a00",
+                    "background": "#fbf8ff",
+                    "tertiary-fixed": "#00fbfb",
+                    "on-background": "#191a2d",
+                    "inverse-surface": "#2e2f43",
+                    "on-secondary-fixed-variant": "#44455a",
+                    "error": "#ba1a1a",
+                    "surface-tint": "#735c00",
+                    "surface-container-low": "#f5f2ff",
+                    "on-surface": "#191a2d",
+                    "on-primary": "#ffffff",
+                    "inverse-primary": "#e9c349",
+                    "primary": "#735c00",
+                    "on-secondary-fixed": "#191a2d",
+                    "primary-container": "#d4af37",
+                    "secondary-fixed": "#e1e0fb",
+                    "on-error-container": "#93000a",
+                    "on-primary-container": "#554300",
+                    "inverse-on-surface": "#f1efff",
+                    "on-tertiary-fixed-variant": "#004f4f"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Inter"],
+                    "body": ["Inter"],
+                    "label": ["Inter"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-sidebar {
+            background: linear-gradient(180deg, rgba(26, 27, 46, 0.95) 0%, rgba(26, 27, 46, 1) 100%);
+            backdrop-filter: blur(20px);
+        }
+        .editorial-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+        .ghost-border {
+            border: 1px solid rgba(208, 197, 175, 0.15);
+        }
+    </style>
+</head>
+<body class="bg-surface-container-low font-body text-on-surface selection:bg-primary-container/30">
+<!-- SideNavBar (Authority: JSON) -->
+<aside class="fixed left-0 h-screen w-64 z-50 bg-[#1A1B2E] flex flex-col p-6 space-y-8 shadow-2xl sidebar-gradient">
+<div class="mb-12">
+<h1 class="text-2xl font-black text-[#D4AF37] uppercase tracking-tighter">CineBase</h1>
+<p class="text-xs font-label uppercase tracking-widest text-slate-400 mt-1">Component Library</p>
+</div>
+<nav class="flex-1 space-y-2"><!-- Active: Overview -->
+<a class="flex items-center space-x-3 px-4 py-3 text-[#D4AF37] bg-[#5c5c73]/30 rounded-lg font-bold transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-inter tracking-wide uppercase-labels text-xs">Overview</span>
+</a>
+<a class="flex items-center space-x-3 px-4 py-3 text-slate-400 hover:text-white hover:bg-[#5c5c73]/10 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="smart_button">smart_button</span>
+<span class="font-inter tracking-wide uppercase-labels text-xs">Buttons</span>
+</a>
+<a class="flex items-center space-x-3 px-4 py-3 text-slate-400 hover:text-white hover:bg-[#5c5c73]/10 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="input">input</span>
+<span class="font-inter tracking-wide uppercase-labels text-xs">Form Elements</span>
+</a>
+<a class="flex items-center space-x-3 px-4 py-3 text-slate-400 hover:text-white hover:bg-[#5c5c73]/10 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="error">error</span>
+<span class="font-inter tracking-wide uppercase-labels text-xs">Status Indicators</span>
+</a>
+<a class="flex items-center space-x-3 px-4 py-3 text-slate-400 hover:text-white hover:bg-[#5c5c73]/10 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="grid_view">grid_view</span>
+<span class="font-inter tracking-wide uppercase-labels text-xs">Layout Rules</span>
+</a></nav>
+<div class="pt-6 border-t border-slate-800 space-y-1"><a class="flex items-center space-x-3 px-4 py-2 text-slate-400 hover:text-white transition-colors" href="#">
+<span class="material-symbols-outlined text-sm" data-icon="settings">settings</span>
+<span class="font-inter tracking-wide uppercase-labels text-[10px]">Settings</span>
+</a>
+<a class="flex items-center space-x-3 px-4 py-2 text-slate-400 hover:text-white transition-colors" href="#">
+<span class="material-symbols-outlined text-sm" data-icon="menu_book">menu_book</span>
+<span class="font-inter tracking-wide uppercase-labels text-[10px]">Documentation</span>
+</a>
+<div class="mt-4 px-4">
+<span class="bg-primary/20 text-[#D4AF37] px-3 py-1 rounded-full text-[10px] font-bold tracking-tighter">v1.0.4</span>
+</div></div>
+</aside>
+<!-- TopNavBar (Authority: JSON) -->
+<header class="fixed top-0 right-0 w-[calc(100%-16rem)] z-40 bg-white/80 dark:bg-[#1A1B2E]/80 backdrop-blur-xl shadow-sm flex justify-between items-center h-16 px-8">
+<div class="flex items-center gap-8">
+<span class="text-sm font-label font-bold text-on-surface uppercase tracking-widest">Design System</span>
+<nav class="flex items-center gap-6">
+<a class="text-[#D4AF37] font-bold font-inter text-sm" href="#">Guidelines</a>
+<a class="text-slate-600 dark:text-slate-300 hover:text-[#D4AF37] transition-colors font-inter text-sm" href="#">Tokens</a>
+<a class="text-slate-600 dark:text-slate-300 hover:text-[#D4AF37] transition-colors font-inter text-sm" href="#">Components</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative group">
+<span class="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-slate-400 text-lg" data-icon="search">search</span>
+<input class="bg-surface-container-highest ghost-border rounded-xl pl-10 pr-4 py-1.5 text-sm w-64 focus:outline-none focus:ring-0 focus:border-primary transition-all" placeholder="Search components..." type="text"/>
+</div>
+<button class="material-symbols-outlined text-slate-600 hover:text-primary transition-opacity" data-icon="dark_mode">dark_mode</button>
+<button class="material-symbols-outlined text-slate-600 hover:text-primary transition-opacity" data-icon="help_outline">help_outline</button>
+<img alt="User Avatar" class="w-8 h-8 rounded-full bg-surface-container-high p-0.5 border border-outline-variant/30" data-alt="minimalist close-up profile avatar icon for a designer on a clean workspace background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC-cXnQ-rkusszHF65TETznOLW6bbnyjHE4HUxCf5MMKmTMUZ1sh3DgpN3xuzU7WacfI65JVQtCuCDSVSN-nztv__KaXS8TxNdgIckjoM3N4FuI-ATU6f9xg2wZflfUdL7MrvnROV8ZoInAQdsL02dtUC8jlUPy6PdrgAdOA2xRvqi88R9Imr55n0Za9k6vS5AIHOJEB_mT6JM3gfque4FkhE532Owt0fR85Q_WRN9dMyfW2m9e9iFab7SJ1letXWRGxPfBELpTCes"/>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="ml-64 pt-24 p-12 min-h-screen">
+<!-- Header Section -->
+<section class="mb-16">
+<span class="text-xs font-label uppercase tracking-widest text-primary font-bold mb-2 block">System Overview</span>
+<h2 class="text-5xl font-black tracking-tighter text-on-surface mb-4">The Cinematic Authority</h2>
+<p class="max-w-2xl text-secondary text-lg leading-relaxed">A high-end film archive aesthetic. Moving away from templates towards intentional asymmetry and deep tonal layering.</p>
+</section>
+<div class="grid grid-cols-12 gap-8">
+<!-- Section 1: Buttons (Left Column) -->
+<div class="col-span-12 lg:col-span-7 space-y-8">
+<div class="bg-surface-container-lowest p-8 rounded-xl shadow-sm ghost-border">
+<div class="flex items-center gap-2 mb-6">
+<span class="material-symbols-outlined text-primary" data-icon="smart_button">smart_button</span>
+<h3 class="text-xl font-bold tracking-tight">Button Hierarchy</h3>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<!-- Primary & Secondary -->
+<div class="space-y-6">
+<div class="space-y-3">
+<p class="text-[10px] font-label font-bold text-secondary uppercase tracking-widest">Primary (Gold)</p>
+<div class="flex flex-wrap gap-4">
+<button class="bg-primary-container hover:bg-primary text-on-primary-container px-6 py-3 rounded-xl font-bold shadow-lg shadow-primary/20 transition-all duration-300 active:scale-95">Launch Project</button>
+<button class="bg-primary text-white px-6 py-3 rounded-xl font-bold shadow-lg shadow-primary/20 opacity-80 cursor-not-allowed">Disabled</button>
+</div>
+</div>
+<div class="space-y-3">
+<p class="text-[10px] font-label font-bold text-secondary uppercase tracking-widest">Secondary (Indigo)</p>
+<div class="flex flex-wrap gap-4">
+<button class="bg-on-background text-white px-6 py-3 rounded-xl font-bold hover:bg-slate-800 transition-all duration-300 active:scale-95">Manage Archive</button>
+<button class="bg-secondary-container text-on-secondary-container px-6 py-3 rounded-xl font-bold hover:bg-secondary-container/80 transition-all">Edit Metadata</button>
+</div>
+</div>
+</div>
+<!-- Outline & Ghost -->
+<div class="space-y-6">
+<div class="space-y-3">
+<p class="text-[10px] font-label font-bold text-secondary uppercase tracking-widest">Outline &amp; Ghost</p>
+<div class="flex flex-wrap gap-4">
+<button class="border-2 border-on-background text-on-background px-6 py-3 rounded-xl font-bold hover:bg-on-background hover:text-white transition-all duration-300">View Specs</button>
+<button class="text-on-background px-6 py-3 rounded-xl font-bold hover:bg-surface-container-high transition-all flex items-center gap-2">
+<span class="material-symbols-outlined text-sm" data-icon="close">close</span> Dismiss
+                                    </button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Section 2: Form Elements -->
+<div class="bg-surface-container-lowest p-8 rounded-xl shadow-sm ghost-border">
+<div class="flex items-center gap-2 mb-6">
+<span class="material-symbols-outlined text-primary" data-icon="input">input</span>
+<h3 class="text-xl font-bold tracking-tight">Form Inputs</h3>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="space-y-2">
+<label class="text-[10px] font-label font-bold text-secondary uppercase tracking-widest ml-1">Archive Title</label>
+<input class="w-full bg-surface-container-highest ghost-border rounded-xl px-4 py-3 focus:ring-0 focus:border-l-4 focus:border-primary transition-all" placeholder="e.g. Neon Noir 2024" type="text"/>
+</div>
+<div class="space-y-2">
+<label class="text-[10px] font-label font-bold text-secondary uppercase tracking-widest ml-1">Curator Access</label>
+<select class="w-full bg-surface-container-highest ghost-border rounded-xl px-4 py-3 focus:ring-0 focus:border-l-4 focus:border-primary transition-all appearance-none">
+<option>Read &amp; Annotate</option>
+<option>Full Master Access</option>
+<option>Drafting Only</option>
+</select>
+</div>
+<div class="col-span-2 flex items-center gap-6 p-4 bg-surface-container rounded-xl">
+<label class="flex items-center gap-3 cursor-pointer group">
+<div class="w-5 h-5 rounded border-2 border-outline-variant group-hover:border-primary transition-colors flex items-center justify-center">
+<span class="material-symbols-outlined text-xs text-primary opacity-0 group-hover:opacity-100" data-icon="check">check</span>
+</div>
+<span class="text-sm font-medium">Auto-sync Master file</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<div class="w-5 h-5 rounded-full border-2 border-outline-variant group-hover:border-primary transition-colors flex items-center justify-center">
+<div class="w-2 h-2 rounded-full bg-primary opacity-0 group-hover:opacity-100 transition-opacity"></div>
+</div>
+<span class="text-sm font-medium">Public Archive</span>
+</label>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Column -->
+<div class="col-span-12 lg:col-span-5 space-y-8">
+<!-- Section 3: Data Vis & KPI -->
+<div class="bg-on-background p-8 rounded-xl shadow-2xl text-white relative overflow-hidden">
+<div class="absolute -right-12 -top-12 w-48 h-48 bg-primary/10 rounded-full blur-3xl"></div>
+<div class="relative z-10">
+<div class="flex justify-between items-start mb-8">
+<div>
+<p class="text-[10px] font-label font-bold text-primary uppercase tracking-widest">Network Latency</p>
+<h4 class="text-4xl font-black mt-1">24.5<span class="text-lg font-light text-slate-400">ms</span></h4>
+</div>
+<span class="material-symbols-outlined text-tertiary-fixed text-4xl" data-icon="monitoring">monitoring</span>
+</div>
+<div class="space-y-4">
+<div class="flex justify-between text-xs font-label">
+<span class="text-slate-400">STABILITY INDEX</span>
+<span class="text-tertiary-fixed font-bold">98.2%</span>
+</div>
+<div class="w-full h-1.5 bg-white/10 rounded-full overflow-hidden">
+<div class="w-[98%] h-full bg-tertiary-fixed shadow-[0_0_10px_rgba(0,251,251,0.5)]"></div>
+</div>
+</div>
+<div class="mt-8 flex gap-2">
+<div class="flex-1 h-12 bg-white/5 rounded-lg flex items-end p-1 gap-1">
+<div class="w-full bg-tertiary-fixed/30 h-4 rounded-sm"></div>
+<div class="w-full bg-tertiary-fixed/40 h-8 rounded-sm"></div>
+<div class="w-full bg-tertiary-fixed/60 h-6 rounded-sm"></div>
+<div class="w-full bg-tertiary-fixed h-10 rounded-sm"></div>
+<div class="w-full bg-tertiary-fixed/80 h-5 rounded-sm"></div>
+</div>
+<div class="flex-1 h-12 bg-white/5 rounded-lg flex items-center justify-center">
+<span class="text-[10px] font-label text-slate-400">UPTIME REALTIME</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Section 4: Status Indicators -->
+<div class="bg-surface-container-lowest p-8 rounded-xl shadow-sm ghost-border">
+<div class="flex items-center gap-2 mb-6">
+<span class="material-symbols-outlined text-primary" data-icon="error">error</span>
+<h3 class="text-xl font-bold tracking-tight">System Status</h3>
+</div>
+<div class="space-y-4">
+<div class="flex items-center justify-between p-3 bg-tertiary-container/10 rounded-xl">
+<div class="flex items-center gap-3">
+<span class="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></span>
+<span class="text-sm font-bold">Main Server Cluster</span>
+</div>
+<span class="px-3 py-1 bg-tertiary-container text-on-tertiary-container rounded-full text-[10px] font-bold uppercase tracking-widest">Active</span>
+</div>
+<div class="flex items-center justify-between p-3 bg-primary-container/10 rounded-xl">
+<div class="flex items-center gap-3">
+<span class="w-2 h-2 rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]"></span>
+<span class="text-sm font-bold">Metadata indexing</span>
+</div>
+<span class="px-3 py-1 bg-primary-container/30 text-primary rounded-full text-[10px] font-bold uppercase tracking-widest">Pending</span>
+</div>
+<div class="flex items-center justify-between p-3 bg-red-50 rounded-xl">
+<div class="flex items-center gap-3">
+<span class="w-2 h-2 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]"></span>
+<span class="text-sm font-bold">Legacy API Access</span>
+</div>
+<span class="px-3 py-1 bg-red-100 text-red-600 rounded-full text-[10px] font-bold uppercase tracking-widest">Blocked</span>
+</div>
+<div class="flex items-center justify-between p-3 bg-cyan-50 rounded-xl">
+<div class="flex items-center gap-3">
+<span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse shadow-[0_0_8px_rgba(34,211,238,0.5)]"></span>
+<span class="text-sm font-bold">Local Cache</span>
+</div>
+<span class="px-3 py-1 bg-cyan-100 text-cyan-600 rounded-full text-[10px] font-bold uppercase tracking-widest">Syncing</span>
+</div>
+</div>
+</div>
+<!-- Section 5: Typography -->
+<div class="bg-surface-container-lowest p-8 rounded-xl shadow-sm ghost-border">
+<div class="flex items-center gap-2 mb-6">
+<span class="material-symbols-outlined text-primary" data-icon="text_fields">text_fields</span>
+<h3 class="text-xl font-bold tracking-tight">Typography</h3>
+</div>
+<div class="space-y-6">
+<div>
+<p class="text-[10px] font-label text-slate-400 mb-1">DISPLAY H1</p>
+<h1 class="text-4xl font-black tracking-tighter leading-none">Inter Black Extra</h1>
+</div>
+<div>
+<p class="text-[10px] font-label text-slate-400 mb-1">HEADLINE H2</p>
+<h2 class="text-2xl font-bold tracking-tight">SemiBold Headline Style</h2>
+</div>
+<div>
+<p class="text-[10px] font-label text-slate-400 mb-1">SUBHEADER H3</p>
+<h3 class="text-lg font-medium">Medium Weighted Title</h3>
+</div>
+<div>
+<p class="text-[10px] font-label text-slate-400 mb-1">BODY TEXT</p>
+<p class="text-sm text-secondary leading-relaxed">High-end UI breathes through generous line height and intentional white space. This paragraph uses Inter regular at 1.6 spacing.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Visual Asset Showcase (Asymmetric Layout) -->
+<section class="mt-16 grid grid-cols-12 gap-8">
+<div class="col-span-12 md:col-span-8 h-80 rounded-2xl overflow-hidden relative group">
+<img class="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700" data-alt="cinematic close-up of a vintage film projector in a dark room with dramatic spotlight and dust particles in the air" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD7_Su9zjtDlQ15cuOWX3PI3ytU4OJURPc1SaxEDp8o7JnexWEM13M7aX3hZDxb3nEKhX-9bHZfP7CjCCEkSnDn_CMk79SXwqaRIrTAhCf_FSk_KdYBI5fF7Qrw-1PhVTaPUTlQvOjpNWGTL5GajiJtAzK6I26jDHrS-RZt3oXB2aV5vO_wqR-vDkZFt1DyOaflyDIWpAHT_HRXo9oe5kgzkkpSA4LM9PehRfiJQuA6Bs259ctNZXON9N6CLIAf14y8uSwsth4evzg"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex items-end p-8">
+<div>
+<span class="bg-primary px-3 py-1 rounded-full text-[10px] font-bold text-white uppercase tracking-widest">Featured Resource</span>
+<h4 class="text-3xl font-black text-white mt-2">Visual Asset Guidelines</h4>
+</div>
+</div>
+</div>
+<div class="col-span-12 md:col-span-4 bg-primary-container p-8 rounded-2xl flex flex-col justify-between">
+<span class="material-symbols-outlined text-on-primary-container text-5xl" data-icon="auto_awesome">auto_awesome</span>
+<div>
+<h5 class="text-xl font-bold text-on-primary-container leading-tight mb-4">Mastering the Digital Curator aesthetic.</h5>
+<button class="w-full py-4 bg-on-background text-white rounded-xl font-bold hover:opacity-90 transition-opacity">Download Kit</button>
+</div>
+</div>
+</section>
+</main>
+</body></html>

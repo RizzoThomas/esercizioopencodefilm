@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="it-IT">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CineBase - Gestione Registi</title>
+
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
+  <script src="/js/tailwind-config.js"></script>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="/css/styles.css?v=2" rel="stylesheet">
+  <script src="/js/route-guard.js"></script>
+</head>
+
+<body class="bg-canvas text-ink font-sans">
+  <div id="navbar-container"></div>
+
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Page Header -->
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
+      <div>
+        <h1 class="text-2xl font-bold text-ink">Gestione Registi</h1>
+        <p class="text-sm text-body mt-1">Gestisci i registi</p>
+      </div>
+      <div class="mt-4 md:mt-0">
+        <button onclick="openModal('regista-modal', 'Aggiungi Regista')"
+          class="btn-primary text-white px-4 py-2 text-sm font-medium">
+          <i class="fa-solid fa-plus mr-2"></i>Aggiungi Regista
+        </button>
+      </div>
+    </div>
+
+    <!-- Stats Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <div class="card-ferrari overflow-hidden">
+        <div class="p-5 flex items-center">
+          <div class="flex-shrink-0 bg-ferrari-primary p-3">
+            <i class="fa-solid fa-user text-white text-xl"></i>
+          </div>
+          <div class="ml-5 w-0 flex-1">
+            <dl>
+              <dt class="text-sm font-medium text-body truncate">Registi Totali</dt>
+              <dd class="text-2xl font-semibold text-ink" id="total-registi">0</dd>
+            </dl>
+          </div>
+        </div>
+      </div>
+      <div class="card-ferrari overflow-hidden">
+        <div class="p-5 flex items-center">
+          <div class="flex-shrink-0 bg-ferrari-primary p-3">
+            <i class="fa-solid fa-globe text-white text-xl"></i>
+          </div>
+          <div class="ml-5 w-0 flex-1">
+            <dl>
+              <dt class="text-sm font-medium text-body truncate">Nazionalita</dt>
+              <dd class="text-2xl font-semibold text-ink" id="total-nationalities">0</dd>
+            </dl>
+          </div>
+        </div>
+      </div>
+      <div class="card-ferrari overflow-hidden">
+        <div class="p-5 flex items-center">
+          <div class="flex-shrink-0 bg-ferrari-primary p-3">
+            <i class="fa-solid fa-film text-white text-xl"></i>
+          </div>
+          <div class="ml-5 w-0 flex-1">
+            <dl>
+              <dt class="text-sm font-medium text-body truncate">Film Associati</dt>
+              <dd class="text-2xl font-semibold text-ink" id="total-films-associated">0</dd>
+            </dl>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Table Controls -->
+    <div class="card-ferrari mb-6 p-4">
+      <div class="flex flex-col md:flex-row gap-4">
+        <div class="flex-1 relative">
+          <input type="text" id="search-input" placeholder="Cerca registi..." class="input-ferrari px-4 py-2 w-full">
+          <i class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-body"></i>
+        </div>
+        <select class="input-ferrari px-4 py-2" title="Ordina registi">
+          <option>Aggiunti di recente</option>
+          <option>Nome A-Z</option>
+          <option>Piu film</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="card-ferrari overflow-x-auto">
+      <table class="min-w-full divide-y divide-hairline">
+        <thead class="bg-canvas-elevated">
+          <tr>
+            <th class="px-6 py-3 text-left label-caps">ID</th>
+            <th class="px-6 py-3 text-left label-caps">Nome</th>
+            <th class="px-6 py-3 text-left label-caps">Cognome</th>
+            <th class="px-6 py-3 text-left label-caps">Nazionalità</th>
+            <th class="px-6 py-3 text-left label-caps">Film</th>
+            <th class="px-6 py-3 text-left label-caps">Azioni</th>
+          </tr>
+        </thead>
+        <tbody id="registi-table-body" class="bg-canvas divide-y divide-hairline">
+          <tr>
+            <td colspan="6" class="px-6 py-4 text-center text-body">Caricamento...</td>
+          </tr>
+        </tbody>
+      </table>
+      <div
+        class="px-6 py-4 border-t border-hairline-variant/10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <p id="pagination-info" class="text-sm text-body">Caricamento...</p>
+        <div class="flex items-center gap-2">
+          <button id="pagination-first" onclick="goToFirstPage()" type="button" title="Prima pagina"
+            aria-label="Vai alla prima pagina"
+            class="px-3 py-1.5 border border-hairline-variant text-sm text-ink btn-page disabled:opacity-50 disabled:cursor-not-allowed">
+            <i class="fa-solid fa-angles-left"></i>
+          </button>
+          <button id="pagination-prev" onclick="goToPrevPage()" type="button" title="Pagina precedente"
+            aria-label="Vai alla pagina precedente"
+            class="px-3 py-1.5 border border-hairline-variant text-sm text-ink btn-page disabled:opacity-50 disabled:cursor-not-allowed">
+            <i class="fa-solid fa-chevron-left"></i>
+          </button>
+          <span id="page-indicator" class="text-sm text-ink px-2">Pagina 1 di 1</span>
+          <button id="pagination-next" onclick="goToNextPage()" type="button" title="Pagina successiva"
+            aria-label="Vai alla pagina successiva"
+            class="px-3 py-1.5 border border-hairline-variant text-sm text-ink btn-page disabled:opacity-50 disabled:cursor-not-allowed">
+            <i class="fa-solid fa-chevron-right"></i>
+          </button>
+          <button id="pagination-last" onclick="goToLastPage()" type="button" title="Ultima pagina"
+            aria-label="Vai all'ultima pagina"
+            class="px-3 py-1.5 border border-hairline-variant text-sm text-ink btn-page disabled:opacity-50 disabled:cursor-not-allowed">
+            <i class="fa-solid fa-angles-right"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div id="footer-container"></div>
+
+  <!-- Toast Container -->
+  <div id="toast-container" class="fixed bottom-4 right-4 z-50"></div>
+
+  <!-- Modal -->
+  <div id="regista-modal" class="fixed inset-0 z-50 hidden" aria-labelledby="modal-title" role="dialog"
+    aria-modal="true">
+    <div class="fixed inset-0 bg-gray-500/75 transition-opacity modal-backdrop"></div>
+    <div class="fixed inset-0 z-10 overflow-y-auto">
+      <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+        <div
+          class="relative transform overflow-hidden bg-canvas-elevated-lowest text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
+          <div class="bg-canvas-elevated-lowest px-6 pt-6 pb-4">
+            <h3 class="text-lg font-bold text-ink" id="modal-title">Aggiungi Regista</h3>
+            <button type="button"
+              class="absolute top-4 right-4 text-body hover:text-ink"
+              onclick="closeModal('regista-modal')" title="Chiudi" aria-label="Chiudi modal">
+              <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+          </div>
+          <div class="bg-canvas-elevated-lowest px-6 pb-4">
+            <form id="regista-form" class="space-y-4">
+              <input type="hidden" name="id" value="">
+              <div>
+                <label for="regista-nome" class="block text-sm font-medium text-ink mb-1">Nome</label>
+                <input id="regista-nome" type="text" name="nome" required class="input-ferrari w-full px-4 py-2"
+                  title="Nome del regista">
+              </div>
+              <div>
+                <label for="regista-cognome"
+                  class="block text-sm font-medium text-ink mb-1">Cognome</label>
+                <input id="regista-cognome" type="text" name="cognome" required class="input-ferrari w-full px-4 py-2"
+                  title="Cognome del regista">
+              </div>
+              <div>
+                <label for="regista-nazionalita"
+                  class="block text-sm font-medium text-ink mb-1">Nazionalità</label>
+                <input id="regista-nazionalita" type="text" name="nazionalita" class="input-ferrari w-full px-4 py-2"
+                  title="Nazionalità del regista">
+              </div>
+            </form>
+          </div>
+          <div class="bg-canvas-elevated-low px-6 py-4 flex justify-end gap-3">
+            <button type="button" class="btn-outline px-4 py-2 text-sm font-medium"
+              onclick="closeModal('regista-modal')">Annulla</button>
+            <button type="submit" form="regista-form" class="btn-primary">Salva</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Modal -->
+  <div id="delete-modal" class="fixed inset-0 z-50 hidden">
+    <div class="fixed inset-0 bg-gray-500/75 modal-backdrop"></div>
+    <div class="fixed inset-0 z-10 overflow-y-auto">
+      <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+        <div
+          class="relative transform overflow-hidden bg-canvas-elevated-lowest text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-md">
+          <div class="bg-canvas-elevated-lowest px-6 pt-6 pb-4">
+            <div class="flex items-center gap-4">
+              <div class="flex-shrink-0 flex items-center justify-center h-12 w-12 bg-red-100">
+                <i class="fa-solid fa-triangle-exclamation text-red-600 text-xl"></i>
+              </div>
+              <div>
+                <h3 class="text-lg font-bold text-ink">Conferma Eliminazione</h3>
+                <p class="text-sm text-body mt-1" id="delete-message">Sei sicuro di voler eliminare
+                  questo elemento?</p>
+              </div>
+            </div>
+          </div>
+          <div class="bg-canvas-elevated-low px-6 py-4 flex justify-end gap-3">
+            <button type="button" class="btn-outline px-4 py-2 text-sm font-medium"
+              onclick="closeDeleteModal()">Annulla</button>
+            <button type="button"
+              class="px-4 py-2 bg-red-600 text-white text-sm font-medium hover:bg-red-700"
+              id="confirm-delete-btn">Elimina</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/utils.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/template-loader.js"></script>
+  <script src="/js/admin-shell.js"></script>
+  <script src="/js/form-handlers.js"></script>
+  <script src="/js/navbar.js"></script>
+  <script src="/js/pages/registi.js"></script>
+  <script>
+    function openModal(modalId, title = 'Aggiungi') {
+      document.getElementById('modal-title').textContent = title;
+      document.getElementById(modalId).classList.remove('hidden');
+      document.getElementById('regista-form').reset();
+      document.getElementById('regista-form').dataset.editId = '';
+    }
+
+    function closeModal(modalId) {
+      document.getElementById(modalId).classList.add('hidden');
+    }
+
+    function openDeleteModal(itemName, callback) {
+      document.getElementById('delete-message').textContent = `Sei sicuro di voler eliminare "${itemName}"?`;
+      document.getElementById('delete-modal').classList.remove('hidden');
+      document.getElementById('confirm-delete-btn').onclick = () => {
+        callback();
+        closeDeleteModal();
+      };
+    }
+
+    function closeDeleteModal() {
+      document.getElementById('delete-modal').classList.add('hidden');
+    }
+  </script>
+</body>
+
+</html>
+
+
+

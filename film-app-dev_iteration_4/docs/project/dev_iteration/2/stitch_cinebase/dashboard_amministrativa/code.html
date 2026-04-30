@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CineManage - Movie Admin Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ec5b13",
+                        "background-light": "#f8f6f6",
+                        "background-dark": "#221610",
+                    },
+                    fontFamily: {
+                        "display": ["Public Sans", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+</head>
+<body class="font-display bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 antialiased">
+<div class="flex min-h-screen overflow-hidden">
+<!-- Sidebar -->
+<aside class="w-64 flex-shrink-0 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col">
+<div class="p-6 flex items-center gap-3">
+<div class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-white shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined fill-1">movie_filter</span>
+</div>
+<div>
+<h1 class="text-lg font-bold leading-tight tracking-tight">CineManage</h1>
+<p class="text-xs text-slate-500 dark:text-slate-400 font-medium">Admin Console</p>
+</div>
+</div>
+<nav class="flex-1 px-4 py-4 space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl bg-primary text-white font-semibold transition-all shadow-md shadow-primary/20" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span>Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all" href="#">
+<span class="material-symbols-outlined">movie</span>
+<span>Movies</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all" href="#">
+<span class="material-symbols-outlined">person</span>
+<span>Directors</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all" href="#">
+<span class="material-symbols-outlined">theater_comedy</span>
+<span>Cinemas</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all" href="#">
+<span class="material-symbols-outlined">calendar_month</span>
+<span>Screenings</span>
+</a>
+</nav>
+<div class="p-4 mt-auto border-t border-slate-200 dark:border-slate-800">
+<div class="flex items-center gap-3 p-2">
+<div class="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden">
+<img alt="User Avatar" class="w-full h-full object-cover" data-alt="User avatar illustration of a male profile" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCp9fFL9yLUXfsR15vIsS5HZJg732J705RAavNiSwk3MtYTiSkI4h1NLatVyHJLbkpyOkr8eLWXSFVqhavSyl6pjHJZkJuQpnxCxXkZD7990XN3r6f-gP2N57Gm3tyvU65lem2deoZl3SECshkZTki29ZAcmB2CoFAviJru_tlzSUo2iPICEfy-3kojc4a4LtvYODX88SBc1FZoBU6ZcprIx4D4OmTFnQISq-KEGp_bn9TqMjrj3ebELS9v10dAeph5oIxlxoxdlX0"/>
+</div>
+<div class="flex-1 min-w-0">
+<p class="text-sm font-semibold truncate">Alex Rivera</p>
+<p class="text-xs text-slate-500 dark:text-slate-400 truncate">Senior Admin</p>
+</div>
+<button class="text-slate-400 hover:text-primary">
+<span class="material-symbols-outlined text-xl">logout</span>
+</button>
+</div>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 flex flex-col min-w-0 overflow-y-auto">
+<!-- Header -->
+<header class="sticky top-0 z-10 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md px-8 py-4 flex items-center justify-between border-b border-slate-200 dark:border-slate-800">
+<div class="flex items-center gap-4">
+<h2 class="text-2xl font-bold tracking-tight">Overview</h2>
+</div>
+<div class="flex items-center gap-6">
+<div class="relative w-64">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg">search</span>
+<input class="w-full pl-10 pr-4 py-2 bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:ring-primary focus:border-primary transition-all" placeholder="Search movies, screenings..." type="text"/>
+</div>
+<div class="flex items-center gap-2">
+<button class="p-2 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg relative transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full"></span>
+</button>
+<button class="p-2 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg transition-colors">
+<span class="material-symbols-outlined">settings</span>
+</button>
+</div>
+</div>
+</header>
+<div class="p-8 max-w-7xl mx-auto w-full space-y-8">
+<!-- Welcome Section -->
+<div>
+<h3 class="text-lg font-medium text-slate-500 dark:text-slate-400">Welcome back, Alex</h3>
+<p class="text-sm text-slate-400 dark:text-slate-500">Here's a quick look at your cinema network today.</p>
+</div>
+<!-- Stats Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+<!-- Total Movies -->
+<div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+<div class="flex items-center justify-between mb-4">
+<div class="w-12 h-12 bg-primary/10 text-primary rounded-xl flex items-center justify-center">
+<span class="material-symbols-outlined text-2xl">movie</span>
+</div>
+<span class="text-emerald-500 text-sm font-bold flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">trending_up</span> 12%
+                            </span>
+</div>
+<p class="text-slate-500 dark:text-slate-400 text-sm font-medium">Total Movies</p>
+<p class="text-3xl font-bold mt-1 tracking-tight">1,240</p>
+</div>
+<!-- Total Directors -->
+<div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+<div class="flex items-center justify-between mb-4">
+<div class="w-12 h-12 bg-blue-500/10 text-blue-500 rounded-xl flex items-center justify-center">
+<span class="material-symbols-outlined text-2xl">person</span>
+</div>
+<span class="text-emerald-500 text-sm font-bold flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">trending_up</span> 3%
+                            </span>
+</div>
+<p class="text-slate-500 dark:text-slate-400 text-sm font-medium">Total Directors</p>
+<p class="text-3xl font-bold mt-1 tracking-tight">458</p>
+</div>
+<!-- Cinemas Active -->
+<div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+<div class="flex items-center justify-between mb-4">
+<div class="w-12 h-12 bg-purple-500/10 text-purple-500 rounded-xl flex items-center justify-center">
+<span class="material-symbols-outlined text-2xl">theater_comedy</span>
+</div>
+<span class="text-slate-400 text-sm font-bold">Stable</span>
+</div>
+<p class="text-slate-500 dark:text-slate-400 text-sm font-medium">Cinemas Active</p>
+<p class="text-3xl font-bold mt-1 tracking-tight">12</p>
+</div>
+<!-- Today's Screenings -->
+<div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+<div class="flex items-center justify-between mb-4">
+<div class="w-12 h-12 bg-orange-500/10 text-orange-500 rounded-xl flex items-center justify-center">
+<span class="material-symbols-outlined text-2xl">schedule</span>
+</div>
+<span class="text-emerald-500 text-sm font-bold flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">trending_up</span> 5%
+                            </span>
+</div>
+<p class="text-slate-500 dark:text-slate-400 text-sm font-medium">Today's Screenings</p>
+<p class="text-3xl font-bold mt-1 tracking-tight">84</p>
+</div>
+</div>
+<!-- Main Content Layout -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+<!-- Recent Screenings Table -->
+<div class="lg:col-span-2 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+<div class="px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+<h4 class="font-bold text-lg">Upcoming Screenings</h4>
+<button class="text-primary text-sm font-bold hover:underline">View All</button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead>
+<tr class="text-xs uppercase text-slate-400 font-bold border-b border-slate-100 dark:border-slate-800">
+<th class="px-6 py-4">Movie</th>
+<th class="px-6 py-4">Cinema</th>
+<th class="px-6 py-4">Time</th>
+<th class="px-6 py-4">Status</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-14 bg-slate-200 dark:bg-slate-700 rounded overflow-hidden flex-shrink-0">
+<div class="w-full h-full bg-gradient-to-br from-primary to-orange-700" data-alt="Vibrant orange and red movie poster abstract gradient"></div>
+</div>
+<div>
+<p class="font-bold text-sm">Interstellar 2</p>
+<p class="text-xs text-slate-500">Sci-Fi • 2h 45m</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 text-sm font-medium">Grand Odeon Hall 4</td>
+<td class="px-6 py-4 text-sm text-slate-500">18:30 PM</td>
+<td class="px-6 py-4">
+<span class="px-2 py-1 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 text-xs font-bold rounded-full">On Schedule</span>
+</td>
+</tr>
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-14 bg-slate-200 dark:bg-slate-700 rounded overflow-hidden flex-shrink-0">
+<div class="w-full h-full bg-gradient-to-br from-blue-600 to-indigo-900" data-alt="Deep blue and purple cinematic poster background"></div>
+</div>
+<div>
+<p class="font-bold text-sm">Midnight City</p>
+<p class="text-xs text-slate-500">Noir • 1h 55m</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 text-sm font-medium">Downtown Cineplex</td>
+<td class="px-6 py-4 text-sm text-slate-500">21:00 PM</td>
+<td class="px-6 py-4">
+<span class="px-2 py-1 bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 text-xs font-bold rounded-full">Nearly Sold Out</span>
+</td>
+</tr>
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-14 bg-slate-200 dark:bg-slate-700 rounded overflow-hidden flex-shrink-0">
+<div class="w-full h-full bg-gradient-to-br from-slate-600 to-slate-900" data-alt="Abstract dark grey and black textured background"></div>
+</div>
+<div>
+<p class="font-bold text-sm">The Silent Valley</p>
+<p class="text-xs text-slate-500">Thriller • 2h 10m</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 text-sm font-medium">Starlight Plaza</td>
+<td class="px-6 py-4 text-sm text-slate-500">19:45 PM</td>
+<td class="px-6 py-4">
+<span class="px-2 py-1 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 text-xs font-bold rounded-full">On Schedule</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Side Section: Quick Actions / Active Directors -->
+<div class="space-y-6">
+<!-- Top Directors -->
+<div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+<h4 class="font-bold text-lg mb-6">Trending Directors</h4>
+<div class="space-y-5">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full overflow-hidden border-2 border-primary/20 p-0.5">
+<img alt="Director 1" class="w-full h-full object-cover rounded-full" data-alt="Stylized portrait of a male director" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAdKX0Nyw1or9U_9acLJA1VSfuK6wopvjjXVU-jLmIwNSBY0kHpUrtatF0M3c9h6dFSmtIfdS39kA05eCNgBznHMz82olntmhEGZ_c6M0_SBXEANDx_EIRXcNhwZX5l4LdkGZzGdL2Yfmwmo9GNFQXMCeeXAWKBo0IfrQaKxvsQiKPeQvpn2qeQ0-OlhbigEUrzdUDsAFiP3lnIilr4gH82f0YeemirBBYPf-SwC9RF8_R81OSoqLhvkkQsXLOfU_vKsDlj8mumDyA"/>
+</div>
+<div class="flex-1">
+<p class="text-sm font-bold">Christopher Nolan</p>
+<p class="text-xs text-slate-500">3 Active Projects</p>
+</div>
+<span class="material-symbols-outlined text-slate-300">chevron_right</span>
+</div>
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full overflow-hidden border-2 border-primary/20 p-0.5">
+<img alt="Director 2" class="w-full h-full object-cover rounded-full" data-alt="Stylized portrait of a female director" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD0LbzIVyerqHZszESdxc2vpdvWBlKacJLEIJOtVlXLmQrldcLu7kooO-a8rz67OMcZEn9j3DeDfzMJJBjXAxFxDWRzXl1LlUKriZuqTON0kGlYZMDoG3HEX07JtXiQy-4E6lkZj7scdR8vLdkK0-jM772SR4VaH3b94H22lWEo1wvS4a370yLfDIGeQkSeeaflAxlHT2tPxmhZ7yMAtmywZhXuaR-1HKBBdyMdgpKDjvcmj75c2OpDUKzaqi56au-7sWPsBSorJbQ"/>
+</div>
+<div class="flex-1">
+<p class="text-sm font-bold">Greta Gerwig</p>
+<p class="text-xs text-slate-500">1 Active Project</p>
+</div>
+<span class="material-symbols-outlined text-slate-300">chevron_right</span>
+</div>
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full overflow-hidden border-2 border-primary/20 p-0.5">
+<img alt="Director 3" class="w-full h-full object-cover rounded-full" data-alt="Stylized portrait of a male director with glasses" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAqlfpIDV1iIRjl99fAtDeFq2nK5t3PDFz7GWyEe4qj71J_CMLSPrA3iIaNIrGSW7qVQA0fQhXN8EBkcWmUzGCarH8J5OIynrc6zIK_wJ4adQt0_P8EhTrz7Sk0UbP05ZzXQbVul_ISlWFUFua2KxfKH1nLfYHfcGF7IJmfqDQwPI1Y_gwPtMkqQl0MTLJ-j5cUq0IwTcVDdIOgnk-VjAal4-r9Y2CJQ1lUC5bMRmsxoQZmrLq7BnPrvAx6YUopsbLubX57EO8f3yw"/>
+</div>
+<div class="flex-1">
+<p class="text-sm font-bold">Wes Anderson</p>
+<p class="text-xs text-slate-500">2 Active Projects</p>
+</div>
+<span class="material-symbols-outlined text-slate-300">chevron_right</span>
+</div>
+</div>
+<button class="w-full mt-6 py-2.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold text-sm rounded-xl hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+                                View Directory
+                            </button>
+</div>
+<!-- Quick Stats Mini Card -->
+<div class="bg-primary p-6 rounded-xl shadow-lg shadow-primary/30 relative overflow-hidden">
+<div class="relative z-10">
+<h4 class="text-white font-bold text-lg mb-2">Cinema Insights</h4>
+<p class="text-white/80 text-sm mb-4">You have reached 92% occupancy across all active screenings today.</p>
+<div class="w-full bg-white/20 h-2 rounded-full overflow-hidden">
+<div class="bg-white h-full w-[92%] rounded-full"></div>
+</div>
+</div>
+<!-- Abstract Pattern decoration -->
+<div class="absolute -right-4 -bottom-4 w-24 h-24 bg-white/10 rounded-full blur-2xl"></div>
+<div class="absolute -left-4 -top-4 w-24 h-24 bg-orange-300/20 rounded-full blur-2xl"></div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

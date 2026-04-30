@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="it-IT">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CineBase - Login</title>
+
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
+  <script src="/js/tailwind-config.js"></script>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="/css/styles.css?v=2" rel="stylesheet">
+  <script src="/js/route-guard.js"></script>
+</head>
+
+<body class="bg-canvas text-ink font-sans min-h-screen flex flex-col">
+  <div id="navbar-container"></div>
+
+  <div class="flex-1 flex items-center justify-center px-4 py-12">
+    <div class="w-full max-w-md">
+      <!-- Logo -->
+      <div class="text-center mb-8">
+        <a href="/index.html" class="text-3xl font-bold text-ferrari-primary tracking-tight inline-flex items-center gap-2">
+          <span class="text-4xl">🎬</span>
+          CineBase
+        </a>
+      </div>
+
+      <!-- Login Card -->
+      <div class=" card-ferrari p-8">
+        <div class="text-center mb-6">
+          <h1 class="text-2xl font-bold text-ink mb-2">Accedi al tuo account</h1>
+          <p class="text-body text-sm">Inserisci le tue credenziali per continuare</p>
+        </div>
+
+        <!-- Error Alert -->
+        <div id="error-alert"
+          class="hidden bg-ferrari-primary border border-ferrari-primary/30 text-ferrari-semantic-warning px-4 py-3 mb-6 text-sm">
+          <i class="fa-solid fa-circle-exclamation mr-2"></i>
+          <span id="error-message"></span>
+        </div>
+
+        <!-- Expired Alert -->
+        <div id="expired-alert"
+          class="hidden bg-ferrari-primary border border-ferrari-primary/30 text-ferrari-primary px-4 py-3 mb-6 text-sm">
+          <i class="fa-solid fa-clock mr-2"></i>
+          <span>La tua sessione è scaduta. Effettua il login per continuare.</span>
+        </div>
+
+        <!-- Login Form -->
+        <form id="login-form" class="space-y-5">
+          <div>
+            <label for="email" class="block text-sm font-medium text-ink mb-2">Email</label>
+            <input type="email" id="email" name="email" class="input-ferrari w-full px-4 py-3"
+              placeholder="nome@esempio.com" required autocomplete="email">
+          </div>
+
+          <div>
+            <label for="password" class="block text-sm font-medium text-ink mb-2">Password</label>
+            <div class="relative">
+              <input type="password" id="password" name="password" class="input-ferrari w-full px-4 py-3 pr-12"
+                placeholder="Inserisci la password" required autocomplete="current-password">
+              <button type="button" id="toggle-password" title="Mostra o nascondi password"
+                aria-label="Mostra o nascondi password"
+                class="absolute right-3 top-1/2 -translate-y-1/2 text-body hover:text-ink">
+                <i class="fa-solid fa-eye"></i>
+              </button>
+            </div>
+          </div>
+
+          <button type="submit" id="submit-btn" class="btn-primary w-full py-3 text-base font-semibold">
+            <span id="btn-text">Accedi</span>
+            <span id="btn-loader" class="hidden">
+              <i class="fa-solid fa-spinner fa-spin mr-2"></i>Accesso in corso...
+            </span>
+          </button>
+        </form>
+
+        <!-- Divider -->
+        <div class="flex items-center gap-4 my-6">
+          <div class="flex-1 h-px bg-canvas-elevated/30"></div>
+          <span class="text-body text-sm">oppure</span>
+          <div class="flex-1 h-px bg-canvas-elevated/30"></div>
+        </div>
+
+        <!-- Register Link -->
+        <div class="text-center">
+          <p class="text-body text-sm">
+            Non hai un account?
+            <a href="/registrazione.html" class="text-ferrari-primary hover:text-ferrari-primary-light font-medium ml-1">
+              Registrati
+            </a>
+          </p>
+        </div>
+      </div>
+
+      <!-- Back to Home -->
+      <div class="text-center mt-6">
+        <a href="/index.html"
+          class="text-body hover:text-ferrari-primary text-sm inline-flex items-center gap-1">
+          <i class="fa-solid fa-arrow-left text-xs"></i>
+          Torna alla home
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div id="footer-container"></div>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/template-loader.js"></script>
+  <script src="/js/navbar.js"></script>
+  <script src="/js/pages/login.js"></script>
+</body>
+
+</html>
+
+

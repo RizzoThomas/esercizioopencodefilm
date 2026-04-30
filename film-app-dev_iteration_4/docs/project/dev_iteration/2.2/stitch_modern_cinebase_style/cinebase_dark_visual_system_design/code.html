@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "inverse-primary": "#e9c349",
+                    "surface-container-lowest": "#ffffff",
+                    "secondary": "#5c5c73",
+                    "on-background": "#191a2d",
+                    "surface-tint": "#735c00",
+                    "secondary-fixed": "#e1e0fb",
+                    "surface": "#fbf8ff",
+                    "tertiary-fixed": "#00fbfb",
+                    "surface-dim": "#d9d8f2",
+                    "tertiary-fixed-dim": "#00dddd",
+                    "surface-bright": "#fbf8ff",
+                    "background": "#fbf8ff",
+                    "error": "#ba1a1a",
+                    "on-error-container": "#93000a",
+                    "inverse-surface": "#2e2f43",
+                    "surface-container-low": "#f5f2ff",
+                    "surface-container-high": "#e7e6ff",
+                    "tertiary": "#006a6a",
+                    "on-primary-container": "#554300",
+                    "on-tertiary-fixed": "#002020",
+                    "surface-container-highest": "#e1e0fb",
+                    "on-secondary-fixed-variant": "#44455a",
+                    "on-secondary-container": "#626279",
+                    "on-surface-variant": "#4d4635",
+                    "primary-container": "#d4af37",
+                    "error-container": "#ffdad6",
+                    "tertiary-container": "#00c7c7",
+                    "on-primary": "#ffffff",
+                    "secondary-fixed-dim": "#c5c4de",
+                    "surface-container": "#eeecff",
+                    "on-secondary": "#ffffff",
+                    "primary-fixed-dim": "#e9c349",
+                    "outline-variant": "#d0c5af",
+                    "on-secondary-fixed": "#191a2d",
+                    "primary": "#735c00",
+                    "inverse-on-surface": "#f1efff",
+                    "outline": "#7f7663",
+                    "on-tertiary-container": "#004e4e",
+                    "on-primary-fixed-variant": "#574500",
+                    "on-tertiary": "#ffffff",
+                    "on-primary-fixed": "#241a00",
+                    "secondary-container": "#e1e0fb",
+                    "on-surface": "#191a2d",
+                    "primary-fixed": "#ffe088",
+                    "on-tertiary-fixed-variant": "#004f4f",
+                    "surface-variant": "#e1e0fb",
+                    "on-error": "#ffffff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Inter"],
+                    "body": ["Inter"],
+                    "label": ["Inter"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #0F101A; /* Darker base than Indigo Dark for depth */
+            color: #ffffff;
+            font-family: 'Inter', sans-serif;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-panel {
+            background: rgba(26, 27, 46, 0.85);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(212, 175, 55, 0.1);
+        }
+        .gold-glow {
+            box-shadow: 0 0 40px rgba(212, 175, 55, 0.15);
+        }
+        .cyan-glow {
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.1);
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-primary-container selection:text-on-primary-container">
+<!-- Sidebar from JSON Strategy -->
+<aside class="h-screen w-64 fixed left-0 top-0 bg-[#1A1B2E] dark:bg-[#0F101A] shadow-2xl flex flex-col pt-12 pb-8 h-full z-50">
+<div class="px-8 mb-12">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center">
+<span class="material-symbols-outlined text-white" style="font-variation-settings: 'FILL' 1;">movie_filter</span>
+</div>
+<div>
+<h1 class="text-xl font-black text-white leading-none">CineBase</h1>
+<p class="font-['Inter'] uppercase tracking-widest text-[0.65rem] font-bold text-slate-400 mt-1">Studio Edition</p>
+</div>
+</div>
+</div>
+<nav class="flex-grow space-y-1">
+<a class="flex items-center gap-4 text-slate-400 hover:text-[#D4AF37] py-3 px-8 my-1 transition-colors font-['Inter'] uppercase tracking-widest text-[0.75rem] font-bold group" href="#">
+<span class="material-symbols-outlined">movie_filter</span>
+<span>Production</span>
+</a>
+<a class="flex items-center gap-4 text-slate-400 hover:text-[#D4AF37] py-3 px-8 my-1 transition-colors font-['Inter'] uppercase tracking-widest text-[0.75rem] font-bold group" href="#">
+<span class="material-symbols-outlined">auto_stories</span>
+<span>Catalog</span>
+</a>
+<a class="flex items-center gap-4 text-slate-400 hover:text-[#D4AF37] py-3 px-8 my-1 transition-colors font-['Inter'] uppercase tracking-widest text-[0.75rem] font-bold group" href="#">
+<span class="material-symbols-outlined">description</span>
+<span>Contracts</span>
+</a>
+<a class="flex items-center gap-4 text-slate-400 hover:text-[#D4AF37] py-3 px-8 my-1 transition-colors font-['Inter'] uppercase tracking-widest text-[0.75rem] font-bold group" href="#">
+<span class="material-symbols-outlined">language</span>
+<span>Distribution</span>
+</a>
+<a class="bg-gradient-to-r from-[#D4AF37] to-[#735c00] text-white rounded-r-xl py-3 px-8 my-1 flex items-center gap-4 font-['Inter'] uppercase tracking-widest text-[0.75rem] font-bold translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">tune</span>
+<span>Settings</span>
+</a>
+</nav>
+<div class="px-8 mt-auto pt-8 border-t border-white/5 space-y-4">
+<a class="flex items-center gap-4 text-slate-400 hover:text-[#D4AF37] transition-colors font-['Inter'] uppercase tracking-widest text-[0.75rem] font-bold" href="#">
+<span class="material-symbols-outlined">help</span>
+<span>Support</span>
+</a>
+<a class="flex items-center gap-4 text-slate-400 hover:text-error transition-colors font-['Inter'] uppercase tracking-widest text-[0.75rem] font-bold" href="#">
+<span class="material-symbols-outlined">logout</span>
+<span>Sign Out</span>
+</a>
+</div>
+</aside>
+<!-- Main Canvas -->
+<main class="ml-64 p-12 min-h-screen bg-[#0F101A]">
+<!-- Header Section -->
+<header class="mb-16">
+<div class="flex items-center justify-between">
+<div>
+<span class="font-['Inter'] uppercase tracking-[0.2em] text-[0.75rem] font-bold text-primary mb-2 block">System Documentation</span>
+<h2 class="text-5xl font-black tracking-tighter text-white">Visual System Design</h2>
+<p class="mt-4 text-slate-400 max-w-2xl font-body leading-relaxed text-lg">
+                        The CineBase dark interface is a study in cinematic depth. It utilizes tonal layering and ambient illumination to create a premium, authoritative workspace for film industry professionals.
+                    </p>
+</div>
+<div class="w-48 h-48 bg-gradient-to-br from-[#D4AF37]/20 to-transparent rounded-full blur-3xl"></div>
+</div>
+</header>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-12 gap-8">
+<!-- 1. Color Palette Section -->
+<section class="col-span-12 lg:col-span-7 glass-panel rounded-3xl p-8 relative overflow-hidden">
+<div class="relative z-10">
+<h3 class="font-headline text-2xl font-bold mb-8 flex items-center gap-3">
+<span class="w-2 h-8 bg-primary rounded-full"></span>
+                        Dark Theme Color Palette
+                    </h3>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+<div class="space-y-3">
+<div class="h-32 w-full bg-[#1A1B2E] rounded-xl border border-white/5 flex items-end p-3">
+<span class="text-[0.65rem] font-bold text-white/50">#1A1B2E</span>
+</div>
+<span class="block text-[0.7rem] uppercase font-bold tracking-widest text-slate-500">Indigo Dark</span>
+</div>
+<div class="space-y-3">
+<div class="h-32 w-full bg-[#D4AF37] rounded-xl flex items-end p-3">
+<span class="text-[0.65rem] font-bold text-[#241a00]">#D4AF37</span>
+</div>
+<span class="block text-[0.7rem] uppercase font-bold tracking-widest text-slate-500">Gold Accent</span>
+</div>
+<div class="space-y-3">
+<div class="h-32 w-full bg-[#00FFFF] rounded-xl flex items-end p-3">
+<span class="text-[0.65rem] font-bold text-[#002020]">#00FFFF</span>
+</div>
+<span class="block text-[0.7rem] uppercase font-bold tracking-widest text-slate-500">Technical Cyan</span>
+</div>
+<div class="space-y-3">
+<div class="h-32 w-full bg-[#2E2F43] rounded-xl flex items-end p-3 border border-white/10">
+<span class="text-[0.65rem] font-bold text-white/50">#2E2F43</span>
+</div>
+<span class="block text-[0.7rem] uppercase font-bold tracking-widest text-slate-500">Surface Slate</span>
+</div>
+</div>
+</div>
+<div class="absolute top-0 right-0 p-8 opacity-10">
+<span class="material-symbols-outlined text-[120px]">palette</span>
+</div>
+</section>
+<!-- 4. The Shadow & Glow (Moved for Asymmetry) -->
+<section class="col-span-12 lg:col-span-5 bg-gradient-to-br from-[#1A1B2E] to-[#0F101A] border border-white/5 rounded-3xl p-8 flex flex-col justify-between">
+<div>
+<h3 class="font-headline text-2xl font-bold mb-4">The Shadow &amp; Glow</h3>
+<p class="text-slate-400 font-body text-sm leading-loose">
+                        In dark mode, we replace traditional black shadows with <span class="text-primary font-bold">Ambient Tonal Layering</span>. 
+                        Depth is communicated via "illuminated edges" and 20px backdrop blurs, suggesting a physical glass layering system.
+                    </p>
+</div>
+<div class="mt-8 flex justify-center py-10 relative">
+<div class="w-40 h-24 glass-panel rounded-xl gold-glow relative z-20 flex items-center justify-center border-white/20">
+<span class="text-[0.6rem] font-bold tracking-widest uppercase">Floating Glass</span>
+</div>
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-primary/10 rounded-full blur-3xl"></div>
+</div>
+</section>
+<!-- 2. Cinematic Typography Section -->
+<section class="col-span-12 lg:col-span-4 glass-panel rounded-3xl p-8">
+<h3 class="font-headline text-xl font-bold mb-8">Cinematic Typography</h3>
+<div class="space-y-10">
+<div>
+<span class="block text-[0.6rem] font-bold text-primary mb-2 tracking-widest uppercase">Display 3.5rem</span>
+<h1 class="text-4xl font-black tracking-tighter leading-none">Film Title</h1>
+</div>
+<div>
+<span class="block text-[0.6rem] font-bold text-primary mb-2 tracking-widest uppercase">Headline 1.5rem</span>
+<h2 class="text-2xl font-bold text-white">Production Analytics</h2>
+</div>
+<div>
+<span class="block text-[0.6rem] font-bold text-primary mb-2 tracking-widest uppercase">Body 0.875rem</span>
+<p class="text-slate-400 leading-relaxed text-sm">Set with a generous line height to ensure data-heavy management remains breathable and premium.</p>
+</div>
+<div class="pt-4 border-t border-white/5">
+<span class="block text-[0.6rem] font-bold text-primary mb-2 tracking-widest uppercase">Metadata Label</span>
+<p class="font-['Inter'] uppercase tracking-widest text-[0.7rem] font-bold text-slate-100">ARCHIVE_ID_0912X</p>
+</div>
+</div>
+</section>
+<!-- 3. Dark Mode UI Components -->
+<section class="col-span-12 lg:col-span-8 glass-panel rounded-3xl p-8">
+<h3 class="font-headline text-xl font-bold mb-8">Dark Mode UI Components</h3>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+<!-- Buttons Column -->
+<div class="space-y-8">
+<div>
+<span class="block text-[0.65rem] font-bold text-slate-500 mb-4 tracking-widest uppercase">Action Tokens</span>
+<div class="flex flex-col gap-4">
+<button class="w-full bg-gradient-to-r from-[#D4AF37] to-[#735c00] text-on-primary-fixed font-bold py-3 px-6 rounded-xl shadow-lg active:scale-95 transition-transform">
+                                    Primary Action
+                                </button>
+<button class="w-full border border-[#00FFFF] text-[#00FFFF] hover:bg-[#00FFFF]/10 py-3 px-6 rounded-xl transition-all font-bold flex items-center justify-center gap-2 group">
+<span class="material-symbols-outlined text-sm">analytics</span>
+                                    Technical View
+                                </button>
+</div>
+</div>
+<div>
+<span class="block text-[0.65rem] font-bold text-slate-500 mb-4 tracking-widest uppercase">Navigation State</span>
+<div class="flex gap-4">
+<div class="bg-surface-container-highest/20 p-2 rounded-xl border border-white/10 flex items-center gap-3 pr-6">
+<div class="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-lg">dashboard</span>
+</div>
+<span class="text-xs font-bold uppercase tracking-widest">Active State</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Cards & Chips Column -->
+<div class="space-y-8">
+<div>
+<span class="block text-[0.65rem] font-bold text-slate-500 mb-4 tracking-widest uppercase">Status Indicators</span>
+<div class="flex flex-wrap gap-3">
+<span class="bg-[#10B981]/10 text-[#10B981] px-4 py-1.5 rounded-full text-[0.65rem] font-black uppercase tracking-widest border border-[#10B981]/20">Active</span>
+<span class="bg-[#D4AF37]/10 text-[#D4AF37] px-4 py-1.5 rounded-full text-[0.65rem] font-black uppercase tracking-widest border border-[#D4AF37]/20">Pending</span>
+<span class="bg-error/10 text-error px-4 py-1.5 rounded-full text-[0.65rem] font-black uppercase tracking-widest border border-error/20">Blocked</span>
+</div>
+</div>
+<div>
+<span class="block text-[0.65rem] font-bold text-slate-500 mb-4 tracking-widest uppercase">Information Card</span>
+<div class="bg-[#2E2F43]/40 border border-white/10 rounded-2xl p-5 hover:border-primary/40 transition-colors">
+<div class="flex justify-between items-start mb-4">
+<div class="w-10 h-10 rounded-full overflow-hidden bg-slate-700">
+<img alt="User" data-alt="close-up professional headshot of a film producer in a dark studio setting with cinematic lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBnxINepndTpye7HzPmvmzc1JE04AaN6krvDf3LC-S-CvIaOUlXP56yL8xJwWd6-k3dXDn8zsy2SjxyxqaD26a8VxGM4Zvo9MVc-3bxg-NY99hMODWcFGAuExBPeJAt2cXTvS2LiUS7HNg1VIhViTyi3RGC-D1NRbATUHxs0KCHj5N2dZ8RDDIEp4mVCdqXNTZWd9prT2XM35PwDCUC9vSHwgWIOnHVE6sWPxOQN8K7VtJjUt_ckRPlAkZAzO42hVhVWC79TvXe-pU"/>
+</div>
+<span class="material-symbols-outlined text-slate-500">more_vert</span>
+</div>
+<h4 class="font-bold text-white mb-1">Contract #8291</h4>
+<p class="text-[0.7rem] text-slate-400 font-medium">Last updated 2h ago</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Visualization / Graphic Section -->
+<section class="col-span-12 glass-panel rounded-3xl p-12 overflow-hidden relative">
+<div class="grid grid-cols-1 md:grid-cols-2 items-center gap-16 relative z-10">
+<div>
+<h3 class="font-headline text-3xl font-black mb-6 tracking-tight">The Digital Curator</h3>
+<p class="text-slate-400 leading-relaxed text-lg mb-8">
+                            Our dark interface doesn't just display data; it showcases it. By utilizing wide margins and high-contrast gold accents, we create a sensory experience that mirrors the prestige of a private screening room.
+                        </p>
+<div class="flex gap-6">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">verified</span>
+<span class="text-xs font-bold uppercase tracking-widest">Authorized Access</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">history_edu</span>
+<span class="text-xs font-bold uppercase tracking-widest">Premium Archival</span>
+</div>
+</div>
+</div>
+<div class="relative group">
+<div class="w-full h-80 rounded-2xl bg-gradient-to-br from-[#1A1B2E] to-[#0F101A] border border-white/10 relative overflow-hidden group-hover:border-primary/30 transition-all duration-500">
+<!-- Simulated Chart -->
+<div class="absolute inset-x-0 bottom-0 h-48 flex items-end justify-between px-10 pb-8">
+<div class="w-8 bg-primary/20 h-1/2 rounded-t-lg border-t-2 border-primary"></div>
+<div class="w-8 bg-primary/20 h-2/3 rounded-t-lg border-t-2 border-primary"></div>
+<div class="w-8 bg-primary/20 h-1/3 rounded-t-lg border-t-2 border-primary"></div>
+<div class="w-8 bg-[#00FFFF]/20 h-full rounded-t-lg border-t-2 border-[#00FFFF]"></div>
+<div class="w-8 bg-primary/20 h-3/4 rounded-t-lg border-t-2 border-primary"></div>
+<div class="w-8 bg-primary/20 h-1/2 rounded-t-lg border-t-2 border-primary"></div>
+</div>
+<div class="absolute inset-0 bg-gradient-to-t from-[#0F101A] via-transparent to-transparent"></div>
+</div>
+<!-- Ambient Glow Element -->
+<div class="absolute -top-10 -right-10 w-40 h-40 bg-[#00FFFF]/5 rounded-full blur-3xl"></div>
+</div>
+</div>
+</section>
+</div>
+<!-- Footer / Credits -->
+<footer class="mt-24 pt-8 border-t border-white/5 flex justify-between items-center opacity-40">
+<p class="text-[0.7rem] font-bold uppercase tracking-widest">CineBase V2.0 // Studio Design Language</p>
+<p class="text-[0.7rem] font-bold uppercase tracking-widest">Ref: #CB-VIS-SYS-24</p>
+</footer>
+</main>
+</body></html>

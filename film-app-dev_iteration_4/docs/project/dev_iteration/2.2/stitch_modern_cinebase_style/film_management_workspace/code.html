@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CineBase | Film Management Workspace</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "outline": "#7f7663",
+                        "on-secondary": "#ffffff",
+                        "tertiary-container": "#00c7c7",
+                        "surface-container-high": "#e7e6ff",
+                        "surface-variant": "#e1e0fb",
+                        "on-primary": "#ffffff",
+                        "primary-fixed-dim": "#e9c349",
+                        "on-secondary-container": "#626279",
+                        "primary-container": "#d4af37",
+                        "on-primary-fixed-variant": "#574500",
+                        "error": "#ba1a1a",
+                        "secondary": "#5c5c73",
+                        "on-primary-fixed": "#241a00",
+                        "outline-variant": "#d0c5af",
+                        "inverse-surface": "#2e2f43",
+                        "inverse-primary": "#e9c349",
+                        "on-secondary-fixed-variant": "#44455a",
+                        "tertiary": "#006a6a",
+                        "surface-container-low": "#f5f2ff",
+                        "on-tertiary-fixed-variant": "#004f4f",
+                        "on-tertiary-fixed": "#002020",
+                        "on-tertiary": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "primary-fixed": "#ffe088",
+                        "on-error": "#ffffff",
+                        "surface-container": "#eeecff",
+                        "surface": "#fbf8ff",
+                        "surface-bright": "#fbf8ff",
+                        "on-primary-container": "#554300",
+                        "secondary-fixed": "#e1e0fb",
+                        "background": "#fbf8ff",
+                        "surface-tint": "#735c00",
+                        "inverse-on-surface": "#f1efff",
+                        "error-container": "#ffdad6",
+                        "tertiary-fixed-dim": "#00dddd",
+                        "surface-dim": "#d9d8f2",
+                        "on-secondary-fixed": "#191a2d",
+                        "on-tertiary-container": "#004e4e",
+                        "tertiary-fixed": "#00fbfb",
+                        "secondary-fixed-dim": "#c5c4de",
+                        "surface-container-highest": "#e1e0fb",
+                        "on-surface-variant": "#4d4635",
+                        "on-surface": "#191a2d",
+                        "primary": "#735c00",
+                        "secondary-container": "#e1e0fb",
+                        "surface-container-lowest": "#ffffff",
+                        "on-background": "#191a2d"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Inter"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .headline-bold { font-weight: 800; }
+        .uppercase-labels { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
+        .glass-panel {
+            backdrop-filter: blur(20px);
+            background: linear-gradient(to bottom right, rgba(26, 27, 46, 0.85), rgba(92, 92, 115, 0.7));
+        }
+        body { font-family: 'Inter', sans-serif; background-color: #f5f2ff; }
+    </style>
+</head>
+<body class="text-on-surface">
+<!-- SideNavBar Component -->
+<aside class="fixed left-0 h-screen w-64 z-40 bg-[#1A1B2E] flex flex-col p-6 space-y-8 shadow-2xl">
+<div class="pt-8 flex flex-col items-center">
+<div class="w-16 h-16 rounded-xl bg-primary-container flex items-center justify-center mb-4 shadow-lg overflow-hidden">
+<img alt="CineBase Logo" class="w-full h-full" data-alt="minimalist geometric brand logo with gold and indigo shapes on a textured background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAN91y-6T5vSOE4p1a95k709Inr4v_zFgcFb_KlDYvuv1UOjiKn_qbbJbW0D6RuOI-sfsWL4C2E_D326w844cGW97K2C9d7YGEnobMmD66G9d5GS1iZejdTozQbpF5aN10CZ7KXM6gRa4NHiMb7a6slQo00fl2nq5rX116HnoxAK_-Bpq41pzQzNgHXHpziKKmA_8ODMTTIgMYbpUVifLh-y6MdSh2DYzzrR417lQpmpqgs5aEONcSLA5ivPNbuDuVvCJXxV9k2ZLE"/>
+</div>
+<h1 class="text-xl font-bold text-[#D4AF37] font-headline tracking-tighter">CineBase</h1>
+<p class="font-inter tracking-wide uppercase-labels text-[10px] text-slate-400">Premium Curator</p>
+</div>
+<nav class="flex-1 space-y-2 mt-8">
+<a class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-white transition-colors hover:bg-[#5c5c73]/10 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="uppercase-labels">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-[#D4AF37] bg-[#5c5c73]/30 rounded-lg font-bold" href="#">
+<span class="material-symbols-outlined" data-icon="movie">movie</span>
+<span class="uppercase-labels">Films</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-white transition-colors hover:bg-[#5c5c73]/10 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="person_4">person_4</span>
+<span class="uppercase-labels">Directors</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-white transition-colors hover:bg-[#5c5c73]/10 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="theater_comedy">theater_comedy</span>
+<span class="uppercase-labels">Screenings</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-white transition-colors hover:bg-[#5c5c73]/10 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="leaderboard">leaderboard</span>
+<span class="uppercase-labels">Analytics</span>
+</a>
+</nav>
+<div class="pt-6 border-t border-slate-700/50 space-y-2">
+<a class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-white transition-colors hover:bg-[#5c5c73]/10 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+<span class="uppercase-labels">Help Center</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-white transition-colors hover:bg-[#5c5c73]/10 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+<span class="uppercase-labels">Sign Out</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="ml-64 min-h-screen">
+<!-- TopNavBar Component -->
+<header class="sticky top-0 w-full z-50 bg-slate-50/80 backdrop-blur-xl flex justify-between items-center px-8 py-4 shadow-[0px_10px_30px_rgba(25,26,45,0.06)]">
+<div class="flex items-center gap-8">
+<h2 class="text-2xl font-black tracking-tighter text-[#D4AF37] font-headline uppercase">Archive Management</h2>
+<div class="hidden md:flex gap-6 items-center">
+<a class="text-slate-500 hover:text-[#D4AF37] font-inter tracking-tight uppercase-labels" href="#">Showcase</a>
+<a class="text-[#D4AF37] border-b-2 border-[#D4AF37] pb-1 font-inter tracking-tight uppercase-labels" href="#">Archives</a>
+<a class="text-slate-500 hover:text-[#D4AF37] font-inter tracking-tight uppercase-labels" href="#">Membership</a>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="relative group">
+<input class="bg-surface-container-highest border-none rounded-xl px-10 py-2 text-sm focus:ring-2 focus:ring-primary-container transition-all w-64" placeholder="Search archives..." type="text"/>
+<span class="material-symbols-outlined absolute left-3 top-2.5 text-slate-400 text-sm" data-icon="search">search</span>
+</div>
+<button class="bg-primary-container text-on-primary-container px-6 py-2 rounded-xl font-bold uppercase-labels shadow-lg hover:shadow-xl transition-all">
+                    Enterprise Access
+                </button>
+<div class="flex gap-4">
+<span class="material-symbols-outlined text-slate-500 cursor-pointer hover:text-primary transition-colors" data-icon="notifications">notifications</span>
+<span class="material-symbols-outlined text-slate-500 cursor-pointer hover:text-primary transition-colors" data-icon="settings">settings</span>
+</div>
+<div class="w-10 h-10 rounded-full border-2 border-primary-container overflow-hidden">
+<img alt="Administrator Profile" data-alt="professional portrait of a creative professional in a studio setting with soft lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBbj_F9VPKDK-60fOmsOsn-W4yi_uPTCInD5QHtd46dYBby2FWdLY8RYzLUiE0vjZmUouSeO5ArvS58ST1KwCdoa9nKp2tMtSluF0DXf2rbSGcpgd4f0Lkn2r5sdKH3z09d7UisMFb4tGZQS5fAD-r6Ph6Is2HZthY541UdstGnU_77n2cIqVw5ecVkWQPicu8KnyO820ndI6GvggQR4GlL9M6GrbgWbZ9Tr1FJvKHH1Q_woqf5Q_UL1LTAHhRgxk0SiC6svc3dgXQ"/>
+</div>
+</div>
+</header>
+<div class="p-10 space-y-8">
+<!-- Header Action Row -->
+<div class="flex justify-between items-end">
+<div>
+<h3 class="text-4xl font-black tracking-tighter font-headline text-on-surface">Film Collection</h3>
+<p class="text-secondary mt-2 max-w-lg">Managing the digital assets of the global cinematic authority. Authenticate, categorize, and archive the world's most prestigious motion pictures.</p>
+</div>
+<button class="flex items-center gap-2 bg-primary-container text-white px-8 py-4 rounded-xl font-bold shadow-[0_10px_20px_-5px_rgba(212,175,55,0.4)] hover:scale-105 transition-transform active:scale-95">
+<span class="material-symbols-outlined" data-icon="add">add</span>
+<span class="uppercase-labels">Add New Film</span>
+</button>
+</div>
+<!-- Management Workspace Card -->
+<div class="bg-surface-container-lowest rounded-xl shadow-[0px_10px_30px_rgba(25,26,45,0.06)] overflow-hidden">
+<!-- Table Controls -->
+<div class="p-6 border-b border-surface-container flex justify-between items-center bg-slate-50/50">
+<div class="flex gap-4">
+<div class="bg-surface-container rounded-lg px-4 py-2 flex items-center gap-2 text-sm font-medium">
+<span class="material-symbols-outlined text-sm" data-icon="filter_list">filter_list</span>
+<span class="uppercase-labels">Filters</span>
+</div>
+<div class="bg-surface-container rounded-lg px-4 py-2 flex items-center gap-2 text-sm font-medium">
+<span class="material-symbols-outlined text-sm" data-icon="sort">sort</span>
+<span class="uppercase-labels">Sort: Release Date</span>
+</div>
+</div>
+<div class="text-secondary text-sm font-medium">
+                        Showing <span class="text-on-surface font-bold">128</span> Total Films
+                    </div>
+</div>
+<!-- Cinematic Table -->
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low text-secondary uppercase-labels">
+<th class="px-8 py-5">Title &amp; Production</th>
+<th class="px-8 py-5">Director</th>
+<th class="px-8 py-5">Duration</th>
+<th class="px-8 py-5">Genre</th>
+<th class="px-8 py-5">Status</th>
+<th class="px-8 py-5 text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y-0">
+<!-- Film Row 1 -->
+<tr class="group hover:bg-surface-container transition-all cursor-pointer">
+<td class="px-8 py-6">
+<div class="flex items-center gap-4">
+<div class="w-14 h-20 bg-slate-200 rounded-lg overflow-hidden shadow-md group-hover:scale-110 transition-transform flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="cinematic moody movie poster of a silhouette in a foggy city street with neon highlights" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCCGqPhKnK8m8bf392bDm8I9WN2ED9OPde5as9uTtkogF5UTSRUBbO_EG_b3Lq17AMM3ePhHY0CIcAcolTcXNyTfNkPUaceE4ahmSbZSg-KX1pszWI0Axz-agCHs1bf_umE5_Mb7HXaAL0ZcLYHA7OieWHKdkGsOOZdzXd89WxHgPib6bwaZeNlQ3sd7dlHrDAm7l8u477aC4tJ-P2tSpLyVIn39LX1Bo7bEvKmOGdk5A-nED5EvnrUVkRyGmIkeNzbpIobuGpPwdI"/>
+</div>
+<div>
+<h4 class="font-bold text-on-surface text-lg">Nocturnal Echoes</h4>
+<p class="text-secondary text-sm">2023 • Neo-Noir</p>
+</div>
+</div>
+</td>
+<td class="px-8 py-6">
+<div class="flex items-center gap-2">
+<div class="w-8 h-8 rounded-full bg-slate-200 overflow-hidden">
+<img alt="Director" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBghY_zW7JO2SLl32B3kMBbvBRbMDQt8HSiObakY7MgXKugptu1x67H4npiIFUo-fp5OBlVruJi7ZKt9s1fs26FAb6h9Y7imSpCBTXmMN4DamSpjuB7NuhcU3NXLyTGV6g_wYEzwCE_WCUbooTERMymvdprydgy7Q48wRtRu9seVydTzUPAJ-k43PI3R9GkMZOPCdNlsja_Lp6sX8Yp-Pr7DKcank3gLQOMXp1Of8guP-A7zp7lP0IHIC5337H50xE83qduT6cjQn4"/>
+</div>
+<span class="font-medium">Elena Vance</span>
+</div>
+</td>
+<td class="px-8 py-6">
+<span class="text-secondary font-medium">134 min</span>
+</td>
+<td class="px-8 py-6">
+<div class="flex gap-2">
+<span class="px-3 py-1 rounded-full bg-surface-container-high text-on-secondary-container text-xs font-bold uppercase-labels">Thriller</span>
+</div>
+</td>
+<td class="px-8 py-6">
+<span class="flex items-center gap-1.5 text-emerald-600 font-bold uppercase-labels">
+<span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                                        Released
+                                    </span>
+</td>
+<td class="px-8 py-6 text-right">
+<div class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-2 rounded-lg bg-surface-container-highest text-secondary hover:text-primary hover:bg-primary-fixed transition-all">
+<span class="material-symbols-outlined" data-icon="edit">edit</span>
+</button>
+<button class="p-2 rounded-lg bg-surface-container-highest text-secondary hover:text-error hover:bg-error-container transition-all">
+<span class="material-symbols-outlined" data-icon="delete">delete</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Film Row 2 -->
+<tr class="group hover:bg-surface-container transition-all cursor-pointer">
+<td class="px-8 py-6">
+<div class="flex items-center gap-4">
+<div class="w-14 h-20 bg-slate-200 rounded-lg overflow-hidden shadow-md group-hover:scale-110 transition-transform flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="dramatic wide angle shot of a vintage cinema camera on a dolly track with warm studio lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAJJrH9C88tLttDJBTXJPBbGT_HylqXoZKaL2FMBFyQn0Kf2ZIDSFeIgU7LH3Y36omDBd7fUvaozRFUFYmw7f6KS3B2zxUIEDCslzml28FZjEQxLb0FvHvfHrbZaNHKThl53CDf8UNnmlUWa2mhgYqLBwSL9MFuCacKCxi3tAmvDa8UGiPLF18WjbxUFdTD4UpLCr3VlYBrkTg4UVz-5my4ROdCLvKtC_8DVTiqARHdQiMEgCvQ3CzZ0y9N_vX-oGn98yFIqeImlSg"/>
+</div>
+<div>
+<h4 class="font-bold text-on-surface text-lg">The Silent Shore</h4>
+<p class="text-secondary text-sm">2024 • Documentary</p>
+</div>
+</div>
+</td>
+<td class="px-8 py-6">
+<div class="flex items-center gap-2">
+<div class="w-8 h-8 rounded-full bg-slate-200 overflow-hidden">
+<img alt="Director" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB8FJEy9RY9oyy66-BiqG9N1i5NXvuImtkBuhxlQw-D136qrGcdWVMOL0jKWoaLEvJSAbhbdqKm5rpVd7AtX-arxYNeDy7SYj-Oi2xDvXEkZypwq3Igx3Z5HzCrm6E4UnvplQH5nIRTzRZ_BtrwstKYQT7XLpI_x0begaOWMccuPGTMMqFz9yD_dPUAMqLqyb2E2FlK8_NjHLNI0PvmH-E860Zail7Ln-BAKlDngBbtYYcm0vDpCOMTga6kDRw06gB2itnfc9Midhs"/>
+</div>
+<span class="font-medium">Marcus Thorne</span>
+</div>
+</td>
+<td class="px-8 py-6">
+<span class="text-secondary font-medium">92 min</span>
+</td>
+<td class="px-8 py-6">
+<div class="flex gap-2">
+<span class="px-3 py-1 rounded-full bg-surface-container-high text-on-secondary-container text-xs font-bold uppercase-labels">Nature</span>
+</div>
+</td>
+<td class="px-8 py-6">
+<span class="flex items-center gap-1.5 text-primary font-bold uppercase-labels">
+<span class="w-2 h-2 rounded-full bg-primary-container animate-pulse"></span>
+                                        Editing
+                                    </span>
+</td>
+<td class="px-8 py-6 text-right">
+<div class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-2 rounded-lg bg-surface-container-highest text-secondary hover:text-primary hover:bg-primary-fixed transition-all">
+<span class="material-symbols-outlined" data-icon="edit">edit</span>
+</button>
+<button class="p-2 rounded-lg bg-surface-container-highest text-secondary hover:text-error hover:bg-error-container transition-all">
+<span class="material-symbols-outlined" data-icon="delete">delete</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Film Row 3 -->
+<tr class="group hover:bg-surface-container transition-all cursor-pointer">
+<td class="px-8 py-6">
+<div class="flex items-center gap-4">
+<div class="w-14 h-20 bg-slate-200 rounded-lg overflow-hidden shadow-md group-hover:scale-110 transition-transform flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="abstract cinematic background with blue and red light trails on a dark black canvas" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCP2CWIM2F44tAekWHwlkN1gpung0VWloURGm7LTNl_diqrnFqu4JlZr6M9srVp7J3bd5V9aTMK_5xlC7GjCMQy5MbYAREzV4-LEva4nnoXXegYvzG_WfWTlUZ_edGk7WKVtAPt9Yhjrz7jujOo0NQtGiyRwzlhk6B3y1vEdUcrngR3POb8s4lDSzNOHaqPheLokO_tBxFrJ1pvcyEB3Tb7iERROFRjijTo1QqnfeGdKMHZAHHXvDgl3EVzXDnwsEGhcJahZy245aU"/>
+</div>
+<div>
+<h4 class="font-bold text-on-surface text-lg">Abstract Horizon</h4>
+<p class="text-secondary text-sm">2022 • Experimental</p>
+</div>
+</div>
+</td>
+<td class="px-8 py-6">
+<div class="flex items-center gap-2">
+<div class="w-8 h-8 rounded-full bg-slate-200 overflow-hidden">
+<img alt="Director" src="https://lh3.googleusercontent.com/aida-public/AB6AXuByqQS08u7teJMMgdptKWHe4rwr9zi-hCfTbc1tYMhY_iMuatIqLcuLMXm9L9o25SujTaZKNxK3DKuzsu2DUXQeYmr03bEllULBfXSkOcBvXHyHX-LNpQGrJLmGvZ2sYG3aZ56qCtbQt_wn37neTU2sGEozZiTkR_kvKlcgK1hbaQPHA9NMIHbfUcq_i_2HbXwKZpn4Qx6wwCeGgk8blXsVRnRapgGyQYsc2rQd8CRoYH4884kRsvHHSrkdWpC0G4BTYdci9w2JhPc"/>
+</div>
+<span class="font-medium">Sia Koda</span>
+</div>
+</td>
+<td class="px-8 py-6">
+<span class="text-secondary font-medium">45 min</span>
+</td>
+<td class="px-8 py-6">
+<div class="flex gap-2">
+<span class="px-3 py-1 rounded-full bg-surface-container-high text-on-secondary-container text-xs font-bold uppercase-labels">Art</span>
+</div>
+</td>
+<td class="px-8 py-6">
+<span class="flex items-center gap-1.5 text-secondary font-bold uppercase-labels">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+                                        Archived
+                                    </span>
+</td>
+<td class="px-8 py-6 text-right">
+<div class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-2 rounded-lg bg-surface-container-highest text-secondary hover:text-primary hover:bg-primary-fixed transition-all">
+<span class="material-symbols-outlined" data-icon="edit">edit</span>
+</button>
+<button class="p-2 rounded-lg bg-surface-container-highest text-secondary hover:text-error hover:bg-error-container transition-all">
+<span class="material-symbols-outlined" data-icon="delete">delete</span>
+</button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination -->
+<div class="p-6 bg-slate-50/50 border-t border-surface-container flex justify-between items-center">
+<p class="text-secondary text-sm uppercase-labels">Page 1 of 12</p>
+<div class="flex gap-2">
+<button class="px-4 py-2 bg-white rounded-lg border border-outline-variant/20 text-on-surface hover:bg-surface-container transition-colors font-medium">Previous</button>
+<button class="px-4 py-2 bg-primary-container text-white rounded-lg font-bold shadow-md">1</button>
+<button class="px-4 py-2 bg-white rounded-lg border border-outline-variant/20 text-on-surface hover:bg-surface-container transition-colors font-medium">2</button>
+<button class="px-4 py-2 bg-white rounded-lg border border-outline-variant/20 text-on-surface hover:bg-surface-container transition-colors font-medium">3</button>
+<button class="px-4 py-2 bg-white rounded-lg border border-outline-variant/20 text-on-surface hover:bg-surface-container transition-colors font-medium">Next</button>
+</div>
+</div>
+</div>
+<!-- Detailed Overview Bento Section -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8 pb-12">
+<div class="bg-[#1A1B2E] p-8 rounded-xl col-span-2 text-white relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-9xl" data-icon="auto_awesome" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+</div>
+<h5 class="text-2xl font-bold mb-4 font-headline tracking-tight text-[#D4AF37]">Archive Insight</h5>
+<p class="text-slate-300 text-lg mb-6 leading-relaxed">The 2024 curation cycle is 84% complete. Focus is currently on restoring mid-century architectural documentaries. Ensure metadata alignment with global standards.</p>
+<div class="flex gap-4">
+<div class="bg-[#5c5c73]/30 p-4 rounded-lg">
+<span class="block text-2xl font-black text-[#D4AF37]">42</span>
+<span class="uppercase-labels text-[10px] text-slate-400">New Submissions</span>
+</div>
+<div class="bg-[#5c5c73]/30 p-4 rounded-lg">
+<span class="block text-2xl font-black text-[#D4AF37]">12</span>
+<span class="uppercase-labels text-[10px] text-slate-400">Pending Review</span>
+</div>
+</div>
+</div>
+<div class="bg-primary-container p-8 rounded-xl flex flex-col justify-between">
+<h5 class="text-on-primary-container font-black text-2xl font-headline uppercase tracking-tighter">Director Spotlight</h5>
+<div class="flex items-center gap-4 mt-4">
+<div class="w-16 h-16 rounded-full border-4 border-white/30 overflow-hidden">
+<img alt="Spotlight Director" data-alt="close up of a sophisticated filmmaker with glasses and creative attire in front of a dark cinematic background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDfP1Qh3M1cduByO7pFBGbYP6YdiyGpWZZxoJfUY9gXEyplG7lhujgLIn3je8Dz9191eQqxw0SNm4CnpiTPWkJ1ywo3BC3VsZhsFeHFV9XyCyX1rxvIn21qYS3Z_6kRUPEhwB3uY5uI_bOHw45V4_IHqW-zU6E4rRdweHQ10LwGDJ_AHUooZV5ndQhFDpqF34Ce0G8CF-zHO0flr0KzO4BrzRsb8pzIn8-TAiLjhewWPUUzIijEZkej8AdhwV3tw2wNwFcyn-C11DM"/>
+</div>
+<div>
+<p class="font-bold text-on-primary-container text-lg">Elena Vance</p>
+<p class="uppercase-labels text-[10px] opacity-80">3 Films in Selection</p>
+</div>
+</div>
+<button class="mt-8 bg-on-primary-container text-primary-container py-3 rounded-lg font-black uppercase-labels hover:scale-[1.02] transition-transform">View Full Profile</button>
+</div>
+</div>
+</div>
+<!-- Footer Component -->
+<footer class="w-full py-12 border-t border-slate-200 dark:border-slate-800 bg-white">
+<div class="max-w-7xl mx-auto px-8 flex flex-col md:flex-row justify-between items-center">
+<div class="mb-6 md:mb-0">
+<span class="font-bold text-[#D4AF37] text-xl font-headline">CineBase</span>
+<p class="text-slate-500 font-inter text-sm mt-2">© 2024 CineBase Cinematic Authority. All Rights Reserved.</p>
+</div>
+<div class="flex gap-8">
+<a class="text-slate-500 hover:text-[#D4AF37] underline font-inter text-sm tracking-normal transition-all" href="#">Privacy Policy</a>
+<a class="text-slate-500 hover:text-[#D4AF37] underline font-inter text-sm tracking-normal transition-all" href="#">Terms of Service</a>
+<a class="text-slate-500 hover:text-[#D4AF37] underline font-inter text-sm tracking-normal transition-all" href="#">Archive Access</a>
+<a class="text-slate-500 hover:text-[#D4AF37] underline font-inter text-sm tracking-normal transition-all" href="#">Contact Support</a>
+</div>
+</div>
+</footer>
+</main>
+</body></html>

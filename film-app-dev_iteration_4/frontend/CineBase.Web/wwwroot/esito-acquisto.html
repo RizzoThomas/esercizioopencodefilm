@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="it-IT">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CineBase - Esito Acquisto</title>
+
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
+  <script src="/js/tailwind-config.js"></script>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="/css/styles.css?v=2" rel="stylesheet">
+  <script src="/js/route-guard.js"></script>
+</head>
+
+<body class="bg-canvas text-ink font-sans">
+  <div id="navbar-container"></div>
+
+  <main class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <!-- Loading State -->
+    <div id="loading-state" class="text-center py-16">
+      <i class="fa-solid fa-spinner fa-spin text-4xl mb-4 text-ferrari-primary"></i>
+      <p class="text-body">Caricamento esito acquisto...</p>
+    </div>
+
+    <!-- Error State -->
+    <div id="error-state" class="hidden text-center py-16">
+      <i class="fa-solid fa-circle-exclamation text-6xl text-ferrari-semantic-warning mb-4"></i>
+      <h3 class="text-xl font-semibold text-ink mb-2">Errore</h3>
+      <p class="text-body mb-4" id="error-message"></p>
+      <a href="/programmazione.html" class="btn-outline">
+        <i class="fa-solid fa-film mr-1"></i>Torna alla programmazione
+      </a>
+    </div>
+
+    <!-- Main Content -->
+    <div id="main-content" class="hidden">
+      <!-- Success Header -->
+      <div id="success-header" class="hidden text-center mb-8">
+        <div class="inline-flex items-center justify-center w-20 h-20 bg-emerald-500/15 mb-4">
+          <i class="fa-solid fa-circle-check text-emerald-500 text-4xl"></i>
+        </div>
+        <h1 class="text-3xl font-bold text-ink mb-2">Acquisto completato!</h1>
+        <p class="text-body">I tuoi biglietti sono pronti</p>
+      </div>
+
+      <!-- Pending Header -->
+      <div id="pending-header" class="hidden text-center mb-8">
+        <div class="inline-flex items-center justify-center w-20 h-20 bg-amber-500/15 mb-4">
+          <i class="fa-solid fa-clock text-amber-500 text-4xl"></i>
+        </div>
+        <h1 class="text-3xl font-bold text-ink mb-2">Pagamento in elaborazione</h1>
+        <p class="text-body">Attendi la conferma del pagamento</p>
+      </div>
+
+      <!-- Failed Header -->
+      <div id="failed-header" class="hidden text-center mb-8">
+        <div class="inline-flex items-center justify-center w-20 h-20 bg-red-500/15 mb-4">
+          <i class="fa-solid fa-circle-xmark text-red-500 text-4xl"></i>
+        </div>
+        <h1 class="text-3xl font-bold text-ink mb-2">Pagamento non riuscito</h1>
+        <p class="text-body">Si è verificato un errore durante il pagamento</p>
+      </div>
+
+      <!-- Order Details Card -->
+      <div class="card-ferrari p-6 mb-6">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-lg font-bold text-ink">Dettagli Ordine</h2>
+          <span id="order-code" class="text-sm font-mono text-body"></span>
+        </div>
+        <div id="order-details" class="space-y-3"></div>
+        <div class="border-t border-hairline-variant/20 pt-4 mt-4">
+          <div class="flex justify-between text-sm text-body">
+            <span>Importo carta</span>
+            <span id="detail-importo-carta"></span>
+          </div>
+          <div class="flex justify-between text-sm text-body">
+            <span>Importo credito</span>
+            <span id="detail-importo-credito"></span>
+          </div>
+          <div class="flex justify-between text-xl font-bold text-ink mt-2">
+            <span>Totale</span>
+            <span id="detail-totale"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tickets Card -->
+      <div id="tickets-card" class="card-ferrari p-6 mb-6">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-lg font-bold text-ink">
+            <i class="fa-solid fa-ticket text-ferrari-primary mr-2"></i>Biglietti
+          </h2>
+          <span id="tickets-count" class="text-sm text-body"></span>
+        </div>
+        <div id="tickets-list" class="space-y-3"></div>
+      </div>
+
+      <!-- Email Status -->
+      <div id="email-status-card" class="hidden card-ferrari p-4 mb-6">
+        <div class="flex items-center gap-3">
+          <i id="email-status-icon" class="text-lg"></i>
+          <div>
+            <p id="email-status-text" class="text-sm text-ink"></p>
+            <p id="email-status-detail" class="text-xs text-body"></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="flex flex-col sm:flex-row gap-3">
+        <button id="btn-download-pdf" class="flex-1 btn-primary py-3 text-center">
+          <i class="fa-solid fa-file-pdf mr-2"></i>Scarica PDF
+        </button>
+        <a href="/profilo.html" class="flex-1 btn-outline py-3 text-center">
+          <i class="fa-solid fa-user mr-2"></i>Vai al profilo
+        </a>
+        <a href="/programmazione.html" class="flex-1 btn-outline py-3 text-center">
+          <i class="fa-solid fa-film mr-2"></i>Programmazione
+        </a>
+      </div>
+    </div>
+  </main>
+
+  <div id="footer-container"></div>
+
+  <div id="toast-container" class="fixed bottom-4 right-4 z-50"></div>
+
+  <script src="/js/utils.js?v=20260419b"></script>
+  <script src="/js/api.js?v=20260419b"></script>
+  <script src="/js/auth.js?v=20260419b"></script>
+  <script src="/js/template-loader.js?v=20260419b"></script>
+  <script src="/js/navbar.js?v=20260419b"></script>
+  <script src="/js/pages/esito-acquisto.js?v=20260419b"></script>
+</body>
+
+</html>
+

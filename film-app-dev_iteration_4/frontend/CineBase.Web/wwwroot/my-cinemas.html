@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="it-IT">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CineBase - I Nostri Cinema</title>
+
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
+  <script src="/js/tailwind-config.js"></script>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="/css/styles.css?v=2" rel="stylesheet">
+  <script src="/js/route-guard.js"></script>
+</head>
+
+<body class="bg-canvas text-ink font-sans">
+  <div id="navbar-container"></div>
+
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <!-- Loading State -->
+    <div id="loading-state" class="text-center py-16">
+      <i class="fa-solid fa-spinner fa-spin text-4xl mb-4 text-ferrari-primary"></i>
+      <p class="text-body">Caricamento...</p>
+    </div>
+
+    <!-- Error State -->
+    <div id="error-state" class="hidden text-center py-16">
+      <i class="fa-solid fa-circle-exclamation text-6xl text-ferrari-semantic-warning mb-4"></i>
+      <h3 class="text-xl font-semibold text-ink mb-2">Errore caricamento</h3>
+      <p class="text-body mb-4" id="error-message">Impossibile caricare i dati</p>
+      <button onclick="window.history.back()" class="btn-outline">
+        <i class="fa-solid fa-arrow-left mr-1"></i>Torna indietro
+      </button>
+    </div>
+
+    <!-- Cinema List View -->
+    <div id="cinema-list-view" class="hidden">
+      <h1 class="text-2xl md:text-3xl font-bold text-ink mb-6">
+        <i class="fa-solid fa-film text-ferrari-primary mr-2"></i>I Nostri Cinema
+      </h1>
+
+      <div id="cinemas-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      </div>
+
+      <div id="no-cinemas-state" class="hidden text-center py-16">
+        <i class="fa-solid fa-film text-6xl text-body mb-4"></i>
+        <h3 class="text-xl font-semibold text-ink mb-2">Nessun cinema disponibile</h3>
+        <p class="text-body">Al momento non ci sono cinema nella rete</p>
+      </div>
+    </div>
+
+    <!-- Cinema Detail View -->
+    <div id="cinema-detail-view" class="hidden">
+      <!-- Cinema Header -->
+      <div class="card-ferrari p-6 mb-6">
+        <div class="flex items-start gap-4">
+          <div class="flex-1">
+            <h1 id="cinema-name" class="text-2xl md:text-3xl font-bold text-ink mb-1"></h1>
+            <p id="cinema-address" class="text-body">
+              <i class="fa-solid fa-location-dot mr-1"></i><span></span>
+            </p>
+            <div id="cinema-tipologie" class="flex flex-wrap gap-2 mt-3"></div>
+          </div>
+          <button onclick="goToCinemaList()" class="btn-outline text-sm">
+            <i class="fa-solid fa-arrow-left mr-1"></i>Torna alla lista
+          </button>
+        </div>
+      </div>
+
+      <!-- Date Rail -->
+      <div id="date-rail-container" class="mb-6"></div>
+
+      <!-- Films Schedule -->
+      <div id="films-schedule" class="space-y-4">
+      </div>
+
+      <!-- No Shows State -->
+      <div id="no-shows-state" class="hidden text-center py-12">
+        <i class="fa-solid fa-film text-6xl text-body mb-4"></i>
+        <h3 class="text-xl font-semibold text-ink mb-2">Nessuno show disponibile</h3>
+        <p class="text-body">Non ci sono spettacoli per la data selezionata</p>
+      </div>
+    </div>
+  </main>
+
+  <div id="footer-container"></div>
+
+  <div id="toast-container" class="fixed bottom-4 right-4 z-50"></div>
+
+  <script src="/js/utils.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/template-loader.js"></script>
+  <script src="/js/navbar.js"></script>
+  <script src="/js/date-rail.js"></script>
+  <script src="/js/pages/my-cinemas.js"></script>
+</body>
+
+</html>
+

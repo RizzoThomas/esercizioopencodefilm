@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "outline": "#7f7663",
+                    "on-secondary": "#ffffff",
+                    "tertiary-container": "#00c7c7",
+                    "surface-container-high": "#e7e6ff",
+                    "surface-variant": "#e1e0fb",
+                    "on-primary": "#ffffff",
+                    "primary-fixed-dim": "#e9c349",
+                    "on-secondary-container": "#626279",
+                    "primary-container": "#d4af37",
+                    "on-primary-fixed-variant": "#574500",
+                    "error": "#ba1a1a",
+                    "secondary": "#5c5c73",
+                    "on-primary-fixed": "#241a00",
+                    "outline-variant": "#d0c5af",
+                    "inverse-surface": "#2e2f43",
+                    "inverse-primary": "#e9c349",
+                    "on-secondary-fixed-variant": "#44455a",
+                    "tertiary": "#006a6a",
+                    "surface-container-low": "#f5f2ff",
+                    "on-tertiary-fixed-variant": "#004f4f",
+                    "on-tertiary-fixed": "#002020",
+                    "on-tertiary": "#ffffff",
+                    "on-error-container": "#93000a",
+                    "primary-fixed": "#ffe088",
+                    "on-error": "#ffffff",
+                    "surface-container": "#eeecff",
+                    "surface": "#fbf8ff",
+                    "surface-bright": "#fbf8ff",
+                    "on-primary-container": "#554300",
+                    "secondary-fixed": "#e1e0fb",
+                    "background": "#fbf8ff",
+                    "surface-tint": "#735c00",
+                    "inverse-on-surface": "#f1efff",
+                    "error-container": "#ffdad6",
+                    "tertiary-fixed-dim": "#00dddd",
+                    "surface-dim": "#d9d8f2",
+                    "on-secondary-fixed": "#191a2d",
+                    "on-tertiary-container": "#004e4e",
+                    "tertiary-fixed": "#00fbfb",
+                    "secondary-fixed-dim": "#c5c4de",
+                    "surface-container-highest": "#e1e0fb",
+                    "on-surface-variant": "#4d4635",
+                    "on-surface": "#191a2d",
+                    "primary": "#735c00",
+                    "secondary-container": "#e1e0fb",
+                    "surface-container-lowest": "#ffffff",
+                    "on-background": "#191a2d"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Inter"],
+                    "body": ["Inter"],
+                    "label": ["Inter"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .sidebar-gradient {
+            background: linear-gradient(180deg, #1A1B2E 0%, #111222 100%);
+        }
+    </style>
+</head>
+<body class="bg-surface-container-low font-body text-on-surface">
+<!-- SideNavBar Shell -->
+<aside class="fixed left-0 h-screen w-64 z-40 bg-[#1A1B2E] flex flex-col p-6 space-y-8 shadow-2xl sidebar-gradient">
+<div class="flex flex-col space-y-2 pt-4">
+<div class="flex items-center space-x-3 px-2">
+<div class="w-10 h-10 bg-[#D4AF37] rounded-xl flex items-center justify-center">
+<span class="material-symbols-outlined text-[#1A1B2E]" style="font-variation-settings: 'FILL' 1;">movie</span>
+</div>
+<div>
+<h1 class="text-xl font-bold text-[#D4AF37] tracking-tighter">CineBase</h1>
+<p class="font-inter tracking-wide uppercase-labels text-[10px] text-slate-400">Premium Curator</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 space-y-1">
+<!-- Active: Dashboard -->
+<a class="flex items-center space-x-3 px-4 py-3 text-[#D4AF37] bg-[#5c5c73]/30 rounded-lg font-bold transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-inter tracking-wide uppercase-labels text-xs">Dashboard</span>
+</a>
+<a class="flex items-center space-x-3 px-4 py-3 text-slate-400 hover:text-white hover:bg-[#5c5c73]/10 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="movie">movie</span>
+<span class="font-inter tracking-wide uppercase-labels text-xs">Films</span>
+</a>
+<a class="flex items-center space-x-3 px-4 py-3 text-slate-400 hover:text-white hover:bg-[#5c5c73]/10 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="person_4">person_4</span>
+<span class="font-inter tracking-wide uppercase-labels text-xs">Directors</span>
+</a>
+<a class="flex items-center space-x-3 px-4 py-3 text-slate-400 hover:text-white hover:bg-[#5c5c73]/10 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="theater_comedy">theater_comedy</span>
+<span class="font-inter tracking-wide uppercase-labels text-xs">Screenings</span>
+</a>
+<a class="flex items-center space-x-3 px-4 py-3 text-slate-400 hover:text-white hover:bg-[#5c5c73]/10 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="leaderboard">leaderboard</span>
+<span class="font-inter tracking-wide uppercase-labels text-xs">Analytics</span>
+</a>
+</nav>
+<div class="pt-6 border-t border-slate-800 space-y-1">
+<a class="flex items-center space-x-3 px-4 py-2 text-slate-400 hover:text-white transition-colors" href="#">
+<span class="material-symbols-outlined text-sm" data-icon="help">help</span>
+<span class="font-inter tracking-wide uppercase-labels text-[10px]">Help Center</span>
+</a>
+<a class="flex items-center space-x-3 px-4 py-2 text-slate-400 hover:text-white transition-colors" href="#">
+<span class="material-symbols-outlined text-sm" data-icon="logout">logout</span>
+<span class="font-inter tracking-wide uppercase-labels text-[10px]">Sign Out</span>
+</a>
+</div>
+</aside>
+<!-- Main Canvas -->
+<main class="ml-64 min-h-screen">
+<!-- TopAppBar -->
+<header class="fixed top-0 right-0 left-64 z-30 bg-slate-50/80 backdrop-blur-xl shadow-[0px_10px_30px_rgba(25,26,45,0.06)] px-8 py-4 flex justify-between items-center">
+<div>
+<h2 class="font-inter tracking-tight headline-bold text-xl font-extrabold text-on-surface uppercase">Curator Workspace</h2>
+<p class="text-[10px] font-inter tracking-widest text-secondary uppercase">Unified Administration System</p>
+</div>
+<div class="flex items-center space-x-6">
+<div class="relative group">
+<input class="bg-surface-container-highest border-none rounded-full py-2 px-10 text-sm focus:ring-2 focus:ring-primary-container transition-all w-64 placeholder:text-slate-400" placeholder="Search archive..." type="text"/>
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg">search</span>
+</div>
+<div class="flex items-center space-x-3">
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-slate-100 transition-all text-secondary">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-slate-100 transition-all text-secondary">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+<div class="h-10 w-[1px] bg-slate-200 mx-2"></div>
+<button class="flex items-center space-x-3 pl-2 pr-4 py-1.5 bg-primary rounded-full text-on-primary font-bold text-xs tracking-wide uppercase-labels hover:opacity-90 transition-all">
+<span class="material-symbols-outlined text-sm" data-icon="enterprise">enterprise</span>
+<span>Enterprise Access</span>
+</button>
+</div>
+</div>
+</header>
+<!-- Content Area -->
+<div class="pt-28 px-8 pb-12 space-y-8">
+<!-- Bento Stats Grid -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<!-- Stat Card 1 -->
+<div class="bg-surface-container-lowest rounded-xl p-6 shadow-[0px_10px_30px_rgba(25,26,45,0.03)] border-l-4 border-primary-container flex justify-between items-end">
+<div>
+<p class="font-inter tracking-wide uppercase-labels text-[10px] text-secondary mb-1">Total Admissions</p>
+<h3 class="text-3xl font-black tracking-tighter text-on-surface">1,284,502</h3>
+<p class="text-xs text-tertiary mt-2 flex items-center font-bold">
+<span class="material-symbols-outlined text-sm mr-1">trending_up</span>
+                            +12.4% vs last month
+                        </p>
+</div>
+<div class="w-14 h-14 bg-surface-container-high rounded-full flex items-center justify-center text-primary-container">
+<span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1;">confirmation_number</span>
+</div>
+</div>
+<!-- Stat Card 2 -->
+<div class="bg-surface-container-lowest rounded-xl p-6 shadow-[0px_10px_30px_rgba(25,26,45,0.03)] border-l-4 border-primary-container flex justify-between items-end">
+<div>
+<p class="font-inter tracking-wide uppercase-labels text-[10px] text-secondary mb-1">Gross Revenue</p>
+<h3 class="text-3xl font-black tracking-tighter text-on-surface">$14.2M</h3>
+<p class="text-xs text-tertiary mt-2 flex items-center font-bold">
+<span class="material-symbols-outlined text-sm mr-1">trending_up</span>
+                            +8.1% vs last month
+                        </p>
+</div>
+<div class="w-14 h-14 bg-surface-container-high rounded-full flex items-center justify-center text-primary-container">
+<span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1;">monetization_on</span>
+</div>
+</div>
+<!-- Stat Card 3 -->
+<div class="bg-surface-container-lowest rounded-xl p-6 shadow-[0px_10px_30px_rgba(25,26,45,0.03)] border-l-4 border-primary-container flex justify-between items-end">
+<div>
+<p class="font-inter tracking-wide uppercase-labels text-[10px] text-secondary mb-1">Active Venues</p>
+<h3 class="text-3xl font-black tracking-tighter text-on-surface">412</h3>
+<p class="text-xs text-secondary mt-2 flex items-center font-medium opacity-60">
+                            Across 18 Global Regions
+                        </p>
+</div>
+<div class="w-14 h-14 bg-surface-container-high rounded-full flex items-center justify-center text-primary-container">
+<span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1;">theater_comedy</span>
+</div>
+</div>
+</div>
+<!-- Asymmetric Main Layout -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+<!-- Table Section (2/3 width) -->
+<div class="lg:col-span-2 space-y-4">
+<div class="flex items-center justify-between">
+<h4 class="font-inter tracking-tight headline-bold text-lg font-bold text-on-surface">Recent Releases</h4>
+<button class="text-[10px] font-bold tracking-widest text-primary-container uppercase hover:underline">View Full Archive</button>
+</div>
+<div class="bg-surface-container-lowest rounded-xl shadow-[0px_10px_30px_rgba(25,26,45,0.03)] overflow-hidden">
+<table class="w-full text-left">
+<thead>
+<tr class="bg-surface-container text-secondary">
+<th class="px-6 py-4 font-inter tracking-wide uppercase-labels text-[10px]">Film Title</th>
+<th class="px-6 py-4 font-inter tracking-wide uppercase-labels text-[10px]">Director</th>
+<th class="px-6 py-4 font-inter tracking-wide uppercase-labels text-[10px]">Release Date</th>
+<th class="px-6 py-4 font-inter tracking-wide uppercase-labels text-[10px]">Performance</th>
+<th class="px-6 py-4 font-inter tracking-wide uppercase-labels text-[10px] text-right">Action</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-surface-container">
+<tr class="hover:bg-slate-50 transition-all group">
+<td class="px-6 py-4">
+<div class="flex items-center space-x-3">
+<div class="w-10 h-14 rounded overflow-hidden bg-slate-200">
+<img class="w-full h-full object-cover" data-alt="cinematic movie poster with neon blue and purple lights and dark moody silhouette of a protagonist" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAYn32HDZ2cVqheU2xBzpOyEz8h7Fy_lW3SIy-6HbICPeLZWWIXsNxvqOhZkZS5kmRv3dgKrlIxHEniGJzGfbwkzX1QJvSYisTaCBUrNGbkqjOmVR_7-X8dHpBnTaPsV8Mv-3ufxpg62eMOBq1lbEKTjwnsNgMH2QDcwpdGPfnA0XKIgecVcL5A0BxHs1cBeu3I0AGRz8GCixoydojTI6IcIiOQ8VtIbxGfHydAT8hk-aG7NuOzTVfo8ccwLgABsotZbpGUjo_Ee_I"/>
+</div>
+<span class="font-bold text-on-surface">The Last Frame</span>
+</div>
+</td>
+<td class="px-6 py-4 text-sm text-secondary">Aria Sterling</td>
+<td class="px-6 py-4 text-sm text-secondary">Oct 12, 2024</td>
+<td class="px-6 py-4">
+<div class="w-full bg-surface-container-high rounded-full h-1.5 max-w-[100px]">
+<div class="bg-tertiary-container h-full rounded-full" style="width: 85%"></div>
+</div>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="material-symbols-outlined text-slate-300 hover:text-primary-container transition-colors">more_vert</button>
+</td>
+</tr>
+<tr class="hover:bg-slate-50 transition-all group">
+<td class="px-6 py-4">
+<div class="flex items-center space-x-3">
+<div class="w-10 h-14 rounded overflow-hidden bg-slate-200">
+<img class="w-full h-full object-cover" data-alt="vintage black and white cinematic poster featuring a high contrast film reel and dramatic lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAx7bxnpRiRtx5vYWENu7-Vr8NIeEeiA8bBTZ6B5q4qtVEOXyVLAyczcijrsiU8d_Q4fM8mnmbj04TM1cL6vAZofeS4O1SASZCjw5v3Bu0Qy3vapGmDYhg03b-yjuFDpB3Lokr07ASsPBdNtwpwMyhcbYgKtvWax2fgB3QF3sTK2SWaS5M50rF2hWewZND5D5Dbfn9D0SfbsRWYGLgGk-S2Ttio5JfQGND81cK9QkFUVnxEGogLxgv1relE3Zl2dhylw-NOkQW-XiA"/>
+</div>
+<span class="font-bold text-on-surface">Shadow Narrative</span>
+</div>
+</td>
+<td class="px-6 py-4 text-sm text-secondary">Marcus Vane</td>
+<td class="px-6 py-4 text-sm text-secondary">Oct 08, 2024</td>
+<td class="px-6 py-4">
+<div class="w-full bg-surface-container-high rounded-full h-1.5 max-w-[100px]">
+<div class="bg-tertiary-container h-full rounded-full" style="width: 62%"></div>
+</div>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="material-symbols-outlined text-slate-300 hover:text-primary-container transition-colors">more_vert</button>
+</td>
+</tr>
+<tr class="hover:bg-slate-50 transition-all group">
+<td class="px-6 py-4">
+<div class="flex items-center space-x-3">
+<div class="w-10 h-14 rounded overflow-hidden bg-slate-200">
+<img class="w-full h-full object-cover" data-alt="abstract architectural cinematic shot with leading lines and warm orange golden hour sunlight" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCpEbc2CgA9dx2cqCbjjqDjzCUN6xQbIjte2ejfRasd2JVlcxRZxfBxbCbSzuW_C7jizktn9WZsFjHbpmQqtfcYikxQmPq2u7LY637qr9VxxN8LbK7nEERWOmsNiBXQfi9WqzmF_6rqEyOmWD3PP3QaLqTbRBFAcq9bdzmxWqh7IU20siJ1vCtAf_J49H8P_YxEdcZn90WEO86DzdsAbb96VkiUf_sGPCMpW7QDTl0Qm0utRUdXB7wU_S47oDHfOIueH5xr8mqcBk4"/>
+</div>
+<span class="font-bold text-on-surface">Empire of Light</span>
+</div>
+</td>
+<td class="px-6 py-4 text-sm text-secondary">Julian Thorne</td>
+<td class="px-6 py-4 text-sm text-secondary">Sep 29, 2024</td>
+<td class="px-6 py-4">
+<div class="w-full bg-surface-container-high rounded-full h-1.5 max-w-[100px]">
+<div class="bg-tertiary-container h-full rounded-full" style="width: 45%"></div>
+</div>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="material-symbols-outlined text-slate-300 hover:text-primary-container transition-colors">more_vert</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Editorial Featured Content (1/3 width) -->
+<div class="space-y-6">
+<div class="flex items-center justify-between">
+<h4 class="font-inter tracking-tight headline-bold text-lg font-bold text-on-surface">Curator's Choice</h4>
+</div>
+<div class="relative group rounded-xl overflow-hidden shadow-2xl h-64">
+<img class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" data-alt="empty luxury cinema theater with red velvet seats and ambient low lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCHUAbEAin9dSGaBus28QXJ4IdmfiL3-NaLpDMBG0AT0fbHGRYq8ViPdfQByPHuJtJkEbBCwhE-klyzltD5RpoeYPUus3ezZirUkRsozH3zxPlGV4sz-DZjDMxguN4vKhiitQOVYY3ZjI1vbBlN-_V48aLe3Yk9IhwIIA4X4aJRXGBtMqJZOC_QRJIp1tW8lfXcR3z0w815oVbLskBOjoHQ7S7aFvirpKGWx8k6vYVj-2hz9vpIjhyeITWRV92GvYlNyWFw7OK4zag"/>
+<div class="absolute inset-0 bg-gradient-to-t from-[#1A1B2E] via-transparent to-transparent"></div>
+<div class="absolute bottom-0 p-6 space-y-2">
+<span class="px-3 py-1 bg-[#D4AF37] text-[#1A1B2E] text-[10px] font-black uppercase tracking-widest rounded-full">Spotlight</span>
+<h5 class="text-white text-xl font-bold">The Cinema of Tomorrow</h5>
+<p class="text-slate-300 text-xs leading-relaxed">Exploring the shift towards independent arthouse dominance in the 2024 landscape.</p>
+</div>
+</div>
+<div class="bg-[#1A1B2E] rounded-xl p-6 text-white space-y-4">
+<div class="flex items-center space-x-3">
+<span class="material-symbols-outlined text-[#D4AF37]">auto_awesome</span>
+<h5 class="font-bold text-sm tracking-wide">AI Curator Suggestions</h5>
+</div>
+<p class="text-[11px] text-slate-400 leading-relaxed italic">"Based on admissions trends, consider increasing screening frequency for 'The Last Frame' in metropolitan clusters."</p>
+<button class="w-full py-3 bg-[#5c5c73]/30 border border-[#D4AF37]/20 rounded-lg text-[#D4AF37] text-[10px] font-black uppercase tracking-widest hover:bg-[#5c5c73]/50 transition-all">Review Recommendations</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Footer Shell -->
+<footer class="w-full py-12 border-t border-slate-200 bg-white">
+<div class="max-w-7xl mx-auto px-8 flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+<div class="flex items-center space-x-2">
+<span class="font-bold text-[#D4AF37]">CineBase</span>
+<span class="text-slate-300">|</span>
+<p class="font-inter text-sm tracking-normal text-slate-500">© 2024 CineBase Cinematic Authority. All Rights Reserved.</p>
+</div>
+<div class="flex space-x-8">
+<a class="text-slate-500 hover:text-[#D4AF37] underline text-sm transition-all opacity-80 hover:opacity-100" href="#">Privacy Policy</a>
+<a class="text-slate-500 hover:text-[#D4AF37] underline text-sm transition-all opacity-80 hover:opacity-100" href="#">Terms of Service</a>
+<a class="text-slate-500 hover:text-[#D4AF37] underline text-sm transition-all opacity-80 hover:opacity-100" href="#">Archive Access</a>
+<a class="text-slate-500 hover:text-[#D4AF37] underline text-sm transition-all opacity-80 hover:opacity-100" href="#">Contact Support</a>
+</div>
+</div>
+</footer>
+</main>
+<!-- Contextual FAB -->
+<button class="fixed bottom-8 right-8 w-14 h-14 bg-[#D4AF37] text-[#1A1B2E] rounded-full shadow-2xl flex items-center justify-center hover:scale-105 active:scale-95 transition-all z-50">
+<span class="material-symbols-outlined text-2xl" style="font-variation-settings: 'FILL' 1;">add</span>
+</button>
+</body></html>

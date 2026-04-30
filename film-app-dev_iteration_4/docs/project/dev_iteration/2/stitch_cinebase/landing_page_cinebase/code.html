@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+
+<html class="light" lang="it"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#ec5b13",
+              "background-light": "#f8f6f6",
+              "background-dark": "#221610",
+            },
+            fontFamily: {
+              "display": ["Public Sans"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            font-family: "Public Sans", sans-serif;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display transition-colors duration-300">
+<!-- Top Navigation Bar -->
+<header class="sticky top-0 z-50 w-full border-b border-slate-200 dark:border-primary/20 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="flex h-20 items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-3xl">movie_filter</span>
+<h1 class="text-2xl font-black tracking-tight text-slate-900 dark:text-white uppercase">Cine<span class="text-primary">Base</span></h1>
+</div>
+<nav class="hidden md:flex items-center gap-10">
+<a class="text-sm font-semibold hover:text-primary transition-colors" href="#">Programmazione</a>
+<a class="text-sm font-semibold hover:text-primary transition-colors" href="#">Sale</a>
+<a class="text-sm font-semibold hover:text-primary transition-colors" href="#">Prezzi</a>
+</nav>
+<div class="flex items-center gap-4">
+<button class="flex items-center gap-2 px-5 py-2.5 bg-primary text-white text-sm font-bold rounded-xl hover:bg-primary/90 transition-all shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined text-sm">admin_panel_settings</span>
+                        Login Admin
+                    </button>
+</div>
+</div>
+</div>
+</header>
+<!-- Hero Section -->
+<section class="relative w-full h-[80vh] min-h-[600px] flex items-center overflow-hidden">
+<div class="absolute inset-0 z-0">
+<div class="absolute inset-0 bg-gradient-to-r from-background-dark via-background-dark/80 to-transparent z-10"></div>
+<img alt="Cinematic theater interior" class="w-full h-full object-cover" data-alt="Wide shot of a dark cinematic movie theater" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA-Kee2rgxx2__-R8U40-9OfU3PZJGRmZIcGJVECy_k4v49bHXM-x2_0NVwBFNqSV2uP9eRg1p4SzwyN1P5TvGsjWw6a5qXBZTvKO8Q4tOqdrzqZMs2anKrlsiLwvgyYQl5_rlYXoViZmgQehpyJb38X5GA6WSjrfPwyPEKy4UNxXJFZ02SJ1_Q8twZ534cjFdVYFSZ279cvYUCHIBDPOIvQ2afMu_RDuKddE5n7D0HZ6h984jZwnZXYOby5sYQ3Q1hD25GM9Xq1p8"/>
+</div>
+<div class="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+<div class="max-w-2xl space-y-6">
+<div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/20 border border-primary/30 text-primary text-xs font-bold uppercase tracking-widest">
+<span class="material-symbols-outlined text-sm">stars</span> Piattaforma Cinema N.1
+                </div>
+<h2 class="text-5xl md:text-7xl font-black text-white leading-tight">
+                    La Tua Rete Cinematografica, <span class="text-primary underline decoration-primary/30 underline-offset-8">Gestita in un Click</span>
+</h2>
+<p class="text-lg text-slate-300 max-w-lg leading-relaxed">
+                    Ottimizza la gestione delle tue sale e della programmazione con la piattaforma più avanzata per il cinema moderno.
+                </p>
+<div class="flex flex-wrap gap-4 pt-4">
+<button class="px-8 py-4 bg-primary text-white font-bold rounded-xl hover:scale-105 transition-transform shadow-xl shadow-primary/40">
+                        Inizia Ora
+                    </button>
+<button class="px-8 py-4 bg-white/10 backdrop-blur-md text-white border border-white/20 font-bold rounded-xl hover:bg-white/20 transition-all">
+                        Scopri le Funzioni
+                    </button>
+</div>
+</div>
+</div>
+</section>
+<!-- Public Section: Programmazione -->
+<section class="py-20 bg-background-light dark:bg-background-dark">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-12">
+<div class="space-y-2">
+<h3 class="text-3xl font-black text-slate-900 dark:text-white uppercase tracking-tighter">Film in Programmazione</h3>
+<p class="text-slate-500 dark:text-slate-400">Trova lo spettacolo perfetto nel cinema più vicino a te.</p>
+</div>
+<!-- Filters -->
+<div class="flex flex-wrap gap-4 bg-white dark:bg-background-dark p-2 rounded-2xl border border-slate-200 dark:border-primary/20 shadow-sm">
+<div class="relative group">
+<select class="appearance-none bg-slate-50 dark:bg-background-dark/50 border-none rounded-xl py-3 pl-10 pr-10 text-sm font-semibold focus:ring-2 focus:ring-primary/50 cursor-pointer">
+<option>Seleziona Città</option>
+<option>Roma</option>
+<option>Milano</option>
+<option>Napoli</option>
+</select>
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-primary">location_on</span>
+</div>
+<div class="relative group">
+<input class="bg-slate-50 dark:bg-background-dark/50 border-none rounded-xl py-3 pl-10 pr-4 text-sm font-semibold focus:ring-2 focus:ring-primary/50 cursor-pointer" type="date"/>
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-primary">calendar_today</span>
+</div>
+<div class="relative group">
+<select class="appearance-none bg-slate-50 dark:bg-background-dark/50 border-none rounded-xl py-3 pl-10 pr-10 text-sm font-semibold focus:ring-2 focus:ring-primary/50 cursor-pointer">
+<option>Qualsiasi Orario</option>
+<option>Pomeriggio</option>
+<option>Sera</option>
+<option>Notte</option>
+</select>
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-primary">schedule</span>
+</div>
+</div>
+</div>
+<!-- Movie Grid -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+<!-- Movie Card 1 -->
+<div class="group bg-white dark:bg-background-dark/40 rounded-2xl overflow-hidden border border-slate-200 dark:border-primary/10 hover:border-primary transition-all shadow-md hover:shadow-2xl hover:shadow-primary/10">
+<div class="relative aspect-[2/3] overflow-hidden">
+<img alt="Movie Poster 1" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" data-alt="Modern action movie poster aesthetic" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDQT2c__RAzpXMF0PS962kulsAH9ms2VJ1KPuBFGPmjkD2JeFklr7CsiWml46aezjIZtDF4v2dsCclGBVLBmqbavxprNwQgTKhAIX88hBn-8-fLILw9Lkmbmky3sxFWaizb9PKiodKfcmIX-DjprLQtCAyUmFDF6gHIJrlBd84Fux3FPlr8fq9PGqoBcqswfXud4piaO4hfc-ARqmR2IUVVTSOBl926tewsp5Tz-moCEuIYLWR9Tf9g2m3pFXIO60bsLnUk6uKNkqI"/>
+<div class="absolute top-4 left-4 bg-primary text-white text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider">In Sala</div>
+</div>
+<div class="p-5 space-y-4">
+<div>
+<h4 class="text-xl font-bold dark:text-white mb-1">Interstellar</h4>
+<div class="flex items-center gap-1 text-primary">
+<span class="material-symbols-outlined text-sm fill-1">star</span>
+<span class="text-xs font-bold uppercase tracking-widest text-slate-500">Cineplex Central</span>
+</div>
+</div>
+<div class="flex flex-wrap gap-2">
+<span class="px-3 py-1.5 bg-slate-100 dark:bg-primary/10 text-slate-700 dark:text-slate-300 text-xs font-bold rounded-lg border border-slate-200 dark:border-primary/20">18:30</span>
+<span class="px-3 py-1.5 bg-primary text-white text-xs font-bold rounded-lg border border-primary">21:00</span>
+<span class="px-3 py-1.5 bg-slate-100 dark:bg-primary/10 text-slate-700 dark:text-slate-300 text-xs font-bold rounded-lg border border-slate-200 dark:border-primary/20">23:15</span>
+</div>
+<button class="w-full py-3 text-slate-900 dark:text-white font-bold border-2 border-slate-900 dark:border-primary rounded-xl hover:bg-slate-900 dark:hover:bg-primary hover:text-white transition-all">Prenota Ora</button>
+</div>
+</div>
+<!-- Movie Card 2 -->
+<div class="group bg-white dark:bg-background-dark/40 rounded-2xl overflow-hidden border border-slate-200 dark:border-primary/10 hover:border-primary transition-all shadow-md hover:shadow-2xl hover:shadow-primary/10">
+<div class="relative aspect-[2/3] overflow-hidden">
+<img alt="Movie Poster 2" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" data-alt="Science fiction movie poster aesthetic" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDqDBGEs28Ssj9ZZOEsCyRfXrWn5cs8dooIN_uJfOJdlEF633CR6a_teFZGL4mGynw8OM5AQqqDyz0cqRq9OWuAlq4C2jkwQAI2cwXn1-U767zzJxW3yW8GF2WGgAoB4KOE-oRNseSHTs6MzqF8-1TTADys0Et65Sl_87vS7xYiJZd7SugHtaoO7BtEAS_dxIJTBWb67S9wRkDWXbVnuBNDvCDc71iFyi80z-OG9pd4MOjygUxMZcGwg5ypklEgbqpqvlSlglS8MWg"/>
+<div class="absolute top-4 left-4 bg-primary text-white text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider">Top 10</div>
+</div>
+<div class="p-5 space-y-4">
+<div>
+<h4 class="text-xl font-bold dark:text-white mb-1">Dune: Part Two</h4>
+<div class="flex items-center gap-1 text-primary">
+<span class="material-symbols-outlined text-sm fill-1">star</span>
+<span class="text-xs font-bold uppercase tracking-widest text-slate-500">Sala IMAX Roma</span>
+</div>
+</div>
+<div class="flex flex-wrap gap-2">
+<span class="px-3 py-1.5 bg-slate-100 dark:bg-primary/10 text-slate-700 dark:text-slate-300 text-xs font-bold rounded-lg border border-slate-200 dark:border-primary/20">17:00</span>
+<span class="px-3 py-1.5 bg-slate-100 dark:bg-primary/10 text-slate-700 dark:text-slate-300 text-xs font-bold rounded-lg border border-slate-200 dark:border-primary/20">20:30</span>
+</div>
+<button class="w-full py-3 text-slate-900 dark:text-white font-bold border-2 border-slate-900 dark:border-primary rounded-xl hover:bg-slate-900 dark:hover:bg-primary hover:text-white transition-all">Prenota Ora</button>
+</div>
+</div>
+<!-- Movie Card 3 -->
+<div class="group bg-white dark:bg-background-dark/40 rounded-2xl overflow-hidden border border-slate-200 dark:border-primary/10 hover:border-primary transition-all shadow-md hover:shadow-2xl hover:shadow-primary/10">
+<div class="relative aspect-[2/3] overflow-hidden">
+<img alt="Movie Poster 3" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" data-alt="Abstract colorful film art poster" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB3sy1uYBVCCsK2v2zsHc69Mwf2h6sLzAJQn-LZhDh4pDyjlz8ZqzPt2eWovJdqWFOI7INqFeH7Broo5hhRa5wIe44JIQxFwJyXZyLNPl5w5q3CJOtxmNvLdb5c5OQn4GQ66--SQ89hnYRX2LZ1-qfkqQPSLei1niDkFAYKJgukSDJa0KQV81k5kmCWweuaWUL8ozMk27m2uZI5fem-O72VG7mrwP3LqWkZrlk9lUXEG3v0NQuIrVRUTfWCY9qSb5VHUzRhj53s4oA"/>
+<div class="absolute top-4 left-4 bg-primary text-white text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider">Novità</div>
+</div>
+<div class="p-5 space-y-4">
+<div>
+<h4 class="text-xl font-bold dark:text-white mb-1">Poor Things</h4>
+<div class="flex items-center gap-1 text-primary">
+<span class="material-symbols-outlined text-sm fill-1">star</span>
+<span class="text-xs font-bold uppercase tracking-widest text-slate-500">Cinema Barberini</span>
+</div>
+</div>
+<div class="flex flex-wrap gap-2">
+<span class="px-3 py-1.5 bg-primary text-white text-xs font-bold rounded-lg border border-primary">20:45</span>
+<span class="px-3 py-1.5 bg-slate-100 dark:bg-primary/10 text-slate-700 dark:text-slate-300 text-xs font-bold rounded-lg border border-slate-200 dark:border-primary/20">22:30</span>
+</div>
+<button class="w-full py-3 text-slate-900 dark:text-white font-bold border-2 border-slate-900 dark:border-primary rounded-xl hover:bg-slate-900 dark:hover:bg-primary hover:text-white transition-all">Prenota Ora</button>
+</div>
+</div>
+<!-- Movie Card 4 -->
+<div class="group bg-white dark:bg-background-dark/40 rounded-2xl overflow-hidden border border-slate-200 dark:border-primary/10 hover:border-primary transition-all shadow-md hover:shadow-2xl hover:shadow-primary/10">
+<div class="relative aspect-[2/3] overflow-hidden">
+<img alt="Movie Poster 4" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" data-alt="Neon nights city cinematic poster" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBV4Le7CMclRwDZOuzwj4QVHwyp-karjnWg41bfQLvsIU5GuqjYL9I6l3Wvbi8RPB6kZJ2UmnxQmvfr9Lk1_lfLiSPssdQ4oIrYQfBuhnnX9xnGBwtAcjOGynxCMhA44GQCeLMBv43TLdnIKbZZQV1pH1tRmLruxgM65XQvS0dufKSyqxsJnZrDaKSg6Md0BFxF1G4ftEqoO5baTr__6j6MwBWGTsh6Hx1bm_0dgeaO1FU_iYrFrcpSq9hL5G7ESmMW-M0n3CvX3bs"/>
+<div class="absolute top-4 left-4 bg-primary text-white text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider">Ultimi Posti</div>
+</div>
+<div class="p-5 space-y-4">
+<div>
+<h4 class="text-xl font-bold dark:text-white mb-1">Drive</h4>
+<div class="flex items-center gap-1 text-primary">
+<span class="material-symbols-outlined text-sm fill-1">star</span>
+<span class="text-xs font-bold uppercase tracking-widest text-slate-500">Nuovo Cinema Aquila</span>
+</div>
+</div>
+<div class="flex flex-wrap gap-2">
+<span class="px-3 py-1.5 bg-slate-100 dark:bg-primary/10 text-slate-700 dark:text-slate-300 text-xs font-bold rounded-lg border border-slate-200 dark:border-primary/20">21:15</span>
+</div>
+<button class="w-full py-3 text-slate-900 dark:text-white font-bold border-2 border-slate-900 dark:border-primary rounded-xl hover:bg-slate-900 dark:hover:bg-primary hover:text-white transition-all">Prenota Ora</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Footer -->
+<footer class="bg-slate-900 dark:bg-background-dark/90 text-slate-400 py-16 border-t border-white/5">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-12">
+<div class="col-span-1 md:col-span-2 space-y-6">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-3xl">movie_filter</span>
+<h1 class="text-2xl font-black tracking-tight text-white uppercase">Cine<span class="text-primary">Base</span></h1>
+</div>
+<p class="max-w-sm">La piattaforma definitiva per la gestione cinematografica digitale. Gestisci sale, proiezioni e vendite in un unico ambiente centralizzato.</p>
+<div class="flex gap-4">
+<a class="p-2 bg-white/5 rounded-full hover:text-primary transition-colors" href="#"><span class="material-symbols-outlined">social_leaderboard</span></a>
+<a class="p-2 bg-white/5 rounded-full hover:text-primary transition-colors" href="#"><span class="material-symbols-outlined">share_reviews</span></a>
+<a class="p-2 bg-white/5 rounded-full hover:text-primary transition-colors" href="#"><span class="material-symbols-outlined">link</span></a>
+</div>
+</div>
+<div class="space-y-4">
+<h5 class="text-white font-bold uppercase tracking-wider text-sm">Piattaforma</h5>
+<ul class="space-y-2 text-sm">
+<li><a class="hover:text-primary transition-colors" href="#">Programmazione</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Sale &amp; Hardware</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Pricing</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Dashboard Admin</a></li>
+</ul>
+</div>
+<div class="space-y-4">
+<h5 class="text-white font-bold uppercase tracking-wider text-sm">Supporto</h5>
+<ul class="space-y-2 text-sm">
+<li><a class="hover:text-primary transition-colors" href="#">Help Center</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Privacy Policy</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Termini di Servizio</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Contattaci</a></li>
+</ul>
+</div>
+</div>
+<div class="mt-16 pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4 text-xs font-medium uppercase tracking-widest">
+<p>© 2023 CineBase Management. Tutti i diritti riservati.</p>
+<div class="flex gap-6">
+<a class="hover:text-white transition-colors" href="#">Italiano (IT)</a>
+<a class="hover:text-white transition-colors" href="#">English (US)</a>
+</div>
+</div>
+</div>
+</footer>
+</body></html>

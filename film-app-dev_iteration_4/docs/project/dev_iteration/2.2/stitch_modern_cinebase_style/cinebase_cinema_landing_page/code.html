@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+
+<html class="light" lang="it"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container": "#eeecff",
+                        "secondary-fixed-dim": "#c5c4de",
+                        "tertiary-container": "#00c7c7",
+                        "on-primary": "#ffffff",
+                        "primary-container": "#d4af37",
+                        "error-container": "#ffdad6",
+                        "outline-variant": "#d0c5af",
+                        "primary-fixed-dim": "#e9c349",
+                        "on-secondary": "#ffffff",
+                        "on-tertiary": "#ffffff",
+                        "on-primary-fixed": "#241a00",
+                        "outline": "#7f7663",
+                        "on-tertiary-container": "#004e4e",
+                        "on-primary-fixed-variant": "#574500",
+                        "inverse-on-surface": "#f1efff",
+                        "primary": "#735c00",
+                        "on-secondary-fixed": "#191a2d",
+                        "surface-variant": "#e1e0fb",
+                        "on-error": "#ffffff",
+                        "on-tertiary-fixed-variant": "#004f4f",
+                        "primary-fixed": "#ffe088",
+                        "on-surface": "#191a2d",
+                        "secondary-container": "#e1e0fb",
+                        "surface-tint": "#735c00",
+                        "secondary-fixed": "#e1e0fb",
+                        "secondary": "#5c5c73",
+                        "on-background": "#191a2d",
+                        "surface-container-lowest": "#ffffff",
+                        "inverse-primary": "#e9c349",
+                        "error": "#ba1a1a",
+                        "surface-bright": "#fbf8ff",
+                        "background": "#fbf8ff",
+                        "tertiary-fixed-dim": "#00dddd",
+                        "surface-dim": "#d9d8f2",
+                        "tertiary-fixed": "#00fbfb",
+                        "surface": "#fbf8ff",
+                        "on-primary-container": "#554300",
+                        "tertiary": "#006a6a",
+                        "surface-container-low": "#f5f2ff",
+                        "surface-container-high": "#e7e6ff",
+                        "on-error-container": "#93000a",
+                        "inverse-surface": "#2e2f43",
+                        "on-surface-variant": "#4d4635",
+                        "on-secondary-container": "#626279",
+                        "on-secondary-fixed-variant": "#44455a",
+                        "surface-container-highest": "#e1e0fb",
+                        "on-tertiary-fixed": "#002020"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Inter"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-nav {
+            background: rgba(26, 27, 46, 0.85);
+            backdrop-filter: blur(20px);
+        }
+    </style>
+</head>
+<body class="bg-surface-container-low font-body text-on-surface">
+<!-- TopAppBar -->
+<header class="bg-[#1A1B2E]/85 backdrop-blur-xl dark:bg-[#1A1B2E]/85 docked full-width top-0 sticky z-50 shadow-[0px_10px_30px_rgba(25,26,45,0.06)]">
+<nav class="flex justify-between items-center w-full px-8 py-4 max-w-full">
+<div class="text-2xl font-black tracking-tighter text-[#D4AF37] uppercase">
+                CineBase
+            </div>
+<div class="hidden md:flex items-center gap-8 font-inter tracking-tight">
+<a class="text-[#D4AF37] border-b-2 border-[#D4AF37] pb-1" href="#">Palinsesto</a>
+<a class="text-[#d9d8f2] hover:text-white transition-colors" href="#">Sale</a>
+<a class="text-[#d9d8f2] hover:text-white transition-colors" href="#">Personale</a>
+<a class="text-[#d9d8f2] hover:text-white transition-colors" href="#">Archivio</a>
+</div>
+<div class="flex items-center gap-6">
+<button class="material-symbols-outlined text-[#d9d8f2] hover:text-white transition-all duration-300">settings</button>
+<button class="bg-[#D4AF37] text-[#1A1B2E] px-6 py-2 rounded-xl font-bold uppercase text-xs tracking-widest scale-95 active:scale-90 transition-transform">
+                    Accedi
+                </button>
+</div>
+</nav>
+</header>
+<main>
+<!-- Hero Section -->
+<section class="relative h-[870px] flex items-center justify-center overflow-hidden">
+<div class="absolute inset-0 z-0">
+<img class="w-full h-full object-cover" data-alt="interior of a luxury modern cinema with rows of plush red velvet seats under dramatic golden atmospheric lighting and large screen" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB67gyiTE78mF7tm33sK2R5wPuZLXJ7cByaDxpX1DdKFBZ9WqRsalRuFcIay4jxGybh7_D-juoRgVj2vgn425ljNnJAF0lOp920M6QH_LYK198NhqlbgR2eGEzvUQuU1kg7Jf94X9dFvaW68ZuMnhJ2b3jch7IkR9r6T4llZPRYefUB2Lj9Yi-RMYWut0oBd4hWoVfLu_W3HZHvoCzITAiNr1KaqENr1n36fvmKMCiOjL6bObuhyA4y3FSHJ-e1hVsqo_POBR8PPHY"/>
+<div class="absolute inset-0 bg-gradient-to-b from-[#1A1B2E]/90 via-[#1A1B2E]/60 to-[#1A1B2E]/90"></div>
+</div>
+<div class="relative z-10 text-center px-6 max-w-4xl mx-auto">
+<h1 class="text-5xl md:text-7xl font-black text-[#D4AF37] tracking-tighter mb-6 uppercase leading-tight">
+                    La Tua Rete Cinematografica,<br/>
+<span class="text-white">Gestita in un Click</span>
+</h1>
+<p class="text-lg md:text-xl text-[#d9d8f2] mb-12 leading-relaxed max-w-2xl mx-auto font-light">
+                    Piattaforma completa per la gestione di cinema, film, registi e proiezioni. Semplifica le operazioni quotidiane della tua rete di sale cinematografiche.
+                </p>
+<div class="flex flex-col md:flex-row items-center justify-center gap-6">
+<button class="bg-[#D4AF37] text-[#1A1B2E] px-10 py-4 rounded-xl font-extrabold text-sm uppercase tracking-[0.1em] shadow-xl hover:scale-105 transition-transform">
+                        Area Admin
+                    </button>
+<button class="border-2 border-[#D4AF37] text-white px-10 py-4 rounded-xl font-extrabold text-sm uppercase tracking-[0.1em] hover:bg-[#D4AF37]/10 transition-colors">
+                        Programmazione
+                    </button>
+</div>
+</div>
+</section>
+<!-- Programming Section -->
+<section class="py-24 px-8 max-w-7xl mx-auto">
+<div class="flex items-center gap-6 mb-16">
+<h2 class="text-3xl font-black text-on-surface uppercase tracking-tight">Film in Programmazione</h2>
+<div class="h-[2px] flex-grow bg-[#D4AF37]"></div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+<!-- Film Card 1 -->
+<div class="group bg-surface-container-lowest rounded-xl overflow-hidden shadow-[0px_10px_30px_rgba(25,26,45,0.06)] hover:translate-y-[-8px] transition-all duration-300">
+<div class="aspect-[2/3] overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" data-alt="vintage film poster of La Dolce Vita by Federico Fellini showing elegant scenes in black and white with classic typography" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC2I5GFioDoRNEAmt2OZM--34OgnG00xB6RStuScQ0QLV7ZRjgPoALrJfU7325GTrbaj_hHlMceG7McujwYVz72jLvCXf2FO63SUTO51k3A4CYec20pGZKtV61-2JejSJRkZ6qgVsktKQO-TMa7wqQiEawcQscbhMb-eHFxuCS5odiauiKbNE3feLdvs29_ssBykinE5Cy9vo6OEiguoiWmCJWtryuXDxgfq6_qmp4k9jLpBSSSCI_64N238jPAOpobMsYgZ35BaXQ"/>
+</div>
+<div class="p-8">
+<span class="text-[0.7rem] font-bold text-secondary uppercase tracking-[0.1em] block mb-2">Metadata • 176 min</span>
+<h3 class="text-2xl font-bold text-on-surface mb-1">La dolce vita</h3>
+<p class="text-on-surface-variant text-sm mb-8 italic">Regista Federico Fellini</p>
+<button class="w-full py-4 bg-[#735c00] text-white rounded-lg font-bold uppercase text-xs tracking-widest hover:bg-[#D4AF37] transition-colors">
+                            Prenota
+                        </button>
+</div>
+</div>
+<!-- Film Card 2 -->
+<div class="group bg-surface-container-lowest rounded-xl overflow-hidden shadow-[0px_10px_30px_rgba(25,26,45,0.06)] hover:translate-y-[-8px] transition-all duration-300">
+<div class="aspect-[2/3] overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" data-alt="Kill Bill Volume 1 movie poster with vibrant yellow background and stylized graphic silhouette of Uma Thurman with a katana" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBfd87cMuUcjalJ_oHDwl7Scex7MsiJhAfC4nCnPFLHENgGyP7Xrf8MqMIPYcGuFbM4oKwq9UwXJ2BfxfwLd_Suri50IWfGBOWE5mLDTakeD58EYh-bvxshUxU_Xxi2AOvj42yFt2cI47qKWkAab4AY5S7gK5ltXH7eiOUCLKo0dTBhaZqn7SeaYYcxkwYkd8Xe8JzY34UbAWXb2JkeBhGgRRpm5KzkFhym8__cLSDjWo1F3Jy8gdu1uaZ0FI63v92DA_EK_SfQXxk"/>
+</div>
+<div class="p-8">
+<span class="text-[0.7rem] font-bold text-secondary uppercase tracking-[0.1em] block mb-2">Metadata • 110 min</span>
+<h3 class="text-2xl font-bold text-on-surface mb-1">Kill Bill Volume 1</h3>
+<p class="text-on-surface-variant text-sm mb-8 italic">Regista Quentin Tarantino</p>
+<button class="w-full py-4 bg-[#735c00] text-white rounded-lg font-bold uppercase text-xs tracking-widest hover:bg-[#D4AF37] transition-colors">
+                            Prenota
+                        </button>
+</div>
+</div>
+<!-- Film Card 3 -->
+<div class="group bg-surface-container-lowest rounded-xl overflow-hidden shadow-[0px_10px_30px_rgba(25,26,45,0.06)] hover:translate-y-[-8px] transition-all duration-300">
+<div class="aspect-[2/3] overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" data-alt="Kill Bill Volume 2 movie poster featuring dramatic cinematic composition with warm tones and classic action film aesthetic" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDUI0uD7LOMpmXLpjw9HQAcyQNmNyPCmte9XbkNrwVGDUK0gBrcOLoP1mHxkTZdtyOiGTHBdr-Y-iB0cLUokYlX6pOlvplRS7uhK6PyNkGV0QAB36oVHg8hMUIVifpzoEjNxpOYHRz-xVnOSBUmWkwcHapByZ7TcUpxX_2B8R1mrxJ3AGx3uDW2_bmJ7GTr1QHYQpdNO9q7wMJkGpKn1Lbfv7xc-2Sc1JRe7dekCny-pc1v6mh6jPw7HJs8zPAU5GUHO8BmBYG8GDI"/>
+</div>
+<div class="p-8">
+<span class="text-[0.7rem] font-bold text-secondary uppercase tracking-[0.1em] block mb-2">Metadata • 110 min</span>
+<h3 class="text-2xl font-bold text-on-surface mb-1">Kill Bill Volume 2</h3>
+<p class="text-on-surface-variant text-sm mb-8 italic">Regista Quentin Tarantino</p>
+<button class="w-full py-4 bg-[#735c00] text-white rounded-lg font-bold uppercase text-xs tracking-widest hover:bg-[#D4AF37] transition-colors">
+                            Prenota
+                        </button>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-[#1A1B2E] dark:bg-[#0f0f1a] full-width py-12 px-8 border-t border-[#5c5c73]/15">
+<div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-12">
+<div class="flex flex-col items-center md:items-start gap-4">
+<div class="text-lg font-bold text-[#D4AF37]">CineBase</div>
+<p class="font-inter text-xs uppercase tracking-[0.05em] text-[#d9d8f2]/60">© 2024 CineBase Archive. Tutti i diritti riservati.</p>
+</div>
+<div class="flex flex-wrap justify-center gap-8 font-inter text-xs uppercase tracking-[0.05em]">
+<a class="text-[#d9d8f2]/60 hover:text-[#D4AF37] transition-colors" href="#">Privacy Policy</a>
+<a class="text-[#d9d8f2]/60 hover:text-[#D4AF37] transition-colors" href="#">Termini di Servizio</a>
+<a class="text-[#d9d8f2]/60 hover:text-[#D4AF37] transition-colors" href="#">Contatti</a>
+<a class="text-[#d9d8f2]/60 hover:text-[#D4AF37] transition-colors" href="#">Press Kit</a>
+</div>
+<div class="flex gap-6">
+<a class="text-[#d9d8f2]/60 hover:text-[#D4AF37] transition-colors opacity-80 hover:opacity-100" href="#">
+<span class="material-symbols-outlined">social_leaderboard</span>
+</a>
+<a class="text-[#d9d8f2]/60 hover:text-[#D4AF37] transition-colors opacity-80 hover:opacity-100" href="#">
+<span class="material-symbols-outlined">photo_camera</span>
+</a>
+<a class="text-[#d9d8f2]/60 hover:text-[#D4AF37] transition-colors opacity-80 hover:opacity-100" href="#">
+<span class="material-symbols-outlined">alternate_email</span>
+</a>
+<a class="text-[#d9d8f2]/60 hover:text-[#D4AF37] transition-colors opacity-80 hover:opacity-100" href="#">
+<span class="material-symbols-outlined">play_circle</span>
+</a>
+</div>
+</div>
+</footer>
+</body></html>

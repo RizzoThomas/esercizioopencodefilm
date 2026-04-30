@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="it-IT">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CineBase - Pagamento</title>
+
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
+  <script src="/js/tailwind-config.js"></script>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="/css/styles.css?v=2" rel="stylesheet">
+  <script src="/js/route-guard.js"></script>
+</head>
+
+<body class="bg-canvas text-ink font-sans">
+  <div id="navbar-container"></div>
+
+  <main class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <!-- Loading State -->
+    <div id="loading-state" class="text-center py-16">
+      <i class="fa-solid fa-spinner fa-spin text-4xl mb-4 text-ferrari-primary"></i>
+      <p class="text-body">Caricamento ordine...</p>
+    </div>
+
+    <!-- Error State -->
+    <div id="error-state" class="hidden text-center py-16">
+      <i class="fa-solid fa-circle-exclamation text-6xl text-ferrari-semantic-warning mb-4"></i>
+      <h3 class="text-xl font-semibold text-ink mb-2">Errore</h3>
+      <p class="text-body mb-4" id="error-message"></p>
+      <a href="/programmazione.html" class="btn-outline">
+        <i class="fa-solid fa-film mr-1"></i>Torna alla programmazione
+      </a>
+    </div>
+
+    <!-- Main Content -->
+    <div id="main-content" class="hidden">
+      <h1 class="text-2xl font-bold text-ink mb-6">
+        <i class="fa-solid fa-credit-card text-ferrari-primary mr-2"></i>Pagamento
+      </h1>
+
+      <!-- Order Summary -->
+      <div class="card-ferrari p-6 mb-6">
+        <h2 class="text-lg font-bold text-ink mb-4">Riepilogo Ordine</h2>
+        <div id="order-summary" class="space-y-3"></div>
+        <div class="border-t border-hairline-variant/20 pt-4 mt-4">
+          <div class="flex justify-between text-xl font-bold text-ink">
+            <span>Totale da pagare</span>
+            <span id="order-total"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Payment Method Selection -->
+      <div class="card-ferrari p-6 mb-6">
+        <h2 class="text-lg font-bold text-ink mb-4">Metodo di Pagamento</h2>
+
+        <!-- Credit Balance -->
+        <div id="credit-balance-card" class="mb-4 p-4 bg-canvas-elevated">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm text-body">Il tuo credito</p>
+              <p id="credit-balance" class="text-xl font-bold text-ferrari-primary"></p>
+            </div>
+            <i class="fa-solid fa-wallet text-ferrari-primary text-2xl"></i>
+          </div>
+        </div>
+
+        <!-- Payment Options -->
+        <div class="space-y-3">
+          <!-- Card Only -->
+          <label class="payment-option-card" id="option-card">
+            <input type="radio" name="payment-method" value="carta" class="mr-3" checked>
+            <div class="flex-1">
+              <p class="font-semibold text-ink">Solo carta</p>
+              <p class="text-sm text-body">Paga l'intero importo con carta</p>
+            </div>
+            <i class="fa-solid fa-credit-card text-body"></i>
+          </label>
+
+          <!-- Credit Only -->
+          <label class="payment-option-card" id="option-credito">
+            <input type="radio" name="payment-method" value="credito" class="mr-3">
+            <div class="flex-1">
+              <p class="font-semibold text-ink">Solo credito</p>
+              <p class="text-sm text-body" id="credit-only-desc">Paga con il tuo credito piattaforma</p>
+            </div>
+            <i class="fa-solid fa-wallet text-body"></i>
+          </label>
+
+          <!-- Mixed -->
+          <label class="payment-option-card" id="option-misto">
+            <input type="radio" name="payment-method" value="misto" class="mr-3">
+            <div class="flex-1">
+              <p class="font-semibold text-ink">Pagamento misto</p>
+              <p class="text-sm text-body">Usa parte del credito + carta per il residuo</p>
+            </div>
+            <i class="fa-solid fa-money-bill-transfer text-body"></i>
+          </label>
+        </div>
+
+        <!-- Credit slider for mixed payment -->
+        <div id="credit-slider-section" class="hidden mt-4 p-4 bg-canvas-elevated">
+          <label class="block text-sm font-medium text-ink mb-2">
+            Quanto credito vuoi usare?
+          </label>
+          <input type="range" id="credit-slider" min="0" max="0" step="0.50"
+            class="w-full accent-ferrari-primary mb-2">
+          <div class="flex justify-between text-sm text-body">
+            <span id="credit-amount-label"></span>
+            <span id="card-amount-label"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stripe Card Info (for mixed payment) -->
+      <div id="stripe-info-section" class="hidden card-ferrari p-6 mb-6">
+        <h2 class="text-lg font-bold text-ink mb-4">Pagamento Carta</h2>
+        <p class="text-sm text-body">
+          Verrai reindirizzato alla pagina sicura di Stripe per completare il pagamento con carta.
+        </p>
+      </div>
+
+      <!-- Pay Button -->
+      <button id="btn-pay" class="w-full btn-primary py-4 text-lg">
+        <i class="fa-solid fa-lock mr-2"></i><span id="pay-button-text">Paga ora</span>
+      </button>
+
+      <button id="btn-cancel" class="w-full btn-outline py-3 text-center mt-3">
+        <i class="fa-solid fa-arrow-left mr-2"></i>Annulla e torna ai posti
+      </button>
+    </div>
+  </main>
+
+  <div id="footer-container"></div>
+
+  <div id="toast-container" class="fixed bottom-4 right-4 z-50"></div>
+
+  <script src="/js/utils.js?v=20260419b"></script>
+  <script src="/js/api.js?v=20260419b"></script>
+  <script src="/js/auth.js?v=20260419b"></script>
+  <script src="/js/template-loader.js?v=20260419b"></script>
+  <script src="/js/navbar.js?v=20260419b"></script>
+  <script src="/js/pages/pagamento.js?v=20260419b"></script>
+</body>
+
+</html>
+
+

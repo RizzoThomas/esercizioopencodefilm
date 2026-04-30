@@ -1,0 +1,405 @@
+﻿<!DOCTYPE html>
+<html lang="it-IT">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CineBase - Dashboard</title>
+
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
+  <script src="/js/tailwind-config.js"></script>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="/css/styles.css?v=2" rel="stylesheet">
+  <script src="/js/route-guard.js"></script>
+</head>
+
+<body class="bg-canvas text-ink font-sans">
+  <main class="px-4 sm:px-6 lg:px-8 py-8">
+    <div class="flex items-center justify-between gap-4 mb-8">
+      <h2 class="text-xl sm:text-2xl ferrari-display-md text-ink">Overview</h2>
+      <button onclick="openProiezioneModal()" class="btn-primary whitespace-nowrap">
+        <span class="hidden sm:inline">Aggiungi Proiezione</span>
+        <span class="sm:hidden">+ Proiezione</span>
+      </button>
+    </div>
+        <!-- Stats Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div class="card-ferrari overflow-hidden">
+            <div class="p-5 flex items-center">
+              <div class="flex-shrink-0 bg-ferrari-primary p-3">
+                <i class="fa-solid fa-film text-ink text-xl"></i>
+              </div>
+              <div class="ml-5 w-0 flex-1">
+                <dl>
+                  <dt class="text-sm font-medium text-body truncate">Film</dt>
+                  <dd class="text-2xl font-semibold text-ink" id="stat-movies">-</dd>
+                </dl>
+              </div>
+            </div>
+          </div>
+          <div class="card-ferrari overflow-hidden">
+            <div class="p-5 flex items-center">
+              <div class="flex-shrink-0 bg-ferrari-primary p-3">
+                <i class="fa-solid fa-user text-ink text-xl"></i>
+              </div>
+              <div class="ml-5 w-0 flex-1">
+                <dl>
+                  <dt class="text-sm font-medium text-body truncate">Registi</dt>
+                  <dd class="text-2xl font-semibold text-ink" id="stat-directors">-</dd>
+                </dl>
+              </div>
+            </div>
+          </div>
+          <div class="card-ferrari overflow-hidden">
+            <div class="p-5 flex items-center">
+              <div class="flex-shrink-0 bg-ferrari-primary p-3">
+                <i class="fa-solid fa-building text-ink text-xl"></i>
+              </div>
+              <div class="ml-5 w-0 flex-1">
+                <dl>
+                  <dt class="text-sm font-medium text-body truncate">Cinema</dt>
+                  <dd class="text-2xl font-semibold text-ink" id="stat-cinemas">-</dd>
+                </dl>
+              </div>
+            </div>
+          </div>
+          <div class="card-ferrari overflow-hidden">
+            <div class="p-5 flex items-center">
+              <div class="flex-shrink-0 bg-ferrari-primary p-3">
+                <i class="fa-solid fa-clock text-ink text-xl"></i>
+              </div>
+              <div class="ml-5 w-0 flex-1">
+                <dl>
+                  <dt class="text-sm font-medium text-body truncate">Proiezioni</dt>
+                  <dd class="text-2xl font-semibold text-ink" id="stat-screenings">-</dd>
+                </dl>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Proiezioni in Programma -->
+        <div class="card-ferrari overflow-x-auto mb-8">
+          <div class="px-6 py-4 border-b border-hairline">
+            <h2 class="text-lg font-semibold text-ink">Proiezioni in Programma</h2>
+          </div>
+          <table class="min-w-full divide-y divide-hairline">
+            <thead class="bg-canvas-elevated">
+              <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium label-caps">ID</th>
+                <th class="px-6 py-3 text-left text-xs font-medium label-caps">Film</th>
+                <th class="px-6 py-3 text-left text-xs font-medium label-caps">Cinema</th>
+                <th class="px-6 py-3 text-left text-xs font-medium label-caps">Data</th>
+                <th class="px-6 py-3 text-left text-xs font-medium label-caps">Ora</th>
+                <th class="px-6 py-3 text-left text-xs font-medium label-caps">Status</th>
+              </tr>
+            </thead>
+            <tbody id="upcoming-screenings" class="divide-y divide-hairline">
+              <tr>
+                <td colspan="6" class="px-6 py-4 text-center text-body">Caricamento...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Registi in Evidenza & Analisi Cinema -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div class="card-ferrari overflow-hidden">
+            <div class="px-6 py-4 border-b border-hairline">
+              <h2 class="text-lg font-semibold text-ink">Registi in Evidenza</h2>
+            </div>
+            <div class="p-6">
+              <p class="text-body text-sm">Caricamento in corso...</p>
+            </div>
+          </div>
+          <div class="card-ferrari overflow-hidden">
+            <div class="px-6 py-4 border-b border-hairline">
+              <h2 class="text-lg font-semibold text-ink">Analisi Cinema</h2>
+            </div>
+            <div class="p-6">
+              <p class="text-body text-sm">Caricamento in corso...</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Segnalazioni -->
+        <div class="mt-8">
+          <div class="card-ferrari overflow-x-auto">
+            <div class="px-6 py-4 border-b border-hairline flex items-center justify-between">
+              <h2 class="text-lg font-semibold text-ink"><i class="fa-solid fa-bug text-ferrari-primary mr-2"></i>Segnalazioni</h2>
+              <span id="segnalazioni-count" class="text-xs text-body"></span>
+            </div>
+            <div id="segnalazioni-list" class="divide-y divide-hairline">
+              <div class="px-6 py-8 text-center text-body">Caricamento segnalazioni...</div>
+            </div>
+          </div>
+        </div>
+  </main>
+
+  <!-- Modal per aggiungere/modificare proiezione -->
+  <div id="proiezione-modal" class="fixed inset-0 z-50 hidden">
+    <div class="fixed inset-0 bg-gray-500/75 modal-backdrop" onclick="closeProiezioneModal()"></div>
+    <div class="fixed inset-0 z-10 overflow-y-auto">
+      <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+        <div class="relative transform overflow-hidden bg-canvas-elevated text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
+          <div class="bg-canvas-elevated px-6 pt-6 pb-4 flex justify-between items-center">
+            <h3 class="text-lg font-bold text-ink" id="modal-title">Aggiungi Proiezione</h3>
+            <button type="button" class="text-body hover:text-ink"
+              onclick="closeProiezioneModal()" title="Chiudi" aria-label="Chiudi modal">
+              <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+          </div>
+          <div class="bg-canvas-elevated px-6 pb-4">
+            <form id="proiezione-form" class="space-y-4">
+              <input type="hidden" name="id" value="">
+              <div>
+                <label for="cinema-select" class="block text-sm font-medium text-ink mb-1">Cinema</label>
+                <select id="cinema-select" name="cinemaId" required class="input-ferrari w-full"
+                  title="Seleziona il cinema">
+                  <option value="">Seleziona Cinema</option>
+                </select>
+              </div>
+              <div>
+                <label for="film-select" class="block text-sm font-medium text-ink mb-1">Film</label>
+                <select id="film-select" name="filmId" required class="input-ferrari w-full"
+                  title="Seleziona il film">
+                  <option value="">Seleziona Film</option>
+                </select>
+              </div>
+              <div>
+                <label for="dashboard-proiezione-data"
+                  class="block text-sm font-medium text-ink mb-1">Data</label>
+                <input id="dashboard-proiezione-data" type="date" name="data" required
+                  class="input-ferrari w-full" title="Data della proiezione">
+              </div>
+              <div>
+                <label for="dashboard-proiezione-ora"
+                  class="block text-sm font-medium text-ink mb-1">Ora</label>
+                <input id="dashboard-proiezione-ora" type="time" name="ora" required
+                  class="input-ferrari w-full" title="Ora della proiezione">
+              </div>
+            </form>
+          </div>
+          <div class="bg-canvas px-6 py-4 flex justify-end gap-3">
+            <button type="button" class="btn-outline px-4 py-2 text-sm font-medium"
+              onclick="closeProiezioneModal()">Annulla</button>
+            <button type="button" onclick="saveProiezione()" class="btn-primary">Salva</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast-container" class="fixed bottom-4 right-4 z-50"></div>
+
+  <script src="/js/utils.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/admin-shell.js"></script>
+  <script>
+    function normalizeCollection(data) {
+      if (Array.isArray(data)) return data;
+      if (Array.isArray(data?.$values)) return data.$values;
+      if (Array.isArray(data?.items)) return data.items;
+      return [];
+    }
+
+    // Cache per dropdown
+    let cachedFilms = [];
+    let cachedCinemas = [];
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      try {
+        const [filmsRaw, registiRaw, cinemasRaw, proiezioniRaw] = await Promise.all([
+          API.getFilms(),
+          API.getRegisti(),
+          API.getCinemas(),
+          API.getProiezioni()
+        ]);
+
+        const films = normalizeCollection(filmsRaw);
+        const registi = normalizeCollection(registiRaw);
+        const cinemas = normalizeCollection(cinemasRaw);
+        const proiezioni = normalizeCollection(proiezioniRaw);
+
+        cachedFilms = films;
+        cachedCinemas = cinemas;
+
+        document.getElementById('stat-movies').textContent = films.length;
+        document.getElementById('stat-directors').textContent = registi.length;
+        document.getElementById('stat-cinemas').textContent = cinemas.length;
+        document.getElementById('stat-screenings').textContent = proiezioni.length;
+
+        renderUpcomingScreenings(proiezioni);
+      } catch (error) {
+        console.error('Error loading dashboard:', error);
+      }
+      loadSegnalazioni();
+    });
+
+    function getDashboardFilmTitle(filmId) {
+      const film = cachedFilms.find(f => Number(f.id) === Number(filmId));
+      return film ? film.titolo : `ID ${filmId}`;
+    }
+
+    function getDashboardCinemaName(cinemaId) {
+      const cinema = cachedCinemas.find(c => Number(c.id) === Number(cinemaId));
+      return cinema ? cinema.nome : `ID ${cinemaId}`;
+    }
+
+    function renderUpcomingScreenings(proiezioni) {
+      const tbody = document.getElementById('upcoming-screenings');
+      if (!proiezioni.length) {
+        tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-4 text-center text-body">Nessuna proiezione trovata</td></tr>';
+        return;
+      }
+
+      const now = new Date();
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+      tbody.innerHTML = proiezioni.slice(0, 5).map(p => {
+        let proiezioneDate = null;
+        if (p.data) {
+          const datePart = p.data.split('T')[0];
+          const [year, month, day] = datePart.split('-').map(Number);
+          proiezioneDate = new Date(year, month - 1, day);
+        }
+        const isPast = proiezioneDate && proiezioneDate < today;
+        const statusText = isPast ? 'Passata' : 'In programma';
+
+        const formattedDate = formatDate(p.data);
+
+        let formattedTime = '';
+        if (p.ora && typeof p.ora === 'string') {
+          let oraValue = '';
+          if (p.ora.includes('T')) {
+            oraValue = p.ora.split('T')[1];
+          } else if (p.ora.includes(':')) {
+            oraValue = p.ora;
+          }
+          if (oraValue && oraValue !== '00:00:00') {
+            formattedTime = oraValue.substring(0, 5);
+          }
+        }
+
+        const filmTitle = p.film?.titolo || getDashboardFilmTitle(p.filmId);
+        const cinemaNome = p.cinema?.nome || getDashboardCinemaName(p.cinemaId);
+
+        return `
+    <tr>
+      <td class="px-6 py-4 whitespace-nowrap text-sm text-body">${p.id}</td>
+      <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-ink">${filmTitle}</td>
+      <td class="px-6 py-4 whitespace-nowrap text-sm text-ink">${cinemaNome}</td>
+      <td class="px-6 py-4 whitespace-nowrap text-sm text-body">${formattedDate}</td>
+      <td class="px-6 py-4 whitespace-nowrap text-sm text-body">${formattedTime}</td>
+      <td class="px-6 py-4 whitespace-nowrap">
+        <span class="badge-ferrari">${statusText}</span>
+      </td>
+    </tr>
+    `;
+      }).join('');
+    }
+
+    function populateSelect(selectId, items, idField, labelFields, defaultLabel) {
+      const select = document.getElementById(selectId);
+      if (!select) return;
+      select.innerHTML = `<option value="">${defaultLabel}</option>` +
+        items.map(item => {
+          const label = labelFields.map(f => item[f]).filter(Boolean).join(' - ');
+          return `<option value="${item[idField]}">${label}</option>`;
+        }).join('');
+    }
+
+    function openProiezioneModal() {
+      const modal = document.getElementById('proiezione-modal');
+      const form = document.getElementById('proiezione-form');
+      if (!modal || !form) return;
+
+      form.reset();
+      delete form.dataset.editId;
+
+      populateSelect('cinema-select', cachedCinemas, 'id', ['nome'], 'Seleziona Cinema');
+      populateSelect('film-select', cachedFilms, 'id', ['titolo'], 'Seleziona Film');
+
+      modal.classList.remove('hidden');
+    }
+
+    function closeProiezioneModal() {
+      const modal = document.getElementById('proiezione-modal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    async function saveProiezione() {
+      const form = document.getElementById('proiezione-form');
+      if (!form) return;
+
+      const formData = new FormData(form);
+      const data = Object.fromEntries(formData);
+
+      if (data.cinemaId) data.cinemaId = Number(data.cinemaId);
+      if (data.filmId) data.filmId = Number(data.filmId);
+
+      if (data.data && data.ora) {
+        data.ora = `${data.data}T${data.ora}:00`;
+      }
+
+      try {
+        await API.createProiezione(data);
+        showToast('Proiezione creata con successo', 'success');
+        closeProiezioneModal();
+        const proiezioni = normalizeCollection(await API.getProiezioni());
+        renderUpcomingScreenings(proiezioni);
+      } catch (error) {
+        handleApiError(error);
+      }
+    }
+
+    async function loadSegnalazioni() {
+      const list = document.getElementById('segnalazioni-list');
+      const count = document.getElementById('segnalazioni-count');
+      try {
+        const data = await API.getSegnalazioni();
+        const segnalazioni = Array.isArray(data) ? data : (data?.$values || []);
+        if (!segnalazioni.length) {
+          list.innerHTML = '<div class="px-6 py-8 text-center text-body">Nessuna segnalazione</div>';
+          return;
+        }
+        count.textContent = `${segnalazioni.length} segnalazioni`;
+        list.innerHTML = segnalazioni.slice(0, 10).map(s => {
+          const date = new Date(s.createdAtUtc);
+          const statoColor = s.stato === 'Aperta' ? 'text-amber-500' : s.stato === 'Risolta' ? 'text-emerald-500' : 'text-body';
+          return `<div class="px-6 py-4 flex items-start justify-between gap-4">
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 mb-1">
+                <span class="${statoColor} text-xs font-semibold">${s.stato}</span>
+                <span class="text-ink font-medium text-sm truncate">${s.titolo}</span>
+              </div>
+              <p class="text-xs text-body line-clamp-2">${s.descrizione}</p>
+              <div class="flex flex-wrap gap-3 mt-1 text-xs text-body">
+                ${s.emailUtente ? `<span><i class="fa-solid fa-envelope mr-1"></i>${s.emailUtente}</span>` : ''}
+                <span><i class="fa-regular fa-calendar mr-1"></i>${date.toLocaleDateString('it-IT', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' })}</span>
+              </div>
+            </div>
+            ${s.stato === 'Aperta' ? `<button onclick="risolviSegnalazione(${s.id})" class="btn-ghost text-xs flex-shrink-0"><i class="fa-solid fa-check mr-1"></i>Risolvi</button>` : ''}
+          </div>`;
+        }).join('');
+      } catch {
+        list.innerHTML = '<div class="px-6 py-8 text-center text-body">Errore caricamento segnalazioni</div>';
+      }
+    }
+
+    async function risolviSegnalazione(id) {
+      try {
+        await API.updateStatoSegnalazione(id, { stato: 'Risolta' });
+        showToast('Segnalazione risolta', 'success');
+        loadSegnalazioni();
+      } catch { showToast('Errore', 'danger'); }
+    }
+  </script>
+</body>
+
+</html>

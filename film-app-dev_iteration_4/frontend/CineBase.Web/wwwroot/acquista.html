@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="it-IT">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CineBase - Acquista Biglietti</title>
+
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
+  <script src="/js/tailwind-config.js"></script>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="/css/styles.css?v=2" rel="stylesheet">
+  <script src="/js/route-guard.js"></script>
+</head>
+
+<body class="bg-canvas text-ink font-sans">
+  <div id="navbar-container"></div>
+
+  <main class="acquista-page max-w-7xl mx-auto px-3 sm:px-4 lg:px-5 py-3 lg:py-4">
+    <!-- Loading State -->
+    <div id="loading-state" class="text-center py-16">
+      <i class="fa-solid fa-spinner fa-spin text-4xl mb-4 text-ferrari-primary"></i>
+      <p class="text-body">Caricamento piantina posti...</p>
+    </div>
+
+    <!-- Error State -->
+    <div id="error-state" class="hidden text-center py-16">
+      <i class="fa-solid fa-circle-exclamation text-6xl text-ferrari-semantic-warning mb-4"></i>
+      <h3 class="text-xl font-semibold text-ink mb-2">Errore</h3>
+      <p class="text-body mb-4" id="error-message">Impossibile caricare la piantina</p>
+      <button onclick="window.history.back()" class="btn-outline">
+        <i class="fa-solid fa-arrow-left mr-1"></i>Torna indietro
+      </button>
+    </div>
+
+    <!-- Main Content -->
+    <div id="main-content" class="hidden">
+      <div class="acquista-layout flex flex-col lg:flex-row gap-4 lg:gap-5">
+        <!-- Seat Map Section -->
+        <div class="flex-1 min-w-0">
+          <div class="card-ferrari p-3 lg:p-4 mb-4 h-full">
+            <h1 class="text-lg lg:text-xl font-bold text-ink mb-2.5">
+              <i class="fa-solid fa-couch text-ferrari-primary mr-2"></i>Seleziona Posti
+            </h1>
+
+            <!-- Show Info -->
+            <div id="show-info" class="mb-3 p-3 bg-canvas-elevated">
+              <h2 id="show-film-title" class="text-sm lg:text-base font-bold text-ink"></h2>
+              <div class="flex flex-wrap gap-2 mt-1.5 text-[11px] lg:text-xs text-body">
+                <span id="show-cinema"><i class="fa-solid fa-location-dot mr-1"></i></span>
+                <span id="show-sala"><i class="fa-solid fa-door-open mr-1"></i></span>
+                <span id="show-datetime"><i class="fa-regular fa-calendar mr-1"></i></span>
+              </div>
+              <div class="flex flex-wrap gap-2 mt-1.5 text-[11px] lg:text-xs">
+                <span id="show-prezzo" class="text-ferrari-primary font-semibold"></span>
+              </div>
+            </div>
+
+            <!-- Legend -->
+            <div class="flex flex-wrap gap-x-4 gap-y-1.5 mb-2.5 text-[10px] lg:text-[11px]">
+              <div class="flex items-center gap-1.5">
+                <span class="seat-legend seat-available"></span>
+                <span class="text-body">Disponibile</span>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <span class="seat-legend seat-selected"></span>
+                <span class="text-body">Selezionato</span>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <span class="seat-legend seat-held-other"></span>
+                <span class="text-body">Riservato</span>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <span class="seat-legend seat-sold"></span>
+                <span class="text-body">Venduto</span>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <span class="seat-legend seat-wheelchair"></span>
+                <span class="text-body"><i class="fa-solid fa-wheelchair mr-0.5"></i>Posto disabile</span>
+              </div>
+            </div>
+
+            <!-- Seat Map Container -->
+            <div id="seat-map-container" class="seat-map-wrapper">
+              <div class="seat-map-toolbar hidden lg:flex" aria-label="Controlli zoom piantina">
+                <button id="seat-zoom-out" type="button" class="seat-zoom-btn" title="Riduci zoom" aria-label="Riduci zoom">
+                  <i class="fa-solid fa-minus"></i>
+                </button>
+                <span id="seat-zoom-label" class="seat-zoom-label">100%</span>
+                <button id="seat-zoom-reset" type="button" class="seat-zoom-btn seat-zoom-btn-reset" title="Reset zoom" aria-label="Reset zoom">
+                  <i class="fa-solid fa-arrows-rotate"></i>
+                </button>
+                <button id="seat-zoom-in" type="button" class="seat-zoom-btn" title="Aumenta zoom" aria-label="Aumenta zoom">
+                  <i class="fa-solid fa-plus"></i>
+                </button>
+              </div>
+              <div id="seat-map-screen" class="seat-map-screen mb-3">SCHERMO</div>
+              <div id="seat-map" class="seat-map-grid"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sidebar: Summary & Actions -->
+        <div class="acquista-sidebar lg:w-[20rem] xl:w-[21rem] 2xl:w-[22rem] flex-shrink-0">
+          <!-- Countdown -->
+          <div id="countdown-card" class="hidden card-ferrari p-4 mb-4 border-l-4 border-amber-500">
+            <div class="flex items-center gap-2">
+              <i class="fa-solid fa-clock text-amber-500"></i>
+              <span class="text-sm font-semibold text-ink">Tempo rimanente</span>
+            </div>
+            <p id="countdown-timer" class="text-2xl font-bold text-amber-500 mt-1">10:00</p>
+            <p class="text-xs text-body mt-1">I posti saranno rilasciati allo scadere</p>
+          </div>
+
+          <!-- Selected Seats -->
+          <div class="card-ferrari p-4 lg:p-4 mb-4">
+            <h3 class="text-sm lg:text-base font-bold text-ink mb-2.5">
+              <i class="fa-solid fa-ticket text-ferrari-primary mr-2"></i>Riepilogo
+            </h3>
+            <div id="selected-seats-list" class="space-y-1.5 mb-4 max-h-52 overflow-y-auto pr-1">
+              <p class="text-sm text-body text-center py-4">
+                Seleziona almeno un posto dalla piantina
+              </p>
+            </div>
+            <div class="border-t border-hairline-variant/20 pt-4 mt-4">
+              <div class="flex justify-between text-sm text-body mb-1">
+                <span>Posti selezionati</span>
+                <span id="summary-count">0</span>
+              </div>
+              <div class="flex justify-between text-sm text-body mb-1">
+                <span>Prezzo unitario</span>
+                <span id="summary-unit-price"></span>
+              </div>
+              <div class="flex justify-between text-base lg:text-lg font-bold text-ink mt-2">
+                <span>Totale</span>
+                <span id="summary-total"></span>
+              </div>
+            </div>
+
+            <div class="mt-4 space-y-3">
+              <button id="btn-continue" disabled
+                class="w-full btn-primary py-3 text-center opacity-50 cursor-not-allowed">
+                <i class="fa-solid fa-credit-card mr-2"></i>Continua al pagamento
+              </button>
+              <button id="btn-back"
+                class="w-full btn-outline py-3 text-center">
+                <i class="fa-solid fa-arrow-left mr-2"></i>Torna allo show
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div id="footer-container"></div>
+
+  <div id="toast-container" class="fixed bottom-4 right-4 z-50"></div>
+
+  <script src="/js/utils.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/template-loader.js"></script>
+  <script src="/js/navbar.js"></script>
+  <script src="/js/pages/acquista.js"></script>
+</body>
+
+</html>
+
