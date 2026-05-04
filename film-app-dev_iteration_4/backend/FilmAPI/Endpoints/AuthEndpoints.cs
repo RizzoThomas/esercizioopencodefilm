@@ -24,11 +24,11 @@ public static class AuthEndpoints
             }
         }).AllowAnonymous();
 
-        group.MapPost("/login", async (LoginRequestDTO dto, IAuthService service) =>
+        group.MapPost("/login", async (LoginRequestDTO dto, IAuthService service, HttpContext context) =>
         {
             try
             {
-                var result = await service.LoginAsync(dto);
+                var result = await service.LoginAsync(dto, context);
                 return Results.Ok(result);
             }
             catch (UnauthorizedAccessException)
@@ -126,12 +126,12 @@ public static class AuthEndpoints
             return Results.Ok(new { message = "2FA disabilitato." });
         }).RequireAuthorization("Authenticated");
 
-        // Login con 2FA (per utenti che hanno 2FA abilitato)
-        group.MapPost("/login-2fa", async (TwoFactorVerifyRequestDTO dto, IAuthService service) =>
+        // Login con 2FA (dopo aver ricevuto tempToken dal login)
+        group.MapPost("/login-2fa", async (TwoFactorLoginRequestDTO dto, IAuthService service, HttpContext context) =>
         {
             try
             {
-                var result = await service.LoginWith2FaAsync(dto.Email, dto.Password, dto.Code, dto.DeviceId);
+                var result = await service.LoginWith2FaAsync(dto.TempToken, dto.Code, dto.TrustDevice, dto.DeviceId, context);
                 return Results.Ok(result);
             }
             catch (UnauthorizedAccessException)

@@ -20,6 +20,9 @@ public class AuthService : IAuthService
     private readonly int _refreshTokenExpiryDays;
     private readonly IEmailService _emailService;
     private const string DefaultDeviceId = "web-default";
+    private const int TwoFactorTempTokenExpiryMinutes = 5;
+    private const int TrustedDeviceExpiryDays = 3;
+    private static readonly byte[] _tempTokenKey = RandomNumberGenerator.GetBytes(32);
 
     public AuthService(FilmDbContext context, IEmailService emailService)
     {
@@ -67,7 +70,7 @@ public class AuthService : IAuthService
         };
     }
 
-    public async Task<AuthResponseDTO> LoginAsync(LoginRequestDTO dto)
+    public async Task<AuthResponseDTO> LoginAsync(LoginRequestDTO dto, HttpContext? httpContext = null)
     {
         var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == dto.Email);
         if (user is null || !BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash))
@@ -75,8 +78,28 @@ public class AuthService : IAuthService
             throw new UnauthorizedAccessException("Credenziali non valide");
         }
 
+        // Se 2FA è abilitato, verifica trusted device
+        if (user.TwoFactorEnabled && !string.IsNullOrEmpty(user.TwoFactorSecret))
+        {
+            if (!IsTrustedDevice(httpContext, user.Id))
+            {
+                var tempToken = GenerateTwoFactorTempToken(user.Id);
+                return new AuthResponseDTO
+                {
+                    RequiresTwoFactor = true,
+                    TempToken = tempToken,
+                    User = MapUserInfo(user)
+                };
+            }
+        }
+
+        return await GenerateAuthResponse(user, dto.DeviceId);
+    }
+
+    private async Task<AuthResponseDTO> GenerateAuthResponse(User user, string? deviceId)
+    {
         var accessToken = GenerateAccessToken(user);
-        var refreshToken = await GenerateRefreshTokenAsync(user.Id, dto.DeviceId);
+        var refreshToken = await GenerateRefreshTokenAsync(user.Id, deviceId);
         await _context.SaveChangesAsync();
 
         return new AuthResponseDTO
@@ -326,31 +349,129 @@ public class AuthService : IAuthService
         return TotpUtility.VerifyCode(secret, code);
     }
 
-    public async Task<AuthResponseDTO> LoginWith2FaAsync(string email, string password, string code, string? deviceId)
+    public async Task<AuthResponseDTO> LoginWith2FaAsync(string tempToken, string code, bool trustDevice, string? deviceId, HttpContext? httpContext = null)
     {
-        var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
-        if (user is null || !BCrypt.Net.BCrypt.Verify(password, user.PasswordHash))
-            throw new UnauthorizedAccessException("Credenziali non valide");
+        // Decodifica temp token
+        var parts = tempToken.Split('.');
+        if (parts.Length != 2)
+            throw new UnauthorizedAccessException("Token 2FA non valido");
+
+        var payload = parts[0];
+        var signature = parts[1];
+
+        // Verifica firma HMAC
+        using var hmac = new HMACSHA256(_tempTokenKey);
+        var computedSig = Convert.ToBase64String(hmac.ComputeHash(Encoding.UTF8.GetBytes(payload)))
+            .Replace("/", "_").Replace("+", "-").TrimEnd('=');
+
+        if (!CryptographicOperations.FixedTimeEquals(
+                Encoding.UTF8.GetBytes(signature),
+                Encoding.UTF8.GetBytes(computedSig)))
+            throw new UnauthorizedAccessException("Token 2FA non valido");
+
+        // Decodifica payload (Base64 URL-safe)
+        var json = Encoding.UTF8.GetString(Convert.FromBase64String(
+            payload.Replace("-", "+").Replace("_", "/") + new string('=', (4 - payload.Length % 4) % 4)));
+
+        var payloadObj = System.Text.Json.JsonSerializer.Deserialize<TempTokenPayload>(json);
+        if (payloadObj == null || payloadObj.Exp < DateTimeOffset.UtcNow.ToUnixTimeSeconds())
+            throw new UnauthorizedAccessException("Token 2FA scaduto");
+
+        var user = await _context.Users.FindAsync(payloadObj.UserId)
+            ?? throw new UnauthorizedAccessException("Utente non trovato");
 
         if (!user.TwoFactorEnabled || string.IsNullOrEmpty(user.TwoFactorSecret))
-            throw new InvalidOperationException("2FA non abilitato per questo account");
+            throw new InvalidOperationException("2FA non abilitato");
 
         var secret = TotpUtility.FromBase32(user.TwoFactorSecret);
         if (!TotpUtility.VerifyCode(secret, code))
             throw new UnauthorizedAccessException("Codice 2FA non valido");
 
-        var accessToken = GenerateAccessToken(user);
-        var refreshToken = await GenerateRefreshTokenAsync(user.Id, deviceId);
-        await _context.SaveChangesAsync();
+        // Salva trusted device
+        if (trustDevice && httpContext != null)
+            SetTrustedDeviceCookie(httpContext, user.Id);
 
-        return new AuthResponseDTO
-        {
-            AccessToken = accessToken,
-            RefreshToken = refreshToken.Token,
-            ExpiresAt = refreshToken.ExpiresAt,
-            User = MapUserInfo(user)
-        };
+        return await GenerateAuthResponse(user, deviceId);
     }
+
+    // ─── Trusted Device ──────────────────────────────────────────────
+
+    private bool IsTrustedDevice(HttpContext? httpContext, int userId)
+    {
+        if (httpContext == null) return false;
+
+        var cookie = httpContext.Request.Cookies["cb_trusted_device"];
+        if (string.IsNullOrEmpty(cookie)) return false;
+
+        var parts = cookie.Split(':');
+        if (parts.Length != 3) return false;
+
+        if (!int.TryParse(parts[0], out var cookieUserId) || cookieUserId != userId)
+            return false;
+
+        if (!long.TryParse(parts[1], out var expiryUnix))
+            return false;
+
+        if (DateTimeOffset.UtcNow.ToUnixTimeSeconds() > expiryUnix)
+            return false;
+
+        // Verifica firma HMAC
+        var message = $"{parts[0]}:{parts[1]}";
+        var expectedSig = Convert.ToBase64String(
+            new HMACSHA256(_tempTokenKey).ComputeHash(Encoding.UTF8.GetBytes(message)))
+            .Replace("/", "_").Replace("+", "-").TrimEnd('=');
+
+        return CryptographicOperations.FixedTimeEquals(
+            Encoding.UTF8.GetBytes(parts[2]),
+            Encoding.UTF8.GetBytes(expectedSig));
+    }
+
+    private static void SetTrustedDeviceCookie(HttpContext httpContext, int userId)
+    {
+        var expiry = DateTimeOffset.UtcNow.AddDays(TrustedDeviceExpiryDays);
+        var expiryUnix = expiry.ToUnixTimeSeconds();
+        var message = $"{userId}:{expiryUnix}";
+        var signature = Convert.ToBase64String(
+            new HMACSHA256(_tempTokenKey).ComputeHash(Encoding.UTF8.GetBytes(message)))
+            .Replace("/", "_").Replace("+", "-").TrimEnd('=');
+
+        httpContext.Response.Cookies.Append("cb_trusted_device", $"{message}:{signature}", new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = false, // true in production
+            SameSite = SameSiteMode.Lax,
+            Expires = expiry
+        });
+    }
+
+    // ─── Temp Token 2FA ──────────────────────────────────────────────
+
+    private static string GenerateTwoFactorTempToken(int userId)
+    {
+        var exp = DateTimeOffset.UtcNow.AddMinutes(TwoFactorTempTokenExpiryMinutes).ToUnixTimeSeconds();
+        var payload = System.Text.Json.JsonSerializer.Serialize(new TempTokenPayload
+        {
+            UserId = userId,
+            Exp = exp
+        });
+
+        var payloadBase64 = Convert.ToBase64String(Encoding.UTF8.GetBytes(payload))
+            .Replace("/", "_").Replace("+", "-").TrimEnd('=');
+
+        using var hmac = new HMACSHA256(_tempTokenKey);
+        var signature = Convert.ToBase64String(hmac.ComputeHash(Encoding.UTF8.GetBytes(payloadBase64)))
+            .Replace("/", "_").Replace("+", "-").TrimEnd('=');
+
+        return $"{payloadBase64}.{signature}";
+    }
+
+    private class TempTokenPayload
+    {
+        public int UserId { get; set; }
+        public long Exp { get; set; }
+    }
+
+    // ─── Helper ──────────────────────────────────────────────────────
 
     private static string FormatManualKey(string base32)
     {

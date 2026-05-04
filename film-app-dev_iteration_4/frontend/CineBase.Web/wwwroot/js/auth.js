@@ -117,12 +117,48 @@ const Auth = {
       }
 
       const data = await response.json();
+
+      // Se richiede 2FA, restituisci il temp token senza salvare
+      if (data.requiresTwoFactor) {
+        return { requiresTwoFactor: true, tempToken: data.tempToken };
+      }
+
       this.saveTokens(data.accessToken, data.refreshToken);
       this.saveUser(data.user);
       return data;
     } catch (err) {
       if (err.status) throw err;
       throw { status: 500, message: 'Impossibile connettersi al server. Riprova piu tardi.' };
+    }
+  },
+
+  async loginWith2Fa(tempToken, code, trustDevice) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/auth/login-2fa`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          tempToken,
+          code,
+          trustDevice,
+          deviceId: this.getOrCreateDeviceId()
+        })
+      });
+
+      if (!response.ok) {
+        let message = 'Codice 2FA non valido';
+        const err = await response.json().catch(() => null);
+        message = err?.error || err?.message || message;
+        throw { status: response.status, message };
+      }
+
+      const data = await response.json();
+      this.saveTokens(data.accessToken, data.refreshToken);
+      this.saveUser(data.user);
+      return data;
+    } catch (err) {
+      if (err.status) throw err;
+      throw { status: 500, message: 'Impossibile connettersi al server.' };
     }
   },
 
