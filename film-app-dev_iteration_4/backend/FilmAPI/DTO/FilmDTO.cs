@@ -14,6 +14,7 @@ public class FilmDTO
     public string? DescrizioneLunga { get; set; }
     public string? CastText { get; set; }
     public DateOnly? DataRilascio { get; set; }
+    public double? VoteAverage { get; set; }
     public List<CategoriaDTO> Categorie { get; set; } = new();
 }
 

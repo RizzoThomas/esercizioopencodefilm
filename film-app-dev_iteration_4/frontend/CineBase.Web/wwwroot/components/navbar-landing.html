@@ -23,8 +23,8 @@
           <i class="fa-solid fa-user text-lg"></i>
         </button>
         <div id="user-menu" class="hidden absolute right-0 mt-4 w-48 bg-canvas-elevated border border-hairline py-2 z-50">
-          <a href="/profilo.html" class="block px-4 py-2 text-sm text-ink hover:text-ferrari-primary hover:bg-white/5">
-            <i class="fa-solid fa-user mr-2"></i>Profilo
+          <a href="/profilo.html" id="desktop-user-name-link" class="block px-4 py-2 text-sm text-ink hover:text-ferrari-primary hover:bg-white/5">
+            <i class="fa-solid fa-user mr-2"></i><span id="desktop-user-name">Profilo</span>
           </a>
           <a href="/profilo.html#prenotazioni" class="block px-4 py-2 text-sm text-ink hover:text-ferrari-primary hover:bg-white/5">
             <i class="fa-solid fa-ticket mr-2"></i>Prenotazioni
@@ -110,15 +110,21 @@
 
     if (isLoggedIn && Auth.getUser()) {
       var user = Auth.getUser();
+      var nomeCompleto = (user.nome || '') + (user.cognome ? ' ' + user.cognome : '');
+      if (!nomeCompleto.trim()) nomeCompleto = user.email || 'Profilo';
       if (loginBtn) loginBtn.classList.add('hidden');
       if (userDropdown) userDropdown.classList.remove('hidden');
       if (mobileAuthLinks) mobileAuthLinks.classList.add('hidden');
-      if (mobileUserMenu) { mobileUserMenu.classList.remove('hidden'); mobileUserName.textContent = user.nome || user.email || 'UTENTE'; }
+      if (mobileUserMenu) { mobileUserMenu.classList.remove('hidden'); mobileUserName.textContent = nomeCompleto || user.nome || user.email || 'UTENTE'; }
+      var desktopUserName = document.getElementById('desktop-user-name');
+      if (desktopUserName) desktopUserName.textContent = nomeCompleto;
     } else {
       if (loginBtn) loginBtn.classList.remove('hidden');
       if (userDropdown) userDropdown.classList.add('hidden');
       if (mobileAuthLinks) mobileAuthLinks.classList.remove('hidden');
       if (mobileUserMenu) mobileUserMenu.classList.add('hidden');
+      var desktopUserName = document.getElementById('desktop-user-name');
+      if (desktopUserName) desktopUserName.textContent = 'Profilo';
     }
     document.querySelectorAll('.admin-only').forEach(function(el) {
       if (isAdminOrPowerUser) el.classList.remove('hidden'); else el.classList.add('hidden');

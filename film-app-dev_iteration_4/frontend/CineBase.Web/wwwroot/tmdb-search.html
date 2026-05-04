@@ -24,6 +24,29 @@
       -webkit-box-orient: vertical;
       overflow: hidden;
     }
+    .input-dark {
+      background: #1a1a1a !important;
+      border: 1px solid rgba(255,255,255,0.1) !important;
+      color: #ffffff !important;
+      outline: none;
+      transition: border-color 0.2s ease;
+      -webkit-text-fill-color: #ffffff !important;
+    }
+    .input-dark::placeholder {
+      color: #666666 !important;
+      -webkit-text-fill-color: #666666 !important;
+    }
+    .input-dark:focus {
+      border-color: #da291c !important;
+      box-shadow: 0 0 0 1px rgba(218,41,28,0.3);
+    }
+    .input-dark:-webkit-autofill,
+    .input-dark:-webkit-autofill:hover,
+    .input-dark:-webkit-autofill:focus {
+      -webkit-box-shadow: 0 0 0 1000px #1a1a1a inset !important;
+      -webkit-text-fill-color: #ffffff !important;
+      transition: background-color 5000s ease-in-out 0s;
+    }
   </style>
 </head>
 

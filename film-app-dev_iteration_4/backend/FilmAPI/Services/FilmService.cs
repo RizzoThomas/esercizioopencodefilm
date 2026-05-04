@@ -36,6 +36,7 @@ public class FilmService : IFilmService
                 DescrizioneLunga = f.DescrizioneLunga,
                 CastText = f.CastText,
                 DataRilascio = f.DataRilascio,
+                VoteAverage = f.VoteAverage,
                 Categorie = f.FilmCategorie.Select(fc => new CategoriaDTO
                 {
                     Id = fc.Categoria!.Id,
@@ -45,7 +46,7 @@ public class FilmService : IFilmService
             .ToListAsync();
     }
 
-    public async Task<FilmPagedResultDTO> GetPagedAsync(int page, int pageSize, string? search)
+    public async Task<FilmPagedResultDTO> GetPagedAsync(int page, int pageSize, string? search, string? filter = null)
     {
         var normalizedPage = page < 1 ? 1 : page;
         var normalizedPageSize = pageSize < 1 ? 10 : pageSize;
@@ -66,6 +67,18 @@ public class FilmService : IFilmService
                     (EF.Functions.Like(f.Regista.Nome + " " + f.Regista.Cognome, likePattern) ||
                      EF.Functions.Like(f.Regista.Nome, likePattern) ||
                      EF.Functions.Like(f.Regista.Cognome, likePattern))));
+        }
+
+        // Filtri
+        var oggi = DateOnly.FromDateTime(DateTime.Today);
+        switch (filter?.ToLowerInvariant())
+        {
+            case "upcoming":
+                query = query.Where(f => f.DataRilascio != null && f.DataRilascio >= oggi);
+                break;
+            case "now-playing":
+                query = query.Where(f => f.Proiezioni.Any(p => p.Data >= DateTime.Today));
+                break;
         }
 
         var totalCount = await query.CountAsync();
@@ -96,6 +109,7 @@ public class FilmService : IFilmService
                 DescrizioneLunga = f.DescrizioneLunga,
                 CastText = f.CastText,
                 DataRilascio = f.DataRilascio,
+                VoteAverage = f.VoteAverage,
                 Categorie = f.FilmCategorie.Select(fc => new CategoriaDTO
                 {
                     Id = fc.Categoria!.Id,
@@ -262,6 +276,7 @@ public class FilmService : IFilmService
             DescrizioneLunga = film.DescrizioneLunga,
             CastText = film.CastText,
             DataRilascio = film.DataRilascio,
+            VoteAverage = film.VoteAverage,
             Categorie = film.FilmCategorie.Select(fc => new CategoriaDTO
             {
                 Id = fc.Categoria!.Id,
@@ -291,6 +306,7 @@ public class FilmService : IFilmService
             DescrizioneLunga = film.DescrizioneLunga,
             CastText = film.CastText,
             DataRilascio = film.DataRilascio,
+            VoteAverage = film.VoteAverage,
             Categorie = filmWithCategories?.FilmCategorie.Select(fc => new CategoriaDTO
             {
                 Id = fc.Categoria!.Id,

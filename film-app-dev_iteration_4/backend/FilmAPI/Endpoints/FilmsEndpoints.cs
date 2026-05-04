@@ -11,14 +11,14 @@ public static class FilmsEndpoints
     {
         var group = app.MapGroup("/films");
 
-        group.MapGet("", async (int? page, int? pageSize, string? search, IFilmService service) =>
+        group.MapGet("", async (int? page, int? pageSize, string? search, string? filter, IFilmService service) =>
         {
-            if (!page.HasValue && !pageSize.HasValue && string.IsNullOrWhiteSpace(search))
+            if (!page.HasValue && !pageSize.HasValue && string.IsNullOrWhiteSpace(search) && string.IsNullOrWhiteSpace(filter))
             {
                 return Results.Ok(await service.GetAllAsync());
             }
 
-            var result = await service.GetPagedAsync(page ?? 1, pageSize ?? 10, search);
+            var result = await service.GetPagedAsync(page ?? 1, pageSize ?? 10, search, filter);
             return Results.Ok(result);
         }).AllowAnonymous();
 

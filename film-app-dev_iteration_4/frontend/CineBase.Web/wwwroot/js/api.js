@@ -204,6 +204,20 @@ async function apiFetch(endpoint, options = {}) {
 
 // API Object
 const API = {
+  // Base URL per chiamate dirette
+  baseUrl: API_BASE_URL,
+
+  // Utility: ottieni headers autenticati per chiamate fetch dirette
+  getAuthHeaders: () => {
+    const headers = { 'Content-Type': 'application/json' };
+    const auth = getAuthSafe();
+    const accessToken = auth?.getAccessToken?.();
+    if (accessToken) {
+      headers['Authorization'] = `Bearer ${accessToken}`;
+    }
+    return headers;
+  },
+
   // Registi
   getRegisti: (params = {}) => {
     const query = new URLSearchParams();
@@ -234,6 +248,7 @@ const API = {
     if (params.page != null) query.set('page', String(params.page));
     if (params.pageSize != null) query.set('pageSize', String(params.pageSize));
     if (params.search) query.set('search', String(params.search));
+    if (params.filter) query.set('filter', String(params.filter));
 
     const queryString = query.toString();
     return apiFetch(`/films${queryString ? `?${queryString}` : ''}`);

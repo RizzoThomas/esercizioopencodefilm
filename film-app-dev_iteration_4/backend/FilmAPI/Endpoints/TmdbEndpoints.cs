@@ -10,7 +10,7 @@ public static class TmdbEndpoints
 {
     public static IEndpointRouteBuilder MapTmdbEndpoints(this IEndpointRouteBuilder app)
     {
-        var group = app.MapGroup("/api/tmdb")
+        var group = app.MapGroup("/tmdb")
             .WithTags("TMDB")
             .WithOpenApi()
             .RequireAuthorization();
@@ -206,6 +206,7 @@ public static class TmdbEndpoints
         })
         .WithName("ImportTmdbMovie")
         .WithDescription("Importa un film da TMDB nel database locale")
+        .RequireAuthorization("PowerUserOrAdmin")
         .Produces(StatusCodes.Status201Created)
         .Produces(StatusCodes.Status404NotFound)
         .Produces(StatusCodes.Status409Conflict);
