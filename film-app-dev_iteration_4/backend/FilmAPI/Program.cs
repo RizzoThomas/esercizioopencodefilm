@@ -202,7 +202,10 @@ app.MapGet("/config/frontend", (FrontendRuntimeConfig config) => Results.Ok(new
 
 using (var scope = app.Services.CreateScope())
 {
-    var seeder = new DataSeeder(scope.ServiceProvider.GetRequiredService<FilmDbContext>());
+    var context = scope.ServiceProvider.GetRequiredService<FilmDbContext>();
+    // Applica migration automaticamente (ignora errori colonne già esistenti)
+    try { context.Database.Migrate(); } catch (Exception) { }
+    var seeder = new DataSeeder(context);
     await seeder.SeedAsync();
 }
 

@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FilmAPI.Migrations
 {
     [DbContext(typeof(FilmDbContext))]
-    [Migration("20260504102025_AddTwoFactorAndPasswordReset")]
+    [Migration("20260504103701_AddTwoFactorAndPasswordReset")]
     partial class AddTwoFactorAndPasswordReset
     {
         /// <inheritdoc />
