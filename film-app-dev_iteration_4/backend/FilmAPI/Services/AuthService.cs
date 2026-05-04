@@ -13,21 +13,23 @@ namespace FilmAPI.Services;
 public class AuthService : IAuthService
 {
     private readonly FilmDbContext _context;
+    private readonly IEmailService _emailService;
+    private readonly ILogger<AuthService> _logger;
     private readonly string _jwtSecret;
     private readonly string _jwtIssuer;
     private readonly string _jwtAudience;
     private readonly int _accessTokenExpiryMinutes;
     private readonly int _refreshTokenExpiryDays;
-    private readonly IEmailService _emailService;
     private const string DefaultDeviceId = "web-default";
     private const int TwoFactorTempTokenExpiryMinutes = 5;
     private const int TrustedDeviceExpiryDays = 3;
     private static readonly byte[] _tempTokenKey = RandomNumberGenerator.GetBytes(32);
 
-    public AuthService(FilmDbContext context, IEmailService emailService)
+    public AuthService(FilmDbContext context, IEmailService emailService, ILogger<AuthService> logger)
     {
         _context = context;
         _emailService = emailService;
+        _logger = logger;
         _jwtSecret = Environment.GetEnvironmentVariable("JWT_SECRET") ?? "SuperSecretKeyForCineBaseJWTAuth2026!";
         _jwtIssuer = Environment.GetEnvironmentVariable("JWT_ISSUER") ?? "CineBaseAPI";
         _jwtAudience = Environment.GetEnvironmentVariable("JWT_AUDIENCE") ?? "CineBaseWeb";
@@ -81,6 +83,8 @@ public class AuthService : IAuthService
         // Se 2FA è abilitato, verifica trusted device
         if (user.TwoFactorEnabled && !string.IsNullOrEmpty(user.TwoFactorSecret))
         {
+            _logger.LogWarning("LoginAsync: utente {Email} ha 2FA abilitato. TrustedDevice={IsTrusted}",
+                user.Email, IsTrustedDevice(httpContext, user.Id));
             if (!IsTrustedDevice(httpContext, user.Id))
             {
                 var tempToken = GenerateTwoFactorTempToken(user.Id);

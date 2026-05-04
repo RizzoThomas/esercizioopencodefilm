@@ -203,8 +203,28 @@ app.MapGet("/config/frontend", (FrontendRuntimeConfig config) => Results.Ok(new
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<FilmDbContext>();
-    // Applica migration automaticamente (ignora errori colonne già esistenti)
+    
+    // Verifica se le colonne 2FA esistono già (da migrazione parziale precedente)
+    var conn = context.Database.GetDbConnection();
+    await conn.OpenAsync();
+    var cmd = conn.CreateCommand();
+    cmd.CommandText = "SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='Users' AND COLUMN_NAME='TwoFactorEnabled'";
+    var colExists = Convert.ToInt64(await cmd.ExecuteScalarAsync()) > 0;
+    await conn.CloseAsync();
+
+    if (colExists)
+    {
+        // Colonne già presenti → segna migrazione come applicata
+        cmd = conn.CreateCommand();
+        cmd.CommandText = "INSERT IGNORE INTO `__EFMigrationsHistory` (MigrationId, ProductVersion) VALUES ('20260504103701_AddTwoFactorAndPasswordReset', '9.0.11')";
+        await conn.OpenAsync();
+        await cmd.ExecuteNonQueryAsync();
+        await conn.CloseAsync();
+    }
+    
+    // Applica migration automaticamente
     try { context.Database.Migrate(); } catch (Exception) { }
+    
     var seeder = new DataSeeder(context);
     await seeder.SeedAsync();
 }
