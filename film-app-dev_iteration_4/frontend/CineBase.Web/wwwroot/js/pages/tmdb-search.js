@@ -7,6 +7,8 @@ const TMDBSearch = {
     currentQuery: '',
     currentMode: 'search',
     isAdmin: false,
+    _searchTimer: null,
+    _activeFilterBtn: null,
 
     init() {
         const rawRole = (window.Auth?.getUserRole?.() || '');
@@ -25,6 +27,16 @@ const TMDBSearch = {
         document.getElementById('search-btn')?.addEventListener('click', () => this.handleSearch());
         document.getElementById('search-input')?.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') this.handleSearch();
+        });
+        // Live search con debounce 300ms
+        document.getElementById('search-input')?.addEventListener('input', (e) => {
+            clearTimeout(this._searchTimer);
+            this._searchTimer = setTimeout(() => {
+                const query = e.target.value.trim();
+                if (query.length >= 2 || query.length === 0) {
+                    this.handleLiveSearch(query);
+                }
+            }, 300);
         });
 
         document.getElementById('btn-popular')?.addEventListener('click', () => {
@@ -60,11 +72,54 @@ const TMDBSearch = {
         this.currentQuery = query;
         this.currentMode = 'search';
         this.currentPage = 1;
+        this.highlightFilterButton(null);
         if (this.isAdmin) {
             await this.performSearch();
         } else {
             await this.performLocalSearch();
         }
+    },
+
+    // Live search: chiamato ad ogni digitazione (con debounce)
+    async handleLiveSearch(query) {
+        this.currentQuery = query;
+        this.currentPage = 1;
+        if (!query) {
+            // Torna alla modalità corrente (popolari / in uscita / al cinema)
+            if (this.currentMode === 'popular') {
+                if (this.isAdmin) await this.loadPopular();
+                else await this.loadLocalPopular();
+            } else if (this.currentMode === 'upcoming') {
+                if (this.isAdmin) await this.loadUpcoming();
+                else await this.loadLocalUpcoming();
+            } else if (this.currentMode === 'now_playing') {
+                if (this.isAdmin) await this.loadNowPlaying();
+                else await this.loadLocalNowPlaying();
+            }
+            return;
+        }
+        this.currentMode = 'search';
+        this.highlightFilterButton(null);
+        if (this.isAdmin) {
+            await this.performSearch();
+        } else {
+            await this.performLocalSearch();
+        }
+    },
+
+    // Evidenzia il pulsante filtro attivo
+    highlightFilterButton(mode) {
+        this._activeFilterBtn = mode;
+        const btns = ['btn-popular', 'btn-upcoming', 'btn-now-playing'];
+        btns.forEach(id => {
+            const btn = document.getElementById(id);
+            if (!btn) return;
+            if (mode && id === `btn-${mode === 'now_playing' ? 'now-playing' : mode}`) {
+                btn.classList.add('text-gold');
+            } else {
+                btn.classList.remove('text-gold');
+            }
+        });
     },
 
     // ═══════════════════ TMDB (Admin/PowerUser) ═══════════════════════
@@ -103,6 +158,7 @@ const TMDBSearch = {
         this.currentMode = 'popular';
         this.currentPage = 1;
         document.getElementById('search-input').value = '';
+        this.highlightFilterButton('popular');
         await this.performSearch();
     },
 
@@ -110,6 +166,7 @@ const TMDBSearch = {
         this.currentMode = 'upcoming';
         this.currentPage = 1;
         document.getElementById('search-input').value = '';
+        this.highlightFilterButton('upcoming');
         await this.performSearch();
     },
 
@@ -117,6 +174,7 @@ const TMDBSearch = {
         this.currentMode = 'now_playing';
         this.currentPage = 1;
         document.getElementById('search-input').value = '';
+        this.highlightFilterButton('now_playing');
         await this.performSearch();
     },
 
@@ -160,6 +218,7 @@ const TMDBSearch = {
         this.currentPage = 1;
         this.currentQuery = '';
         document.getElementById('search-input').value = '';
+        this.highlightFilterButton('popular');
         await this.performLocalSearch();
     },
 
@@ -168,6 +227,7 @@ const TMDBSearch = {
         this.currentPage = 1;
         this.currentQuery = '';
         document.getElementById('search-input').value = '';
+        this.highlightFilterButton('upcoming');
         await this.performLocalSearch();
     },
 
@@ -176,6 +236,7 @@ const TMDBSearch = {
         this.currentPage = 1;
         this.currentQuery = '';
         document.getElementById('search-input').value = '';
+        this.highlightFilterButton('now_playing');
         await this.performLocalSearch();
     },
 
@@ -323,6 +384,9 @@ const TMDBSearch = {
                         <button class="view-details-btn btn btn-ghost flex-1 text-xs py-2" data-id="${movie.id}">
                             <i class="fa-solid fa-eye mr-1"></i>Dettagli
                         </button>
+                        <a href="/programmazione.html?filmId=${movie.id}" class="btn btn-ghost text-xs py-2 px-3 inline-flex items-center" title="Guarda proiezioni">
+                            <i class="fa-solid fa-calendar-days"></i>
+                        </a>
                     </div>
                 </div>
             </div>`;
