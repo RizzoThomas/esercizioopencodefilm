@@ -45,4 +45,14 @@ public class User
     public ICollection<Prenotazione> Prenotazioni { get; set; } = new List<Prenotazione>();
     public ICollection<Ordine> Ordini { get; set; } = new List<Ordine>();
     public ICollection<Biglietto> Biglietti { get; set; } = new List<Biglietto>();
+
+    // Password Reset
+    [MaxLength(128)]
+    public string? PasswordResetToken { get; set; }
+    public DateTime? ResetTokenExpiry { get; set; }
+
+    // 2FA
+    [MaxLength(64)]
+    public string? TwoFactorSecret { get; set; }
+    public bool TwoFactorEnabled { get; set; }
 }

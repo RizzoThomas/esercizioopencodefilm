@@ -18,11 +18,13 @@ public class AuthService : IAuthService
     private readonly string _jwtAudience;
     private readonly int _accessTokenExpiryMinutes;
     private readonly int _refreshTokenExpiryDays;
+    private readonly IEmailService _emailService;
     private const string DefaultDeviceId = "web-default";
 
-    public AuthService(FilmDbContext context)
+    public AuthService(FilmDbContext context, IEmailService emailService)
     {
         _context = context;
+        _emailService = emailService;
         _jwtSecret = Environment.GetEnvironmentVariable("JWT_SECRET") ?? "SuperSecretKeyForCineBaseJWTAuth2026!";
         _jwtIssuer = Environment.GetEnvironmentVariable("JWT_ISSUER") ?? "CineBaseAPI";
         _jwtAudience = Environment.GetEnvironmentVariable("JWT_AUDIENCE") ?? "CineBaseWeb";
@@ -207,7 +209,154 @@ public class AuthService : IAuthService
             Cognome = user.Cognome,
             Telefono = user.Telefono,
             Ruolo = user.Ruolo.ToString(),
-            DataRegistrazione = user.DataRegistrazione
+            DataRegistrazione = user.DataRegistrazione,
+            TwoFactorEnabled = user.TwoFactorEnabled
         };
+    }
+
+    // ═══════════════════ Password Reset ═══════════════════════════════
+
+    public async Task<bool> ForgotPasswordAsync(string email)
+    {
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+        if (user is null) return true; // Non rivelare se l'email esiste
+
+        var token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(32))
+            .Replace("/", "_").Replace("+", "-").TrimEnd('=');
+
+        user.PasswordResetToken = token;
+        user.ResetTokenExpiry = DateTime.UtcNow.AddHours(1);
+        await _context.SaveChangesAsync();
+
+        var frontendUrl = Environment.GetEnvironmentVariable("FRONTEND_URL") ?? "http://localhost:5001";
+        var resetLink = $"{frontendUrl}/reset-password.html?token={Uri.EscapeDataString(token)}";
+
+        await _emailService.SendPasswordResetAsync(user.Email, user.Nome, resetLink);
+
+        return true;
+    }
+
+    public async Task<bool> ResetPasswordAsync(string token, string newPassword)
+    {
+        var user = await _context.Users.FirstOrDefaultAsync(u =>
+            u.PasswordResetToken == token &&
+            u.ResetTokenExpiry != null &&
+            u.ResetTokenExpiry > DateTime.UtcNow);
+
+        if (user is null) return false;
+
+        user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(newPassword);
+        user.PasswordResetToken = null;
+        user.ResetTokenExpiry = null;
+        await _context.SaveChangesAsync();
+
+        return true;
+    }
+
+    // ═══════════════════ 2FA ══════════════════════════════════════════
+
+    public async Task<TwoFactorSetupResponseDTO> GenerateTwoFactorSetupAsync(int userId)
+    {
+        var user = await _context.Users.FindAsync(userId)
+            ?? throw new InvalidOperationException("Utente non trovato");
+
+        var secret = TotpUtility.GenerateSecret();
+        var base32 = TotpUtility.ToBase32(secret);
+
+        user.TwoFactorSecret = base32;
+        user.TwoFactorEnabled = false;
+        await _context.SaveChangesAsync();
+
+        var qrUri = TotpUtility.GetQrCodeUri(user.Email, secret);
+
+        // Genera QR code come Base64 PNG
+        string qrBase64;
+        using (var qrGenerator = new QRCoder.QRCodeGenerator())
+        using (var qrData = qrGenerator.CreateQrCode(qrUri, QRCoder.QRCodeGenerator.ECCLevel.Q))
+        using (var qr = new QRCoder.PngByteQRCode(qrData))
+        {
+            qrBase64 = Convert.ToBase64String(qr.GetGraphic(6));
+        }
+
+        return new TwoFactorSetupResponseDTO
+        {
+            Secret = base32,
+            QrCodeBase64 = $"data:image/png;base64,{qrBase64}",
+            ManualKey = FormatManualKey(base32)
+        };
+    }
+
+    public async Task<bool> EnableTwoFactorAsync(int userId, string code)
+    {
+        var user = await _context.Users.FindAsync(userId)
+            ?? throw new InvalidOperationException("Utente non trovato");
+
+        if (string.IsNullOrEmpty(user.TwoFactorSecret))
+            throw new InvalidOperationException("2FA non ancora configurato");
+
+        var secret = TotpUtility.FromBase32(user.TwoFactorSecret);
+        if (!TotpUtility.VerifyCode(secret, code))
+            return false;
+
+        user.TwoFactorEnabled = true;
+        await _context.SaveChangesAsync();
+        return true;
+    }
+
+    public async Task<bool> DisableTwoFactorAsync(int userId)
+    {
+        var user = await _context.Users.FindAsync(userId)
+            ?? throw new InvalidOperationException("Utente non trovato");
+
+        user.TwoFactorSecret = null;
+        user.TwoFactorEnabled = false;
+        await _context.SaveChangesAsync();
+        return true;
+    }
+
+    public async Task<bool> VerifyTwoFactorCodeAsync(int userId, string code)
+    {
+        var user = await _context.Users.FindAsync(userId)
+            ?? throw new InvalidOperationException("Utente non trovato");
+
+        if (string.IsNullOrEmpty(user.TwoFactorSecret))
+            return false;
+
+        var secret = TotpUtility.FromBase32(user.TwoFactorSecret);
+        return TotpUtility.VerifyCode(secret, code);
+    }
+
+    public async Task<AuthResponseDTO> LoginWith2FaAsync(string email, string password, string code, string? deviceId)
+    {
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+        if (user is null || !BCrypt.Net.BCrypt.Verify(password, user.PasswordHash))
+            throw new UnauthorizedAccessException("Credenziali non valide");
+
+        if (!user.TwoFactorEnabled || string.IsNullOrEmpty(user.TwoFactorSecret))
+            throw new InvalidOperationException("2FA non abilitato per questo account");
+
+        var secret = TotpUtility.FromBase32(user.TwoFactorSecret);
+        if (!TotpUtility.VerifyCode(secret, code))
+            throw new UnauthorizedAccessException("Codice 2FA non valido");
+
+        var accessToken = GenerateAccessToken(user);
+        var refreshToken = await GenerateRefreshTokenAsync(user.Id, deviceId);
+        await _context.SaveChangesAsync();
+
+        return new AuthResponseDTO
+        {
+            AccessToken = accessToken,
+            RefreshToken = refreshToken.Token,
+            ExpiresAt = refreshToken.ExpiresAt,
+            User = MapUserInfo(user)
+        };
+    }
+
+    private static string FormatManualKey(string base32)
+    {
+        var chunks = new List<string>();
+        for (var i = 0; i < base32.Length; i += 4)
+            chunks.Add(i + 4 <= base32.Length ? base32.Substring(i, 4) : base32.Substring(i));
+        return string.Join(" ", chunks);
     }
 }

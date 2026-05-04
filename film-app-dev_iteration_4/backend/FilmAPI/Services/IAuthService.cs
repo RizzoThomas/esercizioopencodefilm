@@ -6,7 +6,18 @@ public interface IAuthService
 {
     Task<AuthResponseDTO> RegisterAsync(RegisterRequestDTO dto);
     Task<AuthResponseDTO> LoginAsync(LoginRequestDTO dto);
+    Task<AuthResponseDTO> LoginWith2FaAsync(string email, string password, string code, string? deviceId);
     Task<AuthResponseDTO> RefreshAsync(string refreshToken, string? deviceId);
     Task<bool> LogoutAsync(string refreshToken, string? deviceId);
     Task<UserInfoDTO?> GetUserByIdAsync(int id);
+
+    // Password Reset
+    Task<bool> ForgotPasswordAsync(string email);
+    Task<bool> ResetPasswordAsync(string token, string newPassword);
+
+    // 2FA
+    Task<TwoFactorSetupResponseDTO> GenerateTwoFactorSetupAsync(int userId);
+    Task<bool> EnableTwoFactorAsync(int userId, string code);
+    Task<bool> DisableTwoFactorAsync(int userId);
+    Task<bool> VerifyTwoFactorCodeAsync(int userId, string code);
 }

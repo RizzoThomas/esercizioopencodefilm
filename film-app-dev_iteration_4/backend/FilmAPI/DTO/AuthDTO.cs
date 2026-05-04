@@ -56,6 +56,7 @@ public class UserInfoDTO
     public string? Telefono { get; set; }
     public string Ruolo { get; set; } = string.Empty;
     public DateTime DataRegistrazione { get; set; }
+    public bool TwoFactorEnabled { get; set; }
 }
 
 public class RefreshTokenRequestDTO
@@ -65,4 +66,61 @@ public class RefreshTokenRequestDTO
 
     [MaxLength(128)]
     public string? DeviceId { get; set; }
+}
+
+// ─── Password Reset ────────────────────────────────────────────────
+
+public class ForgotPasswordRequestDTO
+{
+    [Required]
+    [EmailAddress]
+    public string Email { get; set; } = string.Empty;
+}
+
+public class ResetPasswordRequestDTO
+{
+    [Required]
+    public string Token { get; set; } = string.Empty;
+
+    [Required]
+    [MinLength(8)]
+    public string NewPassword { get; set; } = string.Empty;
+}
+
+// ─── 2FA ────────────────────────────────────────────────────────────
+
+public class TwoFactorSetupResponseDTO
+{
+    public string Secret { get; set; } = string.Empty;
+    public string QrCodeBase64 { get; set; } = string.Empty;
+    public string ManualKey { get; set; } = string.Empty;
+}
+
+public class TwoFactorEnableRequestDTO
+{
+    [Required]
+    [StringLength(6, MinimumLength = 6)]
+    public string Code { get; set; } = string.Empty;
+}
+
+public class TwoFactorVerifyRequestDTO
+{
+    [Required]
+    [EmailAddress]
+    public string Email { get; set; } = string.Empty;
+
+    [Required]
+    public string Password { get; set; } = string.Empty;
+
+    [Required]
+    [StringLength(6, MinimumLength = 6)]
+    public string Code { get; set; } = string.Empty;
+
+    [MaxLength(128)]
+    public string? DeviceId { get; set; }
+}
+
+public class TwoFactorStatusDTO
+{
+    public bool Enabled { get; set; }
 }

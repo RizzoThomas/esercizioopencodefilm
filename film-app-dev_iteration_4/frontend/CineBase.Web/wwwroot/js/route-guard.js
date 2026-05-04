@@ -16,7 +16,10 @@ var RouteGuard = (function () {
     '/acquista.html': { roles: ['user', 'poweruser', 'admin'], authRequired: true },
     '/pagamento.html': { roles: ['user', 'poweruser', 'admin'], authRequired: true },
     '/esito-acquisto.html': { roles: ['user', 'poweruser', 'admin'], authRequired: true },
-    '/tmdb-search.html': { roles: ['user', 'poweruser', 'admin'], authRequired: true }
+    '/tmdb-search.html': { roles: ['user', 'poweruser', 'admin'], authRequired: true },
+    '/forgot-password.html': { roles: ['anonimo', 'user', 'poweruser', 'admin'], authRequired: false },
+    '/reset-password.html': { roles: ['anonimo', 'user', 'poweruser', 'admin'], authRequired: false },
+    '/enable-2fa.html': { roles: ['user', 'poweruser', 'admin'], authRequired: true }
   };
 
   var ACCESS_TOKEN_KEY = 'cb_access_token';

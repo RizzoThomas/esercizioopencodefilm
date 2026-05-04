@@ -137,6 +137,25 @@
         </div>
       </div>
     </div>
+
+    <!-- 2FA Security -->
+    <div class="mt-8 card-ferrari p-6">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-xl font-bold text-ink">
+          <i class="fa-solid fa-shield-halved text-ferrari-primary mr-2"></i>Sicurezza (2FA)
+        </h2>
+        <span id="2fa-status-badge" class="badge-ferrari text-xs">--</span>
+      </div>
+      <p class="text-body text-sm mb-4">Proteggi il tuo account con l'autenticazione a due fattori tramite app authenticator (Google Authenticator, Authy, etc.).</p>
+      <div class="flex gap-3">
+        <a href="/enable-2fa.html" id="2fa-enable-btn" class="btn-primary text-sm py-2 px-6 hidden">
+          <i class="fa-solid fa-qrcode mr-2"></i>Attiva 2FA
+        </a>
+        <button id="2fa-disable-btn" class="btn-outline text-sm py-2 px-6 hidden" onclick="disable2FA()">
+          <i class="fa-solid fa-shield-xmark mr-2"></i>Disattiva 2FA
+        </button>
+      </div>
+    </div>
   </main>
 
   <!-- Topup Modal -->

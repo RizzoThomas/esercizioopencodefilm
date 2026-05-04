@@ -34,7 +34,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     loadCinemaPreferito(),
     loadOrdini(),
     loadBiglietti(),
-    loadPrenotazioniLegacy()
+    loadPrenotazioniLegacy(),
+    caricaStato2FA()
   ]);
 
   setupProfiloForm();
@@ -606,6 +607,53 @@ async function payTopup() {
   }
 }
 
+async function caricaStato2FA() {
+  const statusBadge = document.getElementById('2fa-status-badge');
+  const enableBtn = document.getElementById('2fa-enable-btn');
+  const disableBtn = document.getElementById('2fa-disable-btn');
+
+  try {
+    const response = await fetch(`${API.baseUrl}/auth/me`, {
+      headers: API.getAuthHeaders()
+    });
+    if (!response.ok) return;
+    const user = await response.json();
+    const twoFactorEnabled = user?.twoFactorEnabled === true;
+
+    if (statusBadge) {
+      statusBadge.textContent = twoFactorEnabled ? 'ATTIVO' : 'NON ATTIVO';
+      statusBadge.style.background = twoFactorEnabled
+        ? 'rgba(16, 185, 129, 0.15)'
+        : 'rgba(255, 255, 255, 0.1)';
+    }
+    if (enableBtn) enableBtn.classList.toggle('hidden', twoFactorEnabled);
+    if (disableBtn) disableBtn.classList.toggle('hidden', !twoFactorEnabled);
+  } catch {
+    // Ignora errori — la sezione sicurezza è opzionale
+  }
+}
+
+async function disable2FA() {
+  if (!confirm('Sei sicuro di voler disattivare l\'autenticazione a due fattori?')) return;
+
+  try {
+    const response = await fetch(`${API.baseUrl}/auth/2fa/disable`, {
+      method: 'POST',
+      headers: API.getAuthHeaders()
+    });
+
+    if (response.ok) {
+      showToast('2FA disattivato con successo.', 'success');
+      caricaStato2FA();
+    } else {
+      showToast('Errore durante la disattivazione 2FA.', 'error');
+    }
+  } catch {
+    showToast('Impossibile connettersi al server.', 'error');
+  }
+}
+
+window.disable2FA = disable2FA;
 window.deletePrenotazione = deletePrenotazione;
 window.visualizzaBiglietto = visualizzaBiglietto;
 window.chiudiBigliettoModal = chiudiBigliettoModal;

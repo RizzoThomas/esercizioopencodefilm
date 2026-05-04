@@ -368,6 +368,81 @@ public class EmailService : IEmailService
         return amount.ToString("0.00", CultureInfo.GetCultureInfo("it-IT"));
     }
 
+    public async Task<EmailSendResult> SendPasswordResetAsync(string recipientEmail, string recipientName, string resetLink, CancellationToken cancellationToken = default)
+    {
+        if (!HasCompleteConfiguration())
+        {
+            return new EmailSendResult
+            {
+                Success = false,
+                ErrorMessage = "Configurazione SMTP incompleta."
+            };
+        }
+
+        try
+        {
+            var smtpHost = _smtpHost!;
+            var smtpUser = _smtpUser!;
+            var smtpPassword = _smtpPassword!.Replace(" ", string.Empty);
+            var fromEmail = _fromEmail!;
+
+            var message = new MimeMessage();
+            message.From.Add(new MailboxAddress(_fromName, fromEmail));
+            message.To.Add(MailboxAddress.Parse(recipientEmail));
+            message.Subject = "CineBase - Reset Password";
+
+            var name = WebUtility.HtmlEncode(recipientName);
+            var link = WebUtility.HtmlEncode(resetLink);
+
+            var bodyBuilder = new BodyBuilder
+            {
+                TextBody = $"Ciao {recipientName},\n\n" +
+                           $"Abbiamo ricevuto una richiesta di reset password per il tuo account CineBase.\n\n" +
+                           $"Clicca il link per reimpostare la password (valido 1 ora):\n{resetLink}\n\n" +
+                           $"Se non hai richiesto tu il reset, ignora questa email.\n\n" +
+                           $"CineBase Team",
+                HtmlBody = $"""
+<html>
+  <body style="font-family: Arial, sans-serif; color: #111827; line-height: 1.5;">
+    <h1 style="margin-bottom: 8px;">Reset Password CineBase</h1>
+    <p>Ciao {name},</p>
+    <p>Abbiamo ricevuto una richiesta di reset password per il tuo account.</p>
+    <p style="margin: 24px 0;">
+      <a href="{link}" style="background: #da291c; color: #fff; padding: 14px 32px; 
+         text-decoration: none; font-weight: bold; text-transform: uppercase; 
+         letter-spacing: 1.4px; display: inline-block;">
+        Reimposta Password
+      </a>
+    </p>
+    <p style="color: #666; font-size: 0.85em;">Il link è valido per 1 ora.</p>
+    <p style="color: #666; font-size: 0.85em;">Se non hai richiesto tu il reset, ignora questa email.</p>
+    <p>CineBase Team</p>
+  </body>
+</html>
+"""
+            };
+
+            message.Body = bodyBuilder.ToMessageBody();
+
+            using var client = new SmtpClient { Timeout = 15000 };
+            await client.ConnectAsync(smtpHost, _smtpPort, SecureSocketOptions.StartTls, cancellationToken);
+            await client.AuthenticateAsync(smtpUser, smtpPassword, cancellationToken);
+            await client.SendAsync(message, cancellationToken);
+            await client.DisconnectAsync(true, cancellationToken);
+
+            return new EmailSendResult { Success = true, SentAtUtc = DateTime.UtcNow };
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Invio email reset password fallito per {Email}", recipientEmail);
+            return new EmailSendResult
+            {
+                Success = false,
+                ErrorMessage = $"Errore invio email: {ex.Message}"
+            };
+        }
+    }
+
     private static TimeZoneInfo ResolveItalyTimeZone()
     {
         try
