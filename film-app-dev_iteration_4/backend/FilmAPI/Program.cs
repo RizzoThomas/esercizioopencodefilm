@@ -156,6 +156,37 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+// ─── OAuth Social Login ──────────────────────────────────────────────
+var googleClientId = Environment.GetEnvironmentVariable("GOOGLE_CLIENT_ID");
+var googleClientSecret = Environment.GetEnvironmentVariable("GOOGLE_CLIENT_SECRET");
+if (!string.IsNullOrEmpty(googleClientId))
+    builder.Services.AddAuthentication().AddGoogle(options =>
+    {
+        options.ClientId = googleClientId;
+        options.ClientSecret = googleClientSecret ?? "";
+        options.SaveTokens = true;
+    });
+
+var fbAppId = Environment.GetEnvironmentVariable("FACEBOOK_APP_ID");
+var fbAppSecret = Environment.GetEnvironmentVariable("FACEBOOK_APP_SECRET");
+if (!string.IsNullOrEmpty(fbAppId))
+    builder.Services.AddAuthentication().AddFacebook(options =>
+    {
+        options.AppId = fbAppId;
+        options.AppSecret = fbAppSecret ?? "";
+        options.SaveTokens = true;
+    });
+
+var msClientId = Environment.GetEnvironmentVariable("MICROSOFT_CLIENT_ID");
+var msClientSecret = Environment.GetEnvironmentVariable("MICROSOFT_CLIENT_SECRET");
+if (!string.IsNullOrEmpty(msClientId))
+    builder.Services.AddAuthentication().AddMicrosoftAccount(options =>
+    {
+        options.ClientId = msClientId;
+        options.ClientSecret = msClientSecret ?? "";
+        options.SaveTokens = true;
+    });
+
 var app = builder.Build();
 
 app.UseCors("AllowCineBaseFrontend");
@@ -195,6 +226,7 @@ app.MapValidazioneBigliettiEndpoints();
 app.MapSegnalazioniEndpoints();
 app.MapDiagnosticEndpoints();
 app.MapTmdbEndpoints();
+app.MapSocialAuthEndpoints();
 
 app.MapGet("/config/frontend", (FrontendRuntimeConfig config) => Results.Ok(new
 {

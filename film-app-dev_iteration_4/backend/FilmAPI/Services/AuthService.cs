@@ -513,6 +513,15 @@ public class AuthService : IAuthService
 
     // ─── Helper ──────────────────────────────────────────────────────
 
+    // ─── Social Login ────────────────────────────────────────────────
+
+    public async Task<AuthResponseDTO> SocialLoginAsync(User user, string? deviceId = null)
+    {
+        return await GenerateAuthResponse(user, deviceId);
+    }
+
+    // ─── Helper ──────────────────────────────────────────────────────
+
     private static string FormatManualKey(string base32)
     {
         var chunks = new List<string>();
