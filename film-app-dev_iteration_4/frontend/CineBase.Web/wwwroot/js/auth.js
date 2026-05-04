@@ -62,13 +62,16 @@ const Auth = {
 
   isLoggedIn() {
     const token = this.getAccessToken();
-    if (!token) return false;
+    if (!token) { console.log('[auth] isLoggedIn: nessun token'); return false; }
     try {
       const payload = this.parseJwt(token);
-      if (!payload) return false;
+      if (!payload) { console.log('[auth] isLoggedIn: parseJwt fallito'); return false; }
       const now = Math.ceil(Date.now() / 1000);
-      return payload.exp > now;
-    } catch {
+      const valid = payload.exp > now;
+      console.log('[auth] isLoggedIn: exp=' + payload.exp + ' now=' + now + ' valid=' + valid + ' sub=' + payload.sub);
+      return valid;
+    } catch (e) {
+      console.log('[auth] isLoggedIn: errore parse', e);
       return false;
     }
   },
@@ -120,11 +123,13 @@ const Auth = {
 
       // Se richiede 2FA, restituisci il temp token senza salvare
       if (data.requiresTwoFactor) {
+        console.log('[auth] login: 2FA richiesto, restituisco tempToken');
         return { requiresTwoFactor: true, tempToken: data.tempToken };
       }
 
       this.saveTokens(data.accessToken, data.refreshToken);
       this.saveUser(data.user);
+      console.log('[auth] login: token salvato, redirect...');
       return data;
     } catch (err) {
       if (err.status) throw err;
@@ -155,6 +160,7 @@ const Auth = {
       const data = await response.json();
       this.saveTokens(data.accessToken, data.refreshToken);
       this.saveUser(data.user);
+      console.log('[auth] loginWith2Fa: token salvato, redirect...');
       return data;
     } catch (err) {
       if (err.status) throw err;

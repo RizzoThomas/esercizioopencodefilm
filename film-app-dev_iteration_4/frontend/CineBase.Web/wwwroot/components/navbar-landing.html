@@ -101,12 +101,14 @@
 
   function updateAuthUI() {
     if (typeof Auth === 'undefined' || !Auth) {
+      console.log('[navbar] Auth non definito');
       document.querySelectorAll('.admin-only').forEach(function(el) { el.classList.add('hidden'); });
       return;
     }
     var isLoggedIn = Auth.isLoggedIn();
     var role = normalizeRole(isLoggedIn ? (Auth.getUserRole() || null) : null);
     var isAdminOrPowerUser = role === 'admin' || role === 'poweruser';
+    console.log('[navbar] isLoggedIn=' + isLoggedIn + ' role=' + role + ' token=' + (Auth.getAccessToken() ? Auth.getAccessToken().substring(0, 20) + '...' : 'null'));
 
     if (isLoggedIn && Auth.getUser()) {
       var user = Auth.getUser();
