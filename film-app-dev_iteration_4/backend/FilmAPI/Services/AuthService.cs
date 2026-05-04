@@ -80,12 +80,17 @@ public class AuthService : IAuthService
             throw new UnauthorizedAccessException("Credenziali non valide");
         }
 
-        // Se 2FA è abilitato, verifica trusted device
+        // Se 2FA è abilitato, verifica trusted device (header o cookie)
         if (user.TwoFactorEnabled && !string.IsNullOrEmpty(user.TwoFactorSecret))
         {
+            var trustedDeviceToken = httpContext?.Request.Headers["X-Trusted-Device"].FirstOrDefault();
+            var isTrusted = (!string.IsNullOrEmpty(trustedDeviceToken) && ValidateTrustedDeviceToken(trustedDeviceToken, user.Id))
+                         || IsTrustedDevice(httpContext, user.Id);
+            
             _logger.LogWarning("LoginAsync: utente {Email} ha 2FA abilitato. TrustedDevice={IsTrusted}",
-                user.Email, IsTrustedDevice(httpContext, user.Id));
-            if (!IsTrustedDevice(httpContext, user.Id))
+                user.Email, isTrusted);
+                
+            if (!isTrusted)
             {
                 var tempToken = GenerateTwoFactorTempToken(user.Id);
                 return new AuthResponseDTO
@@ -392,10 +397,41 @@ public class AuthService : IAuthService
             throw new UnauthorizedAccessException("Codice 2FA non valido");
 
         // Salva trusted device
-        if (trustDevice && httpContext != null)
-            SetTrustedDeviceCookie(httpContext, user.Id);
+        string? trustedDeviceToken = null;
+        if (trustDevice)
+            trustedDeviceToken = GenerateTrustedDeviceToken(user.Id);
 
-        return await GenerateAuthResponse(user, deviceId);
+        var auth = await GenerateAuthResponse(user, deviceId);
+        auth.TrustedDeviceToken = trustedDeviceToken;
+        return auth;
+    }
+
+    private string GenerateTrustedDeviceToken(int userId)
+    {
+        var exp = DateTimeOffset.UtcNow.AddDays(TrustedDeviceExpiryDays).ToUnixTimeSeconds();
+        var payload = $"{userId}:{exp}";
+        var signature = Convert.ToBase64String(
+            new HMACSHA256(_tempTokenKey).ComputeHash(Encoding.UTF8.GetBytes(payload)))
+            .Replace("/", "_").Replace("+", "-").TrimEnd('=');
+        return $"{payload}:{signature}";
+    }
+
+    private bool ValidateTrustedDeviceToken(string token, int userId)
+    {
+        var parts = token.Split(':');
+        if (parts.Length != 3) return false;
+        if (!int.TryParse(parts[0], out var tokenUserId) || tokenUserId != userId) return false;
+        if (!long.TryParse(parts[1], out var expiryUnix)) return false;
+        if (DateTimeOffset.UtcNow.ToUnixTimeSeconds() > expiryUnix) return false;
+
+        var message = $"{parts[0]}:{parts[1]}";
+        var expectedSig = Convert.ToBase64String(
+            new HMACSHA256(_tempTokenKey).ComputeHash(Encoding.UTF8.GetBytes(message)))
+            .Replace("/", "_").Replace("+", "-").TrimEnd('=');
+
+        return CryptographicOperations.FixedTimeEquals(
+            Encoding.UTF8.GetBytes(parts[2]),
+            Encoding.UTF8.GetBytes(expectedSig));
     }
 
     // ─── Trusted Device ──────────────────────────────────────────────

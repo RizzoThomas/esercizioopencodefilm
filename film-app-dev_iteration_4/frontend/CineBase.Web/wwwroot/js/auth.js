@@ -104,9 +104,16 @@ const Auth = {
 
   async login(email, password) {
     try {
+      const headers = { 'Content-Type': 'application/json' };
+      const trustedDevice = localStorage.getItem('cb_trusted_device');
+      if (trustedDevice) {
+        headers['X-Trusted-Device'] = trustedDevice;
+        console.log('[auth] login: invio header X-Trusted-Device');
+      }
+
       const response = await fetch(`${API_BASE_URL}/auth/login`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         credentials: 'include',
         body: JSON.stringify({ email, password, deviceId: this.getOrCreateDeviceId() })
       });
@@ -162,6 +169,10 @@ const Auth = {
       const data = await response.json();
       this.saveTokens(data.accessToken, data.refreshToken);
       this.saveUser(data.user);
+      if (data.trustedDeviceToken) {
+        localStorage.setItem('cb_trusted_device', data.trustedDeviceToken);
+        console.log('[auth] loginWith2Fa: trusted device salvato in localStorage');
+      }
       console.log('[auth] loginWith2Fa: token salvato, redirect...');
       return data;
     } catch (err) {

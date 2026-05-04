@@ -47,6 +47,7 @@ public class AuthResponseDTO
     public UserInfoDTO User { get; set; } = new();
     public bool RequiresTwoFactor { get; set; }
     public string? TempToken { get; set; }
+    public string? TrustedDeviceToken { get; set; }
 }
 
 public class UserInfoDTO
