@@ -442,8 +442,8 @@ public class AuthService : IAuthService
         httpContext.Response.Cookies.Append("cb_trusted_device", $"{message}:{signature}", new CookieOptions
         {
             HttpOnly = true,
-            Secure = false, // true in production
-            SameSite = SameSiteMode.Lax,
+            Secure = false,
+            SameSite = SameSiteMode.None,
             Expires = expiry
         });
     }

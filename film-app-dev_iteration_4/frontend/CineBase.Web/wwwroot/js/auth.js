@@ -107,6 +107,7 @@ const Auth = {
       const response = await fetch(`${API_BASE_URL}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ email, password, deviceId: this.getOrCreateDeviceId() })
       });
 
@@ -142,6 +143,7 @@ const Auth = {
       const response = await fetch(`${API_BASE_URL}/auth/login-2fa`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({
           tempToken,
           code,
