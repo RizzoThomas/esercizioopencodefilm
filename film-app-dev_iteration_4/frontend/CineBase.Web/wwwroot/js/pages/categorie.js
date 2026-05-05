@@ -22,7 +22,7 @@ async function loadCategorie() {
     renderCategorie(allCategorie);
   } catch (error) {
     handleApiError(error);
-    tableBody.innerHTML = '<tr><td colspan="3" class="px-6 py-4 text-center text-brand-error">Errore nel caricamento delle categorie</td></tr>';
+    tableBody.innerHTML = '<tr><td colspan="3" class="px-6 py-4 text-center text-ferrari-semantic-warning">Errore nel caricamento delle categorie</td></tr>';
   }
 }
 
@@ -31,16 +31,16 @@ function renderCategorie(categorie) {
   if (!tableBody) return;
 
   if (!categorie.length) {
-    tableBody.innerHTML = '<tr><td colspan="3" class="px-6 py-4 text-center text-brand-on-surface-variant">Nessuna categoria trovata</td></tr>';
+    tableBody.innerHTML = '<tr><td colspan="3" class="px-6 py-4 text-center text-body">Nessuna categoria trovata</td></tr>';
     return;
   }
 
   tableBody.innerHTML = categorie.map(categoria => `
     <tr class="row-hover">
-      <td class="px-6 py-4 whitespace-nowrap text-sm text-brand-on-surface-variant">${categoria.id}</td>
-      <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-brand-on-surface">${categoria.nome}</td>
+      <td class="px-6 py-4 whitespace-nowrap text-sm text-body">${categoria.id}</td>
+      <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-ink">${categoria.nome}</td>
       <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-        <button onclick="editCategoria(${categoria.id}, '${escapeHtml(categoria.nome)}')" class="text-brand-gold hover:text-brand-gold-dark mr-3">
+        <button onclick="editCategoria(${categoria.id}, '${escapeHtml(categoria.nome)}')" class="text-ferrari-primary hover:text-ferrari-primary-hover mr-3">
           <i class="fa-solid fa-pencil"></i>
         </button>
         <button onclick="deleteCategoria(${categoria.id}, '${escapeHtml(categoria.nome)}')" class="text-red-600 hover:text-red-900">

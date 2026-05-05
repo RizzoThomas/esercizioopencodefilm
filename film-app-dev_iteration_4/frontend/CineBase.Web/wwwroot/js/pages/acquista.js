@@ -456,20 +456,20 @@ function updateSummary() {
 
   if (selected.length > 0) {
     list.innerHTML = selected.map(s =>
-      `<div class="flex items-center justify-between py-1.5 px-2 rounded-lg bg-brand-surface-container text-sm">
-        <span class="text-brand-on-surface">
-          <span class="text-brand-on-surface-variant text-xs">${s.settore}</span>
+      `<div class="flex items-center justify-between py-1.5 px-2 bg-canvas-elevated text-sm">
+        <span class="text-ink">
+          <span class="text-body text-xs">${s.settore}</span>
           Fila ${s.fila}, Posto ${s.numero}
-          ${s.isWheelchair ? ' <i class="fa-solid fa-wheelchair text-xs text-brand-on-surface-variant"></i>' : ''}
+          ${s.isWheelchair ? ' <i class="fa-solid fa-wheelchair text-xs text-body"></i>' : ''}
         </span>
-        <span class="text-brand-gold font-semibold">${formatCurrency(unitPrice)}</span>
+        <span class="text-ferrari-primary font-semibold">${formatCurrency(unitPrice)}</span>
       </div>`
     ).join('');
     btnContinue.disabled = false;
     btnContinue.classList.remove('opacity-50', 'cursor-not-allowed');
     countdownCard.classList.remove('hidden');
   } else {
-    list.innerHTML = `<p class="text-sm text-brand-on-surface-variant text-center py-4">Seleziona almeno un posto dalla piantina</p>`;
+    list.innerHTML = `<p class="text-sm text-body text-center py-4">Seleziona almeno un posto dalla piantina</p>`;
     btnContinue.disabled = true;
     btnContinue.classList.add('opacity-50', 'cursor-not-allowed');
     countdownCard.classList.add('hidden');

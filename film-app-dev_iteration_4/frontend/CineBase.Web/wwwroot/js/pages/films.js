@@ -51,7 +51,7 @@ async function loadFilms() {
     renderPagination(allFilms.length);
   } catch (error) {
     handleApiError(error);
-    tableBody.innerHTML = '<tr><td colspan="7" class="px-6 py-4 text-center text-brand-error">Errore nel caricamento dei film</td></tr>';
+    tableBody.innerHTML = '<tr><td colspan="7" class="px-6 py-4 text-center text-ferrari-semantic-warning">Errore nel caricamento dei film</td></tr>';
     renderPagination(0);
   }
 }
@@ -126,8 +126,8 @@ function populateCategorieCheckboxes() {
 
   container.innerHTML = allCategorie.map(cat => `
     <label class="inline-flex items-center gap-1 cursor-pointer">
-      <input type="checkbox" name="categoria" value="${cat.id}" class="w-4 h-4 rounded border-brand-outline text-brand-gold focus:ring-brand-gold">
-      <span class="text-sm text-brand-on-surface">${cat.nome}</span>
+      <input type="checkbox" name="categoria" value="${cat.id}" class="w-4 h-4 rounded border-hairline text-ferrari-primary focus:ring-ferrari-primary">
+      <span class="text-sm text-ink">${cat.nome}</span>
     </label>
   `).join('');
 }
@@ -137,30 +137,30 @@ function renderFilms(films) {
   if (!tableBody) return;
   
 if (!films.length) {
-        tableBody.innerHTML = '<tr><td colspan="8" class="px-6 py-4 text-center text-brand-on-surface-variant">Nessun film trovato</td></tr>';
+        tableBody.innerHTML = '<tr><td colspan="8" class="px-6 py-4 text-center text-body">Nessun film trovato</td></tr>';
         return;
     }
 
     tableBody.innerHTML = films.map(film => {
       const categorie = film.categorie || [];
       const categorieBadges = categorie.length
-        ? categorie.map(c => `<span class="inline-block bg-brand-surface-container text-brand-on-surface text-xs px-1.5 py-0.5 rounded mr-1">${c.nome}</span>`).join('')
-        : '<span class="text-brand-on-surface-variant text-xs">-</span>';
+        ? categorie.map(c => `<span class="inline-block bg-canvas-elevated text-ink text-xs px-1.5 py-0.5 rounded mr-1">${c.nome}</span>`).join('')
+        : '<span class="text-body text-xs">-</span>';
       return `
         <tr class="row-hover">
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-brand-on-surface-variant">${film.id}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-body">${film.id}</td>
             <td class="px-6 py-4 whitespace-nowrap">
-                <div class="h-10 w-8 flex-shrink-0 bg-brand-surface-container rounded overflow-hidden">
+                <div class="h-10 w-8 flex-shrink-0 bg-canvas-elevated rounded overflow-hidden">
                     <img class="h-full w-full object-cover" src="${film.copertinaPath?.startsWith('/media/') ? `http://localhost:5000${film.copertinaPath}` : (film.copertinaPath || '/assets/images/defaults/cover-default.jpg')}" alt="${film.titolo}">
                 </div>
             </td>
-      <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-brand-on-surface">${film.titolo}</td>
-      <td class="px-6 py-4 whitespace-nowrap text-sm text-brand-on-surface-variant">${formatDate(film.dataProduzione)}</td>
-      <td class="px-6 py-4 whitespace-nowrap text-sm text-brand-on-surface-variant">${getRegistaName(film)}</td>
-      <td class="px-6 py-4 whitespace-nowrap text-sm text-brand-on-surface-variant">${film.durata || '-'} min</td>
+      <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-ink">${film.titolo}</td>
+      <td class="px-6 py-4 whitespace-nowrap text-sm text-body">${formatDate(film.dataProduzione)}</td>
+      <td class="px-6 py-4 whitespace-nowrap text-sm text-body">${getRegistaName(film)}</td>
+      <td class="px-6 py-4 whitespace-nowrap text-sm text-body">${film.durata || '-'} min</td>
       <td class="px-6 py-4 whitespace-nowrap">${categorieBadges}</td>
       <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-        <button onclick="editFilm(${film.id})" class="text-brand-gold hover:text-brand-gold-dark mr-3">
+        <button onclick="editFilm(${film.id})" class="text-ferrari-primary hover:text-ferrari-primary-hover mr-3">
           <i class="fa-solid fa-pencil"></i>
         </button>
         <button onclick="deleteFilm(${film.id}, '${escapeHtml(film.titolo)}')" class="text-red-600 hover:text-red-900">

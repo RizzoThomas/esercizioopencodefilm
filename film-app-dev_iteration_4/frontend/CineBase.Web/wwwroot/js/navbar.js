@@ -7,11 +7,11 @@ function setActiveNavLink() {
     const isActive = href === currentPath || (currentPath === '/' && href === '/index.html');
 
     if (isActive) {
-      link.classList.add('text-brand-gold', 'border-b-2', 'border-brand-gold');
-      link.classList.remove('text-brand-on-surface-variant', 'hover:text-brand-gold');
+      link.classList.add('text-ferrari-primary', 'border-b-2', 'border-ferrari-primary');
+      link.classList.remove('text-body', 'hover:text-ferrari-primary');
     } else {
-      link.classList.remove('text-brand-gold', 'border-b-2', 'border-brand-gold');
-      link.classList.add('text-brand-on-surface-variant', 'hover:text-brand-gold');
+      link.classList.remove('text-ferrari-primary', 'border-b-2', 'border-ferrari-primary');
+      link.classList.add('text-body', 'hover:text-ferrari-primary');
     }
   });
 
@@ -21,11 +21,11 @@ function setActiveNavLink() {
     const isActive = href === currentPath || (currentPath === '/' && href === '/index.html');
 
     if (isActive) {
-      link.classList.add('text-brand-gold', 'bg-brand-surface-container');
-      link.classList.remove('text-brand-on-surface', 'hover:bg-brand-surface-container');
+      link.classList.add('text-ferrari-primary', 'bg-canvas-elevated');
+      link.classList.remove('text-ink', 'hover:bg-canvas-elevated');
     } else {
-      link.classList.remove('text-brand-gold', 'bg-brand-surface-container');
-      link.classList.add('text-brand-on-surface', 'hover:bg-brand-surface-container');
+      link.classList.remove('text-ferrari-primary', 'bg-canvas-elevated');
+      link.classList.add('text-ink', 'hover:bg-canvas-elevated');
     }
   });
 }

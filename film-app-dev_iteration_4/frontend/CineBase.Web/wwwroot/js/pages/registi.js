@@ -71,7 +71,7 @@ async function loadRegisti() {
     renderPagination(paged.items.length);
   } catch (error) {
     handleApiError(error);
-    tableBody.innerHTML = '<tr><td colspan="6" class="px-6 py-4 text-center text-brand-error">Errore nel caricamento dei registi</td></tr>';
+    tableBody.innerHTML = '<tr><td colspan="6" class="px-6 py-4 text-center text-ferrari-semantic-warning">Errore nel caricamento dei registi</td></tr>';
     renderPagination(0);
   }
 }
@@ -81,7 +81,7 @@ function renderRegisti(registi) {
   if (!tableBody) return;
 
   if (!registi.length) {
-    tableBody.innerHTML = '<tr><td colspan="6" class="px-6 py-4 text-center text-brand-on-surface-variant">Nessun regista trovato</td></tr>';
+    tableBody.innerHTML = '<tr><td colspan="6" class="px-6 py-4 text-center text-body">Nessun regista trovato</td></tr>';
     return;
   }
 
@@ -97,17 +97,17 @@ function renderRegisti(registi) {
     const filmCount = filmCountByRegista[String(regista.id)] || 0;
     return `
       <tr class="row-hover">
-        <td class="px-6 py-4 whitespace-nowrap text-sm text-brand-on-surface-variant">${regista.id}</td>
-        <td class="px-6 py-4 whitespace-nowrap text-sm text-brand-on-surface">${regista.nome}</td>
-        <td class="px-6 py-4 whitespace-nowrap text-sm text-brand-on-surface">${regista.cognome}</td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm text-body">${regista.id}</td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm text-ink">${regista.nome}</td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm text-ink">${regista.cognome}</td>
         <td class="px-6 py-4 whitespace-nowrap">
           <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium chip-active">
             ${regista.nazionalita || '-'}
           </span>
         </td>
-        <td class="px-6 py-4 whitespace-nowrap text-sm text-brand-on-surface-variant">${filmCount}</td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm text-body">${filmCount}</td>
         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-          <button onclick="editRegista(${regista.id})" class="text-brand-gold hover:text-brand-gold-dark mr-3">
+          <button onclick="editRegista(${regista.id})" class="text-ferrari-primary hover:text-ferrari-primary-hover mr-3">
             <i class="fa-solid fa-pencil"></i>
           </button>
           <button onclick="deleteRegista(${regista.id}, '${escapeHtml(`${regista.nome} ${regista.cognome}`)}')" class="text-red-600 hover:text-red-900">

@@ -141,27 +141,27 @@ function renderOrderDetails() {
   const container = document.getElementById('order-details');
   container.innerHTML = `
     <div class="flex justify-between text-sm">
-      <span class="text-brand-on-surface-variant">Film</span>
-      <span class="font-medium text-brand-on-surface">${ordine.filmTitolo}</span>
+      <span class="text-body">Film</span>
+      <span class="font-medium text-ink">${ordine.filmTitolo}</span>
     </div>
     <div class="flex justify-between text-sm">
-      <span class="text-brand-on-surface-variant">Cinema</span>
-      <span class="font-medium text-brand-on-surface">${ordine.cinemaNome}</span>
+      <span class="text-body">Cinema</span>
+      <span class="font-medium text-ink">${ordine.cinemaNome}</span>
     </div>
     <div class="flex justify-between text-sm">
-      <span class="text-brand-on-surface-variant">Sala</span>
-      <span class="font-medium text-brand-on-surface">${ordine.salaNome}</span>
+      <span class="text-body">Sala</span>
+      <span class="font-medium text-ink">${ordine.salaNome}</span>
     </div>
     <div class="flex justify-between text-sm">
-      <span class="text-brand-on-surface-variant">Data e ora</span>
-      <span class="font-medium text-brand-on-surface">${dateStr}</span>
+      <span class="text-body">Data e ora</span>
+      <span class="font-medium text-ink">${dateStr}</span>
     </div>
     <div class="flex justify-between text-sm">
-      <span class="text-brand-on-surface-variant">Numero biglietti</span>
-      <span class="font-medium text-brand-on-surface">${ordine.numeroBiglietti}</span>
+      <span class="text-body">Numero biglietti</span>
+      <span class="font-medium text-ink">${ordine.numeroBiglietti}</span>
     </div>
     <div class="flex justify-between text-sm">
-      <span class="text-brand-on-surface-variant">Stato</span>
+      <span class="text-body">Stato</span>
       <span class="font-medium">${getStatoBadge(ordine.stato)}</span>
     </div>
   `;
@@ -178,26 +178,26 @@ function renderTickets() {
   document.getElementById('tickets-count').textContent = `${tickets.length} bigliett${tickets.length === 1 ? 'o' : 'i'}`;
 
   if (!tickets.length) {
-    container.innerHTML = `<p class="text-sm text-brand-on-surface-variant text-center py-4">Nessun biglietto emesso</p>`;
+    container.innerHTML = `<p class="text-sm text-body text-center py-4">Nessun biglietto emesso</p>`;
     return;
   }
 
   container.innerHTML = tickets.map(t => `
-    <div class="flex items-center justify-between p-3 rounded-xl border border-brand-outline-variant/20 bg-brand-surface-container-low">
+    <div class="flex items-center justify-between p-3 border border-hairline bg-canvas">
       <div class="flex items-center gap-3">
-        <div class="flex-shrink-0 w-10 h-10 rounded-lg bg-brand-gold/15 flex items-center justify-center">
-          <i class="fa-solid fa-ticket text-brand-gold"></i>
+        <div class="flex-shrink-0 w-10 h-10 bg-ferrari-primary/15 flex items-center justify-center">
+          <i class="fa-solid fa-ticket text-ferrari-primary"></i>
         </div>
         <div>
-          <p class="font-semibold text-brand-on-surface text-sm">
+          <p class="font-semibold text-ink text-sm">
             ${t.settore} - Fila ${t.fila}, Posto ${t.numero}
           </p>
-          <p class="text-xs text-brand-on-surface-variant font-mono">${t.codiceBiglietto}</p>
+          <p class="text-xs text-body font-mono">${t.codiceBiglietto}</p>
         </div>
       </div>
       <div class="text-right">
-        <p class="font-semibold text-brand-gold text-sm">${formatCurrency(t.prezzoTotale)}</p>
-        <p class="text-xs ${t.stato === 'Issued' ? 'text-emerald-500' : t.stato === 'Validated' ? 'text-blue-500' : 'text-brand-on-surface-variant'}">${getStatoBiglietto(t.stato)}</p>
+        <p class="font-semibold text-ferrari-primary text-sm">${formatCurrency(t.prezzoTotale)}</p>
+        <p class="text-xs ${t.stato === 'Issued' ? 'text-emerald-500' : t.stato === 'Validated' ? 'text-blue-500' : 'text-body'}">${getStatoBiglietto(t.stato)}</p>
       </div>
     </div>
   `).join('');
@@ -268,9 +268,9 @@ function getStatoBadge(stato) {
     case 'Failed':
       return '<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-red-500/15 text-red-500"><i class="fa-solid fa-xmark text-[10px]"></i>Fallito</span>';
     case 'Cancelled':
-      return '<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-brand-on-surface-variant/15 text-brand-on-surface-variant"><i class="fa-solid fa-ban text-[10px]"></i>Annullato</span>';
+      return '<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-canvas-elevated/50 text-body"><i class="fa-solid fa-ban text-[10px]"></i>Annullato</span>';
     case 'Expired':
-      return '<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-brand-on-surface-variant/15 text-brand-on-surface-variant"><i class="fa-solid fa-hourglass-end text-[10px]"></i>Scaduto</span>';
+      return '<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-canvas-elevated/50 text-body"><i class="fa-solid fa-hourglass-end text-[10px]"></i>Scaduto</span>';
     default:
       return stato;
   }

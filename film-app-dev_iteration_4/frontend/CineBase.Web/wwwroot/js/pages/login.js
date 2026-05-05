@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
     fetch(`${API.baseUrl}/auth/me`, { headers: API.getAuthHeaders() })
       .then(r => r.json())
       .then(user => { if (user?.id) Auth.saveUser(user); })
-      .catch(() => {})
+      .catch(err => console.error('Failed to fetch user info after social login:', err))
       .finally(() => {
         const target = redirect ? decodeURIComponent(redirect) : '/index.html';
         window.location.href = target;

@@ -38,7 +38,7 @@ function renderUtenti(lista) {
         <td class="px-4 py-3 whitespace-nowrap text-sm text-right font-semibold text-ferrari-primary">${formatCurrency(u.creditoResiduo)}</td>
         <td class="px-4 py-3 whitespace-nowrap text-sm text-body">${dateStr}</td>
         <td class="px-4 py-3 whitespace-nowrap text-center">
-          <a href="/utenti-detail.html?id=${u.id}" class="btn-ghost text-xs px-2 py-1 inline-block" title="Visualizza e modifica utente">
+          <a href="/utenti-detail.html?id=${u.id}" class="btn-tertiary text-xs px-2 py-1 inline-block" title="Visualizza e modifica utente">
             <i class="fa-solid fa-pen mr-1"></i>Modifica
           </a>
         </td>

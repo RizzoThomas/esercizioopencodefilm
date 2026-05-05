@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     let sessionId = topupParams.get('session_id') || sessionStorage.getItem('pendingTopupSessionId');
     sessionStorage.removeItem('pendingTopupSessionId');
     if (sessionId) {
-      try { await API.reconcileTopup(sessionId); } catch { }
+      try { await API.reconcileTopup(sessionId); } catch { /* non-critical topup reconciliation */ }
     }
     showToast('Ricarica credito effettuata con successo!', 'success');
     const url = new URL(window.location.href);
@@ -272,8 +272,8 @@ function renderOrdini() {
             <p class="text-xs text-body mt-1 font-mono">${o.codiceOrdine}</p>
           </div>
           <div class="flex flex-col gap-1 ml-2 flex-shrink-0">
-            ${o.stato === 'Paid' ? `<button onclick="downloadPdf(${o.id})" class="btn-ghost text-xs" title="Scarica PDF"><i class="fa-solid fa-file-pdf mr-1"></i>PDF</button>` : ''}
-            <a href="/esito-acquisto.html?orderId=${o.id}" class="btn-ghost text-xs" title="Dettagli"><i class="fa-solid fa-eye mr-1"></i>Dettagli</a>
+            ${o.stato === 'Paid' ? `<button onclick="downloadPdf(${o.id})" class="btn-tertiary text-xs" title="Scarica PDF"><i class="fa-solid fa-file-pdf mr-1"></i>PDF</button>` : ''}
+            <a href="/esito-acquisto.html?orderId=${o.id}" class="btn-tertiary text-xs" title="Dettagli"><i class="fa-solid fa-eye mr-1"></i>Dettagli</a>
           </div>
         </div>
       </div>`;
@@ -356,10 +356,10 @@ function renderBiglietti() {
             ${b.validatoAtUtc ? `<p class="text-xs text-blue-500 mt-1"><i class="fa-solid fa-check mr-1"></i>Validato il ${new Date(b.validatoAtUtc).toLocaleDateString('it-IT', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>` : ''}
           </div>
           <div class="flex flex-col gap-1 ml-2 flex-shrink-0">
-            <button onclick="visualizzaBiglietto('${b.codiceBiglietto}')" class="btn-ghost text-xs" title="Visualizza dettagli">
+            <button onclick="visualizzaBiglietto('${b.codiceBiglietto}')" class="btn-tertiary text-xs" title="Visualizza dettagli">
               <i class="fa-solid fa-eye mr-1"></i>Visualizza
             </button>
-            ${b.stato === 'Issued' || b.stato === 'Validated' ? `<button onclick="downloadPdf(${b.ordineId})" class="btn-ghost text-xs" title="Scarica PDF"><i class="fa-solid fa-file-pdf mr-1"></i>PDF</button>` : ''}
+            ${b.stato === 'Issued' || b.stato === 'Validated' ? `<button onclick="downloadPdf(${b.ordineId})" class="btn-tertiary text-xs" title="Scarica PDF"><i class="fa-solid fa-file-pdf mr-1"></i>PDF</button>` : ''}
           </div>
         </div>
       </div>`;
@@ -542,7 +542,7 @@ function getStatoBadge(stato) {
 async function reconcileTopup(sessionId) {
   try {
     await API.reconcileTopup(sessionId);
-  } catch { }
+  } catch { /* non-critical reconciliation retry */ }
 }
 
 let selectedTopupAmount = 0;

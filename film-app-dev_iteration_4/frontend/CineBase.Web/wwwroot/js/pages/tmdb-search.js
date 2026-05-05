@@ -345,7 +345,7 @@ const TMDBSearch = {
                     <p class="text-ash text-sm mb-3">${year}</p>
                     <p class="text-steel text-xs truncate-2 mb-4">${this.escHtml(movie.overview || 'Nessuna descrizione disponibile')}</p>
                     <div class="flex gap-2">
-                        <button class="view-details-btn btn btn-ghost flex-1 text-xs py-2" data-id="${movie.id}">
+                        <button class="view-details-btn btn btn-tertiary flex-1 text-xs py-2" data-id="${movie.id}">
                             <i class="fa-solid fa-eye mr-1"></i>Dettagli
                         </button>
                         <button class="quick-import-btn btn btn-gold text-xs py-2 px-3" data-id="${movie.id}" title="Importa rapidamente">
@@ -381,10 +381,10 @@ const TMDBSearch = {
                     <p class="text-ash text-sm mb-3">${year}${director ? ' • ' + director : ''}</p>
                     <p class="text-steel text-xs truncate-2 mb-4">${this.escHtml(movie.overview || 'Nessuna descrizione disponibile')}</p>
                     <div class="flex gap-2">
-                        <button class="view-details-btn btn btn-ghost flex-1 text-xs py-2" data-id="${movie.id}">
+                        <button class="view-details-btn btn btn-tertiary flex-1 text-xs py-2" data-id="${movie.id}">
                             <i class="fa-solid fa-eye mr-1"></i>Dettagli
                         </button>
-                        <a href="/programmazione.html?filmId=${movie.id}" class="btn btn-ghost text-xs py-2 px-3 inline-flex items-center" title="Guarda proiezioni">
+                        <a href="/programmazione.html?filmId=${movie.id}" class="btn btn-tertiary text-xs py-2 px-3 inline-flex items-center" title="Guarda proiezioni">
                             <i class="fa-solid fa-calendar-days"></i>
                         </a>
                     </div>

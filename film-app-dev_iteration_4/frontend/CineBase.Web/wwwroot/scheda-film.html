@@ -13,11 +13,11 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
     rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-  <link href="/css/styles.css?v=2" rel="stylesheet">
+  <link href="/css/styles.css?v=3" rel="stylesheet">
   <script src="/js/route-guard.js"></script>
 </head>
 
-<body class="bg-canvas text-ink font-sans">
+<body class="bg-canvas text-ink font-sans cinematic-enter">
   <div id="navbar-container"></div>
 
   <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
@@ -43,9 +43,9 @@
       <div class="card-ferrari p-6 mb-6">
         <div class="flex flex-col md:flex-row gap-6">
           <!-- Cover Image -->
-          <div class="w-full md:w-64 flex-shrink-0">
+<div class="w-full md:w-64 flex-shrink-0 card-spotlight">
             <img id="film-cover" src="" alt=""
-              class="w-full aspect-[2/3] object-cover shadow-lg">
+              class="w-full aspect-[2/3] object-cover shadow-lg poster-reveal">
           </div>
 
           <!-- Film Metadata -->
@@ -170,6 +170,7 @@
   <script src="/js/auth.js"></script>
   <script src="/js/template-loader.js"></script>
   <script src="/js/navbar.js"></script>
+  <script src="/js/aceternity-effects.js"></script>
   <script src="/js/date-rail.js"></script>
   <script src="/js/pages/scheda-film.js"></script>
 </body>

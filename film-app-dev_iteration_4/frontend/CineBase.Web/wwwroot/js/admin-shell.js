@@ -7,7 +7,8 @@
     '/proiezioni.html',
     '/categorie.html',
     '/utenti.html',
-    '/utenti-detail.html'
+    '/utenti-detail.html',
+    '/validazione.html'
   ]);
 
   const PAGE_TITLES = {
@@ -18,7 +19,8 @@
     '/proiezioni.html': 'Proiezioni',
     '/categorie.html': 'Categorie',
     '/utenti.html': 'Utenti',
-    '/utenti-detail.html': 'Dettaglio Utente'
+    '/utenti-detail.html': 'Dettaglio Utente',
+    '/validazione.html': 'Validazione Biglietti'
   };
 
   function getUser() {
@@ -121,6 +123,7 @@
             <a data-admin-link href="/proiezioni.html" class="admin-nav-link flex items-center gap-3 px-4 py-3 text-sm"><i class="fa-solid fa-clock w-5"></i>Proiezioni</a>
             <a data-admin-link href="/categorie.html" class="admin-nav-link flex items-center gap-3 px-4 py-3 text-sm"><i class="fa-solid fa-tags w-5"></i>Categorie</a>
             <a data-admin-link href="/utenti.html" class="admin-nav-link flex items-center gap-3 px-4 py-3 text-sm"><i class="fa-solid fa-users w-5"></i>Utenti</a>
+            <a data-admin-link href="/validazione.html" class="admin-nav-link flex items-center gap-3 px-4 py-3 text-sm"><i class="fa-solid fa-ticket-check w-5"></i>Validazione</a>
           </nav>
           <div class="p-4 border-t border-hairline">
             <a href="/profilo.html" class="flex items-center gap-3 px-4 py-3 text-sm text-body hover:text-ink transition-colors">

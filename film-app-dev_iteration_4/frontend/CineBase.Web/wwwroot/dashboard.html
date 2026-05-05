@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="it-IT">
 
 <head>
@@ -13,11 +13,12 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
     rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-  <link href="/css/styles.css?v=2" rel="stylesheet">
+  <link href="/css/styles.css?v=3" rel="stylesheet">
   <script src="/js/route-guard.js"></script>
 </head>
 
 <body class="bg-canvas text-ink font-sans">
+  <div id="navbar-container"></div>
   <main class="px-4 sm:px-6 lg:px-8 py-8">
     <div class="flex items-center justify-between gap-4 mb-8">
       <h2 class="text-xl sm:text-2xl ferrari-display-md text-ink">Overview</h2>
@@ -384,7 +385,7 @@
                 <span><i class="fa-regular fa-calendar mr-1"></i>${date.toLocaleDateString('it-IT', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' })}</span>
               </div>
             </div>
-            ${s.stato === 'Aperta' ? `<button onclick="risolviSegnalazione(${s.id})" class="btn-ghost text-xs flex-shrink-0"><i class="fa-solid fa-check mr-1"></i>Risolvi</button>` : ''}
+            ${s.stato === 'Aperta' ? `<button onclick="risolviSegnalazione(${s.id})" class="btn-tertiary text-xs flex-shrink-0"><i class="fa-solid fa-check mr-1"></i>Risolvi</button>` : ''}
           </div>`;
         }).join('');
       } catch {
@@ -400,6 +401,7 @@
       } catch { showToast('Errore', 'danger'); }
     }
   </script>
+  <div id="footer-container"></div>
 </body>
 
 </html>

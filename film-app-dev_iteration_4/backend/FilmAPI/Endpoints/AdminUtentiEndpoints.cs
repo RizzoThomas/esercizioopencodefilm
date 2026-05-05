@@ -43,6 +43,34 @@ public static class AdminUtentiEndpoints
                 return Results.BadRequest(ex.Message);
             }
         }).RequireAuthorization("AdminOnly");
+
+        // Admin: visualizza biglietti di un utente specifico
+        group.MapGet("/{id}/biglietti", async (int id, ICheckoutService checkoutService) =>
+        {
+            try
+            {
+                var biglietti = await checkoutService.GetTicketsByUserAsync(id);
+                return Results.Ok(biglietti);
+            }
+            catch (Exception ex)
+            {
+                return Results.NotFound(ex.Message);
+            }
+        }).RequireAuthorization("PowerUserOrAdmin");
+
+        // Admin: visualizza ordini di un utente specifico
+        group.MapGet("/{id}/ordini", async (int id, ICheckoutService checkoutService) =>
+        {
+            try
+            {
+                var ordini = await checkoutService.GetOrdiniByUserAsync(id);
+                return Results.Ok(ordini);
+            }
+            catch (Exception ex)
+            {
+                return Results.NotFound(ex.Message);
+            }
+        }).RequireAuthorization("PowerUserOrAdmin");
     }
 
     private static int? GetUserIdFromContext(HttpContext context)

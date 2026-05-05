@@ -70,7 +70,7 @@ async function loadProiezioni() {
     renderPagination(paged.items.length);
   } catch (error) {
     handleApiError(error);
-    tableBody.innerHTML = '<tr><td colspan="7" class="px-6 py-4 text-center text-brand-error">Errore nel caricamento delle proiezioni</td></tr>';
+    tableBody.innerHTML = '<tr><td colspan="7" class="px-6 py-4 text-center text-ferrari-semantic-warning">Errore nel caricamento delle proiezioni</td></tr>';
     renderPagination(0);
   }
 }
@@ -101,22 +101,22 @@ function renderProiezioni(proiezioni) {
   if (!tableBody) return;
   
   if (!proiezioni.length) {
-    tableBody.innerHTML = '<tr><td colspan="7" class="px-6 py-4 text-center text-brand-on-surface-variant">Nessuna proiezione trovata</td></tr>';
+    tableBody.innerHTML = '<tr><td colspan="7" class="px-6 py-4 text-center text-body">Nessuna proiezione trovata</td></tr>';
     return;
   }
   
   tableBody.innerHTML = proiezioni.map(proiezione => `
     <tr class="row-hover">
-      <td class="px-6 py-4 whitespace-nowrap text-sm text-brand-on-surface-variant">${proiezione.id}</td>
-      <td class="px-6 py-4 whitespace-nowrap text-sm text-brand-on-surface">${getCinemaLabel(proiezione)}</td>
-      <td class="px-6 py-4 whitespace-nowrap text-sm text-brand-on-surface">${getFilmLabel(proiezione)}</td>
-      <td class="px-6 py-4 whitespace-nowrap text-sm text-brand-on-surface-variant">${formatDate(proiezione.data)}</td>
-      <td class="px-6 py-4 whitespace-nowrap text-sm text-brand-on-surface-variant">${formatTime(proiezione.ora)}</td>
+      <td class="px-6 py-4 whitespace-nowrap text-sm text-body">${proiezione.id}</td>
+      <td class="px-6 py-4 whitespace-nowrap text-sm text-ink">${getCinemaLabel(proiezione)}</td>
+      <td class="px-6 py-4 whitespace-nowrap text-sm text-ink">${getFilmLabel(proiezione)}</td>
+      <td class="px-6 py-4 whitespace-nowrap text-sm text-body">${formatDate(proiezione.data)}</td>
+      <td class="px-6 py-4 whitespace-nowrap text-sm text-body">${formatTime(proiezione.ora)}</td>
       <td class="px-6 py-4 whitespace-nowrap">
         ${renderProiezioneStatus(proiezione)}
       </td>
       <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-        <button onclick="editProiezione(${proiezione.id})" class="text-brand-gold hover:text-brand-gold-dark mr-3">
+        <button onclick="editProiezione(${proiezione.id})" class="text-ferrari-primary hover:text-ferrari-primary-hover mr-3">
           <i class="fa-solid fa-pencil"></i>
         </button>
         <button onclick="deleteProiezione(${proiezione.id}, '${getFilmTitle(proiezione.filmId)}')" class="text-red-600 hover:text-red-900">
@@ -155,17 +155,17 @@ function renderProiezioneStatus(proiezione) {
 function getCinemaLabel(proiezione) {
   const cinemaName = proiezione?.cinema?.nome || getCinemaName(proiezione.cinemaId);
   if (cinemaName.startsWith('ID ')) {
-    return `<span class="text-brand-on-surface-variant text-[11px] font-normal opacity-70">${cinemaName}</span>`;
+    return `<span class="text-body text-[11px] font-normal opacity-70">${cinemaName}</span>`;
   }
-  return `${cinemaName} <span class="ml-1 text-[11px] font-normal text-brand-on-surface-variant opacity-70">(ID ${proiezione.cinemaId})</span>`;
+  return `${cinemaName} <span class="ml-1 text-[11px] font-normal text-body opacity-70">(ID ${proiezione.cinemaId})</span>`;
 }
 
 function getFilmLabel(proiezione) {
   const filmTitle = proiezione?.film?.titolo || getFilmTitle(proiezione.filmId);
   if (filmTitle.startsWith('ID ')) {
-    return `<span class="text-brand-on-surface-variant text-[11px] font-normal opacity-70">${filmTitle}</span>`;
+    return `<span class="text-body text-[11px] font-normal opacity-70">${filmTitle}</span>`;
   }
-  return `${filmTitle} <span class="ml-1 text-[11px] font-normal text-brand-on-surface-variant opacity-70">(ID ${proiezione.filmId})</span>`;
+  return `${filmTitle} <span class="ml-1 text-[11px] font-normal text-body opacity-70">(ID ${proiezione.filmId})</span>`;
 }
 
 function getCinemaName(cinemaId) {

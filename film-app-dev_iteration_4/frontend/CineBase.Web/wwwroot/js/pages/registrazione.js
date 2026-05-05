@@ -85,19 +85,19 @@ document.addEventListener('DOMContentLoaded', () => {
     strengthBar.style.width = `${strength}%`;
     
     if (strength === 0) {
-      strengthBar.className = 'h-full bg-brand-error transition-all';
+      strengthBar.className = 'h-full bg-ferrari-semantic-warning transition-all';
       strengthText.textContent = '';
     } else if (strength === 25) {
-      strengthBar.className = 'h-full bg-brand-error transition-all';
+      strengthBar.className = 'h-full bg-ferrari-semantic-warning transition-all';
       strengthText.textContent = `Password debole: ${feedback.join(', ')}`;
     } else if (strength === 50) {
-      strengthBar.className = 'h-full bg-brand-amber-500 transition-all';
+      strengthBar.className = 'h-full bg-amber-500 transition-all';
       strengthText.textContent = 'Password discreta';
     } else if (strength === 75) {
-      strengthBar.className = 'h-full bg-brand-emerald-500 transition-all';
+      strengthBar.className = 'h-full bg-emerald-500 transition-all';
       strengthText.textContent = 'Password buona';
     } else {
-      strengthBar.className = 'h-full bg-brand-emerald transition-all';
+      strengthBar.className = 'h-full bg-emerald-500 transition-all';
       strengthText.textContent = 'Password ottima';
     }
   }

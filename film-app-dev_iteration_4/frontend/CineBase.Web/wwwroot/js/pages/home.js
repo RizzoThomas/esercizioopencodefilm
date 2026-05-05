@@ -47,7 +47,7 @@ async function loadFeaturedFilms() {
   } catch (error) {
     handleApiError(error);
     featuredGrid.innerHTML =
-      '<p class="text-brand-on-surface col-span-full text-center">Errore nel caricamento dei film in evidenza</p>';
+      '<p class="text-ink col-span-full text-center">Errore nel caricamento dei film in evidenza</p>';
   }
 }
 
@@ -103,7 +103,7 @@ function initFeaturedFilms(entries) {
   if (!featuredEntries.length) {
     const featuredGrid = document.getElementById("featured-grid");
     featuredGrid.innerHTML =
-      '<p class="text-brand-on-surface col-span-full text-center">Nessun film disponibile</p>';
+      '<p class="text-ink col-span-full text-center">Nessun film disponibile</p>';
     return;
   }
 
@@ -160,8 +160,8 @@ function renderHeroCard(film, score) {
   const subBadge = score > 0 ? `${score} proiezioni` : "";
   const categorie = film.categorie || [];
   const badgeHtml = categorie.length
-    ? categorie.map(c => `<span class="bg-brand-surface/80 backdrop-blur-sm text-brand-on-surface text-xs px-2 py-0.5 rounded">${c.nome}</span>`).join('')
-    : `<span class="bg-brand-gold text-xs font-bold px-2 py-1 rounded">${film.genere || "Film"}</span>`;
+    ? categorie.map(c => `<span class="bg-canvas/80 backdrop-blur-sm text-ink text-xs px-2 py-0.5 rounded">${c.nome}</span>`).join('')
+    : `<span class="bg-ferrari-primary text-xs font-bold px-2 py-1 rounded">${film.genere || "Film"}</span>`;
   
   const isLoggedIn = typeof Auth !== 'undefined' && Auth?.isLoggedIn?.() || false;
   const cta = isLoggedIn
@@ -169,7 +169,7 @@ function renderHeroCard(film, score) {
     : `<a href="/programmazione.html" class="btn-outline-brand-light transform transition-transform hover:scale-105 backdrop-blur-sm">Scopri Orari</a>`;
 
   return `
-    <div class="card-elevated overflow-hidden group transition-all lg:col-span-2 relative w-full max-w-full h-[118vw] min-h-[420px] max-h-[780px] lg:h-[930px] lg:max-h-none rounded-xl animate-fade-in">
+    <div class="focus-card card-ferrari overflow-hidden group transition-all lg:col-span-2 relative w-full max-w-full h-[118vw] min-h-[420px] max-h-[780px] lg:h-[930px] lg:max-h-none animate-fade-in">
       <div class="absolute inset-0 bg-slate-950">
         <img src="${getCoverImage(film.copertinaPath)}"
              alt="${film.titolo}"
@@ -180,7 +180,7 @@ function renderHeroCard(film, score) {
       </div>
       
       <div class="absolute top-4 left-4 right-4 flex items-center justify-between z-10">
-        <span class="bg-brand-gold text-sm font-bold px-3 py-1 rounded shadow-md text-brand-dark">${badge}</span>
+        <span class="bg-ferrari-primary text-sm font-bold px-3 py-1 rounded shadow-md text-ink">${badge}</span>
         ${subBadge ? `<span class="bg-black/60 backdrop-blur-md text-white text-xs px-2 py-1 rounded border border-white/10">${subBadge}</span>` : ""}
       </div>
 
@@ -190,7 +190,7 @@ function renderHeroCard(film, score) {
         </div>
         <h3 class="text-white font-bold text-3xl lg:text-5xl mb-3 drop-shadow-xl leading-tight line-clamp-2">${film.titolo}</h3>
         <p class="text-gray-100 text-xl mb-6 flex items-center gap-4 font-medium drop-shadow-lg">
-          <span><i class="fa-solid fa-video mr-2 text-brand-gold"></i>${getDirectorName(film)}</span>
+          <span><i class="fa-solid fa-video mr-2 text-ferrari-primary"></i>${getDirectorName(film)}</span>
           ${film.durata ? `<span><i class="fa-regular fa-clock mr-1"></i>${film.durata} min</span>` : ""}
         </p>
         <div class="flex">
@@ -205,7 +205,7 @@ function renderCompactCard(film, score, originalIndex) {
   const badge = score > 0 ? "In Programmazione" : "Novità";
   
   return `
-    <div class="card-elevated flex overflow-hidden group transition-all hover:ring-2 hover:ring-brand-gold/70 cursor-pointer animate-fade-in bg-brand-surface h-[180px] sm:h-[198px] lg:h-[213px]" onclick="setActiveFeatured(${originalIndex})">
+    <div class="focus-card card-ferrari flex overflow-hidden group transition-all hover:ring-2 hover:ring-ferrari-primary/70 cursor-pointer animate-fade-in bg-canvas h-[180px] sm:h-[198px] lg:h-[213px]" onclick="setActiveFeatured(${originalIndex})">
       <div class="w-[28%] lg:w-[32%] bg-slate-800 relative overflow-hidden flex-shrink-0">
         <img src="${getCoverImage(film.copertinaPath)}"
              alt="${film.titolo}"
@@ -213,11 +213,11 @@ function renderCompactCard(film, score, originalIndex) {
       </div>
       <div class="p-3 lg:p-4 flex flex-col justify-center flex-1 overflow-hidden lg:justify-between">
         <div class="flex justify-between items-start mb-1 lg:mb-2">
-          <span class="text-[10px] lg:text-[11px] uppercase tracking-wider text-brand-gold font-bold truncate pr-1">${badge}</span>
-          ${score > 0 ? `<span class="text-[10px] lg:text-[11px] text-brand-on-surface-variant font-medium flex-shrink-0"><i class="fa-solid fa-calendar-day mr-1"></i>${score}</span>` : ""}
+          <span class="text-[10px] lg:text-[11px] uppercase tracking-wider text-ferrari-primary font-bold truncate pr-1">${badge}</span>
+          ${score > 0 ? `<span class="text-[10px] lg:text-[11px] text-body font-medium flex-shrink-0"><i class="fa-solid fa-calendar-day mr-1"></i>${score}</span>` : ""}
         </div>
-        <h3 class="text-brand-on-surface font-bold text-sm sm:text-base lg:text-[1.1rem] mb-1 line-clamp-2 group-hover:text-brand-gold transition-colors leading-tight">${film.titolo}</h3>
-        <p class="text-brand-on-surface-variant text-xs lg:text-[13px] font-medium truncate mt-auto"><i class="fa-solid fa-video text-[10px] mr-1 opacity-70"></i> ${getDirectorName(film)}</p>
+        <h3 class="text-ink font-bold text-sm sm:text-base lg:text-[1.1rem] mb-1 line-clamp-2 group-hover:text-ferrari-primary transition-colors leading-tight">${film.titolo}</h3>
+        <p class="text-body text-xs lg:text-[13px] font-medium truncate mt-auto"><i class="fa-solid fa-video text-[10px] mr-1 opacity-70"></i> ${getDirectorName(film)}</p>
       </div>
     </div>
   `;

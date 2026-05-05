@@ -905,3 +905,654 @@ input[type="range"]::-webkit-slider-thumb {
   text-align: center;
 }
 
+/* ========================================================================
+   Ferrari Light-Mode Component Variants
+   ======================================================================== */
+
+/* Button Outline — Light Canvas */
+.btn-outline-light {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+  background: transparent; color: var(--ferrari-body-on-light);
+  border: 1px solid var(--ferrari-body-on-light);
+  font-family: var(--ferrari-font); font-size: 14px; font-weight: 700;
+  line-height: 1.0; letter-spacing: 1.4px; text-transform: uppercase;
+  padding: 13px 31px; height: 48px; cursor: pointer;
+  border-radius: 0; transition: background 0.2s ease;
+}
+.btn-outline-light:hover { background: rgba(24,24,24,0.08); }
+
+/* Text Input — Light Canvas */
+.input-ferrari-light {
+  background: var(--ferrari-canvas-light) !important; color: var(--ferrari-body-on-light) !important;
+  border: 1px solid var(--ferrari-hairline-on-light);
+  border-radius: 4px; padding: 14px 16px; height: 48px;
+  font-family: var(--ferrari-font); font-size: 14px;
+  outline: none; transition: border-color 0.2s ease;
+  -webkit-text-fill-color: var(--ferrari-body-on-light);
+}
+.input-ferrari-light:focus { border-color: var(--ferrari-primary); }
+.input-ferrari-light::placeholder { color: var(--ferrari-muted); opacity: 0.7; }
+
+/* Top Nav — Light Canvas */
+.navbar-ferrari-light {
+  background: var(--ferrari-canvas-light); height: 64px;
+  border-bottom: 1px solid var(--ferrari-hairline-on-light);
+}
+.nav-link-ferrari-light {
+  font-family: var(--ferrari-font); font-size: 13px; font-weight: 600;
+  line-height: 1.4; letter-spacing: 0.65px; text-transform: uppercase;
+  color: var(--ferrari-body-on-light); transition: opacity 0.2s ease;
+}
+.nav-link-ferrari-light:hover { opacity: 0.8; }
+
+/* ========================================================================
+   Hero Band — Light Canvas Variant
+   ======================================================================== */
+
+.hero-cinema-light {
+  position: relative; min-height: 480px;
+  background: var(--ferrari-canvas-light);
+  display: flex; align-items: center; justify-content: center;
+  text-align: center; padding: 96px 0;
+}
+
+.hero-cinema-light-content {
+  max-width: 900px; margin: 0 auto; padding: 0 48px;
+}
+
+.hero-cinema-light-title {
+  font-family: var(--ferrari-font); font-size: 56px; font-weight: 500;
+  line-height: 1.1; letter-spacing: -1.12px; color: var(--ferrari-body-on-light);
+}
+
+.hero-cinema-light-subtitle {
+  font-family: var(--ferrari-font); font-size: 16px; font-weight: 400;
+  line-height: 1.5; color: var(--ferrari-body); margin-top: 16px;
+}
+
+@media (max-width: 640px) {
+  .hero-cinema-light { padding: 64px 0; min-height: 360px; }
+  .hero-cinema-light-title { font-size: 32px; }
+  .hero-cinema-light-content { padding: 0 16px; }
+}
+
+/* ========================================================================
+   Ferrari Feature Card — Light Canvas
+   ======================================================================== */
+
+.card-ferrari-light-feature {
+  background: var(--ferrari-canvas-light);
+  color: var(--ferrari-body-on-light);
+  border: 1px solid var(--ferrari-hairline-on-light);
+  border-radius: 0; padding: 32px;
+  transition: all 0.2s ease;
+}
+.card-ferrari-light-feature:hover {
+  border-color: var(--ferrari-primary);
+}
+
+/* ========================================================================
+   Ferrari Spec Cell — Technical Spec Callout
+   ======================================================================== */
+
+.spec-cell {
+  background: transparent; color: var(--ferrari-ink);
+  padding: 24px 0; text-align: center;
+}
+
+.spec-cell-value {
+  font-family: var(--ferrari-font); font-size: 80px; font-weight: 700;
+  line-height: 1.0; letter-spacing: -1.6px;
+}
+
+.spec-cell-label {
+  font-family: var(--ferrari-font); font-size: 11px; font-weight: 600;
+  line-height: 1.4; letter-spacing: 1.1px; text-transform: uppercase;
+  color: var(--ferrari-body); margin-top: 8px;
+}
+
+/* Race Position variant */
+.spec-cell-race { color: var(--ferrari-primary); }
+
+/* ========================================================================
+   Ferrari Race Calendar Row
+   ======================================================================== */
+
+.race-calendar-row {
+  display: grid; grid-template-columns: auto 1fr auto;
+  align-items: center; gap: 16px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--ferrari-hairline);
+  font-family: var(--ferrari-font); font-size: 14px;
+  color: var(--ferrari-ink);
+}
+
+.race-calendar-row:last-child { border-bottom: none; }
+
+.race-calendar-date {
+  font-weight: 600; color: var(--ferrari-body);
+  min-width: 100px;
+}
+
+/* ========================================================================
+   Ferrari Preowned Listing Card
+   ======================================================================== */
+
+.card-preowned-listing {
+  background: var(--ferrari-canvas-light);
+  color: var(--ferrari-body-on-light);
+  border: 1px solid var(--ferrari-hairline-on-light);
+  border-radius: 0; padding: 24px;
+  transition: all 0.2s ease;
+}
+.card-preowned-listing:hover {
+  border-color: var(--ferrari-primary);
+}
+
+/* ========================================================================
+   Ferrari Driver Card — F1 Portrait
+   ======================================================================== */
+
+.card-driver {
+  background: var(--ferrari-canvas-elevated);
+  color: var(--ferrari-ink);
+  border-radius: 0; padding: 24px;
+  transition: all 0.2s ease;
+}
+.card-driver:hover {
+  background: #3a3a3a;
+}
+
+.card-driver-number {
+  font-family: var(--ferrari-font); font-size: 48px; font-weight: 700;
+  line-height: 1.0; color: var(--ferrari-primary);
+}
+
+/* ========================================================================
+   Ferrari CTA Band — Pre-footer Dark
+   ======================================================================== */
+
+.cta-band-dark {
+  background: var(--ferrari-canvas);
+  color: var(--ferrari-ink);
+  text-align: center; padding: 96px 0;
+}
+
+.cta-band-dark-title {
+  font-family: var(--ferrari-font); font-size: 36px; font-weight: 500;
+  line-height: 1.2; letter-spacing: -0.36px;
+  margin-bottom: 32px;
+}
+
+@media (max-width: 640px) {
+  .cta-band-dark { padding: 64px 0; }
+  .cta-band-dark-title { font-size: 26px; }
+}
+
+/* ========================================================================
+   Ferrari Newsletter Input Band
+   ======================================================================== */
+
+.newsletter-input-band {
+  background: var(--ferrari-canvas-elevated);
+  color: var(--ferrari-ink);
+  border-radius: 4px; padding: 32px;
+}
+
+.newsletter-input-band .input-ferrari {
+  background: var(--ferrari-canvas) !important;
+}
+
+/* ========================================================================
+   Ferrari Cinematic Animations
+   ======================================================================== */
+
+/* Hero parallax reveal */
+@keyframes heroReveal {
+  from { opacity: 0; transform: scale(1.05); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.hero-cinema img,
+.hero-cinema [style*="background"] {
+  animation: heroReveal 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* Livery band entrance */
+@keyframes liveryEntrance {
+  from { opacity: 0; transform: translateX(-20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.livery-band {
+  animation: liveryEntrance 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* Card hover elevation */
+.card-ferrari,
+.card-ferrari-light,
+.card-driver {
+  transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1),
+              border-color 0.2s ease,
+              background-color 0.2s ease;
+}
+.card-ferrari:hover,
+.card-ferrari-light:hover,
+.card-driver:hover {
+  transform: translateY(-2px);
+}
+
+/* Page transition */
+@keyframes pageIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+main {
+  animation: pageIn 0.35s ease-out forwards;
+}
+
+/* ========================================================================
+   Ferrari Accessibility — Reduced Motion
+   ======================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .hero-cinema img,
+  .hero-cinema [style*="background"] {
+    animation: none;
+  }
+
+  .card-ferrari:hover,
+  .card-ferrari-light:hover,
+  .card-driver:hover,
+  .card-preowned-listing:hover {
+    transform: none;
+  }
+}
+
+/* ========================================================================
+   Ferrari Accessibility — Focus States
+   ======================================================================== */
+
+.btn-primary:focus-visible,
+.btn-outline:focus-visible,
+.btn-outline-light:focus-visible,
+.btn-tertiary:focus-visible {
+  outline: 2px solid var(--ferrari-primary);
+  outline-offset: 2px;
+}
+
+.input-ferrari:focus-visible,
+.input-ferrari-light:focus-visible {
+  outline: none;
+  border-color: var(--ferrari-primary);
+  box-shadow: 0 0 0 2px rgba(218, 41, 28, 0.2);
+}
+
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--ferrari-primary);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+.card-ferrari:focus-within,
+.card-ferrari-light:focus-within,
+.card-driver:focus-within {
+  border-color: var(--ferrari-primary);
+  box-shadow: 0 0 0 1px rgba(218, 41, 28, 0.3);
+}
+
+/* ========================================================================
+   Ferrari Light Theme — CSS Variable Overrides
+   ======================================================================== */
+
+html.light {
+  --ferrari-canvas: #ffffff;
+  --ferrari-canvas-elevated: #f7f7f7;
+  --ferrari-ink: #181818;
+  --ferrari-body: #666666;
+  --ferrari-body-strong: #181818;
+  --ferrari-muted: #8f8f8f;
+  --ferrari-hairline: #d2d2d2;
+}
+
+html.light body {
+  background-color: var(--ferrari-canvas);
+  color: var(--ferrari-ink);
+}
+
+html.light .card-ferrari {
+  background: var(--ferrari-canvas-elevated);
+}
+
+html.light .navbar-ferrari {
+  background: var(--ferrari-canvas);
+  border-bottom-color: var(--ferrari-hairline);
+}
+
+html.light .footer-ferrari {
+  background: var(--ferrari-canvas-elevated);
+}
+
+/* ========================================================================
+   ACETERNITY EFFECTS — Cinematic Micro-Interactions
+   Ferrari-adapted: premium, restrained, dark-canvas optimized
+   ======================================================================== */
+
+/* --- 1. Hero Parallax --- */
+.hero-parallax {
+  position: relative; overflow: hidden;
+}
+
+.hero-parallax [data-parallax-speed] {
+  will-change: transform, opacity;
+  transition: none;
+}
+
+.hero-parallax-layer {
+  position: absolute; inset: 0;
+  background-size: cover; background-position: center;
+}
+
+/* --- 2. Card Spotlight --- */
+.card-spotlight {
+  position: relative; overflow: hidden;
+  --spot-x: 50%; --spot-y: 50%;
+}
+
+.card-spotlight::after {
+  content: ''; position: absolute; inset: 0; z-index: 1;
+  background: radial-gradient(
+    600px circle at var(--spot-x) var(--spot-y),
+    rgba(218, 41, 28, 0.12),
+    transparent 40%
+  );
+  opacity: 0; transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.card-spotlight-active::after {
+  opacity: 1;
+}
+
+.card-spotlight:hover {
+  border-color: var(--ferrari-primary);
+}
+
+.card-spotlight img {
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.card-spotlight:hover img {
+  transform: scale(1.03);
+}
+
+/* --- 3. Focus Cards --- */
+.focus-cards-container {
+  display: grid;
+}
+
+.focus-card {
+  transition: filter 0.4s ease, transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s ease;
+}
+
+.focus-card-blur {
+  filter: blur(4px) brightness(0.7);
+  opacity: 0.7;
+}
+
+.focus-card-active {
+  filter: blur(0) brightness(1);
+  opacity: 1;
+  transform: scale(1.02);
+  z-index: 2;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .focus-card-blur,
+  .focus-card-active {
+    filter: none; opacity: 1; transform: none;
+  }
+}
+
+/* --- 4. Animated Tabs --- */
+.animated-tabs {
+  position: relative; display: inline-flex;
+  background: var(--ferrari-canvas);
+  border-bottom: 1px solid var(--ferrari-hairline);
+}
+
+.animated-tab {
+  position: relative; z-index: 2;
+  padding: 12px 24px;
+  font-family: var(--ferrari-font); font-size: 13px; font-weight: 600;
+  line-height: 1.4; letter-spacing: 0.65px; text-transform: uppercase;
+  color: var(--ferrari-body);
+  background: transparent; border: none; cursor: pointer;
+  transition: color 0.3s ease;
+  white-space: nowrap;
+}
+
+.animated-tab:hover {
+  color: var(--ferrari-ink);
+}
+
+.animated-tab.active {
+  color: var(--ferrari-ink);
+}
+
+.animated-tab-indicator {
+  position: absolute; bottom: 0; left: 0; z-index: 1;
+  height: 2px;
+  background: var(--ferrari-primary);
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), width 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  opacity: 0;
+}
+
+/* --- 5. Sticky Scroll Reveal --- */
+.sticky-reveal-container {
+  display: grid; grid-template-columns: 1fr 1fr;
+  min-height: 100vh;
+}
+
+@media (max-width: 768px) {
+  .sticky-reveal-container {
+    grid-template-columns: 1fr;
+  }
+}
+
+.sticky-reveal-image {
+  position: sticky; top: 80px;
+  height: calc(100vh - 80px);
+  overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+}
+
+.sticky-reveal-image img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+}
+
+.sticky-reveal-text {
+  padding: 96px 48px;
+}
+
+.reveal-on-scroll {
+  opacity: 0; transform: translateY(24px);
+  transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+              transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+
+.reveal-on-scroll.revealed {
+  opacity: 1; transform: translateY(0);
+}
+
+/* --- 6. Text Generate --- */
+.text-generate {
+  visibility: hidden;
+}
+
+/* --- 7. Aurora Background --- */
+.aurora-bg {
+  position: absolute; inset: 0; z-index: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+}
+
+/* --- 8. Floating Navbar --- */
+.floating-navbar {
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+
+/* --- 9. Hero Highlight --- */
+.hero-highlight-text {
+  position: relative; display: inline;
+}
+
+.hero-highlight-text::after {
+  content: ''; position: absolute;
+  left: -4px; right: -4px; bottom: 4px; height: 30%;
+  background: linear-gradient(180deg, transparent, rgba(218, 41, 28, 0.25));
+  z-index: -1;
+  animation: highlightPulse 3s ease-in-out infinite;
+}
+
+@keyframes highlightPulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+.hero-highlight-active {
+  animation: highlightGlow 2s ease-out forwards;
+}
+
+@keyframes highlightGlow {
+  from { text-shadow: 0 0 0 rgba(218, 41, 28, 0); }
+  40% { text-shadow: 0 0 20px rgba(218, 41, 28, 0.4); }
+  to { text-shadow: 0 0 0 rgba(218, 41, 28, 0); }
+}
+
+/* --- 10. Apple Cards Carousel --- */
+.apple-carousel {
+  position: relative; overflow: hidden;
+}
+
+.apple-carousel-track {
+  display: flex; gap: 1rem;
+  overflow-x: auto; scroll-behavior: smooth;
+  padding: 2rem 0;
+  -ms-overflow-style: none; scrollbar-width: none;
+}
+
+.apple-carousel-track::-webkit-scrollbar { display: none; }
+
+.apple-carousel-card {
+  flex-shrink: 0; width: 280px;
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.4s ease;
+}
+
+@media (min-width: 640px) {
+  .apple-carousel-card { width: 320px; }
+}
+
+@media (min-width: 1024px) {
+  .apple-carousel-card { width: 380px; }
+}
+
+/* --- 11. Lamp Effect --- */
+.lamp-header {
+  position: relative; text-align: center;
+}
+
+.lamp-text {
+  transition: color 0.8s ease, text-shadow 0.8s ease;
+  color: var(--ferrari-muted);
+}
+
+.lamp-text.lamp-lit {
+  color: var(--ferrari-ink);
+}
+
+/* --- 12. Expandable Cards --- */
+.expandable-cards-container {
+  display: grid; gap: 1rem;
+}
+
+.expandable-card {
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.expandable-preview { display: block; }
+
+.expandable-detail {
+  max-height: 0; overflow: hidden;
+  transition: max-height 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+              opacity 0.3s ease,
+              padding 0.3s ease;
+  opacity: 0;
+}
+
+.expandable-card.expanded .expandable-detail {
+  max-height: 1000px;
+  opacity: 1;
+  padding-top: 16px;
+}
+
+.expandable-card.expanded {
+  border-color: var(--ferrari-primary);
+}
+
+/* --- 13. Glare Card --- */
+.glare-card {
+  position: relative; overflow: hidden;
+  --glare-x: 50%; --glare-y: 50%;
+}
+
+.glare-card::before {
+  content: ''; position: absolute; inset: 0; z-index: 2;
+  background: radial-gradient(
+    400px circle at var(--glare-x) var(--glare-y),
+    rgba(255, 255, 255, 0.06),
+    transparent 50%
+  );
+  pointer-events: none;
+  opacity: 0; transition: opacity 0.3s ease;
+}
+
+.glare-card:hover::before {
+  opacity: 1;
+}
+
+/* --- 14. Cinematic Page Transition (enhanced) --- */
+@keyframes pageInCinematic {
+  from { opacity: 0; transform: translateY(12px) scale(0.995); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.cinematic-enter {
+  animation: pageInCinematic 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* --- 15. Film Poster Reveal --- */
+@keyframes posterReveal {
+  from { opacity: 0; transform: scale(1.08); filter: brightness(0.4); }
+  to { opacity: 1; transform: scale(1); filter: brightness(1); }
+}
+
+.poster-reveal {
+  animation: posterReveal 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+

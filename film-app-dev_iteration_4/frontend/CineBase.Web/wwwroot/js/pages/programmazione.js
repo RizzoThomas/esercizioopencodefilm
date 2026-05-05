@@ -313,7 +313,7 @@ async function loadFilms(options = {}) {
 
   if (grid && !append) {
     grid.innerHTML = `
-      <div class="col-span-full text-center py-16 text-brand-on-surface-variant">
+      <div class="col-span-full text-center py-16 text-body">
         <i class="fa-solid fa-spinner fa-spin text-4xl mb-4"></i>
         <p>Caricamento film...</p>
       </div>
@@ -345,7 +345,7 @@ async function loadFilms(options = {}) {
     handleApiError(error);
     if (grid) {
       grid.innerHTML = `
-        <div class="col-span-full text-center py-16 text-brand-error">
+        <div class="col-span-full text-center py-16 text-ferrari-semantic-warning">
           <i class="fa-solid fa-circle-exclamation text-4xl mb-4"></i>
           <p>Errore nel caricamento dei film</p>
         </div>
@@ -445,7 +445,7 @@ function renderFilmsCarousel(films) {
 function renderFilmCard(film) {
   const categorie = film.categorie || [];
   const categorieBadges = categorie.slice(0, 3).map(c =>
-    `<span class="inline-block bg-brand-surface-container text-brand-on-surface text-xs px-2 py-0.5 rounded-full">${c.nome}</span>`
+    `<span class="inline-block bg-canvas-elevated text-ink text-xs px-2 py-0.5 rounded-full">${c.nome}</span>`
   ).join('');
 
   let availabilityBadge;
@@ -466,7 +466,7 @@ function renderFilmCard(film) {
     `;
   } else {
     availabilityBadge = `
-      <div class="flex items-center gap-1 text-brand-on-surface-variant text-xs">
+      <div class="flex items-center gap-1 text-body text-xs">
         <i class="fa-solid fa-circle-xmark"></i>
         <span>Non disponibile in questo cinema</span>
       </div>
@@ -474,7 +474,7 @@ function renderFilmCard(film) {
   }
 
   return `
-    <div class="card-elevated overflow-hidden card-hover cursor-pointer group h-full" onclick="goToSchedaFilm(${film.id})">
+    <div class="card-ferrari overflow-hidden card-hover cursor-pointer group h-full" onclick="goToSchedaFilm(${film.id})">
       <div class="aspect-[2/3] bg-slate-700 relative overflow-hidden">
         <img src="${getCoverImage(film.copertinaPath)}"
               alt="${film.titolo}"
@@ -488,11 +488,11 @@ function renderFilmCard(film) {
           ${categorieBadges}
         </div>
         <div class="absolute bottom-3 left-3 right-3">
-          <span class="bg-brand-gold text-black text-xs font-bold px-2 py-1 rounded-full">${film.durata || '-'} min</span>
+          <span class="bg-ferrari-primary text-black text-xs font-bold px-2 py-1 rounded-full">${film.durata || '-'} min</span>
         </div>
       </div>
       <div class="p-4">
-        <h3 class="text-brand-on-surface font-semibold text-lg mb-2 line-clamp-2">${film.titolo}</h3>
+        <h3 class="text-ink font-semibold text-lg mb-2 line-clamp-2">${film.titolo}</h3>
         ${availabilityBadge}
       </div>
     </div>
@@ -592,7 +592,7 @@ function setupCinemaModal() {
         const list = document.getElementById('cinema-list');
         if (list) {
           list.innerHTML = `
-            <div class="text-center py-8 text-brand-on-surface-variant">
+            <div class="text-center py-8 text-body">
               <i class="fa-solid fa-spinner fa-spin text-2xl mb-2"></i>
               <p>Caricamento cinema...</p>
             </div>
@@ -670,7 +670,7 @@ function renderCinemaList(search = '') {
 
   if (!cinemas.length) {
     list.innerHTML = `
-      <div class="text-center py-8 text-brand-on-surface-variant">
+      <div class="text-center py-8 text-body">
         <i class="fa-solid fa-film text-3xl mb-2"></i>
         <p>Nessun cinema trovato</p>
       </div>
@@ -682,23 +682,23 @@ function renderCinemaList(search = '') {
     const isSelected = Number(cinema.id) === Number(selectedCinemaId);
     const distance = cinema.distanzaKm != null ? `${cinema.distanzaKm.toFixed(1)} km` : '';
     const tipologie = (cinema.tipologieSalePresenti || []).slice(0, 4).map(t =>
-      `<span class="inline-block bg-brand-surface-container text-brand-on-surface text-xs px-2 py-0.5 rounded-full">${formatTipoSalaLabel(t)}</span>`
+      `<span class="inline-block bg-canvas-elevated text-ink text-xs px-2 py-0.5 rounded-full">${formatTipoSalaLabel(t)}</span>`
     ).join('');
 
     return `
     <button onclick="selectCinema(${cinema.id})"
-      class="w-full text-left p-4 rounded-xl border transition-colors ${isSelected
-        ? 'border-brand-gold bg-brand-surface-container-high'
-        : 'border-brand-outline-variant/20 hover:border-brand-gold/50 hover:bg-brand-surface-container-low'
+      class="w-full text-left p-4 border transition-colors ${isSelected
+        ? 'border-ferrari-primary bg-canvas-elevated'
+        : 'border-hairline/20 hover:border-ferrari-primary/50 hover:bg-canvas'
       }">
       <div class="flex items-start justify-between gap-3">
         <div class="flex-1 min-w-0">
           <div class="flex items-center gap-2 mb-1">
-            <h3 class="font-semibold text-brand-on-surface truncate">${cinema.nome}</h3>
-            ${isSelected ? '<i class="fa-solid fa-circle-check text-brand-gold"></i>' : ''}
+            <h3 class="font-semibold text-ink truncate">${cinema.nome}</h3>
+            ${isSelected ? '<i class="fa-solid fa-circle-check text-ferrari-primary"></i>' : ''}
           </div>
-          <p class="text-sm text-brand-on-surface-variant">${cinema.citta}${cinema.indirizzo ? ` - ${cinema.indirizzo}` : ''}</p>
-          ${distance ? `<p class="text-xs text-brand-on-surface-variant mt-1"><i class="fa-solid fa-location-dot mr-1"></i>${distance}</p>` : ''}
+          <p class="text-sm text-body">${cinema.citta}${cinema.indirizzo ? ` - ${cinema.indirizzo}` : ''}</p>
+          ${distance ? `<p class="text-xs text-body mt-1"><i class="fa-solid fa-location-dot mr-1"></i>${distance}</p>` : ''}
           ${tipologie ? `<div class="flex flex-wrap gap-1 mt-2">${tipologie}</div>` : ''}
         </div>
       </div>

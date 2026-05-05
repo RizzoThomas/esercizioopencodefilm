@@ -204,7 +204,7 @@ function renderFilm() {
   if (categories) {
     const cats = filmData.categorie || [];
     categories.innerHTML = cats.map(c =>
-      `<span class="inline-block bg-brand-surface-container text-brand-on-surface text-xs px-2 py-0.5 rounded-full">${c.nome}</span>`
+      `<span class="inline-block bg-canvas-elevated text-ink text-xs px-2 py-0.5 rounded-full">${c.nome}</span>`
     ).join('');
   }
 
@@ -443,7 +443,7 @@ function setupCinemaModal() {
         const list = document.getElementById('cinema-list');
         if (list) {
           list.innerHTML = `
-            <div class="text-center py-8 text-brand-on-surface-variant">
+            <div class="text-center py-8 text-body">
               <i class="fa-solid fa-spinner fa-spin text-2xl mb-2"></i>
               <p>Caricamento cinema...</p>
             </div>
@@ -526,7 +526,7 @@ function renderCinemaList(search = '') {
 
   if (!cinemas.length) {
     list.innerHTML = `
-      <div class="text-center py-8 text-brand-on-surface-variant">
+      <div class="text-center py-8 text-body">
         <i class="fa-solid fa-film text-3xl mb-2"></i>
         <p>Nessun cinema trovato</p>
       </div>
@@ -538,23 +538,23 @@ function renderCinemaList(search = '') {
     const isSelected = Number(cinema.id) === Number(selectedCinemaId);
     const distance = cinema.distanzaKm != null ? `${cinema.distanzaKm.toFixed(1)} km` : '';
     const tipologie = (cinema.tipologieSalePresenti || []).slice(0, 4).map(t =>
-      `<span class="inline-block bg-brand-surface-container text-brand-on-surface text-xs px-2 py-0.5 rounded-full">${formatTipoSalaLabel(t)}</span>`
+      `<span class="inline-block bg-canvas-elevated text-ink text-xs px-2 py-0.5 rounded-full">${formatTipoSalaLabel(t)}</span>`
     ).join('');
 
     return `
       <button onclick="selectCinema(${cinema.id})"
-        class="w-full text-left p-4 rounded-xl border transition-colors ${isSelected
-          ? 'border-brand-gold bg-brand-surface-container-high'
-          : 'border-brand-outline-variant/20 hover:border-brand-gold/50 hover:bg-brand-surface-container-low'
+        class="w-full text-left p-4 border transition-colors ${isSelected
+          ? 'border-ferrari-primary bg-canvas-elevated'
+          : 'border-hairline/20 hover:border-ferrari-primary/50 hover:bg-canvas'
         }">
         <div class="flex items-start justify-between gap-3">
           <div class="flex-1 min-w-0">
             <div class="flex items-center gap-2 mb-1">
-              <h3 class="font-semibold text-brand-on-surface truncate">${cinema.nome}</h3>
-              ${isSelected ? '<i class="fa-solid fa-circle-check text-brand-gold"></i>' : ''}
+              <h3 class="font-semibold text-ink truncate">${cinema.nome}</h3>
+              ${isSelected ? '<i class="fa-solid fa-circle-check text-ferrari-primary"></i>' : ''}
             </div>
-            <p class="text-sm text-brand-on-surface-variant">${cinema.citta}${cinema.indirizzo ? ` - ${cinema.indirizzo}` : ''}</p>
-            ${distance ? `<p class="text-xs text-brand-on-surface-variant mt-1"><i class="fa-solid fa-location-dot mr-1"></i>${distance}</p>` : ''}
+            <p class="text-sm text-body">${cinema.citta}${cinema.indirizzo ? ` - ${cinema.indirizzo}` : ''}</p>
+            ${distance ? `<p class="text-xs text-body mt-1"><i class="fa-solid fa-location-dot mr-1"></i>${distance}</p>` : ''}
             ${tipologie ? `<div class="flex flex-wrap gap-1 mt-2">${tipologie}</div>` : ''}
           </div>
         </div>

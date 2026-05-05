@@ -1,5 +1,4 @@
-// Configurazione base
-var API_BASE_URL = window.API_BASE_URL || 'http://localhost:5000';
+// API_BASE_URL declared in api.js — global reference
 
 // Formattazione data ISO -> DD/MM/YYYY
 function formatDate(isoDate) {
@@ -80,7 +79,7 @@ function showToast(message, type = 'success') {
   
   const toastId = 'toast-' + Date.now();
   const toastHtml = `
-    <div id="${toastId}" class="${colors[type]} text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-3 animate-fade-in">
+    <div id="${toastId}" class="${colors[type]} text-white px-6 py-3 shadow-lg flex items-center gap-3 animate-fade-in">
       <span>${message}</span>
       <button onclick="this.parentElement.remove()" class="hover:bg-white/20 rounded p-1">
         <i class="fa-solid fa-xmark"></i>

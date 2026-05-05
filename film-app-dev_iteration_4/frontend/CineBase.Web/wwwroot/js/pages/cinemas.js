@@ -66,7 +66,7 @@ async function loadCinemas() {
     renderPagination(paged.items.length);
   } catch (error) {
     handleApiError(error);
-    tableBody.innerHTML = '<tr><td colspan="5" class="px-6 py-4 text-center text-brand-error">Errore nel caricamento dei cinema</td></tr>';
+    tableBody.innerHTML = '<tr><td colspan="5" class="px-6 py-4 text-center text-ferrari-semantic-warning">Errore nel caricamento dei cinema</td></tr>';
     renderPagination(0);
   }
 }
@@ -76,18 +76,18 @@ function renderCinemas(cinemas) {
   if (!tableBody) return;
 
   if (!cinemas.length) {
-    tableBody.innerHTML = '<tr><td colspan="5" class="px-6 py-4 text-center text-brand-on-surface-variant">Nessun cinema trovato</td></tr>';
+    tableBody.innerHTML = '<tr><td colspan="5" class="px-6 py-4 text-center text-body">Nessun cinema trovato</td></tr>';
     return;
   }
 
   tableBody.innerHTML = cinemas.map(cinema => `
     <tr class="row-hover">
-      <td class="px-6 py-4 whitespace-nowrap text-sm text-brand-on-surface-variant">${cinema.id}</td>
-      <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-brand-on-surface">${cinema.nome}</td>
-      <td class="px-6 py-4 whitespace-nowrap text-sm text-brand-on-surface-variant">${cinema.indirizzo || '-'}</td>
-      <td class="px-6 py-4 whitespace-nowrap text-sm text-brand-on-surface-variant">${cinema.citta || '-'}</td>
+      <td class="px-6 py-4 whitespace-nowrap text-sm text-body">${cinema.id}</td>
+      <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-ink">${cinema.nome}</td>
+      <td class="px-6 py-4 whitespace-nowrap text-sm text-body">${cinema.indirizzo || '-'}</td>
+      <td class="px-6 py-4 whitespace-nowrap text-sm text-body">${cinema.citta || '-'}</td>
       <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-        <button onclick="editCinema(${cinema.id})" class="text-brand-gold hover:text-brand-gold-dark mr-3">
+        <button onclick="editCinema(${cinema.id})" class="text-ferrari-primary hover:text-ferrari-primary-hover mr-3">
           <i class="fa-solid fa-pencil"></i>
         </button>
         <button onclick="deleteCinema(${cinema.id}, '${escapeHtml(cinema.nome || '')}')" class="text-red-600 hover:text-red-900">

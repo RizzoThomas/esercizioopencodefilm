@@ -81,24 +81,24 @@ function renderCinemaList() {
 
   grid.innerHTML = allCinemas.map(cinema => {
     const tipologie = (cinema.tipologieSalePresenti || []).map(t =>
-      `<span class="inline-block bg-brand-surface-container text-brand-on-surface text-xs px-2 py-0.5 rounded-full">${formatTipoSalaLabel(t)}</span>`
+      `<span class="inline-block bg-canvas-elevated text-ink text-xs px-2 py-0.5 rounded-full">${formatTipoSalaLabel(t)}</span>`
     ).join('');
 
     const distance = cinema.distanzaKm != null ? `${cinema.distanzaKm.toFixed(1)} km` : '';
 
     return `
-      <div class="card-elevated p-5 card-hover cursor-pointer group" onclick="goToCinemaDetail(${cinema.id})">
+      <div class="card-ferrari p-5 card-hover cursor-pointer group" onclick="goToCinemaDetail(${cinema.id})">
         <div class="flex items-start gap-3 mb-3">
-          <i class="fa-solid fa-film text-brand-gold text-xl mt-1"></i>
+          <i class="fa-solid fa-film text-ferrari-primary text-xl mt-1"></i>
           <div class="flex-1 min-w-0">
-            <h3 class="font-semibold text-lg text-brand-on-surface group-hover:text-brand-gold transition-colors truncate">${cinema.nome}</h3>
-            <p class="text-sm text-brand-on-surface-variant">
+            <h3 class="font-semibold text-lg text-ink group-hover:text-ferrari-primary transition-colors truncate">${cinema.nome}</h3>
+            <p class="text-sm text-body">
               <i class="fa-solid fa-location-dot mr-1"></i>${cinema.citta}${cinema.indirizzo ? ` - ${cinema.indirizzo}` : ''}
             </p>
-            ${distance ? `<p class="text-xs text-brand-on-surface-variant mt-1"><i class="fa-solid fa-location-crosshairs mr-1"></i>${distance}</p>` : ''}
+            ${distance ? `<p class="text-xs text-body mt-1"><i class="fa-solid fa-location-crosshairs mr-1"></i>${distance}</p>` : ''}
           </div>
         </div>
-        ${tipologie ? `<div class="flex flex-wrap gap-1 mt-3 pt-3 border-t border-brand-outline-variant/20">${tipologie}</div>` : ''}
+        ${tipologie ? `<div class="flex flex-wrap gap-1 mt-3 pt-3 border-t border-hairline/20">${tipologie}</div>` : ''}
       </div>
     `;
   }).join('');
@@ -157,7 +157,7 @@ function renderCinemaDetail() {
 
   const cinemaFromList = allCinemas.find(c => Number(c.id) === Number(cinema.id));
   const tipologie = (cinemaFromList?.tipologieSalePresenti || []).map(t =>
-    `<span class="inline-block bg-brand-surface-container text-brand-on-surface text-xs px-2 py-0.5 rounded-full">${t}</span>`
+    `<span class="inline-block bg-canvas-elevated text-ink text-xs px-2 py-0.5 rounded-full">${t}</span>`
   ).join('');
 
   const tipologieEl = document.getElementById('cinema-tipologie');
@@ -263,8 +263,8 @@ function renderSchedule() {
       <div class="film-schedule-card">
         <img src="${cover}" alt="${film.titolo}" class="film-schedule-cover" loading="lazy" decoding="async" fetchpriority="low" referrerpolicy="no-referrer">
         <div class="flex-1 min-w-0">
-          <h3 class="font-semibold text-lg text-brand-on-surface mb-1">${film.titolo}</h3>
-          ${descrizione ? `<p class="text-sm text-brand-on-surface-variant line-clamp-2 mb-3">${descrizione}</p>` : ''}
+          <h3 class="font-semibold text-lg text-ink mb-1">${film.titolo}</h3>
+          ${descrizione ? `<p class="text-sm text-body line-clamp-2 mb-3">${descrizione}</p>` : ''}
           ${showsHtml}
         </div>
       </div>

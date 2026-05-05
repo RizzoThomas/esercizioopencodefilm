@@ -71,15 +71,18 @@ function switchTab(tabName) {
 async function loadMovements() {
   const container = document.getElementById('movimenti-list');
   try {
-    const data = await apiFetch(`/credito/utente/${userId}`);
-    movementsData = normalizeCollection(data?.movimenti) || normalizeCollection(data) || [];
+    // Try admin endpoint first, fallback to credito/me
+    const email = userData?.email || '';
+    const data = await API.getUtenteMovimenti(email);
+    movementsData = normalizeCollection(data) || [];
     if (!movementsData.length) {
       container.innerHTML = '<p class="text-body text-center py-4">Nessun movimento credito</p>';
       return;
     }
     container.innerHTML = movementsData.map(m => {
-      const date = new Date(m.createdAtUtc);
-      const isPositive = m.tipo === 'TopUp' || m.tipo === 'Refund';
+      const date = new Date(m.createdAtUtc || m.data);
+      const importo = m.importo || m.amount || 0;
+      const isPositive = importo > 0 || (m.tipo === 'TopUp' || m.tipo === 'Refund');
       const color = isPositive ? 'text-emerald-500' : 'text-red-400';
       const sign = isPositive ? '+' : '';
       let label, detail;
@@ -87,38 +90,40 @@ async function loadMovements() {
         case 'TopUp': label = 'Ricarica credito'; detail = m.note || `Transazione ${m.id}`; break;
         case 'DebitOrder': label = 'Acquisto biglietti'; detail = m.filmTitolo || m.codiceOrdine || `Ordine ${m.ordineId}`; break;
         case 'Refund': label = 'Rimborso'; detail = m.filmTitolo || m.note || ''; break;
-        default: label = m.tipo || 'Movimento'; detail = m.note || '';
+        default: label = m.tipo || m.descrizione || 'Movimento'; detail = m.note || m.descrizione || '';
       }
-      return `<div class="flex items-start justify-between p-3 border border-hairline"><div><span class="text-ink font-medium text-sm">${label}</span>${detail ? `<p class="text-xs text-body">${detail}</p>` : ''}<p class="text-xs text-body mt-0.5">${date.toLocaleDateString('it-IT', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' })}</p></div><span class="${color} font-semibold text-sm whitespace-nowrap">${sign}${formatCurrency(Math.abs(m.importo))}</span></div>`;
+      const importoDisplay = importo ? `${sign}${formatCurrency(Math.abs(importo))}` : '';
+      return `<div class="flex items-start justify-between p-3 border border-hairline"><div><span class="text-ink font-medium text-sm">${label}</span>${detail ? `<p class="text-xs text-body">${detail}</p>` : ''}<p class="text-xs text-body mt-0.5">${date.toLocaleDateString('it-IT', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' })}</p></div>${importoDisplay ? `<span class="${color} font-semibold text-sm whitespace-nowrap">${importoDisplay}</span>` : ''}</div>`;
     }).join('');
   } catch {
-    container.innerHTML = '<p class="text-body text-center py-4">Nessun movimento o endpoint non disponibile</p>';
+    container.innerHTML = '<p class="text-body text-center py-4">Nessun movimento credito trovato</p>';
   }
 }
 
 async function loadBiglietti() {
   const container = document.getElementById('biglietti-list');
   try {
-    const data = await apiFetch(`/admin/utenti/${userId}/biglietti`);
+    const data = await API.getUtenteBiglietti(userId);
     bigliettiData = normalizeCollection(data) || [];
     if (!bigliettiData.length) {
       container.innerHTML = '<p class="text-body text-center py-4">Nessun biglietto</p>';
       return;
     }
     container.innerHTML = bigliettiData.slice(0, 20).map(b => {
-      const date = new Date(b.startAtUtc);
+      const date = new Date(b.startAtUtc || b.createdAtUtc);
       const statoClass = {Issued:'text-emerald-500',Validated:'text-blue-500',Cancelled:'text-red-400'}[b.stato] || 'text-body';
-      return `<div class="flex items-center justify-between p-3 border border-hairline"><div><p class="text-ink text-sm font-medium">${b.filmTitolo || '-'}</p><p class="text-xs text-body">${b.cinemaNome || ''} - ${b.salaNome || ''} | ${date.toLocaleDateString('it-IT',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}</p><p class="text-xs text-body">${b.settore || ''} Fila ${b.fila || '-'} Posto ${b.numero || '-'} | <span class="${statoClass}">${b.stato || '-'}</span></p></div><span class="text-ferrari-primary font-semibold text-sm">${formatCurrency(b.prezzoTotale)}</span></div>`;
+      const prezzo = b.prezzoTotale || b.prezzo || 0;
+      return `<div class="flex items-center justify-between p-3 border border-hairline"><div><p class="text-ink text-sm font-medium">${b.filmTitolo || '-'}</p><p class="text-xs text-body">${b.cinemaNome || ''} - ${b.salaNome || ''} | ${date.toLocaleDateString('it-IT',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}</p><p class="text-xs text-body">${b.settore || ''} Fila ${b.fila || '-'} Posto ${b.numero || '-'} | <span class="${statoClass}">${b.stato || '-'}</span></p></div><span class="text-ferrari-primary font-semibold text-sm">${formatCurrency(prezzo)}</span></div>`;
     }).join('');
   } catch {
-    container.innerHTML = '<p class="text-body text-center py-4">Endpoint biglietti non disponibile</p>';
+    container.innerHTML = '<p class="text-body text-center py-4">Nessun biglietto trovato</p>';
   }
 }
 
 async function loadOrdini() {
   const container = document.getElementById('ordini-list');
   try {
-    const data = await apiFetch(`/admin/utenti/${userId}/ordini`);
+    const data = await API.getUtenteOrdini(userId);
     ordiniData = normalizeCollection(data) || [];
     if (!ordiniData.length) {
       container.innerHTML = '<p class="text-body text-center py-4">Nessun ordine</p>';
@@ -126,10 +131,11 @@ async function loadOrdini() {
     }
     container.innerHTML = ordiniData.slice(0, 20).map(o => {
       const date = new Date(o.startAtUtc || o.createdAtUtc);
-      return `<div class="flex items-center justify-between p-3 border border-hairline"><div><p class="text-ink text-sm font-medium">${o.filmTitolo || '-'}</p><p class="text-xs text-body">${o.cinemaNome || ''} - ${o.salaNome || ''} | ${date.toLocaleDateString('it-IT',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}</p><p class="text-xs text-body">${o.numeroBiglietti || 0} biglietti | <span class="${o.stato==='Paid'?'text-emerald-500':'text-amber-500'}">${o.stato || '-'}</span> | Cod: ${o.codiceOrdine || '-'}</p></div><span class="text-ferrari-primary font-semibold text-sm">${formatCurrency(o.totaleLordo)}</span></div>`;
+      const totale = o.totaleLordo || o.importoTotale || 0;
+      return `<div class="flex items-center justify-between p-3 border border-hairline"><div><p class="text-ink text-sm font-medium">${o.filmTitolo || '-'}</p><p class="text-xs text-body">${o.cinemaNome || ''} - ${o.salaNome || ''} | ${date.toLocaleDateString('it-IT',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}</p><p class="text-xs text-body">${o.numeroBiglietti || 0} biglietti | <span class="${o.stato==='Paid'?'text-emerald-500':'text-amber-500'}">${o.stato || '-'}</span> | Cod: ${o.codiceOrdine || '-'}</p></div><span class="text-ferrari-primary font-semibold text-sm">${formatCurrency(totale)}</span></div>`;
     }).join('');
   } catch {
-    container.innerHTML = '<p class="text-body text-center py-4">Endpoint ordini non disponibile</p>';
+    container.innerHTML = '<p class="text-body text-center py-4">Nessun ordine trovato</p>';
   }
 }
 

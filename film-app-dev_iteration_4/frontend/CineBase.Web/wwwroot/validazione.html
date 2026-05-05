@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="it-IT">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CineBase — Validazione Biglietti</title>
+
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script src="/js/tailwind-config.js"></script>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="/css/styles.css?v=3" rel="stylesheet">
+  <script src="/js/route-guard.js"></script>
+
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+</head>
+
+<body class="bg-canvas text-ink font-sans">
+  <main>
+    <div class="flex items-center justify-between gap-4 mb-6">
+      <p class="text-sm text-body">Scansiona QR code / barcode con la fotocamera o inserisci il codice manualmente</p>
+      <span id="scan-status" class="flex items-center gap-2 text-xs text-body flex-shrink-0">
+        <span class="w-2 h-2 rounded-full bg-ferrari-muted inline-block"></span>
+        Fotocamera inattiva
+      </span>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+      <div class="card-ferrari overflow-hidden">
+        <div class="p-6 border-b border-hairline flex items-center justify-between">
+          <h2 class="ferrari-title-md text-ink flex items-center gap-2">
+            <i class="fa-solid fa-camera text-ferrari-primary"></i>Scansione Fotocamera
+          </h2>
+          <div class="flex items-center gap-2">
+            <select id="camera-select" class="input-ferrari text-xs py-1.5 px-2 h-auto hidden"><option value="">Auto</option></select>
+            <button id="start-scan-btn" class="btn-primary text-xs py-2 px-4 h-auto"><i class="fa-solid fa-play mr-1"></i>Avvia</button>
+            <button id="stop-scan-btn" class="btn-outline text-xs py-2 px-4 h-auto hidden"><i class="fa-solid fa-stop mr-1"></i>Ferma</button>
+          </div>
+        </div>
+        <div class="relative" style="min-height:320px">
+          <div id="reader" class="w-full" style="min-height:320px"></div>
+          <div id="scan-overlay" class="absolute inset-0 flex items-center justify-center bg-canvas/80 hidden">
+            <div class="text-center">
+              <i class="fa-solid fa-qrcode text-5xl text-ferrari-primary mb-4 block"></i>
+              <p class="text-body">Inquadra un QR code o barcode</p>
+              <p class="text-muted text-sm mt-1">La scansione avviene automaticamente</p>
+            </div>
+          </div>
+          <div id="no-camera-msg" class="flex items-center justify-center p-12 text-center hidden">
+            <div>
+              <i class="fa-solid fa-camera-slash text-4xl text-muted mb-3 block"></i>
+              <p class="text-body">Fotocamera non disponibile</p>
+              <p class="text-muted text-sm mt-1">Usa l inserimento manuale del codice</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="space-y-6">
+        <div class="card-ferrari p-6">
+          <h2 class="ferrari-title-md text-ink flex items-center gap-2 mb-4">
+            <i class="fa-solid fa-keyboard text-ferrari-primary"></i>Inserimento Manuale
+          </h2>
+          <form id="manual-form" class="space-y-4">
+            <div>
+              <label for="codice-input" class="block text-sm font-medium text-ink mb-1">Codice Biglietto</label>
+              <div class="flex gap-2">
+                <input type="text" id="codice-input" class="input-ferrari flex-1 font-mono tracking-wider text-lg text-center" placeholder="es. CB-20260505-ABCDEF12" autocomplete="off" autofocus>
+                <button type="submit" id="validate-btn" class="btn-primary whitespace-nowrap"><i class="fa-solid fa-check mr-1"></i>Valida</button>
+              </div>
+            </div>
+            <p class="text-muted text-xs"><i class="fa-solid fa-info-circle mr-1"></i>Inserisci il codice alfanumerico del biglietto e premi Invio</p>
+          </form>
+        </div>
+
+        <div id="result-card" class="card-ferrari p-6 hidden">
+          <h2 class="ferrari-title-md text-ink flex items-center gap-2 mb-4">
+            <i class="fa-solid fa-clipboard-check text-ferrari-primary"></i>Risultato Validazione
+          </h2>
+          <div id="result-content"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-ferrari overflow-hidden">
+      <div class="p-6 border-b border-hairline flex items-center justify-between">
+        <h2 class="ferrari-title-md text-ink flex items-center gap-2">
+          <i class="fa-solid fa-clock-rotate-left text-ferrari-primary"></i>Ultime Validazioni
+        </h2>
+        <button id="clear-history-btn" class="btn-tertiary text-xs"><i class="fa-solid fa-trash mr-1"></i>Cancella cronologia</button>
+      </div>
+      <div id="history-list" class="divide-y divide-hairline">
+        <div class="px-6 py-8 text-center text-body">
+          <i class="fa-solid fa-ticket-simple text-3xl mb-2 block opacity-30"></i>
+          <p>Nessuna validazione recente</p>
+          <p class="text-xs text-muted mt-1">I biglietti validati appariranno qui</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div id="toast-container" class="fixed bottom-4 right-4 z-50"></div>
+
+  <script src="/js/utils.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/admin-shell.js"></script>
+  <script src="/js/pages/validazione.js"></script>
+</body>
+
+</html>

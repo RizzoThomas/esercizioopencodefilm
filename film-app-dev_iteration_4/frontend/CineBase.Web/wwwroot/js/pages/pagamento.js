@@ -95,28 +95,28 @@ function renderOrderSummary() {
 
   container.innerHTML = `
     <div class="flex justify-between text-sm">
-      <span class="text-brand-on-surface-variant">Film</span>
-      <span class="font-medium text-brand-on-surface">${ordine.filmTitolo}</span>
+      <span class="text-body">Film</span>
+      <span class="font-medium text-ink">${ordine.filmTitolo}</span>
     </div>
     <div class="flex justify-between text-sm">
-      <span class="text-brand-on-surface-variant">Cinema</span>
-      <span class="font-medium text-brand-on-surface">${ordine.cinemaNome}</span>
+      <span class="text-body">Cinema</span>
+      <span class="font-medium text-ink">${ordine.cinemaNome}</span>
     </div>
     <div class="flex justify-between text-sm">
-      <span class="text-brand-on-surface-variant">Sala</span>
-      <span class="font-medium text-brand-on-surface">${ordine.salaNome}</span>
+      <span class="text-body">Sala</span>
+      <span class="font-medium text-ink">${ordine.salaNome}</span>
     </div>
     <div class="flex justify-between text-sm">
-      <span class="text-brand-on-surface-variant">Data e ora</span>
-      <span class="font-medium text-brand-on-surface">${dateStr}</span>
+      <span class="text-body">Data e ora</span>
+      <span class="font-medium text-ink">${dateStr}</span>
     </div>
     <div class="flex justify-between text-sm">
-      <span class="text-brand-on-surface-variant">Numero biglietti</span>
-      <span class="font-medium text-brand-on-surface">${ordine.numeroBiglietti}</span>
+      <span class="text-body">Numero biglietti</span>
+      <span class="font-medium text-ink">${ordine.numeroBiglietti}</span>
     </div>
     <div class="flex justify-between text-sm">
-      <span class="text-brand-on-surface-variant">Codice ordine</span>
-      <span class="font-mono text-brand-on-surface">${ordine.codiceOrdine}</span>
+      <span class="text-body">Codice ordine</span>
+      <span class="font-mono text-ink">${ordine.codiceOrdine}</span>
     </div>
   `;
 

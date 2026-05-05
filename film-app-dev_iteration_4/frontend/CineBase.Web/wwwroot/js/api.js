@@ -362,6 +362,15 @@ deleteFilm: (id) => apiFetch(`/films/${id}`, { method: 'DELETE' }),
     method: 'PUT',
     body: JSON.stringify(data)
   }),
+  // Admin: biglietti di un utente specifico
+  getUtenteBiglietti: (userId) => apiFetch(`/admin/utenti/${userId}/biglietti`),
+
+  // Admin: ordini di un utente specifico
+  getUtenteOrdini: (userId) => apiFetch(`/admin/utenti/${userId}/ordini`),
+
+  // Admin: movimenti credito (via email)
+  getUtenteMovimenti: (email) => apiFetch(`/admin/credito/ricariche?email=${encodeURIComponent(email || '')}`),
+
   updateCredito: (id, data) => apiFetch(`/admin/utenti/${id}/credito`, {
     method: 'PUT',
     body: JSON.stringify(data)
