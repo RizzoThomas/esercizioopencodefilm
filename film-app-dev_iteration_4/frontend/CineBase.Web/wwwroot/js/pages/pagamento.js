@@ -250,6 +250,13 @@ async function handlePayment() {
   btnPay.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>Elaborazione pagamento...';
 
   try {
+    // Refresh order state — prevent paying an already-paid order
+    try { ordine = await API.getOrdine(orderId); } catch {}
+    if (ordine?.stato === 'Paid') {
+      window.location.href = `/esito-acquisto.html?orderId=${orderId}&success=true`;
+      return;
+    }
+
     const method = document.querySelector('input[name="payment-method"]:checked')?.value || 'carta';
     let importoCreditoRichiesto = null;
 
