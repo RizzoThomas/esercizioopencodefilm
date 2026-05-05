@@ -307,16 +307,16 @@ async function handlePayment() {
       btnPay.innerHTML = '<i class="fa-solid fa-lock mr-2"></i><span id="pay-button-text">Riprova pagamento</span>';
     }
   } catch (error) {
-    handleApiError(error);
     // On payment failure (especially 409 Conflict), the order state
     // might be corrupted. Redirect to order detail so user can cancel.
     if (error?.status === 409) {
-      showToast('Ordine non più pagabile. Verrai reindirizzato ai dettagli.', 'warning');
+      showToast('Questo ordine non &egrave; pi&ugrave; pagabile. Controlla i dettagli.', 'warning');
       setTimeout(() => {
         window.location.href = `/esito-acquisto.html?orderId=${orderId}`;
-      }, 2000);
+      }, 2500);
       return;
     }
+    handleApiError(error);
     btnPay.disabled = false;
     btnPay.innerHTML = '<i class="fa-solid fa-lock mr-2"></i><span id="pay-button-text">Riprova pagamento</span>';
     updatePayButtonText();
