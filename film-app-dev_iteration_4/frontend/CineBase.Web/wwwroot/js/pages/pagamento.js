@@ -329,8 +329,7 @@ async function handlePayment() {
       btnPay.innerHTML = '<i class="fa-solid fa-lock mr-2"></i><span id="pay-button-text">Riprova pagamento</span>';
     }
   } catch (error) {
-    // On payment failure (especially 409 Conflict), the order state
-    // might be corrupted. Redirect to order detail so user can cancel.
+    // 409: order not in payable state
     if (error?.status === 409) {
       showToast('Questo ordine non &egrave; pi&ugrave; pagabile. Controlla i dettagli.', 'warning');
       setTimeout(() => {
@@ -338,11 +337,32 @@ async function handlePayment() {
       }, 2500);
       return;
     }
+
+    // Network/server error: payment might have succeeded on backend
+    // (MySQL connection errors can cause this). Poll order status.
+    btnPay.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>Verifica pagamento...';
+    const paid = await pollOrderPaid(orderId, 4, 1500);
+    if (paid) {
+      window.location.href = `/esito-acquisto.html?orderId=${orderId}&success=true`;
+      return;
+    }
+
     handleApiError(error);
     btnPay.disabled = false;
     btnPay.innerHTML = '<i class="fa-solid fa-lock mr-2"></i><span id="pay-button-text">Riprova pagamento</span>';
     updatePayButtonText();
   }
+}
+
+async function pollOrderPaid(orderId, attempts, delayMs) {
+  for (let i = 0; i < attempts; i++) {
+    await new Promise(r => setTimeout(r, delayMs));
+    try {
+      const ordine = await API.getOrdine(orderId);
+      if (ordine?.stato === 'Paid') return true;
+    } catch { /* keep polling */ }
+  }
+  return false;
 }
 
 function getStripePublishableKey() {
