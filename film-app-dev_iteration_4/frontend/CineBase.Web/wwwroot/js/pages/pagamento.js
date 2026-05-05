@@ -52,6 +52,21 @@ document.addEventListener('DOMContentLoaded', async () => {
   renderOrderSummary();
   setupPaymentOptions();
   setupActions();
+
+  // Detect back-button return from Stripe: cancel abandoned checkout
+  window.addEventListener('pageshow', async (e) => {
+    if (e.persisted) {
+      // Page restored from bfcache (user clicked back from Stripe)
+      try { ordine = await API.getOrdine(orderId); } catch {}
+      if (ordine?.stato === 'CheckoutInProgress' || ordine?.stato === 'Pending') {
+        try { await API.cancelOrdine(orderId); } catch {}
+        showToast('Pagamento non completato. Ordine annullato.', 'warning');
+        setTimeout(() => {
+          window.location.href = `/acquista.html?showId=${ordine?.showId || ''}`;
+        }, 1500);
+      }
+    }
+  });
 });
 
 async function loadFrontendConfig() {
