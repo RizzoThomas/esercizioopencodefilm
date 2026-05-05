@@ -298,7 +298,7 @@ input[type='password']::-webkit-textfield-decoration-container {
 
 .hero-cinema-content {
   position: absolute; bottom: 0; left: 0; right: 0; z-index: 2;
-  padding: 56px 48px 40px 48px;
+  padding: 56px 48px 0 48px;
 }
 
 .hero-cinema-title {
