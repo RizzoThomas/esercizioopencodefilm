@@ -15,66 +15,65 @@ public static class SocialAuthEndpoints
         // ─── Google ──────────────────────────────────────────────────
         app.MapGet("/auth/login-google", (string? redirect) =>
         {
-            var props = new AuthenticationProperties
-            {
-                RedirectUri = $"/auth/signin-google?redirect={Uri.EscapeDataString(redirect ?? "/index.html")}"
-            };
+            var props = new AuthenticationProperties();
+            props.Items["redirect"] = redirect ?? "/index.html";
             return Results.Challenge(props, ["Google"]);
         }).AllowAnonymous();
 
         // ─── Facebook ────────────────────────────────────────────────
         app.MapGet("/auth/login-facebook", (string? redirect) =>
         {
-            var props = new AuthenticationProperties
-            {
-                RedirectUri = $"/auth/signin-facebook?redirect={Uri.EscapeDataString(redirect ?? "/index.html")}"
-            };
+            var props = new AuthenticationProperties();
+            props.Items["redirect"] = redirect ?? "/index.html";
             return Results.Challenge(props, ["Facebook"]);
         }).AllowAnonymous();
 
         // ─── Microsoft ───────────────────────────────────────────────
         app.MapGet("/auth/login-microsoft", (string? redirect) =>
         {
-            var props = new AuthenticationProperties
-            {
-                RedirectUri = $"/auth/signin-microsoft?redirect={Uri.EscapeDataString(redirect ?? "/index.html")}"
-            };
+            Console.WriteLine($"[AUTH] Microsoft login requested, redirect={redirect}");
+            var props = new AuthenticationProperties();
+            props.Items["redirect"] = redirect ?? "/index.html";
             return Results.Challenge(props, ["Microsoft"]);
-        }).AllowAnonymous();
-
-        // ─── Callback unificato ──────────────────────────────────────
-        app.MapGet("/auth/signin-{provider}", async (string provider, string? redirect, HttpContext context) =>
-        {
-            return await HandleSocialCallback(context, provider, redirect);
         }).AllowAnonymous();
     }
 
-    private static async Task<IResult> HandleSocialCallback(HttpContext context, string provider, string? redirect)
+    /// <summary>
+    /// Processa il ticket OAuth ricevuto da OnTicketReceived.
+    /// Crea/trova l'utente, genera JWT e reindirizza al frontend.
+    /// </summary>
+    public static async Task ProcessOAuthTicket(
+        HttpContext httpContext,
+        ClaimsPrincipal principal,
+        AuthenticationProperties properties,
+        string provider,
+        string frontendBaseUrl)
     {
-        // Normalizza: URL route dà "google", ma lo schema registrato è "Google"
-        var scheme = provider.Length > 0
-            ? char.ToUpper(provider[0]) + provider[1..]
-            : provider;
-        var result = await context.AuthenticateAsync(scheme);
-        if (!result.Succeeded || result.Principal == null)
-        {
-            var frontendUrl = Environment.GetEnvironmentVariable("FRONTEND_URL") ?? "http://localhost:5001";
-            return Results.Redirect($"{frontendUrl}/login.html?error=social_failed");
-        }
+        Console.WriteLine($"[AUTH] OnTicketReceived: provider={provider}");
 
-        var email = result.Principal.FindFirstValue(ClaimTypes.Email);
-        var name = result.Principal.FindFirstValue(ClaimTypes.Name)
-                ?? result.Principal.FindFirstValue(ClaimTypes.GivenName);
-        var surname = result.Principal.FindFirstValue(ClaimTypes.Surname) ?? "";
+        var email = principal.FindFirstValue(ClaimTypes.Email);
+        var name = principal.FindFirstValue(ClaimTypes.Name)
+                ?? principal.FindFirstValue(ClaimTypes.GivenName);
+        var surname = principal.FindFirstValue(ClaimTypes.Surname) ?? "";
+
+        Console.WriteLine($"[AUTH] Claims: email={email}, name={name}, surname={surname}");
 
         if (string.IsNullOrEmpty(email))
         {
-            var frontendUrl = Environment.GetEnvironmentVariable("FRONTEND_URL") ?? "http://localhost:5001";
-            return Results.Redirect($"{frontendUrl}/login.html?error=no_email");
+            httpContext.Response.Redirect($"{frontendBaseUrl}/login.html?error=no_email");
+            return;
         }
 
-        var db = context.RequestServices.GetRequiredService<FilmDbContext>();
-        var authService = context.RequestServices.GetRequiredService<IAuthService>();
+        // Microsoft: accetta solo email del dominio scolastico @issgreppi.it
+        if (provider.Equals("Microsoft", StringComparison.OrdinalIgnoreCase) &&
+            !email.EndsWith("@issgreppi.it", StringComparison.OrdinalIgnoreCase))
+        {
+            httpContext.Response.Redirect($"{frontendBaseUrl}/login.html?error=domain_not_allowed");
+            return;
+        }
+
+        var db = httpContext.RequestServices.GetRequiredService<FilmDbContext>();
+        var authService = httpContext.RequestServices.GetRequiredService<IAuthService>();
 
         var user = await db.Users.FirstOrDefaultAsync(u => u.Email == email);
         if (user == null)
@@ -93,13 +92,13 @@ public static class SocialAuthEndpoints
         }
 
         var authResponse = await authService.SocialLoginAsync(user);
+        Console.WriteLine($"[AUTH] JWT generated for user {user.Email}, redirecting to frontend");
 
-        var frontendRedirect = Environment.GetEnvironmentVariable("FRONTEND_URL") ?? "http://localhost:5001";
-        var target = redirect ?? "/index.html";
-        var url = $"{frontendRedirect}/login.html?token={Uri.EscapeDataString(authResponse.AccessToken)}" +
+        var redirect = properties.Items.TryGetValue("redirect", out var r) ? (r ?? "/index.html") : "/index.html";
+        var url = $"{frontendBaseUrl}/login.html?token={Uri.EscapeDataString(authResponse.AccessToken)}" +
                   $"&refresh={Uri.EscapeDataString(authResponse.RefreshToken)}" +
-                  $"&redirect={Uri.EscapeDataString(target)}";
+                  $"&redirect={Uri.EscapeDataString(redirect)}";
 
-        return Results.Redirect(url);
+        httpContext.Response.Redirect(url);
     }
 }

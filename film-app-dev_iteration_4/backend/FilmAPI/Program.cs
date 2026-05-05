@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using System.Security.Claims;
 using FilmAPI.Data;
 using FilmAPI.Endpoints;
 using FilmAPI.Services;
@@ -124,14 +125,6 @@ builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultSignInScheme = "External";
-})
-.AddCookie("External", options =>
-{
-    options.Cookie.Name = "CineBase.External";
-    options.Cookie.HttpOnly = true;
-    options.Cookie.SameSite = SameSiteMode.Lax;
-    options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
 })
 .AddJwtBearer(options =>
 {
@@ -175,6 +168,12 @@ if (!string.IsNullOrEmpty(googleClientId))
         options.ClientId = googleClientId;
         options.ClientSecret = googleClientSecret ?? "";
         options.SaveTokens = true;
+        options.Events.OnTicketReceived = async context =>
+        {
+            await SocialAuthEndpoints.ProcessOAuthTicket(
+                context.HttpContext, context.Principal!, context.Properties!, "Google", frontendBaseUrl);
+            context.HandleResponse();
+        };
         options.Events.OnRemoteFailure = context =>
         {
             context.Response.Redirect($"{frontendBaseUrl}/login.html?error=access_denied");
@@ -191,6 +190,12 @@ if (!string.IsNullOrEmpty(fbAppId))
         options.AppId = fbAppId;
         options.AppSecret = fbAppSecret ?? "";
         options.SaveTokens = true;
+        options.Events.OnTicketReceived = async context =>
+        {
+            await SocialAuthEndpoints.ProcessOAuthTicket(
+                context.HttpContext, context.Principal!, context.Properties!, "Facebook", frontendBaseUrl);
+            context.HandleResponse();
+        };
         options.Events.OnRemoteFailure = context =>
         {
             context.Response.Redirect($"{frontendBaseUrl}/login.html?error=access_denied");
@@ -201,14 +206,25 @@ if (!string.IsNullOrEmpty(fbAppId))
 
 var msClientId = Environment.GetEnvironmentVariable("MICROSOFT_CLIENT_ID");
 var msClientSecret = Environment.GetEnvironmentVariable("MICROSOFT_CLIENT_SECRET");
+var msTenantId = Environment.GetEnvironmentVariable("MICROSOFT_TENANT_ID") ?? "organizations";
 if (!string.IsNullOrEmpty(msClientId))
     builder.Services.AddAuthentication().AddMicrosoftAccount(options =>
     {
         options.ClientId = msClientId;
         options.ClientSecret = msClientSecret ?? "";
         options.SaveTokens = true;
+        // Usa tenant specifico per la scuola (single-tenant app in Azure AD)
+        options.AuthorizationEndpoint = $"https://login.microsoftonline.com/{msTenantId}/oauth2/v2.0/authorize";
+        options.TokenEndpoint = $"https://login.microsoftonline.com/{msTenantId}/oauth2/v2.0/token";
+        options.Events.OnTicketReceived = async context =>
+        {
+            await SocialAuthEndpoints.ProcessOAuthTicket(
+                context.HttpContext, context.Principal!, context.Properties!, "Microsoft", frontendBaseUrl);
+            context.HandleResponse();
+        };
         options.Events.OnRemoteFailure = context =>
         {
+            Console.WriteLine($"[AUTH] Microsoft OnRemoteFailure: {context.Failure?.Message}");
             context.Response.Redirect($"{frontendBaseUrl}/login.html?error=access_denied");
             context.HandleResponse();
             return Task.CompletedTask;
