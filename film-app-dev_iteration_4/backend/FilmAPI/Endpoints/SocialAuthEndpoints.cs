@@ -51,7 +51,11 @@ public static class SocialAuthEndpoints
 
     private static async Task<IResult> HandleSocialCallback(HttpContext context, string provider, string? redirect)
     {
-        var result = await context.AuthenticateAsync(provider);
+        // Normalizza: URL route dà "google", ma lo schema registrato è "Google"
+        var scheme = provider.Length > 0
+            ? char.ToUpper(provider[0]) + provider[1..]
+            : provider;
+        var result = await context.AuthenticateAsync(scheme);
         if (!result.Succeeded || result.Principal == null)
         {
             var frontendUrl = Environment.GetEnvironmentVariable("FRONTEND_URL") ?? "http://localhost:5001";

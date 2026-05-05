@@ -124,6 +124,14 @@ builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultSignInScheme = "External";
+})
+.AddCookie("External", options =>
+{
+    options.Cookie.Name = "CineBase.External";
+    options.Cookie.HttpOnly = true;
+    options.Cookie.SameSite = SameSiteMode.Lax;
+    options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
 })
 .AddJwtBearer(options =>
 {
@@ -157,6 +165,8 @@ builder.Services.AddAuthentication(options =>
 });
 
 // ─── OAuth Social Login ──────────────────────────────────────────────
+var frontendBaseUrl = Environment.GetEnvironmentVariable("FRONTEND_BASE_URL") ?? "http://localhost:5001";
+
 var googleClientId = Environment.GetEnvironmentVariable("GOOGLE_CLIENT_ID");
 var googleClientSecret = Environment.GetEnvironmentVariable("GOOGLE_CLIENT_SECRET");
 if (!string.IsNullOrEmpty(googleClientId))
@@ -165,6 +175,12 @@ if (!string.IsNullOrEmpty(googleClientId))
         options.ClientId = googleClientId;
         options.ClientSecret = googleClientSecret ?? "";
         options.SaveTokens = true;
+        options.Events.OnRemoteFailure = context =>
+        {
+            context.Response.Redirect($"{frontendBaseUrl}/login.html?error=access_denied");
+            context.HandleResponse();
+            return Task.CompletedTask;
+        };
     });
 
 var fbAppId = Environment.GetEnvironmentVariable("FACEBOOK_APP_ID");
@@ -175,6 +191,12 @@ if (!string.IsNullOrEmpty(fbAppId))
         options.AppId = fbAppId;
         options.AppSecret = fbAppSecret ?? "";
         options.SaveTokens = true;
+        options.Events.OnRemoteFailure = context =>
+        {
+            context.Response.Redirect($"{frontendBaseUrl}/login.html?error=access_denied");
+            context.HandleResponse();
+            return Task.CompletedTask;
+        };
     });
 
 var msClientId = Environment.GetEnvironmentVariable("MICROSOFT_CLIENT_ID");
@@ -185,6 +207,12 @@ if (!string.IsNullOrEmpty(msClientId))
         options.ClientId = msClientId;
         options.ClientSecret = msClientSecret ?? "";
         options.SaveTokens = true;
+        options.Events.OnRemoteFailure = context =>
+        {
+            context.Response.Redirect($"{frontendBaseUrl}/login.html?error=access_denied");
+            context.HandleResponse();
+            return Task.CompletedTask;
+        };
     });
 
 var app = builder.Build();
