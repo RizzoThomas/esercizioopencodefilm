@@ -35,7 +35,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     loadOrdini(),
     loadBiglietti(),
     loadPrenotazioniLegacy(),
-    caricaStato2FA()
+    caricaStato2FA(),
+    loadAccountSecurity()
   ]);
 
   setupProfiloForm();
@@ -659,4 +660,101 @@ window.visualizzaBiglietto = visualizzaBiglietto;
 window.chiudiBigliettoModal = chiudiBigliettoModal;
 window.caricaAltriBiglietti = caricaAltriBiglietti;
 window.caricaAltriOrdini = caricaAltriOrdini;
+window.submitChangePassword = submitChangePassword;
+window.submitSetPasswordRequest = submitSetPasswordRequest;
+
+// ─── Account Security (Iteration 5) ────────────────────────────────
+
+async function loadAccountSecurity() {
+  var container = document.getElementById('account-security-content');
+  if (!container || !Auth.isLoggedIn()) return;
+
+  try {
+    var security = await Auth.getAccountSecurity();
+    renderAccountSecurity(container, security);
+  } catch (err) {
+    container.innerHTML = '<p class="text-body text-sm">Impossibile caricare le impostazioni di sicurezza.</p>';
+  }
+}
+
+function renderAccountSecurity(container, security) {
+  var html = '';
+
+  // Provider collegati
+  if (security.linkedProviders && security.linkedProviders.length > 0) {
+    html += '<div class="mb-4"><p class="text-sm font-medium text-ink mb-2">Provider collegati:</p>';
+    security.linkedProviders.forEach(function(p) {
+      var icon = p.provider === 'Google' ? 'fa-google' : p.provider === 'Microsoft' ? 'fa-microsoft' : 'fa-facebook';
+      html += '<span class="inline-flex items-center gap-2 mr-3 mb-2 px-3 py-1 text-xs bg-white/5 border border-hairline"><i class="fa-brands ' + icon + '"></i>' + p.name + '</span>';
+    });
+    html += '</div>';
+  }
+
+  // Stato password
+  if (security.hasLocalPassword) {
+    var lastChanged = security.passwordChangedAtUtc
+      ? new Date(security.passwordChangedAtUtc).toLocaleDateString('it-IT')
+      : 'mai';
+
+    html += '<div class="mb-4 p-3 bg-emerald-500/10 border border-emerald-500/30">';
+    html += '<p class="text-sm font-medium text-emerald-400"><i class="fa-solid fa-circle-check mr-1"></i>Password locale attiva</p>';
+    html += '<p class="text-xs text-body mt-1">Ultimo cambio: ' + lastChanged + '</p>';
+    html += '</div>';
+
+    // Form cambio password
+    html += '<div class="mb-4"><p class="text-sm font-medium text-ink mb-3">Cambia password:</p>';
+    html += '<form onsubmit="submitChangePassword(event)" class="space-y-3">';
+    html += '<input type="password" id="sec-current-pwd" class="input-ferrari w-full px-3 py-2 text-sm" placeholder="Password attuale" required>';
+    html += '<input type="password" id="sec-new-pwd" class="input-ferrari w-full px-3 py-2 text-sm" placeholder="Nuova password (min. 8 caratteri)" required minlength="8">';
+    html += '<button type="submit" class="btn-primary text-sm py-2 px-4"><i class="fa-solid fa-key mr-2"></i>Cambia Password</button>';
+    html += '</form></div>';
+  } else {
+    html += '<div class="mb-4 p-3 bg-amber-500/10 border border-amber-500/30">';
+    html += '<p class="text-sm font-medium text-amber-400"><i class="fa-solid fa-triangle-exclamation mr-1"></i>Nessuna password locale</p>';
+    html += '<p class="text-xs text-body mt-1">Accedi solo tramite social. Imposta una password per maggiore sicurezza.</p>';
+    html += '</div>';
+
+    html += '<button onclick="submitSetPasswordRequest()" id="btn-setup-pwd" class="btn-primary text-sm py-2 px-4">';
+    html += '<i class="fa-solid fa-envelope mr-2"></i>Invia link per impostare password';
+    html += '</button>';
+  }
+
+  container.innerHTML = html;
+}
+
+async function submitChangePassword(event) {
+  event.preventDefault();
+  var currentPwd = document.getElementById('sec-current-pwd').value;
+  var newPwd = document.getElementById('sec-new-pwd').value;
+
+  if (newPwd.length < 8) {
+    showToast('La password deve essere di almeno 8 caratteri.', 'error');
+    return;
+  }
+
+  try {
+    await Auth.changePassword(currentPwd, newPwd);
+    showToast('Password cambiata con successo. Effettua nuovamente il login sugli altri dispositivi.', 'success');
+    document.getElementById('sec-current-pwd').value = '';
+    document.getElementById('sec-new-pwd').value = '';
+    // Ricarica stato sicurezza
+    loadAccountSecurity();
+  } catch (err) {
+    showToast(err.message || 'Errore durante il cambio password.', 'error');
+  }
+}
+
+async function submitSetPasswordRequest() {
+  var btn = document.getElementById('btn-setup-pwd');
+  if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>Invio in corso...'; }
+
+  try {
+    await Auth.requestSetPassword();
+    showToast('Email inviata! Controlla la tua casella di posta per impostare la password.', 'success');
+  } catch (err) {
+    showToast(err.message || 'Errore durante la richiesta.', 'error');
+  } finally {
+    if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-envelope mr-2"></i>Invia link per impostare password'; }
+  }
+}
 

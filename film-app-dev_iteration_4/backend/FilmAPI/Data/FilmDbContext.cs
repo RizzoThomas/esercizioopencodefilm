@@ -9,6 +9,19 @@ public class FilmDbContext : DbContext
     {
     }
 
+    /// <summary>
+    /// Auto-popola NormalizedEmail per nuovi User che hanno Email ma non NormalizedEmail.
+    /// </summary>
+    public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        foreach (var entry in ChangeTracker.Entries<User>().Where(e => e.State == EntityState.Added))
+        {
+            if (string.IsNullOrEmpty(entry.Entity.NormalizedEmail) && !string.IsNullOrEmpty(entry.Entity.Email))
+                entry.Entity.NormalizedEmail = entry.Entity.Email.Trim().ToUpperInvariant();
+        }
+        return base.SaveChangesAsync(cancellationToken);
+    }
+
     public DbSet<Regista> Registi { get; set; }
     public DbSet<Film> Films { get; set; }
     public DbSet<Cinema> Cinemas { get; set; }
@@ -25,6 +38,13 @@ public class FilmDbContext : DbContext
     public DbSet<Ordine> Ordini { get; set; }
     public DbSet<Biglietto> Biglietti { get; set; }
     public DbSet<MovimentoCredito> MovimentiCredito { get; set; }
+
+    // ─── Iteration 5: Auth & Security ─────────────────────────────
+    public DbSet<UserExternalLogin> UserExternalLogins { get; set; }
+    public DbSet<AccountActionToken> AccountActionTokens { get; set; }
+    public DbSet<ExternalAuthState> ExternalAuthStates { get; set; }
+    public DbSet<ExternalAuthExchangeCode> ExternalAuthExchangeCodes { get; set; }
+    public DbSet<UserSecurityAuditLog> UserSecurityAuditLogs { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -75,6 +95,76 @@ public class FilmDbContext : DbContext
         modelBuilder.Entity<User>(entity =>
         {
             entity.HasIndex(e => e.Email).IsUnique();
+            entity.HasIndex(e => e.NormalizedEmail).IsUnique();
+
+            entity.HasOne(u => u.CinemaPreferito)
+                  .WithMany()
+                  .HasForeignKey(u => u.CinemaPreferitoId)
+                  .OnDelete(DeleteBehavior.SetNull);
+        });
+
+        // ─── Iteration 5: Auth & Security ─────────────────────────────
+
+        modelBuilder.Entity<UserExternalLogin>(entity =>
+        {
+            entity.HasIndex(e => new { e.Provider, e.ProviderUserId }).IsUnique();
+            entity.HasIndex(e => new { e.UserId, e.Provider });
+            entity.HasIndex(e => e.EmailAtLogin);
+
+            entity.HasOne(e => e.User)
+                  .WithMany(u => u.ExternalLogins)
+                  .HasForeignKey(e => e.UserId)
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<AccountActionToken>(entity =>
+        {
+            entity.HasIndex(e => e.TokenHash).IsUnique();
+            entity.HasIndex(e => new { e.UserId, e.Purpose, e.ExpiresAtUtc });
+
+            entity.HasOne(e => e.User)
+                  .WithMany(u => u.ActionTokens)
+                  .HasForeignKey(e => e.UserId)
+                  .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(e => e.CreatedByUser)
+                  .WithMany()
+                  .HasForeignKey(e => e.CreatedByUserId)
+                  .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<ExternalAuthState>(entity =>
+        {
+            entity.HasIndex(e => e.StateHash).IsUnique();
+            entity.HasIndex(e => e.ExpiresAtUtc);
+        });
+
+        modelBuilder.Entity<ExternalAuthExchangeCode>(entity =>
+        {
+            entity.HasIndex(e => e.CodeHash).IsUnique();
+            entity.HasIndex(e => e.ExpiresAtUtc);
+
+            entity.HasOne(e => e.User)
+                  .WithMany()
+                  .HasForeignKey(e => e.UserId)
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<UserSecurityAuditLog>(entity =>
+        {
+            entity.HasIndex(e => new { e.UserId, e.CreatedAtUtc });
+            entity.HasIndex(e => new { e.ActorUserId, e.CreatedAtUtc });
+            entity.HasIndex(e => new { e.EventType, e.CreatedAtUtc });
+
+            entity.HasOne(e => e.User)
+                  .WithMany()
+                  .HasForeignKey(e => e.UserId)
+                  .OnDelete(DeleteBehavior.SetNull);
+
+            entity.HasOne(e => e.ActorUser)
+                  .WithMany()
+                  .HasForeignKey(e => e.ActorUserId)
+                  .OnDelete(DeleteBehavior.SetNull);
         });
 
         modelBuilder.Entity<RefreshToken>(entity =>
@@ -272,12 +362,5 @@ public class FilmDbContext : DbContext
                   .OnDelete(DeleteBehavior.Restrict);
         });
 
-        modelBuilder.Entity<User>(entity =>
-        {
-            entity.HasOne(u => u.CinemaPreferito)
-                  .WithMany()
-                  .HasForeignKey(u => u.CinemaPreferitoId)
-                  .OnDelete(DeleteBehavior.SetNull);
-        });
     }
 }

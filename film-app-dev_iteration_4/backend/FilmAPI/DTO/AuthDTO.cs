@@ -90,6 +90,52 @@ public class ResetPasswordRequestDTO
     public string NewPassword { get; set; } = string.Empty;
 }
 
+// ─── Change Password ───────────────────────────────────────────────
+
+public class ChangePasswordRequestDTO
+{
+    [Required]
+    public string CurrentPassword { get; set; } = string.Empty;
+
+    [Required]
+    [MinLength(8)]
+    public string NewPassword { get; set; } = string.Empty;
+}
+
+// ─── Set Password (social-only → locale) ───────────────────────────
+
+public class SetPasswordRequestDTO
+{
+    [Required]
+    [MinLength(8)]
+    public string NewPassword { get; set; } = string.Empty;
+}
+
+// ─── External Auth ──────────────────────────────────────────────────
+
+public class ExternalExchangeRequestDTO
+{
+    [Required]
+    public string Code { get; set; } = string.Empty;
+}
+
+public class ExternalProviderDTO
+{
+    public string Provider { get; set; } = string.Empty;
+    public string Name { get; set; } = string.Empty;
+    public string StartUrl { get; set; } = string.Empty;
+}
+
+// ─── Account Security ──────────────────────────────────────────────
+
+public class AccountSecurityDTO
+{
+    public bool HasLocalPassword { get; set; }
+    public DateTime? PasswordChangedAtUtc { get; set; }
+    public List<ExternalProviderDTO> LinkedProviders { get; set; } = new();
+    public int AuthVersion { get; set; }
+}
+
 // ─── 2FA ────────────────────────────────────────────────────────────
 
 public class TwoFactorSetupResponseDTO

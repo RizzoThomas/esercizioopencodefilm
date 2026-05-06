@@ -42,11 +42,14 @@ public class PagamentoService : IPagamentoService
         var metodo = NormalizePaymentMethod(dto.MetodoPagamento);
         var ordine = await LoadOrderAsync(orderId);
 
+        Console.WriteLine($"[PAY] userId={userId} orderId={orderId} metodo={metodo} stato={ordine?.Stato}");
+
         if (ordine is null || ordine.UserId != userId)
             throw new KeyNotFoundException("Ordine non trovato.");
 
         if (ordine.Stato == OrdineState.Paid)
         {
+            Console.WriteLine($"[PAY] Ordine gia pagato, restituisco successo.");
             _ = TrySendOrderTicketsEmailAsync(ordine.Id);
             return new PayOrdineResponseDTO
             {
@@ -57,7 +60,7 @@ public class PagamentoService : IPagamentoService
         }
 
         if (ordine.Stato != OrdineState.Pending && ordine.Stato != OrdineState.CheckoutInProgress)
-            throw new InvalidOperationException("L'ordine non e pagabile nello stato corrente.");
+            throw new InvalidOperationException($"L'ordine non e pagabile nello stato corrente ({ordine.Stato}).");
 
         var holdStates = await LoadOrderHoldStatesAsync(ordine.Id);
         ValidateHoldStatesForPendingPayment(ordine, holdStates);
@@ -532,6 +535,7 @@ public class PagamentoService : IPagamentoService
 
     private static void ValidateHoldStatesForPendingPayment(Ordine ordine, List<ShowPostoStato> holdStates)
     {
+        Console.WriteLine($"[PAY] Validating {holdStates.Count} hold states for order {ordine.Id}, stato ordine={ordine.Stato}");
         if (holdStates.Count == 0)
             throw new InvalidOperationException("Ordine privo di posti in hold associati.");
 
@@ -540,6 +544,7 @@ public class PagamentoService : IPagamentoService
 
         foreach (var holdState in holdStates)
         {
+            Console.WriteLine($"[PAY] HoldState: id={holdState.Id} stato={holdState.Stato} userId={holdState.UserId} scadeAt={holdState.ScadeAtUtc} now={now}");
             if (holdState.UserId != ordine.UserId)
                 throw new InvalidOperationException("I posti in hold non appartengono all'utente dell'ordine.");
 
@@ -547,10 +552,10 @@ public class PagamentoService : IPagamentoService
                 continue;
 
             if (holdState.Stato != ShowPostoState.Hold)
-                throw new InvalidOperationException("Uno o piu posti in hold non sono piu validi per il pagamento.");
+                throw new InvalidOperationException($"Uno o piu posti in hold non sono piu validi per il pagamento (stato={holdState.Stato}).");
 
             if (!isCheckoutInProgress && holdState.ScadeAtUtc <= now)
-                throw new InvalidOperationException("Uno o piu posti in hold non sono piu validi per il pagamento.");
+                throw new InvalidOperationException($"Uno o piu posti in hold non sono piu validi per il pagamento (scaduto: {holdState.ScadeAtUtc} <= {now}).");
         }
     }
 

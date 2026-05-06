@@ -17,6 +17,11 @@ public interface IAuthService
     Task<bool> ForgotPasswordAsync(string email);
     Task<bool> ResetPasswordAsync(string token, string newPassword);
 
+    // Change / Set Password
+    Task<bool> ChangePasswordAsync(int userId, string currentPassword, string newPassword);
+    Task<bool> RequestSetPasswordAsync(int userId);
+    Task<AccountSecurityDTO?> GetAccountSecurityAsync(int userId);
+
     // 2FA
     Task<TwoFactorSetupResponseDTO> GenerateTwoFactorSetupAsync(int userId);
     Task<bool> EnableTwoFactorAsync(int userId, string code);

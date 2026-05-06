@@ -18,38 +18,24 @@ document.addEventListener('DOMContentLoaded', () => {
   const params = new URLSearchParams(window.location.search);
   const expired = params.get('expired');
   const redirect = params.get('redirect');
-  const socialToken = params.get('token');
-  const socialRefresh = params.get('refresh');
   const socialError = params.get('error');
-
-  // Social login callback: salva token e redirect
-  if (socialToken && socialRefresh) {
-    Auth.saveTokens(socialToken, socialRefresh);
-    // Fetch user info
-    fetch(`${API.baseUrl}/auth/me`, { headers: API.getAuthHeaders() })
-      .then(r => r.json())
-      .then(user => { if (user?.id) Auth.saveUser(user); })
-      .catch(err => console.error('Failed to fetch user info after social login:', err))
-      .finally(() => {
-        const target = redirect ? decodeURIComponent(redirect) : '/index.html';
-        window.location.href = target;
-      });
-    return;
-  }
 
   // Errore social login
   if (socialError) {
     if (errorAlert && errorMessage) {
-      errorMessage.textContent = socialError === 'no_email' 
-        ? 'Il provider non ha fornito un\'email. Riprova con un altro metodo.'
-        : 'Accesso con social network fallito. Riprova.';
+      var errorMap = {
+        'no_email': 'Il provider non ha fornito un\'email. Riprova con un altro metodo.',
+        'email_not_verified': 'L\'email Google non risulta verificata. Usa un account Google con email verificata.',
+        'domain_not_allowed': 'Accesso Microsoft riservato al dominio @issgreppi.it.',
+        'elevated_role': 'Gli account con privilegi elevati devono usare la password. Accedi con email e password.',
+        'access_denied': 'Accesso negato dal provider. Riprova.'
+      };
+      errorMessage.textContent = errorMap[socialError] || 'Accesso con social network fallito. Riprova.';
       errorAlert.classList.remove('hidden');
     }
     // Pulisci URL
-    const url = new URL(window.location);
+    var url = new URL(window.location);
     url.searchParams.delete('error');
-    url.searchParams.delete('token');
-    url.searchParams.delete('refresh');
     window.history.replaceState({}, '', url);
   }
 
@@ -58,7 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   if (Auth.isLoggedIn()) {
-    window.location.href = redirect ? decodeURIComponent(redirect) : '/index.html';
+    Auth.redirectAfterLogin();
     return;
   }
 

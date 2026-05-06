@@ -14,6 +14,9 @@ public class AuthService : IAuthService
 {
     private readonly FilmDbContext _context;
     private readonly IEmailService _emailService;
+    private readonly IAccountTokenService _accountTokenService;
+    private readonly IAccountEmailService _accountEmailService;
+    private readonly IUserSecurityAuditService _auditService;
     private readonly ILogger<AuthService> _logger;
     private readonly string _jwtSecret;
     private readonly string _jwtIssuer;
@@ -25,10 +28,13 @@ public class AuthService : IAuthService
     private const int TrustedDeviceExpiryDays = 3;
     private static readonly byte[] _tempTokenKey = RandomNumberGenerator.GetBytes(32);
 
-    public AuthService(FilmDbContext context, IEmailService emailService, ILogger<AuthService> logger)
+    public AuthService(FilmDbContext context, IEmailService emailService, IAccountTokenService accountTokenService, IAccountEmailService accountEmailService, IUserSecurityAuditService auditService, ILogger<AuthService> logger)
     {
         _context = context;
         _emailService = emailService;
+        _accountTokenService = accountTokenService;
+        _accountEmailService = accountEmailService;
+        _auditService = auditService;
         _logger = logger;
         _jwtSecret = Environment.GetEnvironmentVariable("JWT_SECRET") ?? "SuperSecretKeyForCineBaseJWTAuth2026!";
         _jwtIssuer = Environment.GetEnvironmentVariable("JWT_ISSUER") ?? "CineBaseAPI";
@@ -48,7 +54,9 @@ public class AuthService : IAuthService
         var user = new User
         {
             Email = dto.Email,
+            NormalizedEmail = dto.Email.Trim().ToUpperInvariant(),
             PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password),
+            LocalCredentialsEnabled = true,
             Nome = dto.Nome,
             Cognome = dto.Cognome,
             Telefono = dto.Telefono,
@@ -75,10 +83,19 @@ public class AuthService : IAuthService
     public async Task<AuthResponseDTO> LoginAsync(LoginRequestDTO dto, HttpContext? httpContext = null)
     {
         var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == dto.Email);
-        if (user is null || !BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash))
+        if (user is null || user.PasswordHash is null || !BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash))
         {
             throw new UnauthorizedAccessException("Credenziali non valide");
         }
+
+        if (user.IsDisabled)
+        {
+            throw new UnauthorizedAccessException("Account disabilitato");
+        }
+
+        // Aggiorna ultimo login
+        user.LastLoginAtUtc = DateTime.UtcNow;
+        user.LastLoginProvider = "Local";
 
         // Se 2FA è abilitato, verifica trusted device (header o cookie)
         if (user.TwoFactorEnabled && !string.IsNullOrEmpty(user.TwoFactorSecret))
@@ -184,7 +201,8 @@ public class AuthService : IAuthService
             new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
             new Claim(JwtRegisteredClaimNames.Email, user.Email),
             new Claim("role", user.Ruolo.ToString()),
-            new Claim("nome", user.Nome)
+            new Claim("nome", user.Nome),
+            new Claim("auth_version", user.AuthVersion.ToString())
         };
 
         var token = new JwtSecurityToken(
@@ -250,39 +268,126 @@ public class AuthService : IAuthService
 
     public async Task<bool> ForgotPasswordAsync(string email)
     {
-        var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
-        if (user is null) return true; // Non rivelare se l'email esiste
+        var normalizedEmail = email.Trim().ToUpperInvariant();
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.NormalizedEmail == normalizedEmail);
+        if (user is null) return true;
 
-        var token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(32))
-            .Replace("/", "_").Replace("+", "-").TrimEnd('=');
+        var ttlMinutes = int.TryParse(Environment.GetEnvironmentVariable("PASSWORD_RESET_TOKEN_TTL_MINUTES"), out var mins) ? mins : 30;
+        var rawToken = await _accountTokenService.CreateTokenAsync(user.Id, AccountActionTokenPurpose.PasswordReset, TimeSpan.FromMinutes(ttlMinutes));
 
-        user.PasswordResetToken = token;
-        user.ResetTokenExpiry = DateTime.UtcNow.AddHours(1);
-        await _context.SaveChangesAsync();
+        var frontendBaseUrl = Environment.GetEnvironmentVariable("FRONTEND_BASE_URL") ?? "http://localhost:5001";
+        var resetUrl = $"{frontendBaseUrl}/reset-password.html?token={Uri.EscapeDataString(rawToken)}";
 
-        var frontendUrl = Environment.GetEnvironmentVariable("FRONTEND_URL") ?? "http://localhost:5001";
-        var resetLink = $"{frontendUrl}/reset-password.html?token={Uri.EscapeDataString(token)}";
-
-        await _emailService.SendPasswordResetAsync(user.Email, user.Nome, resetLink);
+        await _accountEmailService.SendPasswordResetAsync(user.Email, user.Nome, resetUrl);
+        await _auditService.LogAsync(user.Id, null, "PasswordResetRequested");
 
         return true;
     }
 
     public async Task<bool> ResetPasswordAsync(string token, string newPassword)
     {
-        var user = await _context.Users.FirstOrDefaultAsync(u =>
-            u.PasswordResetToken == token &&
-            u.ResetTokenExpiry != null &&
-            u.ResetTokenExpiry > DateTime.UtcNow);
+        var (valid, actionToken) = await _accountTokenService.ValidateTokenAsync(token, AccountActionTokenPurpose.PasswordReset);
+        if (!valid || actionToken is null) return false;
 
+        var consumed = await _accountTokenService.ConsumeTokenAsync(token, AccountActionTokenPurpose.PasswordReset);
+        if (!consumed) return false;
+
+        var user = await _context.Users.FindAsync(actionToken.UserId);
         if (user is null) return false;
 
         user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(newPassword);
-        user.PasswordResetToken = null;
-        user.ResetTokenExpiry = null;
+        user.LocalCredentialsEnabled = true;
+        user.PasswordChangedAtUtc = DateTime.UtcNow;
+        user.AuthVersion++;
+
+        await RevokeAllRefreshTokensAsync(user.Id);
+        await _auditService.LogAsync(user.Id, user.Id, "PasswordResetCompleted");
         await _context.SaveChangesAsync();
 
         return true;
+    }
+
+    // ═══════════════════ Change Password ══════════════════════════════
+
+    public async Task<bool> ChangePasswordAsync(int userId, string currentPassword, string newPassword)
+    {
+        var user = await _context.Users.FindAsync(userId);
+        if (user is null) return false;
+
+        if (user.PasswordHash is null)
+            return false;
+
+        if (!BCrypt.Net.BCrypt.Verify(currentPassword, user.PasswordHash))
+            return false;
+
+        user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(newPassword);
+        user.LocalCredentialsEnabled = true;
+        user.PasswordChangedAtUtc = DateTime.UtcNow;
+        user.AuthVersion++;
+
+        await RevokeAllRefreshTokensAsync(user.Id);
+        await _auditService.LogAsync(user.Id, userId, "PasswordChanged");
+        await _context.SaveChangesAsync();
+
+        await _accountEmailService.SendPasswordChangedAsync(user.Email, user.Nome);
+
+        return true;
+    }
+
+    // ═══════════════════ Set Password (social-only → locale) ═════════
+
+    public async Task<bool> RequestSetPasswordAsync(int userId)
+    {
+        var user = await _context.Users.FindAsync(userId);
+        if (user is null) return false;
+
+        var ttlMinutes = int.TryParse(Environment.GetEnvironmentVariable("SET_PASSWORD_TOKEN_TTL_MINUTES"), out var mins) ? mins : 60;
+        var rawToken = await _accountTokenService.CreateTokenAsync(user.Id, AccountActionTokenPurpose.SetPassword, TimeSpan.FromMinutes(ttlMinutes));
+
+        var frontendBaseUrl = Environment.GetEnvironmentVariable("FRONTEND_BASE_URL") ?? "http://localhost:5001";
+        var setupUrl = $"{frontendBaseUrl}/set-password.html?token={Uri.EscapeDataString(rawToken)}";
+
+        await _accountEmailService.SendSetPasswordAsync(user.Email, user.Nome, setupUrl);
+        await _auditService.LogAsync(user.Id, userId, "SetPasswordRequested");
+
+        return true;
+    }
+
+    // ═══════════════════ Account Security ═════════════════════════════
+
+    public async Task<AccountSecurityDTO?> GetAccountSecurityAsync(int userId)
+    {
+        var user = await _context.Users.FindAsync(userId);
+        if (user is null) return null;
+
+        var linkedProviders = await _context.UserExternalLogins
+            .Where(el => el.UserId == userId && el.RevokedAtUtc == null)
+            .ToListAsync();
+
+        return new AccountSecurityDTO
+        {
+            HasLocalPassword = !string.IsNullOrEmpty(user.PasswordHash),
+            PasswordChangedAtUtc = user.PasswordChangedAtUtc,
+            LinkedProviders = linkedProviders.Select(el => new ExternalProviderDTO
+            {
+                Provider = el.Provider.ToString(),
+                Name = el.EmailAtLogin,
+                StartUrl = string.Empty
+            }).ToList(),
+            AuthVersion = user.AuthVersion
+        };
+    }
+
+    // ═══════════════════ Revoke Refresh Tokens ════════════════════════
+
+    private async Task RevokeAllRefreshTokensAsync(int userId)
+    {
+        var tokens = await _context.RefreshTokens
+            .Where(rt => rt.UserId == userId && rt.RevokedAt == null)
+            .ToListAsync();
+
+        foreach (var t in tokens)
+            t.RevokedAt = DateTime.UtcNow;
     }
 
     // ═══════════════════ 2FA ══════════════════════════════════════════

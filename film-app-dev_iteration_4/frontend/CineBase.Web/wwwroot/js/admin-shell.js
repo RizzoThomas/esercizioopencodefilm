@@ -28,6 +28,20 @@
     return Auth.getUser();
   }
 
+  function getUserRole() {
+    var user = getUser();
+    if (!user) return null;
+    var role = String(user.ruolo || '').trim().toLowerCase();
+    if (role === '2' || role === 'admin') return 'admin';
+    if (role === '1' || role === 'poweruser') return 'poweruser';
+    if (role === '0' || role === 'user') return 'user';
+    return null;
+  }
+
+  function isAdmin() {
+    return getUserRole() === 'admin';
+  }
+
   function toggleSidebar() {
     const sidebar = document.getElementById('admin-sidebar');
     const backdrop = document.getElementById('admin-sidebar-backdrop');
@@ -122,7 +136,7 @@
             <a data-admin-link href="/cinemas.html" class="admin-nav-link flex items-center gap-3 px-4 py-3 text-sm"><i class="fa-solid fa-building w-5"></i>Cinema</a>
             <a data-admin-link href="/proiezioni.html" class="admin-nav-link flex items-center gap-3 px-4 py-3 text-sm"><i class="fa-solid fa-clock w-5"></i>Proiezioni</a>
             <a data-admin-link href="/categorie.html" class="admin-nav-link flex items-center gap-3 px-4 py-3 text-sm"><i class="fa-solid fa-tags w-5"></i>Categorie</a>
-            <a data-admin-link href="/utenti.html" class="admin-nav-link flex items-center gap-3 px-4 py-3 text-sm"><i class="fa-solid fa-users w-5"></i>Utenti</a>
+            <a data-admin-link href="/utenti.html" class="admin-nav-link flex items-center gap-3 px-4 py-3 text-sm" data-role-required="admin"><i class="fa-solid fa-users w-5"></i>Utenti</a>
             <a data-admin-link href="/validazione.html" class="admin-nav-link flex items-center gap-3 px-4 py-3 text-sm"><i class="fa-solid fa-ticket-check w-5"></i>Validazione</a>
           </nav>
           <div class="p-4 border-t border-hairline">
@@ -187,5 +201,12 @@
     bindActions();
     setActiveLinks();
     updateUserUI();
+
+    // Nascondi link admin-only per PowerUser
+    if (!isAdmin()) {
+      document.querySelectorAll('[data-role-required="admin"]').forEach(function(el) {
+        el.style.display = 'none';
+      });
+    }
   });
 })();

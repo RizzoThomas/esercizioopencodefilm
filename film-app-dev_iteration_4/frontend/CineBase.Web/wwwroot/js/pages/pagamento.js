@@ -282,19 +282,21 @@ async function handlePayment() {
       importoCreditoRichiesto = parseFloat(slider.value);
     }
 
-    if (method === 'credito' && (creditoData?.saldoAttuale || 0) >= ordine.totaleLordo) {
-      const metodoPagamento = 'Credito';
-      const idempotencyKey = `pay-${orderId}-${Date.now()}`;
-      const result = await API.payOrdine(orderId, metodoPagamento, importoCreditoRichiesto, idempotencyKey);
-
-      if (result.statoPagamento === 'Paid' || result.ordine?.stato === 'Paid') {
-        window.location.href = `/esito-acquisto.html?orderId=${orderId}&success=true`;
-      } else {
-        showToast(result.messaggio || 'Pagamento in elaborazione', 'info');
-        setTimeout(() => {
-          window.location.href = `/esito-acquisto.html?orderId=${orderId}`;
-        }, 2000);
+    if (method === 'credito') {
+      const saldo = creditoData?.saldoAttuale || 0;
+      if (saldo < ordine.totaleLordo) {
+        showToast('Credito insufficiente. Hai ' + formatCurrency(saldo) + ', servono ' + formatCurrency(ordine.totaleLordo) + '.', 'danger');
+        btnPay.disabled = false;
+        btnPay.innerHTML = '<i class="fa-solid fa-lock mr-2"></i><span id="pay-button-text">Paga</span>';
+        return;
       }
+
+      const metodoPagamento = 'Credito';
+      const idempotencyKey = 'pay-' + orderId + '-' + Date.now();
+      console.log('[PAGAMENTO] Paying with credit, orderId=' + orderId);
+      const result = await API.payOrdine(orderId, metodoPagamento, importoCreditoRichiesto, idempotencyKey);
+      console.log('[PAGAMENTO] Credit payment result:', result);
+      window.location.replace('/esito-acquisto.html?orderId=' + orderId + '&success=true');
       return;
     }
 
@@ -329,11 +331,11 @@ async function handlePayment() {
       btnPay.innerHTML = '<i class="fa-solid fa-lock mr-2"></i><span id="pay-button-text">Riprova pagamento</span>';
     }
   } catch (error) {
-    // 409: order not in payable state
+    // 409: order not in payable state (seats expired, already paid, etc.)
     if (error?.status === 409) {
-      showToast('Questo ordine non &egrave; pi&ugrave; pagabile. Controlla i dettagli.', 'warning');
-      setTimeout(() => {
-        window.location.href = `/esito-acquisto.html?orderId=${orderId}`;
+      showToast('I posti selezionati non sono pi\u00f9 disponibili. Torna alla selezione posti.', 'warning');
+      setTimeout(function() {
+        window.location.href = '/acquista.html?showId=' + (ordine?.showId || '');
       }, 2500);
       return;
     }

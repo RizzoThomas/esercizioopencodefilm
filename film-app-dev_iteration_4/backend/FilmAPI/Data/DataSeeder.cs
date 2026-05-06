@@ -33,7 +33,9 @@ public class DataSeeder
         var admin = new User
         {
             Email = adminEmail,
+            NormalizedEmail = adminEmail.ToUpperInvariant(),
             PasswordHash = BCrypt.Net.BCrypt.HashPassword(adminPassword),
+            LocalCredentialsEnabled = true,
             Nome = "Admin",
             Cognome = "CineBase",
             Ruolo = UserRole.Admin,

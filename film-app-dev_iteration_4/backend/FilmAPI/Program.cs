@@ -57,6 +57,9 @@ builder.Services.AddDbContext<FilmDbContext>(
         .EnableDetailedErrors()
 );
 
+builder.Services.AddScoped<IAccountTokenService, AccountTokenService>();
+builder.Services.AddScoped<IAccountEmailService, AccountEmailService>();
+builder.Services.AddScoped<IUserSecurityAuditService, UserSecurityAuditService>();
 builder.Services.AddScoped<IRegistaService, RegistaService>();
 builder.Services.AddScoped<IFilmService, FilmService>();
 builder.Services.AddScoped<ICinemaService, CinemaService>();
@@ -207,17 +210,22 @@ if (!string.IsNullOrEmpty(fbAppId))
 var msClientId = Environment.GetEnvironmentVariable("MICROSOFT_CLIENT_ID");
 var msClientSecret = Environment.GetEnvironmentVariable("MICROSOFT_CLIENT_SECRET");
 var msTenantId = Environment.GetEnvironmentVariable("MICROSOFT_TENANT_ID") ?? "organizations";
+Console.WriteLine($"[STARTUP] Microsoft Auth: ClientId={msClientId?[..Math.Min(8, msClientId?.Length ?? 0)]}..., TenantId={msTenantId}, SecretPresent={!string.IsNullOrEmpty(msClientSecret)}");
+Console.WriteLine($"[STARTUP] Microsoft Auth: AuthEndpoint=https://login.microsoftonline.com/{msTenantId}/oauth2/v2.0/authorize");
+Console.WriteLine($"[STARTUP] Microsoft Auth: TokenEndpoint=https://login.microsoftonline.com/{msTenantId}/oauth2/v2.0/token");
 if (!string.IsNullOrEmpty(msClientId))
     builder.Services.AddAuthentication().AddMicrosoftAccount(options =>
     {
         options.ClientId = msClientId;
         options.ClientSecret = msClientSecret ?? "";
         options.SaveTokens = true;
+        options.CallbackPath = "/signin-microsoft";
         // Usa tenant specifico per la scuola (single-tenant app in Azure AD)
         options.AuthorizationEndpoint = $"https://login.microsoftonline.com/{msTenantId}/oauth2/v2.0/authorize";
         options.TokenEndpoint = $"https://login.microsoftonline.com/{msTenantId}/oauth2/v2.0/token";
         options.Events.OnTicketReceived = async context =>
         {
+            Console.WriteLine($"[AUTH] Microsoft OnTicketReceived OK - processing user");
             await SocialAuthEndpoints.ProcessOAuthTicket(
                 context.HttpContext, context.Principal!, context.Properties!, "Microsoft", frontendBaseUrl);
             context.HandleResponse();
@@ -225,15 +233,20 @@ if (!string.IsNullOrEmpty(msClientId))
         options.Events.OnRemoteFailure = context =>
         {
             Console.WriteLine($"[AUTH] Microsoft OnRemoteFailure: {context.Failure?.Message}");
+            Console.WriteLine($"[AUTH] Microsoft OnRemoteFailure: {context.Failure?.InnerException?.Message}");
+            Console.WriteLine($"[AUTH] Microsoft OnRemoteFailure stack: {context.Failure?.StackTrace}");
             context.Response.Redirect($"{frontendBaseUrl}/login.html?error=access_denied");
             context.HandleResponse();
             return Task.CompletedTask;
         };
     });
+else
+    Console.WriteLine("[STARTUP] Microsoft Auth: DISABLED (no MICROSOFT_CLIENT_ID)");
 
 var app = builder.Build();
 
 app.UseCors("AllowCineBaseFrontend");
+app.UseMiddleware<FilmAPI.Middleware.RateLimiterMiddleware>();
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseStaticFiles();
@@ -280,24 +293,6 @@ app.MapGet("/config/frontend", (FrontendRuntimeConfig config) => Results.Ok(new
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<FilmDbContext>();
-    
-    // Verifica se le colonne 2FA esistono già (da migrazione parziale precedente)
-    var conn = context.Database.GetDbConnection();
-    await conn.OpenAsync();
-    var cmd = conn.CreateCommand();
-    cmd.CommandText = "SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='Users' AND COLUMN_NAME='TwoFactorEnabled'";
-    var colExists = Convert.ToInt64(await cmd.ExecuteScalarAsync()) > 0;
-    await conn.CloseAsync();
-
-    if (colExists)
-    {
-        // Colonne già presenti → segna migrazione come applicata
-        cmd = conn.CreateCommand();
-        cmd.CommandText = "INSERT IGNORE INTO `__EFMigrationsHistory` (MigrationId, ProductVersion) VALUES ('20260504103701_AddTwoFactorAndPasswordReset', '9.0.11')";
-        await conn.OpenAsync();
-        await cmd.ExecuteNonQueryAsync();
-        await conn.CloseAsync();
-    }
     
     // Applica migration automaticamente
     try { context.Database.Migrate(); } catch (Exception) { }

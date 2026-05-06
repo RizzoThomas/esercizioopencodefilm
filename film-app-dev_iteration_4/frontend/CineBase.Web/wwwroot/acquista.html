@@ -13,7 +13,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
     rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-  <link href="/css/styles.css?v=3" rel="stylesheet">
+  <link href="/css/styles.css?v=5" rel="stylesheet">
   <script src="/js/route-guard.js"></script>
 </head>
 
@@ -162,13 +162,38 @@
   <div id="toast-container" class="fixed bottom-4 right-4 z-50"></div>
 
   <script src="/js/utils.js"></script>
-  <script src="/js/api.js"></script>
+  <script src="/js/api.js?v=final"></script>
   <script src="/js/auth.js"></script>
   <script src="/js/template-loader.js"></script>
   <script src="/js/navbar.js"></script>
   <script src="/js/aceternity-effects.js"></script>
   <script src="/js/pages/acquista.js"></script>
+  <style id="seat-fix">
+    #seat-map-grid .seat-btn, .seat-btn{width:1.2rem!important;height:1.2rem!important;border-radius:3px!important}
+    .seat-available{background:#252525!important;border-color:#3d3d3d!important}
+    .seat-available:hover{transform:scale(1.18)!important;box-shadow:0 0 8px rgba(218,41,28,.35)!important}
+    .seat-selected{transform:scale(1.12)!important;box-shadow:0 0 10px rgba(218,41,28,.55)!important}
+    .seat-map-layout{gap:0.5rem!important}
+    .seat-level-block{gap:0.3rem!important}
+    .seat-level-sectors{gap:0.35rem!important}
+    .seat-sector-card{padding:0.25rem 0.3rem!important;gap:0.12rem!important}
+    .seat-sector-grid{gap:0.04rem!important}
+    .seat-row{gap:0.04rem!important}
+    .seat-placeholder{width:1.2rem!important;height:1.2rem!important}
+    .fila-label{font-size:0.42rem!important;opacity:0.5!important}
+    .seat-num-label{font-size:0.36rem!important;opacity:0.4!important}
+    .seat-map-screen{clip-path:polygon(7% 0,93% 0,100% 100%,0% 100%)!important;background:linear-gradient(180deg,var(--ferrari-primary)0%,#8b0000 100%)!important;box-shadow:0 2px 18px rgba(218,41,28,.2)!important;width:min(50%,16rem)!important;margin-bottom:0.6rem!important}
+    .seat-map-wrapper{background:radial-gradient(ellipse at center,rgba(218,41,28,.03)0%,transparent 65%)!important}
+    .seat-level-title{font-size:0.48rem!important;padding:0.08rem 0.4rem!important}
+    .seat-sector-name{font-size:0.46rem!important;opacity:0.65!important}
+    .seat-held-other{background:repeating-linear-gradient(45deg,#161000,#161000 2px,#3a2c00 2px,#3a2c00 4px)!important}
+    .seat-sold{opacity:0.45!important}
+    .seat-sold::after{font-size:0.7rem!important}
+    .seat-wheelchair::after{font-size:0.58rem!important}
+    .seat-legend{width:1.1rem!important;height:1.1rem!important;border-radius:3px!important}
+  </style>
 </body>
 
 </html>
+
 

@@ -593,11 +593,150 @@ img {
   }
 }
 
-.seat-map-wrapper { overflow-x: auto; padding: 0.1rem; --seat-map-zoom: 1; }
-
-.seat-map-toolbar {
-  display: flex; align-items: center; justify-content: flex-end;
-  gap: 0.4rem; margin-bottom: 0.45rem;
+.seat-map-wrapper { 
+  overflow-x: auto; padding: 0.1rem; 
+  --seat-map-zoom: 1;
+  background: radial-gradient(ellipse at center, rgba(218,41,28,0.04) 0%, transparent 70%);
+}
+.seat-map-screen {
+  text-align: center; padding: 0.25rem 0; margin: 0 auto 0.7rem;
+  width: min(55%, 18rem);
+  background: linear-gradient(180deg, var(--ferrari-primary) 0%, #8b0000 100%);
+  color: rgba(255,255,255,0.9); font-size: 0.52rem; font-weight: 700;
+  letter-spacing: 0.25em; text-transform: uppercase;
+  clip-path: polygon(8% 0, 92% 0, 100% 100%, 0% 100%);
+  box-shadow: 0 2px 20px rgba(218,41,28,0.25), 0 0 40px rgba(218,41,28,0.08);
+}
+.seat-map-grid { display: block; }
+.seat-map-layout {
+  display: flex; flex-direction: column; gap: 0.5rem;
+  min-width: max-content; transform-origin: top center;
+  width: fit-content; margin-inline: auto;
+}
+.seat-level-block { display: flex; flex-direction: column; gap: 0.3rem; }
+.seat-level-header { display: flex; align-items: center; justify-content: center; }
+.seat-level-title {
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 0.1rem 0.45rem;
+  background: rgba(255,255,255,0.04); color: var(--ferrari-body);
+  font-size: 0.5rem; font-weight: 600;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  border: 1px solid rgba(255,255,255,0.06);
+}
+.seat-level-sectors { display: grid; gap: 0.35rem; justify-content: center; }
+.seat-level-cols-1 { grid-template-columns: max-content; }
+.seat-level-cols-2 { grid-template-columns: repeat(2, max-content); }
+.seat-level-cols-3 { grid-template-columns: repeat(3, max-content); }
+.seat-sector-card {
+  display: flex; flex-direction: column; gap: 0.15rem;
+  padding: 0.3rem 0.35rem;
+  border: 1px solid rgba(255,255,255,0.04);
+  background: rgba(255,255,255,0.015);
+}
+.seat-sector-card-compact { padding-inline: 0.5rem; }
+.seat-sector-name {
+  text-align: center; font-size: 0.48rem; font-weight: 600;
+  color: var(--ferrari-body); opacity: 0.7;
+  text-transform: uppercase; letter-spacing: 0.08em;
+}
+.seat-sector-grid { display: flex; flex-direction: column; gap: 0.06rem; }
+.seat-row { display: flex; align-items: center; gap: 0.06rem; }
+.seat-row-numbers { margin-bottom: 0.04rem; }
+.seat-btn {
+  width: 1.2rem; height: 1.2rem;
+  border: 1.5px solid transparent; cursor: pointer;
+  transition: all 0.12s ease; font-size: 0; padding: 0;
+  position: relative; border-radius: 3px;
+}
+@media (min-width: 640px) { .seat-btn { width: 1.3rem; height: 1.3rem; } }
+@media (min-width: 1280px) {
+  .seat-btn { width: 1.4rem; height: 1.4rem; }
+  .seat-placeholder, .seat-num-label { width: 1.4rem; }
+  .fila-label { width: 1.2rem; font-size: 0.5rem; }
+}
+/* ---- Disponibile ---- */
+.seat-available { background: #252525; border-color: #3d3d3d; }
+.seat-available:hover {
+  border-color: var(--ferrari-primary);
+  background: rgba(218,41,28,0.15);
+  transform: scale(1.18);
+  box-shadow: 0 0 8px rgba(218,41,28,0.35);
+  z-index: 2;
+}
+/* ---- Selezionato ---- */
+.seat-selected {
+  background: var(--ferrari-primary) !important;
+  border-color: #ff4433 !important;
+  transform: scale(1.12);
+  box-shadow: 0 0 10px rgba(218,41,28,0.55);
+  z-index: 2;
+}
+.seat-held-other {
+  background: repeating-linear-gradient(45deg, #161000, #161000 2px, #3a2c00 2px, #3a2c00 4px);
+  border-color: #7a5f00; cursor: not-allowed;
+}
+.seat-held-me {
+  background: var(--ferrari-primary); border-color: #ff4433;
+  opacity: 0.6; cursor: not-allowed;
+}
+.seat-sold {
+  background: #141414; border-color: #2a2a2a; cursor: not-allowed; opacity: 0.5;
+}
+.seat-sold::after {
+  content: '\00d7'; position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  color: #ff6b6b; font-size: 0.75rem; font-weight: 700; line-height: 1;
+}
+.seat-wheelchair { background: #0e1a28; border-color: #2e5680; }
+.seat-wheelchair::after {
+  font-family: "Font Awesome 6 Free"; font-weight: 900; content: "\f193";
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  color: #5ea0e8; font-size: 0.62rem;
+}
+.seat-wheelchair.seat-selected::after { color: #ffffff; }
+.seat-placeholder { width: 1.2rem; height: 1.2rem; display: inline-block; }
+/* ---- Legenda ---- */
+.seat-legend {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 1.2rem; height: 1.2rem; border: 1.5px solid transparent;
+  position: relative; font-size: 0.6rem; flex-shrink: 0; border-radius: 3px;
+}
+.seat-legend.seat-available { background: #252525; border-color: #3d3d3d; }
+.seat-legend.seat-selected { background: var(--ferrari-primary); border-color: #ff4433; }
+.seat-legend.seat-held-other {
+  background: repeating-linear-gradient(45deg, #161000, #161000 2px, #3a2c00 2px, #3a2c00 4px);
+  border-color: #7a5f00;
+}
+.seat-legend.seat-sold { background: #141414; border-color: #2a2a2a; opacity: 0.5; }
+.seat-legend.seat-sold::after {
+  content: '\00d7'; position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  color: #ff6b6b; font-size: 0.75rem; font-weight: 700; line-height: 1;
+}
+.seat-legend.seat-wheelchair { background: #0e1a28; border-color: #2e5680; }
+.seat-legend.seat-wheelchair::after {
+  font-family: "Font Awesome 6 Free"; font-weight: 900; content: "\f193";
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  color: #5ea0e8; font-size: 0.62rem;
+}
+.fila-label {
+  width: 1.15rem; text-align: right; font-size: 0.45rem;
+  font-weight: 500; color: var(--ferrari-body); opacity: 0.6;
+  margin-right: 0.1rem; flex-shrink: 0;
+}
+.fila-label-header { opacity: 0; }
+.seat-num-label {
+  width: 1.2rem; text-align: center;
+  font-size: 0.38rem; color: var(--ferrari-body); opacity: 0.5; flex-shrink: 0;
+}
+@media (min-width: 640px) {
+  .fila-label { width: 1.25rem; font-size: 0.48rem; }
+  .seat-num-label { width: 1.3rem; }
+  .seat-level-cols-2 { grid-template-columns: repeat(2, max-content); }
+  .seat-level-cols-3 { grid-template-columns: repeat(3, max-content); }
+}
+@media (max-width: 900px) {
+  .seat-level-cols-2, .seat-level-cols-3 { grid-template-columns: max-content; }
 }
 
 .seat-zoom-btn {

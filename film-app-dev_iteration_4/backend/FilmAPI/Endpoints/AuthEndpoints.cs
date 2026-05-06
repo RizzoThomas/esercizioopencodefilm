@@ -1,7 +1,12 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
+using System.Text;
+using FilmAPI.Data;
 using FilmAPI.DTO;
+using FilmAPI.Model;
 using FilmAPI.Services;
+using Microsoft.EntityFrameworkCore;
 
 namespace FilmAPI.Endpoints;
 
@@ -88,6 +93,38 @@ public static class AuthEndpoints
                 : Results.BadRequest(new { error = "Token non valido o scaduto." });
         }).AllowAnonymous();
 
+        // ─── Social Login Exchange ──────────────────────────────────────
+
+        group.MapPost("/external/exchange", async (ExternalExchangeRequestDTO dto, FilmDbContext db, IAuthService authService) =>
+        {
+            if (string.IsNullOrEmpty(dto.Code))
+                return Results.BadRequest(new { error = "Code mancante." });
+
+            // Hash del code per lookup
+            var codeHash = Convert.ToBase64String(
+                SHA256.HashData(Encoding.UTF8.GetBytes(dto.Code)))
+                .Replace("/", "_").Replace("+", "-").TrimEnd('=');
+
+            var exchangeCode = await db.ExternalAuthExchangeCodes
+                .Include(ec => ec.User)
+                .FirstOrDefaultAsync(ec => ec.CodeHash == codeHash);
+
+            if (exchangeCode == null || exchangeCode.ConsumedAtUtc != null)
+                return Results.BadRequest(new { error = "Code non valido o già usato." });
+
+            if (exchangeCode.ExpiresAtUtc < DateTime.UtcNow)
+                return Results.BadRequest(new { error = "Code scaduto." });
+
+            // Consuma il code
+            exchangeCode.ConsumedAtUtc = DateTime.UtcNow;
+
+            // Genera token applicativi
+            var authResponse = await authService.SocialLoginAsync(exchangeCode.User!);
+            await db.SaveChangesAsync();
+
+            return Results.Ok(authResponse);
+        }).AllowAnonymous();
+
         // ─── 2FA ──────────────────────────────────────────────────────
 
         group.MapPost("/2fa/setup", async (HttpContext context, IAuthService service) =>
@@ -143,6 +180,45 @@ public static class AuthEndpoints
                 return Results.BadRequest(new { error = ex.Message });
             }
         }).AllowAnonymous();
+
+        // ─── Change Password ──────────────────────────────────────────
+
+        group.MapPost("/change-password", async (HttpContext context, ChangePasswordRequestDTO dto, IAuthService service) =>
+        {
+            var userId = GetUserId(context);
+            if (userId is null) return Results.Unauthorized();
+
+            var result = await service.ChangePasswordAsync(userId.Value, dto.CurrentPassword, dto.NewPassword);
+            return result
+                ? Results.Ok(new { message = "Password modificata con successo." })
+                : Results.BadRequest(new { error = "Password attuale non valida o account senza password locale." });
+        }).RequireAuthorization("Authenticated");
+
+        // ─── Set Password Request (social-only → locale) ──────────────
+
+        group.MapPost("/set-password/request", async (HttpContext context, IAuthService service) =>
+        {
+            var userId = GetUserId(context);
+            if (userId is null) return Results.Unauthorized();
+
+            var result = await service.RequestSetPasswordAsync(userId.Value);
+            return result
+                ? Results.Ok(new { message = "Email per impostare la password inviata." })
+                : Results.NotFound(new { error = "Utente non trovato." });
+        }).RequireAuthorization("Authenticated");
+
+        // ─── Account Security ─────────────────────────────────────────
+
+        group.MapGet("/security/me", async (HttpContext context, IAuthService service) =>
+        {
+            var userId = GetUserId(context);
+            if (userId is null) return Results.Unauthorized();
+
+            var security = await service.GetAccountSecurityAsync(userId.Value);
+            return security is null
+                ? Results.NotFound(new { error = "Utente non trovato." })
+                : Results.Ok(security);
+        }).RequireAuthorization("Authenticated");
     }
 
     private static int? GetUserId(HttpContext context)

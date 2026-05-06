@@ -13,7 +13,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
     rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-  <link href="/css/styles.css?v=3" rel="stylesheet">
+  <link href="/css/styles.css?v=5" rel="stylesheet">
   <script src="/js/route-guard.js"></script>
 </head>
 
@@ -138,6 +138,21 @@
       </div>
     </div>
 
+    <!-- Sicurezza Account (Iteration 5) -->
+    <div class="mt-8 card-ferrari p-6">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-xl font-bold text-ink">
+          <i class="fa-solid fa-lock text-ferrari-primary mr-2"></i>Sicurezza Account
+        </h2>
+      </div>
+      <div id="account-security-content">
+        <div class="text-center py-4 text-body">
+          <i class="fa-solid fa-spinner fa-spin text-xl mb-2"></i>
+          <p class="text-sm">Caricamento...</p>
+        </div>
+      </div>
+    </div>
+
     <!-- 2FA Security -->
     <div class="mt-8 card-ferrari p-6">
       <div class="flex items-center justify-between mb-4">
@@ -214,7 +229,7 @@
   <div id="toast-container" class="fixed bottom-4 right-4 z-50"></div>
 
   <script src="/js/utils.js"></script>
-  <script src="/js/api.js"></script>
+  <script src="/js/api.js?v=final"></script>
   <script src="/js/auth.js"></script>
   <script src="/js/template-loader.js"></script>
   <script src="/js/navbar.js"></script>
@@ -223,4 +238,5 @@
 </body>
 
 </html>
+
 

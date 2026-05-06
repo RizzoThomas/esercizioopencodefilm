@@ -428,6 +428,18 @@ public sealed class FakeEmailService : IEmailService
             FailureMessage = "SMTP fake failure";
         }
     }
+
+    public Task<EmailSendResult> SendTopupConfirmationAsync(string recipientEmail, string recipientName, decimal amount, decimal newBalance, string transactionId, CancellationToken cancellationToken = default)
+    {
+        lock (_lock) { _sentEmails.Add(new SentEmailRecord { RecipientEmail = recipientEmail, FileName = "topup_confirmation" }); }
+        return Task.FromResult(new EmailSendResult { Success = true, SentAtUtc = DateTime.UtcNow });
+    }
+
+    public Task<EmailSendResult> SendPasswordResetAsync(string recipientEmail, string recipientName, string resetLink, CancellationToken cancellationToken = default)
+    {
+        lock (_lock) { _sentEmails.Add(new SentEmailRecord { RecipientEmail = recipientEmail, FileName = "password_reset" }); }
+        return Task.FromResult(new EmailSendResult { Success = true, SentAtUtc = DateTime.UtcNow });
+    }
 }
 
 public sealed class SentEmailRecord

@@ -271,11 +271,85 @@ const Auth = {
   redirectAfterLogin() {
     const params = new URLSearchParams(window.location.search);
     const redirect = params.get('redirect');
-    if (redirect) {
-      window.location.href = redirect;
-    } else {
-      window.location.href = '/index.html';
+    // Usa sanitizeRedirectPath se disponibile (da route-guard), altrimenti fallback safe
+    var safe = '/index.html';
+    if (redirect && typeof window.RouteGuard !== 'undefined' && window.RouteGuard.sanitizeRedirectPath) {
+      safe = window.RouteGuard.sanitizeRedirectPath(redirect);
+    } else if (redirect && redirect.charAt(0) === '/' && redirect.indexOf('://') === -1 && redirect.indexOf('..') === -1) {
+      safe = redirect;
     }
+    window.location.href = safe;
+  },
+
+  /**
+   * Avvia il flusso di login esterno (Google, Microsoft, Facebook).
+   */
+  startExternalLogin(provider, redirectPath) {
+    var safe = '/index.html';
+    if (typeof window.RouteGuard !== 'undefined' && window.RouteGuard.sanitizeRedirectPath) {
+      safe = window.RouteGuard.sanitizeRedirectPath(redirectPath);
+    }
+    var providerMap = { google: 'login-google', microsoft: 'login-microsoft', facebook: 'login-facebook' };
+    var endpoint = providerMap[provider.toLowerCase()] || 'login-google';
+    window.location.href = API_BASE_URL + '/auth/' + endpoint + '?redirect=' + encodeURIComponent(safe);
+  },
+
+  async changePassword(currentPassword, newPassword) {
+    var accessToken = this.getAccessToken();
+    var response = await fetch(API_BASE_URL + '/auth/change-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + accessToken },
+      body: JSON.stringify({ currentPassword, newPassword })
+    });
+    if (!response.ok) {
+      var err = await response.json().catch(function() { return {}; });
+      throw { status: response.status, message: err.error || err.message || 'Errore cambio password' };
+    }
+    return response.json();
+  },
+
+  async requestSetPassword() {
+    var accessToken = this.getAccessToken();
+    var response = await fetch(API_BASE_URL + '/auth/set-password/request', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + accessToken }
+    });
+    if (!response.ok) {
+      var err = await response.json().catch(function() { return {}; });
+      throw { status: response.status, message: err.error || 'Errore richiesta setup password' };
+    }
+    return response.json();
+  },
+
+  async getAccountSecurity() {
+    var accessToken = this.getAccessToken();
+    var response = await fetch(API_BASE_URL + '/auth/security/me', {
+      method: 'GET',
+      headers: { 'Authorization': 'Bearer ' + accessToken }
+    });
+    if (!response.ok) throw { status: response.status, message: 'Errore caricamento sicurezza account' };
+    return response.json();
+  },
+
+  async forgotPassword(email) {
+    var response = await fetch(API_BASE_URL + '/auth/forgot-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email })
+    });
+    // Sempre OK per non enumerare email
+    return response.json();
+  },
+
+  async resetPassword(token, newPassword) {
+    var response = await fetch(API_BASE_URL + '/auth/reset-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token, newPassword })
+    });
+    var data = await response.json();
+    if (!response.ok) throw { status: response.status, message: data.error || 'Token non valido o scaduto' };
+    return data;
   }
 };
 

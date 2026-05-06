@@ -19,7 +19,10 @@ var RouteGuard = (function () {
     '/tmdb-search.html': { roles: ['user', 'poweruser', 'admin'], authRequired: true },
     '/forgot-password.html': { roles: ['anonimo', 'user', 'poweruser', 'admin'], authRequired: false },
     '/reset-password.html': { roles: ['anonimo', 'user', 'poweruser', 'admin'], authRequired: false },
-    '/enable-2fa.html': { roles: ['user', 'poweruser', 'admin'], authRequired: true }
+    '/enable-2fa.html': { roles: ['user', 'poweruser', 'admin'], authRequired: true },
+    '/social-login-complete.html': { roles: ['anonimo', 'user', 'poweruser', 'admin'], authRequired: false },
+    '/utenti.html': { roles: ['admin'], authRequired: true },
+    '/utenti-detail.html': { roles: ['admin'], authRequired: true }
   };
 
   var ACCESS_TOKEN_KEY = 'cb_access_token';
@@ -32,6 +35,17 @@ var RouteGuard = (function () {
     if (value === '1' || value === 'poweruser') return 'poweruser';
     if (value === '0' || value === 'user') return 'user';
     return 'anonimo';
+  }
+
+  /**
+   * Blocca redirect a URL esterni. Accetta solo path relativi che iniziano con '/'.
+   */
+  function sanitizeRedirectPath(path) {
+    if (!path || typeof path !== 'string') return '/index.html';
+    if (path.indexOf('://') !== -1 || path.indexOf('//') === 0) return '/index.html';
+    if (path.indexOf('..') !== -1) return '/index.html';
+    if (path.charAt(0) !== '/') return '/index.html';
+    return path;
   }
 
   function parseJwt(token) {
@@ -119,7 +133,7 @@ var RouteGuard = (function () {
 
     if (permission.anonymousOnly && isLoggedIn) {
       var params = new URLSearchParams(window.location.search);
-      var redirect = params.get('redirect');
+      var redirect = sanitizeRedirectPath(params.get('redirect'));
       window.location.replace(redirect || '/index.html');
       return false;
     }
@@ -146,7 +160,7 @@ var RouteGuard = (function () {
     check();
   }
 
-  return { check: check, normalizeRole: normalizeRole, PAGE_PERMISSIONS: PAGE_PERMISSIONS };
+  return { check: check, normalizeRole: normalizeRole, sanitizeRedirectPath: sanitizeRedirectPath, PAGE_PERMISSIONS: PAGE_PERMISSIONS };
 })();
 
 if (typeof window !== 'undefined') {

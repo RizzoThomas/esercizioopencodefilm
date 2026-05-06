@@ -357,8 +357,24 @@ deleteFilm: (id) => apiFetch(`/films/${id}`, { method: 'DELETE' }),
   deleteCategoria: (id) => apiFetch(`/categorie/${id}`, { method: 'DELETE' }),
 
   // Admin Utenti
-  getUtenti: () => apiFetch('/admin/utenti'),
-  updateRuolo: (id, data) => apiFetch(`/admin/utenti/${id}/ruolo`, {
+  getUtenti: (params = {}) => {
+    var query = new URLSearchParams();
+    if (params.page != null) query.set('page', String(params.page));
+    if (params.pageSize != null) query.set('pageSize', String(params.pageSize));
+    if (params.search) query.set('search', String(params.search));
+    if (params.role) query.set('role', String(params.role));
+    var qs = query.toString();
+    return apiFetch('/admin/utenti' + (qs ? '?' + qs : ''));
+  },
+  createUtenteInvito: (data) => apiFetch('/admin/utenti/inviti', {
+    method: 'POST',
+    body: JSON.stringify(data)
+  }),
+  sendPasswordSetup: (userId) => apiFetch('/admin/utenti/' + userId + '/password-setup', {
+    method: 'POST'
+  }),
+  getUtenteSecurity: (userId) => apiFetch('/admin/utenti/' + userId + '/security'),
+  updateRuolo: (id, data) => apiFetch('/admin/utenti/' + id + '/ruolo', {
     method: 'PUT',
     body: JSON.stringify(data)
   }),

@@ -104,7 +104,9 @@ function confirmDelete(itemName, callback) {
 
 // Formatta importo in EUR
 function formatCurrency(amount) {
-  return new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR' }).format(amount);
+  var val = parseFloat(amount);
+  if (isNaN(val)) return '0,00 \u20AC';
+  return new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR' }).format(val);
 }
 
 // Ottiene URL copertina film con fallback
