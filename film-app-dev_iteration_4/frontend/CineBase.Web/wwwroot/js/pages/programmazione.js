@@ -525,9 +525,10 @@ function renderFilmCard(film) {
 function buildAcquistaUrl(showId) {
   const params = new URLSearchParams(window.location.search);
   const offertaId = params.get('offertaId') || sessionStorage.getItem('pending_offerta_id');
-  let url = '/acquista.html?showId=' + showId;
-  if (offertaId) url += '&offertaId=' + encodeURIComponent(offertaId);
-  return url;
+  if (offertaId) {
+    return '/pagamento.html?offertaId=' + encodeURIComponent(offertaId) + '&showId=' + encodeURIComponent(showId);
+  }
+  return '/acquista.html?showId=' + showId;
 }
 
 function getCarouselVisibleEstimate(track) {

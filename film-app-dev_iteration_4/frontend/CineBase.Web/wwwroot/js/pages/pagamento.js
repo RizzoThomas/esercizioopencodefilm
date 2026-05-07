@@ -2,6 +2,11 @@ let orderId = null;
 let ordine = null;
 let creditoData = null;
 let frontendConfig = null;
+const urlParams = new URLSearchParams(window.location.search);
+const offertaIdFromUrl = urlParams.get('offertaId');
+const showIdFromUrl = urlParams.get('showId');
+const abbonamentoIdFromUrl = urlParams.get('abbonamentoId');
+let paymentFlowMode = 'order';
 
 document.addEventListener('DOMContentLoaded', async () => {
   // Reset button state when page loads (fix for stuck "Elaborazione pagamento...")
@@ -9,6 +14,22 @@ document.addEventListener('DOMContentLoaded', async () => {
   
   if (!Auth?.isLoggedIn?.()) {
     window.location.replace('/login.html?redirect=' + encodeURIComponent(window.location.pathname + window.location.search));
+    return;
+  }
+
+  if (offertaIdFromUrl && showIdFromUrl) {
+    paymentFlowMode = 'offerta';
+    await Promise.all([loadCredito(), loadFrontendConfig()]);
+    await loadOffertaPayment(offertaIdFromUrl, showIdFromUrl);
+    setupActions();
+    return;
+  }
+
+  if (abbonamentoIdFromUrl) {
+    paymentFlowMode = 'abbonamento';
+    await Promise.all([loadCredito(), loadFrontendConfig()]);
+    await loadAbbonamentoPayment(abbonamentoIdFromUrl);
+    setupActions();
     return;
   }
 
@@ -55,6 +76,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Detect back-button return from Stripe: cancel abandoned checkout
   window.addEventListener('pageshow', async (e) => {
+    if (paymentFlowMode !== 'order') return;
     if (e.persisted) {
       // Page restored from bfcache (user clicked back from Stripe)
       try { ordine = await API.getOrdine(orderId); } catch {}
@@ -94,6 +116,93 @@ async function loadCredito() {
     creditoData = await API.getCreditoMe();
   } catch {
     creditoData = { saldoAttuale: 0 };
+  }
+}
+
+function normalizeCollection(data) {
+  if (Array.isArray(data)) return data;
+  if (Array.isArray(data?.$values)) return data.$values;
+  if (Array.isArray(data?.items)) return data.items;
+  return [];
+}
+
+function hideOrderOnlyControls() {
+  document.getElementById('option-misto')?.classList.add('hidden');
+  document.getElementById('option-ticket')?.classList.add('hidden');
+  document.getElementById('credit-slider-section')?.classList.add('hidden');
+  document.getElementById('btn-cancel')?.classList.add('hidden');
+}
+
+async function loadOffertaPayment(offertaId, showId) {
+  try {
+    const offers = normalizeCollection(await API.getOfferte());
+    const offerta = offers.find((offer) => String(offer.id) === String(offertaId)) || null;
+    if (!offerta) throw new Error('Offerta non trovata');
+
+    hideOrderOnlyControls();
+    document.getElementById('offerta-banner')?.classList.remove('hidden');
+    document.getElementById('offerta-banner-name').textContent = offerta.nome || 'Offerta';
+    document.getElementById('offerta-banner-desc').textContent = offerta.descrizione || '';
+
+    hideLoading();
+    document.getElementById('main-content').classList.remove('hidden');
+
+    document.getElementById('order-summary').innerHTML = `
+      <div class="flex justify-between text-sm">
+        <span class="text-body">Biglietti</span>
+        <span class="font-medium text-ink">${offerta.numeroBiglietti || 0}</span>
+      </div>
+      <div class="flex justify-between text-sm">
+        <span class="text-body">Popcorn</span>
+        <span class="font-medium text-ink">${offerta.includePopcorn || 0}</span>
+      </div>
+    `;
+
+    document.getElementById('order-total').textContent = formatCurrency(offerta.prezzo);
+    window._offertaData = { id: offertaId, showId, prezzo: offerta.prezzo };
+    ordine = { totaleLordo: offerta.prezzo, showId };
+
+    setupPaymentOptions();
+    onPaymentMethodChange(document.querySelector('input[name="payment-method"]:checked')?.value || 'carta');
+  } catch (e) {
+    showError(e?.message || 'Offerta non trovata');
+  }
+}
+
+async function loadAbbonamentoPayment(abbonamentoId) {
+  try {
+    const abbonamenti = normalizeCollection(await API.getAbbonamenti());
+    const abb = abbonamenti.find((item) => String(item.id) === String(abbonamentoId)) || null;
+    if (!abb) throw new Error('Abbonamento non trovato');
+
+    hideOrderOnlyControls();
+    document.getElementById('abbonamento-banner')?.classList.remove('hidden');
+    document.getElementById('abbonamento-banner-name').textContent = abb.nome || 'Abbonamento';
+    document.getElementById('abbonamento-banner-desc').textContent = abb.descrizione || '';
+
+    hideLoading();
+    document.getElementById('main-content').classList.remove('hidden');
+
+    const prezzo = abb.prezzoAnnuale || abb.prezzo || 0;
+    document.getElementById('order-summary').innerHTML = `
+      <div class="flex justify-between text-sm">
+        <span class="text-body">Tipo</span>
+        <span class="font-medium text-ink">${abb.tipo || '-'}</span>
+      </div>
+      <div class="flex justify-between text-sm">
+        <span class="text-body">Biglietti/mese</span>
+        <span class="font-medium text-ink">${abb.numeroBigliettiPerMese || 0}</span>
+      </div>
+    `;
+
+    document.getElementById('order-total').textContent = formatCurrency(prezzo);
+    window._abbonamentoData = { id: abbonamentoId, prezzo, tipo: abb.tipo };
+    ordine = { totaleLordo: prezzo, showId: 0 };
+
+    setupPaymentOptions();
+    onPaymentMethodChange(document.querySelector('input[name="payment-method"]:checked')?.value || 'carta');
+  } catch (e) {
+    showError(e?.message || 'Abbonamento non trovato');
   }
 }
 
@@ -251,7 +360,7 @@ function setupActions() {
     await handlePayment();
   });
 
-  btnCancel.addEventListener('click', async () => {
+  btnCancel?.addEventListener('click', async () => {
     btnCancel.disabled = true;
     btnCancel.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>Annullamento...';
 
@@ -281,21 +390,56 @@ async function handlePayment() {
       return;
     }
 
-    const _params = new URLSearchParams(window.location.search);
-    const _offertaId = _params.get('offertaId');
-    if (_offertaId) {
-      try {
-        const offerResult = await API.acquistaOfferta(_offertaId, ordine.showId);
-        if (offerResult?.id) {
-          window.location.href = '/esito-acquisto.html?orderId=' + offerResult.id + '&success=true';
-          return;
-        }
-      } catch (e) {
-        showToast('Errore attivazione offerta: ' + (e?.message || 'Riprova'), 'danger');
-        btnPay.disabled = false;
-        btnPay.innerHTML = '<i class="fa-solid fa-lock mr-2"></i><span id="pay-button-text">Riprova pagamento</span>';
+    if (window._offertaData) {
+      const method = document.querySelector('input[name="payment-method"]:checked')?.value || 'carta';
+      if (method === 'credito') {
+        const result = await API.acquistaOfferta(window._offertaData.id, window._offertaData.showId);
+        window.location.href = '/esito-acquisto.html?orderId=' + (result?.id || '') + '&success=true';
         return;
       }
+
+      const session = await API.createStripeCheckoutSession(0, {
+        metodoPagamento: 'Carta',
+        importo: window._offertaData.prezzo
+      });
+
+      if (session?.stripeCheckoutUrl) {
+        window.location.href = session.stripeCheckoutUrl;
+        return;
+      }
+
+      showToast('Errore nella creazione della sessione di pagamento', 'danger');
+      btnPay.disabled = false;
+      btnPay.innerHTML = '<i class="fa-solid fa-lock mr-2"></i><span id="pay-button-text">Riprova pagamento</span>';
+      return;
+    }
+
+    if (window._abbonamentoData) {
+      const method = document.querySelector('input[name="payment-method"]:checked')?.value || 'carta';
+      try {
+        const res = await fetch((window.API_BASE_URL || 'http://localhost:5000') + '/abbonamenti/' + window._abbonamentoData.id + '/attiva', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + Auth.getAccessToken()
+          },
+          body: JSON.stringify({ metodoPagamento: method === 'credito' ? 'credito' : 'carta', autoRinnovo: true })
+        });
+
+        if (res.ok) {
+          showToast('Abbonamento attivato!', 'success');
+          setTimeout(() => window.location.href = '/profilo.html', 1500);
+        } else {
+          const err = await res.json().catch(() => ({}));
+          showToast(err.message || 'Errore', 'danger');
+        }
+      } catch (e) {
+        showToast('Errore di rete', 'danger');
+      }
+
+      btnPay.disabled = false;
+      btnPay.innerHTML = '<i class="fa-solid fa-lock mr-2"></i><span id="pay-button-text">Riprova pagamento</span>';
+      return;
     }
 
     method = document.querySelector('input[name="payment-method"]:checked')?.value || 'carta';
@@ -446,6 +590,7 @@ function showError(message) {
 
 // Reset button state when returning from Stripe via browser back
 window.addEventListener('pageshow', (event) => {
+  if (paymentFlowMode !== 'order') return;
   if (event.persisted) {
     resetPayButton();
     if (orderId) {

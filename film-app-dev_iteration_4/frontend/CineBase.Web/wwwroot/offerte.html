@@ -299,29 +299,12 @@
         `;
 
         grid.querySelectorAll('.subscription-action-btn').forEach(btn => {
-          btn.addEventListener('click', async () => {
+          btn.addEventListener('click', () => {
             if (typeof Auth === 'undefined' || !Auth.isLoggedIn()) {
               window.location.href = '/login.html?redirect=/offerte.html';
               return;
             }
-
-            try {
-              const API_BASE = window.API_BASE_URL || 'http://localhost:5000';
-              const res = await fetch(API_BASE + '/abbonamenti/' + btn.dataset.subscriptionId + '/attiva', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + Auth.getAccessToken() },
-                body: JSON.stringify({ autoRinnovo: true, metodoPagamento: 'carta' })
-              });
-              if (res.ok) {
-                showToast('Abbonamento attivato! Vai al profilo per i dettagli.', 'success');
-                setTimeout(() => window.location.href = '/profilo.html', 1500);
-              } else {
-                const err = await res.json().catch(() => ({}));
-                showToast(err.message || 'Errore attivazione abbonamento', 'danger');
-              }
-            } catch (e) {
-              showToast('Errore di rete', 'danger');
-            }
+            window.location.href = '/pagamento.html?abbonamentoId=' + encodeURIComponent(btn.dataset.subscriptionId || '');
           });
         });
 
