@@ -29,6 +29,42 @@ public static class ProfiloEndpoints
             return result is null ? Results.NotFound() : Results.Ok(result);
         }).RequireAuthorization("Authenticated");
 
+        group.MapGet("/subscription", async (HttpContext context, IProfiloService service) =>
+        {
+            var userId = GetUserIdFromContext(context);
+            if (userId == null) return Results.Unauthorized();
+
+            var result = await service.GetUserSubscriptionAsync(userId.Value);
+            return result is null ? Results.NotFound() : Results.Ok(result);
+        }).RequireAuthorization("Authenticated");
+
+        group.MapGet("/vouchers", async (HttpContext context, IProfiloService service) =>
+        {
+            var userId = GetUserIdFromContext(context);
+            if (userId == null) return Results.Unauthorized();
+
+            var result = await service.GetUserVouchersAsync(userId.Value);
+            return Results.Ok(result);
+        }).RequireAuthorization("Authenticated");
+
+        group.MapPost("/subscription/cancel", async (HttpContext context, IProfiloService service) =>
+        {
+            var userId = GetUserIdFromContext(context);
+            if (userId == null) return Results.Unauthorized();
+
+            var result = await service.CancelUserSubscriptionAsync(userId.Value);
+            return result is null ? Results.NotFound() : Results.Ok(result);
+        }).RequireAuthorization("Authenticated");
+
+        group.MapPut("/subscription/autorenew", async (HttpContext context, AutoRenewRequestDTO dto, IProfiloService service) =>
+        {
+            var userId = GetUserIdFromContext(context);
+            if (userId == null) return Results.Unauthorized();
+
+            var result = await service.ToggleAutoRenewAsync(userId.Value, dto.AutoRinnovo);
+            return result is null ? Results.NotFound() : Results.Ok(result);
+        }).RequireAuthorization("Authenticated");
+
         group.MapGet("/cinema-preferito", async (HttpContext context, IProfiloService service) =>
         {
             var userId = GetUserIdFromContext(context);
@@ -91,5 +127,10 @@ public static class ProfiloEndpoints
         }
 
         return userId;
+    }
+
+    public class AutoRenewRequestDTO
+    {
+        public bool AutoRinnovo { get; set; }
     }
 }

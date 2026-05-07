@@ -40,6 +40,16 @@
     .offer-image-header {
       min-height: 9rem;
     }
+    .show-picker-overlay {
+      backdrop-filter: blur(10px);
+    }
+    .show-picker-btn {
+      transition: transform .15s ease, border-color .15s ease, background-color .15s ease;
+    }
+    .show-picker-btn:hover {
+      transform: translateY(-1px);
+      border-color: var(--ferrari-primary, #FF2800);
+    }
   </style>
 </head>
 
@@ -165,7 +175,7 @@
                   ${originalPrice ? `<span class="text-xs text-body/60 line-through">${originalPrice}</span>` : ''}
                 </div>
               </div>
-              <button class="btn-primary text-sm whitespace-nowrap" data-offer-id="${offerta.id}">
+              <button class="btn-primary text-sm whitespace-nowrap offer-acquista-btn" data-offer-id="${offerta.id}" data-cinema-id="${offerta.cinemaId || ''}">
                 Acquista
               </button>
             </div>
@@ -222,6 +232,61 @@
       setTimeout(() => toast.remove(), 4000);
     }
 
+    function showShowPicker(shows, offerId) {
+      const oldOverlay = document.querySelector('[data-show-picker-overlay]');
+      if (oldOverlay) oldOverlay.remove();
+
+      const overlay = document.createElement('div');
+      overlay.dataset.showPickerOverlay = 'true';
+      overlay.className = 'show-picker-overlay fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4';
+      overlay.innerHTML = `
+        <div class="bg-canvas-elevated border border-hairline rounded-2xl p-6 max-w-2xl w-full max-h-[85vh] overflow-y-auto shadow-2xl">
+          <div class="flex items-start justify-between gap-4 mb-5">
+            <div>
+              <p class="text-ferrari-primary uppercase tracking-[0.25em] text-xs mb-2">Seleziona spettacolo</p>
+              <h3 class="text-2xl font-bold text-ink">Scegli dove usare l'offerta</h3>
+              <p class="text-body text-sm mt-1">Seleziona uno spettacolo disponibile per proseguire al pagamento.</p>
+            </div>
+            <button class="text-body hover:text-ink text-2xl close-picker-btn" aria-label="Chiudi">&times;</button>
+          </div>
+          <div class="space-y-3">
+            ${shows.map((s) => {
+              const showDate = s.startAtUtc ? new Date(s.startAtUtc).toLocaleString('it-IT', { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : 'Data non disponibile';
+              return `
+                <button class="show-picker-btn w-full text-left p-4 rounded-xl bg-canvas border border-hairline transition-colors"
+                  data-show-id="${s.id}">
+                  <div class="flex items-start justify-between gap-4">
+                    <div class="min-w-0">
+                      <p class="text-lg font-semibold text-ink truncate">${s.filmTitolo || 'Film'}</p>
+                      <p class="text-sm text-body mt-1">${showDate}</p>
+                      <p class="text-sm text-body mt-1">${s.cinemaNome || ''}${s.salaNome ? ` · Sala ${s.salaNome}` : ''}</p>
+                    </div>
+                    <div class="shrink-0 text-ferrari-primary">
+                      <i class="fa-solid fa-ticket text-xl"></i>
+                    </div>
+                  </div>
+                </button>`;
+            }).join('')}
+          </div>
+          <button class="mt-5 w-full btn-outline text-sm close-picker-btn">Annulla</button>
+        </div>`;
+
+      document.body.appendChild(overlay);
+      const close = () => overlay.remove();
+      overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) close();
+      });
+      overlay.querySelectorAll('.close-picker-btn').forEach((btn) => btn.addEventListener('click', close));
+      overlay.querySelectorAll('.show-picker-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const showId = btn.dataset.showId;
+          if (!showId) return;
+          close();
+          window.location.href = `/pagamento.html?offertaId=${encodeURIComponent(offerId)}&showId=${encodeURIComponent(showId)}`;
+        });
+      });
+    }
+
     function normalizeCollection(data) {
       if (Array.isArray(data)) return data;
       if (Array.isArray(data?.$values)) return data.$values;
@@ -263,17 +328,30 @@
           </div>
         `;
 
-        grid.querySelectorAll('[data-offer-id]').forEach((btn) => {
+        grid.querySelectorAll('.offer-acquista-btn').forEach((btn) => {
           btn.addEventListener('click', () => {
             const offerId = btn.getAttribute('data-offer-id');
+            const cinemaId = btn.getAttribute('data-cinema-id');
             if (!offerId) return;
-            sessionStorage.setItem('pending_offerta_id', offerId);
-            const targetUrl = `/programmazione.html?offertaId=${encodeURIComponent(offerId)}`;
-            if (typeof Auth !== 'undefined' && Auth.isLoggedIn && Auth.isLoggedIn()) {
-              window.location.assign(targetUrl);
-            } else {
-              window.location.assign(`/login.html?redirect=${encodeURIComponent(targetUrl)}`);
+            const isLoggedIn = typeof Auth !== 'undefined' && Auth.isLoggedIn && Auth.isLoggedIn();
+            if (!isLoggedIn) {
+              window.location.href = '/login.html?redirect=' + encodeURIComponent('/offerte.html');
+              return;
             }
+
+            (async () => {
+              try {
+                const shows = normalizeCollection(await API.getShows(cinemaId));
+                if (!shows.length) {
+                  showToast('Nessuno spettacolo disponibile per questo cinema', 'warning');
+                  return;
+                }
+                showShowPicker(shows, offerId);
+              } catch (error) {
+                console.error(error);
+                showToast('Errore caricamento spettacoli', 'danger');
+              }
+            })();
           });
         });
 

@@ -1,6 +1,7 @@
 using FilmAPI.Data;
 using FilmAPI.DTO;
 using FilmAPI.Model;
+using FilmAPI.Services;
 using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
 
@@ -74,6 +75,45 @@ public static class AbbonamentiEndpoints
             await db.SaveChangesAsync();
 
             return Results.Ok(new { message = "Abbonamento attivato!", subscriptionId = sub.Id, dataScadenza = sub.DataScadenza });
+        }).RequireAuthorization("Authenticated");
+
+        abbonamentiGroup.MapPost("/{id}/stripe-checkout-session", async (
+            int id,
+            HttpContext httpContext,
+            ClaimsPrincipal user,
+            FilmDbContext db,
+            IStripePaymentGateway stripeGateway) =>
+        {
+            var userId = int.Parse(user.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
+            if (userId == 0) return Results.Unauthorized();
+
+            var abbonamento = await db.Abbonamenti.AsNoTracking().FirstOrDefaultAsync(a => a.Id == id && a.Attivo);
+            if (abbonamento is null) return Results.NotFound("Abbonamento non trovato.");
+
+            var frontendBaseUrl = Environment.GetEnvironmentVariable("FRONTEND_BASE_URL") ?? "http://localhost:5001";
+            var successUrl = $"{frontendBaseUrl}/pagamento.html?abbonamentoId={id}&stripe=success&session_id={{CHECKOUT_SESSION_ID}}";
+            var cancelUrl = $"{frontendBaseUrl}/pagamento.html?abbonamentoId={id}&stripe=cancelled";
+
+            var session = await stripeGateway.CreateCheckoutSessionAsync(
+                new StripeCreateCheckoutSessionRequest
+                {
+                    OrderId = 0,
+                    OrderCode = $"ABBONAMENTO-{id}",
+                    UserId = userId,
+                    ShowId = 0,
+                    Amount = abbonamento.PrezzoAnnuale ?? abbonamento.Prezzo,
+                    SuccessUrl = successUrl,
+                    CancelUrl = cancelUrl
+                },
+                httpContext.Request.Headers["Idempotency-Key"].FirstOrDefault());
+
+            return Results.Ok(new
+            {
+                stripeCheckoutSessionId = session.Id,
+                stripeCheckoutUrl = session.Url,
+                expiresAtUtc = session.ExpiresAt,
+                amount = abbonamento.PrezzoAnnuale ?? abbonamento.Prezzo
+            });
         }).RequireAuthorization("Authenticated");
     }
 }

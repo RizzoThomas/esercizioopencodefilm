@@ -6,6 +6,7 @@ const urlParams = new URLSearchParams(window.location.search);
 const offertaIdFromUrl = urlParams.get('offertaId');
 const showIdFromUrl = urlParams.get('showId');
 const abbonamentoIdFromUrl = urlParams.get('abbonamentoId');
+const stripeStatusFromUrl = urlParams.get('stripe');
 let paymentFlowMode = 'order';
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -20,6 +21,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (offertaIdFromUrl && showIdFromUrl) {
     paymentFlowMode = 'offerta';
     await Promise.all([loadCredito(), loadFrontendConfig()]);
+    if (stripeStatusFromUrl === 'success') {
+      await finalizeOffertaAfterStripe(offertaIdFromUrl, showIdFromUrl);
+      return;
+    }
     await loadOffertaPayment(offertaIdFromUrl, showIdFromUrl);
     setupActions();
     return;
@@ -28,6 +33,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (abbonamentoIdFromUrl) {
     paymentFlowMode = 'abbonamento';
     await Promise.all([loadCredito(), loadFrontendConfig()]);
+    if (stripeStatusFromUrl === 'success') {
+      await finalizeAbbonamentoAfterStripe(abbonamentoIdFromUrl);
+      return;
+    }
     await loadAbbonamentoPayment(abbonamentoIdFromUrl);
     setupActions();
     return;
@@ -131,6 +140,7 @@ function hideOrderOnlyControls() {
   document.getElementById('option-ticket')?.classList.add('hidden');
   document.getElementById('credit-slider-section')?.classList.add('hidden');
   document.getElementById('btn-cancel')?.classList.add('hidden');
+  document.getElementById('order-summary-card')?.classList.add('hidden');
 }
 
 async function loadOffertaPayment(offertaId, showId) {
@@ -141,6 +151,7 @@ async function loadOffertaPayment(offertaId, showId) {
 
     hideOrderOnlyControls();
     document.getElementById('offerta-banner')?.classList.remove('hidden');
+    document.getElementById('offerta-banner').classList.remove('hidden');
     document.getElementById('offerta-banner-name').textContent = offerta.nome || 'Offerta';
     document.getElementById('offerta-banner-desc').textContent = offerta.descrizione || '';
 
@@ -159,13 +170,63 @@ async function loadOffertaPayment(offertaId, showId) {
     `;
 
     document.getElementById('order-total').textContent = formatCurrency(offerta.prezzo);
-    window._offertaData = { id: offertaId, showId, prezzo: offerta.prezzo };
+    window._offertaData = { id: offertaId, showId, prezzo: offerta.prezzo, nome: offerta.nome };
     ordine = { totaleLordo: offerta.prezzo, showId };
 
     setupPaymentOptions();
     onPaymentMethodChange(document.querySelector('input[name="payment-method"]:checked')?.value || 'carta');
   } catch (e) {
     showError(e?.message || 'Offerta non trovata');
+  }
+}
+
+async function finalizeOffertaAfterStripe(offertaId, showId) {
+  const marker = `offerta-finalized-${offertaId}-${showId}`;
+  if (sessionStorage.getItem(marker)) {
+    window.location.href = '/profilo.html';
+    return;
+  }
+
+  try {
+    const result = await API.acquistaOfferta(offertaId, showId);
+    sessionStorage.setItem(marker, '1');
+    if (result?.id) {
+      window.location.href = '/esito-acquisto.html?orderId=' + result.id + '&success=true';
+      return;
+    }
+    throw new Error('Finalizzazione offerta fallita');
+  } catch (e) {
+    showError(e?.message || 'Finalizzazione offerta fallita');
+  }
+}
+
+async function finalizeAbbonamentoAfterStripe(abbonamentoId) {
+  const marker = `abbonamento-finalized-${abbonamentoId}`;
+  if (sessionStorage.getItem(marker)) {
+    window.location.href = '/profilo.html';
+    return;
+  }
+
+  try {
+    const res = await fetch((window.API_BASE_URL || 'http://localhost:5000') + '/abbonamenti/' + abbonamentoId + '/attiva', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + Auth.getAccessToken()
+      },
+      body: JSON.stringify({ metodoPagamento: 'carta', autoRinnovo: true })
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.message || 'Attivazione abbonamento fallita');
+    }
+
+    sessionStorage.setItem(marker, '1');
+    showToast('Abbonamento attivato!', 'success');
+    setTimeout(() => window.location.href = '/profilo.html', 1200);
+  } catch (e) {
+    showError(e?.message || 'Attivazione abbonamento fallita');
   }
 }
 
@@ -177,6 +238,7 @@ async function loadAbbonamentoPayment(abbonamentoId) {
 
     hideOrderOnlyControls();
     document.getElementById('abbonamento-banner')?.classList.remove('hidden');
+    document.getElementById('abbonamento-banner').classList.remove('hidden');
     document.getElementById('abbonamento-banner-name').textContent = abb.nome || 'Abbonamento';
     document.getElementById('abbonamento-banner-desc').textContent = abb.descrizione || '';
 
@@ -196,7 +258,7 @@ async function loadAbbonamentoPayment(abbonamentoId) {
     `;
 
     document.getElementById('order-total').textContent = formatCurrency(prezzo);
-    window._abbonamentoData = { id: abbonamentoId, prezzo, tipo: abb.tipo };
+    window._abbonamentoData = { id: abbonamentoId, prezzo, tipo: abb.tipo, nome: abb.nome };
     ordine = { totaleLordo: prezzo, showId: 0 };
 
     setupPaymentOptions();
@@ -393,15 +455,23 @@ async function handlePayment() {
     if (window._offertaData) {
       const method = document.querySelector('input[name="payment-method"]:checked')?.value || 'carta';
       if (method === 'credito') {
-        const result = await API.acquistaOfferta(window._offertaData.id, window._offertaData.showId);
-        window.location.href = '/esito-acquisto.html?orderId=' + (result?.id || '') + '&success=true';
-        return;
+        try {
+          const result = await API.acquistaOfferta(window._offertaData.id, window._offertaData.showId);
+          if (result?.id) {
+            window.location.href = '/esito-acquisto.html?orderId=' + result.id + '&success=true';
+            return;
+          }
+          throw new Error('Risposta acquisto offerta non valida');
+        } catch (e) {
+          showToast('Errore: ' + (e?.message || 'pagamento offerta'), 'danger');
+          btnPay.disabled = false;
+          btnPay.innerHTML = '<i class="fa-solid fa-lock mr-2"></i><span id="pay-button-text">Riprova pagamento</span>';
+          return;
+        }
       }
 
-      const session = await API.createStripeCheckoutSession(0, {
-        metodoPagamento: 'Carta',
-        importo: window._offertaData.prezzo
-      });
+      const idempotencyKey = `offerta-${window._offertaData.id}-${Date.now()}`;
+      const session = await API.createOffertaStripeCheckoutSession(window._offertaData.id, window._offertaData.showId, idempotencyKey);
 
       if (session?.stripeCheckoutUrl) {
         window.location.href = session.stripeCheckoutUrl;
@@ -416,6 +486,42 @@ async function handlePayment() {
 
     if (window._abbonamentoData) {
       const method = document.querySelector('input[name="payment-method"]:checked')?.value || 'carta';
+      if (method === 'credito') {
+        try {
+          const res = await fetch((window.API_BASE_URL || 'http://localhost:5000') + '/abbonamenti/' + window._abbonamentoData.id + '/attiva', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer ' + Auth.getAccessToken()
+            },
+            body: JSON.stringify({ metodoPagamento: 'credito', autoRinnovo: true })
+          });
+
+          if (res.ok) {
+            showToast('Abbonamento attivato!', 'success');
+            setTimeout(() => window.location.href = '/profilo.html', 1500);
+            return;
+          }
+
+          const err = await res.json().catch(() => ({}));
+          showToast(err.message || 'Errore', 'danger');
+        } catch (e) {
+          showToast('Errore di rete', 'danger');
+        }
+
+        btnPay.disabled = false;
+        btnPay.innerHTML = '<i class="fa-solid fa-lock mr-2"></i><span id="pay-button-text">Riprova pagamento</span>';
+        return;
+      }
+
+      const idempotencyKey = `abbonamento-${window._abbonamentoData.id}-${Date.now()}`;
+      const session = await API.createAbbonamentoStripeCheckoutSession(window._abbonamentoData.id, idempotencyKey);
+
+      if (session?.stripeCheckoutUrl) {
+        window.location.href = session.stripeCheckoutUrl;
+        return;
+      }
+
       try {
         const res = await fetch((window.API_BASE_URL || 'http://localhost:5000') + '/abbonamenti/' + window._abbonamentoData.id + '/attiva', {
           method: 'POST',
@@ -423,16 +529,17 @@ async function handlePayment() {
             'Content-Type': 'application/json',
             'Authorization': 'Bearer ' + Auth.getAccessToken()
           },
-          body: JSON.stringify({ metodoPagamento: method === 'credito' ? 'credito' : 'carta', autoRinnovo: true })
+          body: JSON.stringify({ metodoPagamento: 'carta', autoRinnovo: true })
         });
 
         if (res.ok) {
           showToast('Abbonamento attivato!', 'success');
           setTimeout(() => window.location.href = '/profilo.html', 1500);
-        } else {
-          const err = await res.json().catch(() => ({}));
-          showToast(err.message || 'Errore', 'danger');
+          return;
         }
+
+        const err = await res.json().catch(() => ({}));
+        showToast(err.message || 'Errore', 'danger');
       } catch (e) {
         showToast('Errore di rete', 'danger');
       }

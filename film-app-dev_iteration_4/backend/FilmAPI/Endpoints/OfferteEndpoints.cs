@@ -105,6 +105,51 @@ public static class OfferteEndpoints
             var summary = await checkoutService.GetOrdineByIdAsync(order.Id, userId);
             return summary is null ? Results.NotFound() : Results.Ok(summary);
         }).RequireAuthorization("Authenticated");
+
+        offerteGroup.MapPost("/{id}/stripe-checkout-session", async (
+            int id,
+            CreateOffertaCheckoutSessionRequestDTO req,
+            HttpContext httpContext,
+            ClaimsPrincipal user,
+            FilmDbContext db,
+            IStripePaymentGateway stripeGateway) =>
+        {
+            var userId = int.Parse(user.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
+            if (userId == 0)
+                return Results.Unauthorized();
+
+            if (req.ShowId <= 0)
+                return Results.BadRequest("ShowId obbligatorio.");
+
+            var offer = await db.Offerte.AsNoTracking().FirstOrDefaultAsync(o => o.Id == id && o.Attiva);
+            if (offer is null)
+                return Results.NotFound("Offerta non trovata.");
+
+            var frontendBaseUrl = Environment.GetEnvironmentVariable("FRONTEND_BASE_URL") ?? "http://localhost:5001";
+            var successUrl = $"{frontendBaseUrl}/pagamento.html?offertaId={id}&showId={req.ShowId}&stripe=success&session_id={{CHECKOUT_SESSION_ID}}";
+            var cancelUrl = $"{frontendBaseUrl}/pagamento.html?offertaId={id}&showId={req.ShowId}&stripe=cancelled";
+
+            var session = await stripeGateway.CreateCheckoutSessionAsync(
+                new StripeCreateCheckoutSessionRequest
+                {
+                    OrderId = 0,
+                    OrderCode = $"OFFERTA-{id}",
+                    UserId = userId,
+                    ShowId = req.ShowId,
+                    Amount = offer.Prezzo,
+                    SuccessUrl = successUrl,
+                    CancelUrl = cancelUrl
+                },
+                httpContext.Request.Headers["Idempotency-Key"].FirstOrDefault());
+
+            return Results.Ok(new
+            {
+                stripeCheckoutSessionId = session.Id,
+                stripeCheckoutUrl = session.Url,
+                expiresAtUtc = session.ExpiresAt,
+                amount = offer.Prezzo
+            });
+        }).RequireAuthorization("Authenticated");
     }
 
     private static async Task<List<int>?> SelectAvailableSeatIdsAsync(FilmDbContext db, int showId, int salaId, int requiredCount)
