@@ -419,6 +419,20 @@ public sealed class FakeEmailService : IEmailService
         });
     }
 
+    public Task<EmailSendResult> SendVoucherPurchaseAsync(string recipientEmail, string recipientName, string voucherCode, decimal importo, DateTime? scadenzaUtc, CancellationToken cancellationToken = default)
+    {
+        lock (_lock)
+        {
+            _sentEmails.Add(new SentEmailRecord { RecipientEmail = recipientEmail, FileName = "voucher_purchase" });
+        }
+
+        return Task.FromResult(new EmailSendResult
+        {
+            Success = true,
+            SentAtUtc = DateTime.UtcNow
+        });
+    }
+
     public void Reset()
     {
         lock (_lock)

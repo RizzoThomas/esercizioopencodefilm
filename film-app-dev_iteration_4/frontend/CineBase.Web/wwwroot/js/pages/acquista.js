@@ -586,7 +586,11 @@ function setupActions() {
       stopKeepAlive();
       stopCountdown();
 
-      window.location.href = `/pagamento.html?orderId=${ordine.id}`;
+      const params = new URLSearchParams(window.location.search);
+      const offertaId = params.get('offertaId');
+      let url = '/pagamento.html?orderId=' + ordine.id;
+      if (offertaId) url += '&offertaId=' + encodeURIComponent(offertaId);
+      window.location.href = url;
     } catch (error) {
       handleApiError(error);
       btnContinue.disabled = false;

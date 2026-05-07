@@ -306,7 +306,8 @@
             }
 
             try {
-              const res = await fetch('/api/abbonamenti/' + btn.dataset.subscriptionId + '/attiva', {
+              const API_BASE = window.API_BASE_URL || 'http://localhost:5000';
+              const res = await fetch(API_BASE + '/abbonamenti/' + btn.dataset.subscriptionId + '/attiva', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + Auth.getAccessToken() },
                 body: JSON.stringify({ autoRinnovo: true, metodoPagamento: 'carta' })

@@ -12,3 +12,9 @@ public class AbbonamentoDTO
     public int NumeroBigliettiPerMese { get; set; }
     public int IncludePopcornPerMese { get; set; }
 }
+
+public class AttivaAbbonamentoRequest
+{
+    public string? MetodoPagamento { get; set; }
+    public bool AutoRinnovo { get; set; } = true;
+}

@@ -281,6 +281,23 @@ async function handlePayment() {
       return;
     }
 
+    const _params = new URLSearchParams(window.location.search);
+    const _offertaId = _params.get('offertaId');
+    if (_offertaId) {
+      try {
+        const offerResult = await API.acquistaOfferta(_offertaId, ordine.showId);
+        if (offerResult?.id) {
+          window.location.href = '/esito-acquisto.html?orderId=' + offerResult.id + '&success=true';
+          return;
+        }
+      } catch (e) {
+        showToast('Errore attivazione offerta: ' + (e?.message || 'Riprova'), 'danger');
+        btnPay.disabled = false;
+        btnPay.innerHTML = '<i class="fa-solid fa-lock mr-2"></i><span id="pay-button-text">Riprova pagamento</span>';
+        return;
+      }
+    }
+
     method = document.querySelector('input[name="payment-method"]:checked')?.value || 'carta';
     let importoCreditoRichiesto = null;
 

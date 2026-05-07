@@ -523,9 +523,11 @@ function renderFilmCard(film) {
 }
 
 function buildAcquistaUrl(showId) {
-  const url = `/acquista.html?showId=${showId}`;
-  if (!pendingOffertaId) return url;
-  return `${url}&offertaId=${encodeURIComponent(pendingOffertaId)}`;
+  const params = new URLSearchParams(window.location.search);
+  const offertaId = params.get('offertaId') || sessionStorage.getItem('pending_offerta_id');
+  let url = '/acquista.html?showId=' + showId;
+  if (offertaId) url += '&offertaId=' + encodeURIComponent(offertaId);
+  return url;
 }
 
 function getCarouselVisibleEstimate(track) {
