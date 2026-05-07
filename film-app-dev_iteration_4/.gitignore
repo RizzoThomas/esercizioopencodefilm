@@ -494,3 +494,4 @@ $RECYCLE.BIN/
 
 # Build archives
 ../*.zip
+token-usage-output.txt
