@@ -62,6 +62,30 @@ public class UserInfoDTO
     public bool TwoFactorEnabled { get; set; }
 }
 
+public class UserSubscriptionDTO
+{
+    public int Id { get; set; }
+    public int AbbonamentoId { get; set; }
+    public string AbbonamentoNome { get; set; } = string.Empty;
+    public string AbbonamentoTipo { get; set; } = string.Empty;
+    public string MetodoPagamento { get; set; } = string.Empty;
+    public bool AutoRinnovo { get; set; }
+    public DateTime DataInizio { get; set; }
+    public DateTime DataScadenza { get; set; }
+    public string Stato { get; set; } = string.Empty;
+    public int NumeroBigliettiPerMese { get; set; }
+    public int IncludePopcornPerMese { get; set; }
+}
+
+public class UserVoucherDTO
+{
+    public int Id { get; set; }
+    public string Codice { get; set; } = string.Empty;
+    public decimal Importo { get; set; }
+    public DateTime? DataScadenza { get; set; }
+    public string Stato { get; set; } = string.Empty;
+}
+
 public class RefreshTokenRequestDTO
 {
     [Required]

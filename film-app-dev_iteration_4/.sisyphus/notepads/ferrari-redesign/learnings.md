@@ -1,1 +1,2 @@
 Seeded offers/subscriptions need backend + frontend contract alignment: offers now expose discount metadata, subscriptions are a separate collection, and the frontend should render both with consistent Ferrari-themed cards.
+Profile enrichment works best when the new subscription/voucher blocks stay hidden until data arrives; this keeps existing profile sections stable and avoids empty UI noise for users without active items.

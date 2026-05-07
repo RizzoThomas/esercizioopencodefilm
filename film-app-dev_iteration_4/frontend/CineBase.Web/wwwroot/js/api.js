@@ -334,6 +334,13 @@ deleteFilm: (id) => apiFetch(`/films/${id}`, { method: 'DELETE' }),
     method: 'PUT',
     body: JSON.stringify(data)
   }),
+  getUserVouchers: () => apiFetch('/users/me/vouchers'),
+  getUserSubscription: () => apiFetch('/users/me/subscription'),
+  cancelSubscription: () => apiFetch('/users/me/subscription/cancel', { method: 'POST' }),
+  toggleAutoRenew: (autoRinnovo) => apiFetch('/users/me/subscription/autorenew', {
+    method: 'PUT',
+    body: JSON.stringify({ autoRinnovo })
+  }),
 
   // Prenotazioni
   getPrenotazioni: () => apiFetch('/prenotazioni'),
@@ -507,8 +514,6 @@ deleteFilm: (id) => apiFetch(`/films/${id}`, { method: 'DELETE' }),
     method: 'POST',
     body: JSON.stringify({ showId: showId })
   }),
-  getUserVouchers: () => apiFetch('/users/me/vouchers'),
-
   // Checkout - Annulla ordine pendente
   cancelOrdine: (orderId) => apiFetch(`/checkout/orders/${orderId}/cancel`, {
     method: 'POST'

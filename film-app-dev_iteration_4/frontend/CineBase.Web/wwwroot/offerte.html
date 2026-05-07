@@ -299,11 +299,27 @@
         `;
 
         grid.querySelectorAll('.subscription-action-btn').forEach(btn => {
-          btn.addEventListener('click', () => {
-            if (typeof Auth !== 'undefined' && Auth.isLoggedIn()) {
-              showToast('🎬 Abbonamento "' + btn.dataset.subscriptionName + '" — funzione in arrivo! Contatta il cinema per attivarlo.', 'info');
-            } else {
-              window.location.href = '/login.html?redirect=' + encodeURIComponent('/offerte.html');
+          btn.addEventListener('click', async () => {
+            if (typeof Auth === 'undefined' || !Auth.isLoggedIn()) {
+              window.location.href = '/login.html?redirect=/offerte.html';
+              return;
+            }
+
+            try {
+              const res = await fetch('/api/abbonamenti/' + btn.dataset.subscriptionId + '/attiva', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + Auth.getAccessToken() },
+                body: JSON.stringify({ autoRinnovo: true, metodoPagamento: 'carta' })
+              });
+              if (res.ok) {
+                showToast('Abbonamento attivato! Vai al profilo per i dettagli.', 'success');
+                setTimeout(() => window.location.href = '/profilo.html', 1500);
+              } else {
+                const err = await res.json().catch(() => ({}));
+                showToast(err.message || 'Errore attivazione abbonamento', 'danger');
+              }
+            } catch (e) {
+              showToast('Errore di rete', 'danger');
             }
           });
         });

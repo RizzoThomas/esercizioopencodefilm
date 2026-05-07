@@ -1,6 +1,7 @@
 let profiloData = null;
 let creditoData = null;
 let cinemaPreferito = null;
+let userSubscriptionData = null;
 
 document.addEventListener('DOMContentLoaded', async () => {
   if (!Auth?.isLoggedIn?.()) {
@@ -32,6 +33,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     loadProfilo(),
     loadCredito(),
     loadCinemaPreferito(),
+    loadUserSubscription(),
+    loadUserVouchers(),
     loadOrdini(),
     loadBiglietti(),
     loadPrenotazioniLegacy(),
@@ -41,6 +44,98 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   setupProfiloForm();
 });
+
+async function loadUserSubscription() {
+  try {
+    const sub = await API.getUserSubscription();
+    if (!sub) return;
+
+    userSubscriptionData = sub;
+    const section = document.getElementById('subscription-section');
+    if (!section) return;
+    section.classList.remove('hidden');
+    const content = document.getElementById('subscription-content');
+    if (!content) return;
+
+    content.innerHTML = `
+      <div class="p-4 bg-canvas-elevated rounded-lg border border-hairline">
+        <div class="flex justify-between items-start mb-3">
+          <div>
+            <h3 class="text-xl font-bold text-ink">${sub.abbonamentoNome}</h3>
+            <p class="text-sm text-body">${sub.abbonamentoTipo} · Dal ${new Date(sub.dataInizio).toLocaleDateString('it-IT')}</p>
+          </div>
+          <span class="px-3 py-1 rounded-full text-xs font-semibold ${sub.stato === 'attivo' ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}">${sub.stato}</span>
+        </div>
+        <div class="space-y-1.5 text-sm text-ink/90 mb-4">
+          <div><i class="fa-solid fa-ticket mr-2 text-ferrari-primary"></i>${sub.numeroBigliettiPerMese} biglietti/mese</div>
+          ${sub.includePopcornPerMese > 0 ? `<div><i class="fa-solid fa-popcorn mr-2 text-ferrari-primary"></i>${sub.includePopcornPerMese} popcorn/mese</div>` : ''}
+          <div><i class="fa-solid fa-calendar mr-2 text-ferrari-primary"></i>Scade: ${new Date(sub.dataScadenza).toLocaleDateString('it-IT')}</div>
+        </div>
+        <div class="flex gap-3 flex-wrap">
+          <button onclick="toggleAutoRenew()" class="btn-outline text-xs px-3 py-1.5">
+            <i class="fa-solid fa-rotate mr-1"></i>Rinnovo auto: ${sub.autoRinnovo ? 'ON' : 'OFF'}
+          </button>
+          <button onclick="cancelUserSubscription()" class="btn-outline text-xs px-3 py-1.5 text-red-400 border-red-400/30">
+            <i class="fa-solid fa-xmark mr-1"></i>Cancella
+          </button>
+        </div>
+      </div>`;
+  } catch (e) {
+    console.error('subscription load err', e);
+  }
+}
+
+async function loadUserVouchers() {
+  try {
+    const vouchers = await API.getUserVouchers();
+    if (!vouchers?.length) return;
+
+    const section = document.getElementById('vouchers-section');
+    if (!section) return;
+    section.classList.remove('hidden');
+    const content = document.getElementById('vouchers-content');
+    if (!content) return;
+
+    content.innerHTML = vouchers.map(v => `
+      <div class="p-4 bg-canvas-elevated rounded-lg border border-hairline">
+        <p class="text-xs text-body uppercase tracking-wider mb-1">Codice</p>
+        <p class="text-lg font-mono font-bold text-ferrari-primary mb-2">${v.codice}</p>
+        <div class="flex justify-between text-sm">
+          <span class="text-ink font-semibold">${Number(v.importo || v.saldoResiduo || 0).toFixed(2)} €</span>
+          <span class="${v.stato === 'attivo' ? 'text-green-400' : 'text-red-400'} text-xs font-semibold uppercase">${v.stato}</span>
+        </div>
+        ${v.dataScadenza ? `<p class="text-xs text-body/60 mt-1">Scade: ${new Date(v.dataScadenza).toLocaleDateString('it-IT')}</p>` : ''}
+      </div>`).join('');
+  } catch (e) {
+    console.error('voucher load err', e);
+  }
+}
+
+async function toggleAutoRenew() {
+  try {
+    const autoRinnovo = !userSubscriptionData?.autoRinnovo;
+    const res = await API.toggleAutoRenew(autoRinnovo);
+    if (res) {
+      await loadUserSubscription();
+      showToast('Auto-rinnovo aggiornato', 'success');
+    }
+  } catch (e) {
+    showToast('Errore', 'danger');
+  }
+}
+
+async function cancelUserSubscription() {
+  if (!confirm('Sei sicuro di voler cancellare l\'abbonamento?')) return;
+  try {
+    const res = await API.cancelSubscription();
+    if (res !== undefined) {
+      await loadUserSubscription();
+      showToast('Abbonamento cancellato', 'warning');
+    }
+  } catch (e) {
+    showToast('Errore', 'danger');
+  }
+}
 
 async function loadProfilo() {
   try {

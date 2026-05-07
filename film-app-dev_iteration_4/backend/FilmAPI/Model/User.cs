@@ -81,6 +81,7 @@ public class User
     public ICollection<Prenotazione> Prenotazioni { get; set; } = new List<Prenotazione>();
     public ICollection<Ordine> Ordini { get; set; } = new List<Ordine>();
     public ICollection<Biglietto> Biglietti { get; set; } = new List<Biglietto>();
+    public ICollection<UserSubscription> UserSubscriptions { get; set; } = new List<UserSubscription>();
     public ICollection<UserExternalLogin> ExternalLogins { get; set; } = new List<UserExternalLogin>();
     public ICollection<AccountActionToken> ActionTokens { get; set; } = new List<AccountActionToken>();
 

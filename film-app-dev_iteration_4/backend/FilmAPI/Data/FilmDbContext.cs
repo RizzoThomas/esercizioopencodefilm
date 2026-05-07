@@ -41,6 +41,7 @@ public class FilmDbContext : DbContext
     public DbSet<Offerta> Offerte { get; set; }
     public DbSet<Abbonamento> Abbonamenti { get; set; }
     public DbSet<Voucher> Vouchers { get; set; }
+    public DbSet<UserSubscription> UserSubscriptions { get; set; }
 
     // ─── Iteration 5: Auth & Security ─────────────────────────────
     public DbSet<UserExternalLogin> UserExternalLogins { get; set; }
@@ -346,6 +347,22 @@ public class FilmDbContext : DbContext
         {
             entity.HasIndex(e => e.Codice)
                   .IsUnique();
+        });
+
+        modelBuilder.Entity<UserSubscription>(entity =>
+        {
+            entity.HasIndex(e => new { e.UserId, e.Stato });
+            entity.HasIndex(e => e.DataScadenza);
+
+            entity.HasOne(e => e.User)
+                  .WithMany(u => u.UserSubscriptions)
+                  .HasForeignKey(e => e.UserId)
+                  .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(e => e.Abbonamento)
+                  .WithMany()
+                  .HasForeignKey(e => e.AbbonamentoId)
+                  .OnDelete(DeleteBehavior.Restrict);
         });
 
         modelBuilder.Entity<MovimentoCredito>(entity =>
