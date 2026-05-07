@@ -13,11 +13,16 @@ public static class OfferteEndpoints
     {
         var offerteGroup = app.MapGroup("/offerte");
 
-        offerteGroup.MapGet("/", async (FilmDbContext db) =>
+        offerteGroup.MapGet("/", async (FilmDbContext db, int? cinemaId) =>
         {
-            var offerte = await db.Offerte
+            var query = db.Offerte
                 .AsNoTracking()
-                .Where(o => o.Attiva)
+                .Where(o => o.Attiva);
+
+            if (cinemaId.HasValue && cinemaId.Value > 0)
+                query = query.Where(o => o.CinemaId == cinemaId.Value);
+
+            var offerte = await query
                 .OrderBy(o => o.Prezzo)
                 .ThenBy(o => o.Id)
                 .Select(o => new
@@ -27,8 +32,13 @@ public static class OfferteEndpoints
                     descrizione = o.Descrizione,
                     tipo = o.Tipo,
                     prezzo = o.Prezzo,
+                    prezzoOriginale = o.PrezzoOriginale,
+                    scontoPercentuale = o.ScontoPercentuale,
+                    inEvidenza = o.InEvidenza,
                     numeroBiglietti = o.NumeroBiglietti,
-                    includePopcorn = o.IncludePopcorn
+                    includePopcorn = o.IncludePopcorn,
+                    cinemaId = o.CinemaId,
+                    cinemaNome = o.Cinema != null ? o.Cinema.Nome : null
                 })
                 .ToListAsync();
 

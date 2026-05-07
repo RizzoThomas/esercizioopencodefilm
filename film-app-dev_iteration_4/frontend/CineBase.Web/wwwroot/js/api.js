@@ -498,7 +498,11 @@ deleteFilm: (id) => apiFetch(`/films/${id}`, { method: 'DELETE' }),
     });
   },
 
-  getOfferte: () => apiFetch('/offerte'),
+  getOfferte: (cinemaId) => {
+    const query = cinemaId ? `?cinemaId=${encodeURIComponent(cinemaId)}` : '';
+    return apiFetch(`/offerte${query}`);
+  },
+  getAbbonamenti: () => apiFetch('/abbonamenti'),
   acquistaOfferta: (offertaId, showId) => apiFetch('/offerte/' + offertaId + '/acquista', {
     method: 'POST',
     body: JSON.stringify({ showId: showId })

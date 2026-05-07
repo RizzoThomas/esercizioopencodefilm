@@ -4,6 +4,7 @@ using FilmAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FilmAPI.Migrations
 {
     [DbContext(typeof(FilmDbContext))]
-    partial class FilmDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260507072356_AddScontiAbbonamenti")]
+    partial class AddScontiAbbonamenti
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -514,9 +517,6 @@ namespace FilmAPI.Migrations
                     b.Property<bool>("Attiva")
                         .HasColumnType("tinyint(1)");
 
-                    b.Property<int?>("CinemaId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("CreatedAtUtc")
                         .HasColumnType("datetime(6)");
 
@@ -551,8 +551,6 @@ namespace FilmAPI.Migrations
                         .HasColumnType("longtext");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CinemaId");
 
                     b.ToTable("Offerte");
                 });
@@ -1343,15 +1341,6 @@ namespace FilmAPI.Migrations
                     b.Navigation("Ordine");
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("FilmAPI.Model.Offerta", b =>
-                {
-                    b.HasOne("FilmAPI.Model.Cinema", "Cinema")
-                        .WithMany()
-                        .HasForeignKey("CinemaId");
-
-                    b.Navigation("Cinema");
                 });
 
             modelBuilder.Entity("FilmAPI.Model.Ordine", b =>

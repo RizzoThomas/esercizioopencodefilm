@@ -39,6 +39,7 @@ public class FilmDbContext : DbContext
     public DbSet<Biglietto> Biglietti { get; set; }
     public DbSet<MovimentoCredito> MovimentiCredito { get; set; }
     public DbSet<Offerta> Offerte { get; set; }
+    public DbSet<Abbonamento> Abbonamenti { get; set; }
     public DbSet<Voucher> Vouchers { get; set; }
 
     // ─── Iteration 5: Auth & Security ─────────────────────────────

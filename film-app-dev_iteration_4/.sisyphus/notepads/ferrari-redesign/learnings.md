@@ -1,6 +1,1 @@
-- Replaced legacy Lamborghini/Gold CSS tokens with Ferrari-only design tokens in styles.css.
-- Removed the .dark token block so the theme stays dark-only via :root variables.
-- Verified the stylesheet now exposes ferrari primary/canvas/ink/body/hairline/spacing/rounded tokens only.
-- Rewrote tailwind-config.js to map Tailwind ferrari color keys directly to CSS ferrari variables and removed darkMode class config.
-- Added a public offerte page that reuses the Ferrari dark shell and loads deal cards from the backend.
-- Added ticket/voucher payment support in pagamento flow, including voucher code passthrough to checkout pay API.
+Seeded offers/subscriptions need backend + frontend contract alignment: offers now expose discount metadata, subscriptions are a separate collection, and the frontend should render both with consistent Ferrari-themed cards.

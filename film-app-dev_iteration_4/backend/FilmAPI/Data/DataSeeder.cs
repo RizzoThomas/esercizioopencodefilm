@@ -19,9 +19,10 @@ public class DataSeeder
     {
         await SeedAdminAsync();
         await SeedCategorieAsync();
-        await SeedOfferteAsync();
-        await SeedVoucherAsync();
         await SeedDevDataAsync();
+        await SeedOfferteAsync();
+        await SeedAbbonamentiAsync();
+        await SeedVoucherAsync();
     }
 
     private async Task SeedAdminAsync()
@@ -83,42 +84,204 @@ public class DataSeeder
 
     private async Task SeedOfferteAsync()
     {
-        if (_context.Offerte.Any())
+        var milano = await _context.Cinemas.FirstOrDefaultAsync(c => c.Nome.Contains("Milano"));
+        var roma = await _context.Cinemas.FirstOrDefaultAsync(c => c.Nome.Contains("Roma"));
+        var napoli = await _context.Cinemas.FirstOrDefaultAsync(c => c.Nome.Contains("Napoli"));
+
+        var newOffers = new List<Offerta>();
+
+        void AddOrUpdate(string nome, Offerta candidate)
+        {
+            var existing = _context.Offerte.FirstOrDefault(o => o.Nome == nome);
+            if (existing is not null)
+            {
+                existing.Descrizione = candidate.Descrizione;
+                existing.Tipo = candidate.Tipo;
+                existing.Prezzo = candidate.Prezzo;
+                existing.PrezzoOriginale = candidate.PrezzoOriginale;
+                existing.ScontoPercentuale = candidate.ScontoPercentuale;
+                existing.InEvidenza = candidate.InEvidenza;
+                existing.NumeroBiglietti = candidate.NumeroBiglietti;
+                existing.IncludePopcorn = candidate.IncludePopcorn;
+                existing.CinemaId = candidate.CinemaId;
+                existing.Attiva = true;
+                return;
+            }
+
+            newOffers.Add(candidate);
+        }
+
+        AddOrUpdate("Pacchetto Famiglia", new Offerta
+        {
+            Nome = "Pacchetto Famiglia",
+            Descrizione = "5 biglietti a prezzo promozionale per serate in famiglia.",
+            Tipo = "solo_biglietti",
+            Prezzo = 35m,
+            PrezzoOriginale = 50m,
+            ScontoPercentuale = 30,
+            InEvidenza = true,
+            NumeroBiglietti = 5,
+            IncludePopcorn = 0,
+            CinemaId = milano?.Id,
+            Attiva = true,
+            CreatedAtUtc = DateTime.UtcNow
+        });
+
+        AddOrUpdate("Serata Cinema", new Offerta
+        {
+            Nome = "Serata Cinema",
+            Descrizione = "3 biglietti con popcorn inclusi per una serata completa.",
+            Tipo = "biglietti_popcorn",
+            Prezzo = 28m,
+            PrezzoOriginale = 40m,
+            ScontoPercentuale = 30,
+            NumeroBiglietti = 3,
+            IncludePopcorn = 3,
+            CinemaId = roma?.Id,
+            Attiva = true,
+            CreatedAtUtc = DateTime.UtcNow
+        });
+
+        AddOrUpdate("Coppia", new Offerta
+        {
+            Nome = "Coppia",
+            Descrizione = "2 biglietti con popcorn per una serata in due.",
+            Tipo = "biglietti_popcorn",
+            Prezzo = 18m,
+            PrezzoOriginale = 25m,
+            ScontoPercentuale = 28,
+            NumeroBiglietti = 2,
+            IncludePopcorn = 2,
+            CinemaId = napoli?.Id,
+            Attiva = true,
+            CreatedAtUtc = DateTime.UtcNow
+        });
+
+        AddOrUpdate("Super Risparmio", new Offerta
+        {
+            Nome = "Super Risparmio",
+            Descrizione = "6 biglietti per chi vuole organizzare una maratona cinema.",
+            Tipo = "solo_biglietti",
+            Prezzo = 38m,
+            PrezzoOriginale = 55m,
+            ScontoPercentuale = 31,
+            InEvidenza = true,
+            NumeroBiglietti = 6,
+            IncludePopcorn = 0,
+            CinemaId = milano?.Id,
+            Attiva = true,
+            CreatedAtUtc = DateTime.UtcNow
+        });
+
+        AddOrUpdate("Notte Horror", new Offerta
+        {
+            Nome = "Notte Horror",
+            Descrizione = "4 biglietti e 4 popcorn per una notte da brividi.",
+            Tipo = "biglietti_popcorn",
+            Prezzo = 32m,
+            PrezzoOriginale = 48m,
+            ScontoPercentuale = 33,
+            NumeroBiglietti = 4,
+            IncludePopcorn = 4,
+            CinemaId = roma?.Id,
+            Attiva = true,
+            CreatedAtUtc = DateTime.UtcNow
+        });
+
+        AddOrUpdate("Pomeriggio Family", new Offerta
+        {
+            Nome = "Pomeriggio Family",
+            Descrizione = "3 biglietti per una uscita pomeridiana in famiglia.",
+            Tipo = "solo_biglietti",
+            Prezzo = 15m,
+            PrezzoOriginale = 22m,
+            ScontoPercentuale = 32,
+            InEvidenza = true,
+            NumeroBiglietti = 3,
+            IncludePopcorn = 0,
+            CinemaId = napoli?.Id,
+            Attiva = true,
+            CreatedAtUtc = DateTime.UtcNow
+        });
+
+        AddOrUpdate("Abbonamento Serale", new Offerta
+        {
+            Nome = "Abbonamento Serale",
+            Descrizione = "Perfetto per chi ama guardare film dopo il lavoro.",
+            Tipo = "abbonamento",
+            Prezzo = 24m,
+            PrezzoOriginale = 30m,
+            ScontoPercentuale = 20,
+            NumeroBiglietti = 2,
+            IncludePopcorn = 0,
+            CinemaId = roma?.Id,
+            Attiva = true,
+            CreatedAtUtc = DateTime.UtcNow
+        });
+
+        AddOrUpdate("Abbonamento Weekend", new Offerta
+        {
+            Nome = "Abbonamento Weekend",
+            Descrizione = "Due ingressi e snack per il fine settimana.",
+            Tipo = "abbonamento",
+            Prezzo = 19m,
+            PrezzoOriginale = 26m,
+            ScontoPercentuale = 27,
+            NumeroBiglietti = 2,
+            IncludePopcorn = 2,
+            CinemaId = milano?.Id,
+            Attiva = true,
+            CreatedAtUtc = DateTime.UtcNow
+        });
+
+        if (newOffers.Count > 0)
+            _context.Offerte.AddRange(newOffers);
+
+        await _context.SaveChangesAsync();
+    }
+
+    private async Task SeedAbbonamentiAsync()
+    {
+        if (_context.Abbonamenti.Any())
             return;
 
-        _context.Offerte.AddRange(new[]
+        _context.Abbonamenti.AddRange(new[]
         {
-            new Offerta
+            new Abbonamento
             {
-                Nome = "Pacchetto Famiglia",
-                Descrizione = "5 biglietti a prezzo promozionale per serate in famiglia.",
-                Tipo = "solo_biglietti",
-                Prezzo = 35m,
-                NumeroBiglietti = 5,
-                IncludePopcorn = 0,
-                Attiva = true,
+                Nome = "Abbonamento Mensile Base",
+                Descrizione = "Ideale per chi vuole guardare più film spendendo meno ogni mese.",
+                Tipo = "mensile",
+                Prezzo = 29.90m,
+                ScontoPercentuale = 25,
+                NumeroBigliettiPerMese = 4,
+                IncludePopcornPerMese = 0,
+                Attivo = true,
                 CreatedAtUtc = DateTime.UtcNow
             },
-            new Offerta
+            new Abbonamento
             {
-                Nome = "Serata Cinema",
-                Descrizione = "3 biglietti con popcorn inclusi per una serata completa.",
-                Tipo = "biglietti_popcorn",
-                Prezzo = 28m,
-                NumeroBiglietti = 3,
-                IncludePopcorn = 3,
-                Attiva = true,
+                Nome = "Abbonamento Annuale Plus",
+                Descrizione = "La soluzione completa per chi vive il cinema tutto l'anno.",
+                Tipo = "annuale",
+                Prezzo = 24.90m,
+                PrezzoAnnuale = 249m,
+                ScontoPercentuale = 40,
+                NumeroBigliettiPerMese = 4,
+                IncludePopcornPerMese = 2,
+                Attivo = true,
                 CreatedAtUtc = DateTime.UtcNow
             },
-            new Offerta
+            new Abbonamento
             {
-                Nome = "Coppia",
-                Descrizione = "2 biglietti con popcorn per una serata in due.",
-                Tipo = "biglietti_popcorn",
-                Prezzo = 18m,
-                NumeroBiglietti = 2,
-                IncludePopcorn = 2,
-                Attiva = true,
+                Nome = "Abbonamento Mensile Premium",
+                Descrizione = "Più biglietti, più vantaggi, più cinema ogni mese.",
+                Tipo = "mensile",
+                Prezzo = 49.90m,
+                ScontoPercentuale = 35,
+                NumeroBigliettiPerMese = 8,
+                IncludePopcornPerMese = 4,
+                Attivo = true,
                 CreatedAtUtc = DateTime.UtcNow
             }
         });
