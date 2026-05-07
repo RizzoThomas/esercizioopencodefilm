@@ -13,18 +13,35 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
     rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-  <link href="/css/styles.css?v=5" rel="stylesheet">
+  <link href="/css/styles.css?v=8" rel="stylesheet">
   <script src="/js/route-guard.js"></script>
 </head>
 
 <body class="bg-canvas text-ink font-sans cinematic-enter">
   <div id="navbar-container"></div>
 
-  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-24">
     <!-- Loading State -->
-    <div id="loading-state" class="text-center py-16">
-      <i class="fa-solid fa-spinner fa-spin text-4xl mb-4 text-ferrari-primary"></i>
-      <p class="text-body">Caricamento scheda film...</p>
+    <div id="loading-state" class="py-16">
+      <div class="card-ferrari p-6 mb-6 animate-fade-in">
+        <div class="flex flex-col md:flex-row gap-6">
+          <div class="w-full md:w-64 flex-shrink-0">
+            <div class="skeleton skeleton-poster w-full"></div>
+          </div>
+          <div class="flex-1 space-y-4">
+            <div class="skeleton skeleton-title w-[60%]"></div>
+            <div class="skeleton skeleton-text w-[30%]"></div>
+            <div class="flex gap-2">
+              <div class="skeleton w-16 h-6 rounded"></div>
+              <div class="skeleton w-20 h-6 rounded"></div>
+            </div>
+            <div class="skeleton skeleton-text w-[45%]"></div>
+            <div class="skeleton skeleton-text w-[80%]"></div>
+            <div class="skeleton skeleton-text w-[70%]"></div>
+            <div class="skeleton skeleton-text w-[55%]"></div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Error State -->
@@ -132,14 +149,14 @@
 
   <!-- Cinema Selection Modal (reuse from programmazione) -->
   <div id="cinema-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center modal-backdrop">
-    <div class="bg-canvas-elevated-lowest shadow-2xl w-full max-w-2xl mx-4 max-h-[85vh] flex flex-col overflow-hidden animate-fade-in">
-      <div class="flex items-center justify-between p-5 border-b border-hairline-variant/20">
+    <div class="bg-canvas-elevated w-full max-w-2xl mx-4 max-h-[85vh] flex flex-col overflow-hidden animate-fade-in">
+      <div class="flex items-center justify-between p-5 border-b border-hairline">
         <h2 class="text-xl font-bold text-ink">Seleziona Cinema</h2>
         <button id="cinema-modal-close" class="text-body hover:text-ink transition-colors p-2">
           <i class="fa-solid fa-xmark text-xl"></i>
         </button>
       </div>
-      <div class="p-4 border-b border-hairline-variant/20">
+      <div class="p-4 border-b border-hairline">
         <div class="relative">
           <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-body"></i>
           <input type="text" id="cinema-search-input" placeholder="Cerca cinema per nome o citta..."
@@ -152,7 +169,7 @@
           <p>Caricamento cinema...</p>
         </div>
       </div>
-      <div class="p-4 border-t border-hairline-variant/20 text-center">
+      <div class="p-4 border-t border-hairline text-center">
         <p class="text-xs text-body">
           <i class="fa-solid fa-location-crosshairs mr-1"></i>
           <span id="geo-status">Ordinamento per distanza disponibile con geolocalizzazione</span>
@@ -168,9 +185,9 @@
   <script src="/js/utils.js"></script>
   <script src="/js/api.js?v=final"></script>
   <script src="/js/auth.js"></script>
-  <script src="/js/template-loader.js"></script>
-  <script src="/js/navbar.js"></script>
-  <script src="/js/aceternity-effects.js"></script>
+  <script src="/js/template-loader.js?v=4"></script>
+  <script src="/js/navbar.js?v=4"></script>
+  <script src="/js/aceternity-effects.js?v=2"></script>
   <script src="/js/date-rail.js"></script>
   <script src="/js/pages/scheda-film.js"></script>
 </body>

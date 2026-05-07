@@ -13,54 +13,61 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
     rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-  <link href="/css/styles.css?v=5" rel="stylesheet">
+  <link href="/css/styles.css?v=8" rel="stylesheet">
   <script src="/js/route-guard.js"></script>
 </head>
 
-<body class="bg-canvas text-ink font-sans">
+<body class="bg-canvas text-ink font-sans cinematic-enter-page">
   <div id="navbar-container"></div>
 
-  <!-- Hero Section — Ferrari Cinematic Parallax + Aurora -->
-  <section class="hero-parallax hero-cinema">
-    <!-- Aurora Background Canvas (z-0, behind everything) -->
-    <canvas class="aurora-bg" data-colors="#da291c,#181818,#303030,#1a0000" style="z-index:1"></canvas>
+  <!-- Hero Section — Cinematic Elevation v2: Letterbox + Ken Burns + Film Grain -->
+  <section class="hero-cinema">
+    <!-- Film grain overlay (fixed, subtle analog texture) -->
+    <div class="hero-film-grain" aria-hidden="true"></div>
 
-    <!-- Parallax layer: background image (slow), z-1 so aurora shows through -->
-    <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=1920')] bg-cover bg-center"
-      data-parallax-speed="0.15" data-parallax-opacity="1.5" style="z-index:2;mix-blend-mode:lighten;opacity:0.85">
+    <!-- Iconic cinema background — fixed, Ken Burns animation -->
+    <div id="hero-bg" class="hero-cinema-bg hero-cinema-bg-active"
+         style="background-image: url('https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?w=1920&q=80');">
     </div>
 
-    <!-- Hero overlay gradient -->
-    <div class="hero-cinema-overlay" data-parallax-speed="0" style="z-index:3"></div>
-
     <!-- Hero content -->
-    <div class="hero-cinema-content" data-parallax-speed="0.3">
-      <h1 class="hero-cinema-title mb-4">
-        CineBase, <span class="text-ferrari-primary hero-highlight-text">piattaforma completa per la gestione di sale cinematografiche</span>
+    <div class="hero-cinema-content">
+      <p class="hero-eyebrow">In programmazione ora</p>
+      <h1 class="hero-cinema-title">
+        CineBase,
+        <span class="highlight">la tua rete cinematografica</span>
       </h1>
-      <p class="text-body text-lg md:text-xl max-w-2xl mb-8 reveal-on-scroll" data-reveal-delay="400ms">
-        Centralizza operazioni, catalogo film, programmazione e controllo della rete cinema in un'unica soluzione.
-        Progettata per estendersi con prenotazione e acquisto biglietti per offrire un ecosistema end-to-end.
+      <p class="hero-cinema-subtitle">
+        Catalogo film, gestione sale, programmazione e biglietteria &mdash;
+        tutto in un ecosistema integrato progettato per il cinema di oggi.
       </p>
-      <div class="flex gap-4 reveal-on-scroll" data-reveal-delay="600ms">
-        <a href="/programmazione.html" class="btn-primary">Vedi Programmazione</a>
+      <div class="hero-cinema-ctas">
+        <a href="/programmazione.html" class="btn-primary group ripple-container magnetic-btn">
+          Esplora la programmazione
+          <span class="inline-flex items-center justify-center w-7 h-7 -mr-1
+                       rounded-full bg-white/10
+                       transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]
+                       group-hover:bg-white/15 group-hover:translate-x-0.5 group-hover:-translate-y-px">
+            <i class="fa-solid fa-arrow-right text-[11px]"></i>
+          </span>
+        </a>
         <a href="/registrazione.html" class="btn-outline">Registrati</a>
       </div>
     </div>
   </section>
 
-  <!-- Film in Evidenza — Focus Cards Grid -->
-  <section id="featured" class="py-16 bg-canvas">
+  <!-- Film in Evidenza — Cinematic Bento Grid -->
+  <section id="featured" class="py-24 bg-canvas">
     <div class="container mx-auto px-4">
-      <div class="flex items-center gap-4 mb-8 lamp-header">
+      <div class="flex items-center gap-4 mb-10 lamp-header reveal-cinematic">
         <h2 class="ferrari-display-lg">
           <span class="lamp-text">In Evidenza Questa Settimana</span>
         </h2>
         <div class="h-0.5 flex-1 bg-ferrari-primary"></div>
       </div>
 
-      <div class="mb-8 flex flex-wrap items-center justify-between gap-4">
-        <p class="text-body max-w-2xl">
+      <div class="mb-10 flex flex-wrap items-center justify-between gap-4 reveal-cinematic reveal-cinematic-delay-1">
+        <p class="page-header-subtitle mt-0">
           Una selezione dei titoli pi&ugrave; rilevanti del momento, scelti in base alla programmazione della settimana e alle nuove uscite.
         </p>
         <a href="/programmazione.html" class="btn-outline">
@@ -68,13 +75,51 @@
         </a>
       </div>
 
-      <!-- Featured Layout — Focus Cards -->
-      <div id="featured-grid" class="focus-cards-container grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-4">
-        <div class="lg:col-span-3 text-center py-12 text-body">
-          <i class="fa-solid fa-film text-4xl mb-4"></i>
-          <p>Caricamento film in evidenza...</p>
+      <!-- Featured Skeleton Loader -->
+      <div id="featured-skeleton" class="focus-cards-container grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-4">
+        <div class="lg:col-span-2">
+          <div class="card-ferrari overflow-hidden h-[118vw] min-h-[420px] max-h-[780px] lg:h-[930px]">
+            <div class="skeleton skeleton-poster w-full h-full"></div>
+          </div>
+        </div>
+        <div class="lg:col-span-1 flex flex-col gap-4 lg:gap-[18px]">
+          <div class="card-ferrari flex overflow-hidden h-[180px] sm:h-[198px] lg:h-[213px]">
+            <div class="skeleton w-[28%] lg:w-[32%] h-full"></div>
+            <div class="p-3 lg:p-4 flex flex-col justify-center flex-1 gap-3">
+              <div class="skeleton skeleton-text w-[40%]"></div>
+              <div class="skeleton skeleton-title w-[75%]"></div>
+              <div class="skeleton skeleton-text w-[55%]"></div>
+            </div>
+          </div>
+          <div class="card-ferrari flex overflow-hidden h-[180px] sm:h-[198px] lg:h-[213px]">
+            <div class="skeleton w-[28%] lg:w-[32%] h-full"></div>
+            <div class="p-3 lg:p-4 flex flex-col justify-center flex-1 gap-3">
+              <div class="skeleton skeleton-text w-[35%]"></div>
+              <div class="skeleton skeleton-title w-[70%]"></div>
+              <div class="skeleton skeleton-text w-[50%]"></div>
+            </div>
+          </div>
+          <div class="card-ferrari flex overflow-hidden h-[180px] sm:h-[198px] lg:h-[213px]">
+            <div class="skeleton w-[28%] lg:w-[32%] h-full"></div>
+            <div class="p-3 lg:p-4 flex flex-col justify-center flex-1 gap-3">
+              <div class="skeleton skeleton-text w-[45%]"></div>
+              <div class="skeleton skeleton-title w-[65%]"></div>
+              <div class="skeleton skeleton-text w-[40%]"></div>
+            </div>
+          </div>
+          <div class="card-ferrari flex overflow-hidden h-[180px] sm:h-[198px] lg:h-[213px]">
+            <div class="skeleton w-[28%] lg:w-[32%] h-full"></div>
+            <div class="p-3 lg:p-4 flex flex-col justify-center flex-1 gap-3">
+              <div class="skeleton skeleton-text w-[30%]"></div>
+              <div class="skeleton skeleton-title w-[72%]"></div>
+              <div class="skeleton skeleton-text w-[48%]"></div>
+            </div>
+          </div>
         </div>
       </div>
+
+      <!-- Featured Content (hidden until loaded) -->
+      <div id="featured-grid" class="focus-cards-container grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-4 hidden"></div>
     </div>
   </section>
 
@@ -86,9 +131,9 @@
   <script src="/js/utils.js"></script>
   <script src="/js/api.js?v=final"></script>
   <script src="/js/auth.js"></script>
-  <script src="/js/template-loader.js"></script>
-  <script src="/js/navbar.js"></script>
-  <script src="/js/aceternity-effects.js"></script>
+  <script src="/js/template-loader.js?v=4"></script>
+  <script src="/js/navbar.js?v=4"></script>
+  <script src="/js/aceternity-effects.js?v=2"></script>
   <script src="/js/pages/home.js"></script>
 </body>
 

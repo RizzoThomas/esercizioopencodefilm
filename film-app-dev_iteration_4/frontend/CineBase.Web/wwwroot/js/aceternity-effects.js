@@ -398,6 +398,55 @@
     },
 
     /* ====================================================================
+       14. CINEMATIC SCROLL REVEAL — Blur + fade + slide on scroll
+       Usage: <div class="reveal-cinematic">...</div>
+       ==================================================================== */
+    cinematicScrollReveal(selector = '.reveal-cinematic') {
+      this.observe(selector, (el, visible) => {
+        if (visible) el.classList.add('revealed');
+      }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+    },
+
+    /* ====================================================================
+       15. RIPPLE CLICK EFFECT — Material wave from click point
+       Usage: <button class="ripple-container">...</button>
+       ==================================================================== */
+    rippleClick(selector = '.ripple-container') {
+      document.querySelectorAll(selector).forEach(el => {
+        el.addEventListener('click', (e) => {
+          const ripple = document.createElement('span');
+          const rect = el.getBoundingClientRect();
+          const size = Math.max(rect.width, rect.height) * 2;
+          ripple.className = 'ripple-effect';
+          ripple.style.left = `${e.clientX - rect.left - size / 2}px`;
+          ripple.style.top  = `${e.clientY - rect.top - size / 2}px`;
+          ripple.style.width = ripple.style.height = `${size}px`;
+          el.appendChild(ripple);
+          ripple.addEventListener('animationend', () => ripple.remove());
+        });
+      });
+    },
+
+    /* ====================================================================
+       16. MAGNETIC HOVER — Button subtly follows cursor
+       Usage: <button class="magnetic-btn">...</button>
+       ==================================================================== */
+    magneticHover(selector = '.magnetic-btn') {
+      if (this.prefersReducedMotion) return;
+      document.querySelectorAll(selector).forEach(btn => {
+        btn.addEventListener('mousemove', (e) => {
+          const rect = btn.getBoundingClientRect();
+          const x = (e.clientX - rect.left - rect.width / 2) * 0.15;
+          const y = (e.clientY - rect.top - rect.height / 2) * 0.15;
+          btn.style.transform = `translate(${x}px, ${y}px)`;
+        });
+        btn.addEventListener('mouseleave', () => {
+          btn.style.transform = 'translate(0, 0)';
+        });
+      });
+    },
+
+    /* ====================================================================
        INIT ALL EFFECTS
        ==================================================================== */
     init() {
@@ -407,12 +456,16 @@
       // Always-active effects (no page-specific dependency)
       this.floatingNavbar('.floating-navbar');
       this.cardSpotlight('.card-spotlight');
+      this.cardSpotlight('.card-spotlight-enhanced');
       this.focusCards('.focus-cards-container');
       this.glareCards('.glare-card');
       this.expandableCards('.expandable-card');
+      this.rippleClick('.ripple-container');
+      this.magneticHover('.magnetic-btn');
 
       // Scroll-triggered effects
       this.stickyScrollReveal('.sticky-reveal-container');
+      this.cinematicScrollReveal('.reveal-cinematic');
 
       // DOMContentLoaded effects
       if (document.readyState === 'loading') {

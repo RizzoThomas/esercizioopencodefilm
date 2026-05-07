@@ -69,7 +69,19 @@ public class PagamentoService : IPagamentoService
         var holdStates = await LoadOrderHoldStatesAsync(ordine.Id);
         ValidateHoldStatesForPendingPayment(ordine, holdStates);
 
-        var total = CalculateTotal(ordine.Show!, holdStates.Count);
+        // Applica sconto offerta se presente
+        decimal? offertaPrezzo = null;
+        if (dto.OffertaId.HasValue && dto.OffertaId.Value > 0)
+        {
+            var offerta = await _db.Offerte.FirstOrDefaultAsync(o => o.Id == dto.OffertaId.Value);
+            if (offerta is not null)
+            {
+                offertaPrezzo = offerta.Prezzo;
+                Console.WriteLine($"[PAY] Offerta applicata: id={offerta.Id} nome={offerta.Nome} prezzo={offerta.Prezzo}");
+            }
+        }
+
+        var total = offertaPrezzo ?? CalculateTotal(ordine.Show!, holdStates.Count);
         var split = ComputePaymentSplit(metodo, total, ordine.User!.CreditoResiduo, dto.ImportoCreditoRichiesto);
 
         if (!string.IsNullOrWhiteSpace(ordine.StripePaymentIntentId)
@@ -442,8 +454,18 @@ public class PagamentoService : IPagamentoService
         ValidateHoldStatesForFinalization(ordine, holdStates);
 
         var now = DateTime.UtcNow;
-        var total = CalculateTotal(ordine.Show!, holdStates.Count);
-        ordine.TotaleLordo = total;
+        var calculatedTotal = CalculateTotal(ordine.Show!, holdStates.Count);
+
+        // Se il TotaleLordo salvato è diverso da quello calcolato (es. offerta applicata),
+        // mantieni il valore salvato invece di ricalcolare
+        if (ordine.TotaleLordo > 0 && Math.Abs(ordine.TotaleLordo - calculatedTotal) > 0.01m)
+        {
+            // L'ordine ha un prezzo speciale (offerta) — non ricalcolare
+        }
+        else
+        {
+            ordine.TotaleLordo = calculatedTotal;
+        }
         ordine.NumeroBiglietti = holdStates.Count;
         ordine.StripePaymentIntentId ??= paymentIntentId;
         ordine.CheckoutCompletedAtUtc ??= ordine.Stato == OrdineState.CheckoutInProgress ? now : null;
@@ -683,7 +705,15 @@ public class PagamentoService : IPagamentoService
         ValidateHoldStatesForPendingPayment(ordine, holdStates);
 
         var total = CalculateTotal(ordine.Show!, holdStates.Count);
-        ordine.TotaleLordo = total;
+        // Se l'ordine ha già un TotaleLordo diverso (offerta applicata), mantienilo
+        if (ordine.TotaleLordo > 0 && Math.Abs(ordine.TotaleLordo - total) > 0.01m)
+        {
+            total = ordine.TotaleLordo;
+        }
+        else
+        {
+            ordine.TotaleLordo = total;
+        }
         ordine.NumeroBiglietti = holdStates.Count;
 
         var split = ComputePaymentSplit(metodo, total, ordine.User!.CreditoResiduo, dto.ImportoCreditoRichiesto);

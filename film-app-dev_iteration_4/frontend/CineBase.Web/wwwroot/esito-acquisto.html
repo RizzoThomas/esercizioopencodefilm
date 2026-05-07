@@ -13,14 +13,14 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
     rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-  <link href="/css/styles.css?v=5" rel="stylesheet">
+  <link href="/css/styles.css?v=8" rel="stylesheet">
   <script src="/js/route-guard.js"></script>
 </head>
 
-<body class="bg-canvas text-ink font-sans">
+<body class="bg-canvas text-ink font-sans cinematic-enter-page">
   <div id="navbar-container"></div>
 
-  <main class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+  <main class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-6 pt-24">
     <!-- Loading State -->
     <div id="loading-state" class="text-center py-16">
       <i class="fa-solid fa-spinner fa-spin text-4xl mb-4 text-ferrari-primary"></i>
@@ -40,29 +40,29 @@
     <!-- Main Content -->
     <div id="main-content" class="hidden">
       <!-- Success Header -->
-      <div id="success-header" class="hidden text-center mb-8">
-        <div class="inline-flex items-center justify-center w-20 h-20 bg-emerald-500/15 mb-4">
-          <i class="fa-solid fa-circle-check text-emerald-500 text-4xl"></i>
+      <div id="success-header" class="hidden text-center mb-10">
+        <div class="inline-flex items-center justify-center w-20 h-20 status-icon-success mb-4">
+          <i class="fa-solid fa-circle-check text-4xl"></i>
         </div>
-        <h1 class="text-3xl font-bold text-ink mb-2">Acquisto completato!</h1>
+        <h1 class="ferrari-display-lg text-ink mb-2">Acquisto completato!</h1>
         <p class="text-body">I tuoi biglietti sono pronti</p>
       </div>
 
       <!-- Pending Header -->
-      <div id="pending-header" class="hidden text-center mb-8">
-        <div class="inline-flex items-center justify-center w-20 h-20 bg-amber-500/15 mb-4">
-          <i class="fa-solid fa-clock text-amber-500 text-4xl"></i>
+      <div id="pending-header" class="hidden text-center mb-10">
+        <div class="inline-flex items-center justify-center w-20 h-20 status-icon-pending mb-4">
+          <i class="fa-solid fa-clock text-4xl"></i>
         </div>
-        <h1 class="text-3xl font-bold text-ink mb-2">Pagamento in elaborazione</h1>
+        <h1 class="ferrari-display-lg text-ink mb-2">Pagamento in elaborazione</h1>
         <p class="text-body">Attendi la conferma del pagamento</p>
       </div>
 
       <!-- Failed Header -->
-      <div id="failed-header" class="hidden text-center mb-8">
-        <div class="inline-flex items-center justify-center w-20 h-20 bg-red-500/15 mb-4">
-          <i class="fa-solid fa-circle-xmark text-red-500 text-4xl"></i>
+      <div id="failed-header" class="hidden text-center mb-10">
+        <div class="inline-flex items-center justify-center w-20 h-20 status-icon-failed mb-4">
+          <i class="fa-solid fa-circle-xmark text-4xl"></i>
         </div>
-        <h1 class="text-3xl font-bold text-ink mb-2">Pagamento non riuscito</h1>
+        <h1 class="ferrari-display-lg text-ink mb-2">Pagamento non riuscito</h1>
         <p class="text-body">Si è verificato un errore durante il pagamento</p>
       </div>
 
@@ -73,7 +73,7 @@
           <span id="order-code" class="text-sm font-mono text-body"></span>
         </div>
         <div id="order-details" class="space-y-3"></div>
-        <div class="border-t border-hairline-variant/20 pt-4 mt-4">
+        <div class="border-t border-hairline pt-4 mt-4">
           <div class="flex justify-between text-sm text-body">
             <span>Importo carta</span>
             <span id="detail-importo-carta"></span>
@@ -130,12 +130,12 @@
 
   <div id="toast-container" class="fixed bottom-4 right-4 z-50"></div>
 
-  <script src="/js/utils.js?v=20260419b"></script>
+  <script src="/js/utils.js?v=2"></script>
   <script src="/js/api.js?v=final"></script>
-  <script src="/js/auth.js?v=20260419b"></script>
-  <script src="/js/template-loader.js?v=20260419b"></script>
-  <script src="/js/navbar.js?v=20260419b"></script>
-  <script src="/js/aceternity-effects.js"></script>
+  <script src="/js/auth.js?v=2"></script>
+  <script src="/js/template-loader.js?v=4"></script>
+  <script src="/js/navbar.js?v=4"></script>
+  <script src="/js/aceternity-effects.js?v=2"></script>
   <script src="/js/pages/esito-acquisto.js?v=20260419b"></script>
 </body>
 

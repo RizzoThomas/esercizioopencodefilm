@@ -6,6 +6,7 @@ public class PayOrdineRequestDTO
     public decimal? ImportoCreditoRichiesto { get; set; }
     public string? IdempotencyKey { get; set; }
     public string? CodiceVoucher { get; init; }
+    public int? OffertaId { get; init; }
 }
 
 public class PayOrdineResponseDTO

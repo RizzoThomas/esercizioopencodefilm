@@ -12,19 +12,20 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
     rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-  <link href="/css/styles.css?v=5" rel="stylesheet">
+  <link href="/css/styles.css?v=8" rel="stylesheet">
   <script src="/js/route-guard.js"></script>
 </head>
 
-<body class="bg-canvas text-ink font-sans">
+<body class="bg-canvas text-ink font-sans cinematic-enter-page">
   <div id="navbar-container"></div>
 
-  <main class="pt-20 pb-12">
+  <main class="pt-24 pb-16">
     <div class="container mx-auto px-4">
       <!-- Header -->
-      <div class="mb-8">
-        <h1 class="ferrari-display-lg text-ink mb-2">Ricerca Film</h1>
-        <p class="text-body">Cerca film su The Movie Database (TMDB) e importali nel catalogo</p>
+      <div class="mb-10">
+        <p class="page-header-eyebrow mb-3">Catalogo</p>
+        <h1 class="page-header-title">Ricerca Film</h1>
+        <p class="page-header-subtitle mt-3">Cerca film su The Movie Database (TMDB) e importali nel catalogo</p>
       </div>
 
       <!-- Search Box -->
@@ -97,7 +98,7 @@
   <!-- Movie Detail Modal -->
   <div id="movie-modal" class="hidden fixed inset-0 z-50 bg-black/90 overflow-y-auto">
     <div class="min-h-screen px-4 py-8">
-      <div class="max-w-4xl mx-auto bg-canvas-elevated border border-hairline">
+      <div class="max-w-4xl mx-auto bg-canvas border border-hairline">
         <!-- Modal Header -->
         <div class="flex justify-between items-center p-6 border-b border-hairline">
           <h2 id="modal-title" class="ferrari-display-md text-ink">Dettagli Film</h2>
@@ -193,9 +194,9 @@
 
   <script src="/js/api.js?v=final"></script>
   <script src="/js/auth.js"></script>
-  <script src="/js/template-loader.js"></script>
-  <script src="/js/navbar.js"></script>
-  <script src="/js/aceternity-effects.js"></script>
+  <script src="/js/template-loader.js?v=4"></script>
+  <script src="/js/navbar.js?v=4"></script>
+  <script src="/js/aceternity-effects.js?v=2"></script>
   <script src="/js/pages/tmdb-search.js"></script>
 </body>
 

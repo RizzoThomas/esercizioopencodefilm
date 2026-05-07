@@ -150,10 +150,13 @@ async function loadOffertaDiscount(offertaId) {
     document.getElementById('offerta-banner-name').textContent = offerta.nome || 'Offerta';
     document.getElementById('offerta-banner-desc').textContent = offerta.descrizione || '';
 
+    // Salva il totale originale prima di applicare lo sconto
+    const totaleOriginale = ordine?.totaleLordo || 0;
     ordine = ordine || {};
+    ordine.totaleOriginale = totaleOriginale;
     ordine.totaleLordo = offerta.prezzo;
     ordine.offertaId = offertaId;
-    window._offertaData = { id: offertaId, nome: offerta.nome, prezzo: offerta.prezzo };
+    window._offertaData = { id: offertaId, nome: offerta.nome, prezzo: offerta.prezzo, totaleOriginale: totaleOriginale };
 
     document.getElementById('order-total').textContent = formatCurrency(offerta.prezzo);
 
@@ -207,6 +210,9 @@ async function loadAbbonamentoPayment(abbonamentoId) {
 
     hideLoading();
     document.getElementById('main-content').classList.remove('hidden');
+
+    // Mostra il credito disponibile (non veniva mostrato nel flusso abbonamento)
+    document.getElementById('credit-balance').textContent = formatCurrency(creditoData?.saldoAttuale || 0);
 
     const prezzo = abb.prezzoAnnuale || abb.prezzo || 0;
     document.getElementById('order-summary').innerHTML = `
@@ -270,10 +276,17 @@ function renderOrderSummary() {
   `;
 
   if (window._offertaData) {
+    const risparmio = (window._offertaData.totaleOriginale || ordine.totaleOriginale || 0) - (window._offertaData.prezzo || 0);
     container.insertAdjacentHTML('beforeend', `
-      <div class="flex justify-between text-sm text-ferrari-primary">
-        <span>Offerta applicata</span>
-        <span class="font-medium">${window._offertaData.nome || 'Offerta'}</span>
+      <div class="border-t border-hairline pt-3 mt-3">
+        <div class="flex justify-between text-sm text-body line-through">
+          <span>Prezzo pieno</span>
+          <span>${formatCurrency(window._offertaData.totaleOriginale || ordine.totaleOriginale || 0)}</span>
+        </div>
+        <div class="flex justify-between text-sm text-ferrari-primary font-medium">
+          <span>Offerta "${window._offertaData.nome}"</span>
+          <span>−${formatCurrency(risparmio)}</span>
+        </div>
       </div>
     `);
   }
@@ -424,6 +437,11 @@ async function handlePayment() {
       return;
     }
 
+    // Se c'è un'offerta, usa il prezzo scontato (non il totale pieno dell'ordine)
+    if (window._offertaData && ordine) {
+      ordine.totaleLordo = window._offertaData.prezzo;
+    }
+
     if (window._abbonamentoData) {
       const method = document.querySelector('input[name="payment-method"]:checked')?.value || 'carta';
       if (method === 'credito') {
@@ -491,6 +509,7 @@ async function handlePayment() {
 
     method = document.querySelector('input[name="payment-method"]:checked')?.value || 'carta';
     let importoCreditoRichiesto = null;
+    const offertaId = window._offertaData?.id || null;
 
     if (method === 'credito') {
       importoCreditoRichiesto = ordine.totaleLordo;
@@ -511,7 +530,7 @@ async function handlePayment() {
       const metodoPagamento = 'Credito';
       const idempotencyKey = 'pay-' + orderId + '-' + Date.now();
       console.log('[PAGAMENTO] Paying with credit, orderId=' + orderId);
-      const result = await API.payOrdine(orderId, metodoPagamento, importoCreditoRichiesto, idempotencyKey);
+      const result = await API.payOrdine(orderId, metodoPagamento, importoCreditoRichiesto, idempotencyKey, null, offertaId);
       console.log('[PAGAMENTO] Credit payment result:', result);
       window.location.replace('/esito-acquisto.html?orderId=' + orderId + '&success=true');
       return;
@@ -528,7 +547,7 @@ async function handlePayment() {
       const metodoPagamento = 'Ticket';
       const idempotencyKey = 'pay-' + orderId + '-' + Date.now();
       console.log('[PAGAMENTO] Paying with ticket, orderId=' + orderId + ' code=' + codiceVoucher);
-      const result = await API.payOrdine(orderId, metodoPagamento, null, idempotencyKey, codiceVoucher);
+      const result = await API.payOrdine(orderId, metodoPagamento, null, idempotencyKey, codiceVoucher, offertaId);
       console.log('[PAGAMENTO] Ticket payment result:', result);
       window.location.replace('/esito-acquisto.html?orderId=' + orderId + '&success=true');
       return;

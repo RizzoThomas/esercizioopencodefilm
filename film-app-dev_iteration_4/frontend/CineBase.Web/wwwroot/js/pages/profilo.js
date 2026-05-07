@@ -58,13 +58,13 @@ async function loadUserSubscription() {
     if (!content) return;
 
     content.innerHTML = `
-      <div class="p-4 bg-canvas-elevated rounded-lg border border-hairline">
+      <div class="p-4 bg-canvas-elevated border border-hairline">
         <div class="flex justify-between items-start mb-3">
           <div>
             <h3 class="text-xl font-bold text-ink">${sub.abbonamentoNome}</h3>
             <p class="text-sm text-body">${sub.abbonamentoTipo} · Dal ${new Date(sub.dataInizio).toLocaleDateString('it-IT')}</p>
           </div>
-          <span class="px-3 py-1 rounded-full text-xs font-semibold ${sub.stato === 'attivo' ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}">${sub.stato}</span>
+          <span class="px-3 py-1 text-xs font-semibold ${sub.stato === 'attivo' ? 'bg-ferrari-primary/15 text-ferrari-primary' : 'bg-ferrari-semantic-warning/15 text-ferrari-semantic-warning'} uppercase tracking-wider">${sub.stato}</span>
         </div>
         <div class="space-y-1.5 text-sm text-ink/90 mb-4">
           <div><i class="fa-solid fa-ticket mr-2 text-ferrari-primary"></i>${sub.numeroBigliettiPerMese} biglietti/mese</div>
@@ -74,6 +74,9 @@ async function loadUserSubscription() {
         <div class="flex gap-3 flex-wrap">
           <button onclick="toggleAutoRenew()" class="btn-outline text-xs px-3 py-1.5">
             <i class="fa-solid fa-rotate mr-1"></i>Rinnovo auto: ${sub.autoRinnovo ? 'ON' : 'OFF'}
+          </button>
+          <button onclick="fermaAbbonamento()" class="btn-outline text-xs px-3 py-1.5 text-ferrari-semantic-warning border-ferrari-semantic-warning hover:bg-ferrari-semantic-warning/10">
+            <i class="fa-solid fa-stop mr-1"></i>Ferma Abbonamento
           </button>
         </div>
       </div>`;
@@ -118,6 +121,17 @@ async function toggleAutoRenew() {
     }
   } catch (e) {
     showToast('Errore', 'danger');
+  }
+}
+
+async function fermaAbbonamento() {
+  if (!confirm('Sei sicuro di voler fermare questo abbonamento? Non verra\' piu\' rinnovato e perderai i benefici alla scadenza.')) return;
+  try {
+    await API.cancelSubscription();
+    await loadUserSubscription();
+    showToast('Abbonamento fermato. Resta attivo fino alla scadenza.', 'success');
+  } catch (e) {
+    showToast('Errore durante la disattivazione', 'danger');
   }
 }
 

@@ -4,6 +4,9 @@
  * Dark Theme via CSS Custom Properties
  */
 
+/* --- Premium Font Import --- */
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&display=swap');
+
 /* ========================================================================
    CSS Custom Properties — Design Tokens
    Ferrari tokens in :root
@@ -41,8 +44,8 @@
   /* Accent (scoped — Hypersail only) */
   --ferrari-accent-yellow: #f6e500;
 
-  /* Typography */
-  --ferrari-font: 'Inter', -apple-system, system-ui, sans-serif;
+  /* Typography — Geist premium geometric sans (FerrariSans substitute) */
+  --ferrari-font: 'Geist', 'Inter', -apple-system, system-ui, sans-serif;
 
   /* Spacing — 4px base, 8px ladder */
   --space-xxxs: 4px;
@@ -284,36 +287,159 @@ input[type='password']::-webkit-textfield-decoration-container {
 .footer-link-ferrari:hover { color: var(--ferrari-ink); }
 
 /* ========================================================================
-   Ferrari Hero (Cinematic Full-bleed)
+   Ferrari Hero (Cinematic Full-bleed) — CINEMATIC ELEVATION v2
    ======================================================================== */
 
 .hero-cinema {
-  position: relative; min-height: 560px; overflow: hidden;
+  position: relative;
+  min-height: 100dvh;
+  overflow: hidden;
+  background: var(--ferrari-canvas);
 }
 
-.hero-cinema-overlay {
-  position: absolute; inset: 0; z-index: 1;
-  background: linear-gradient(to top, rgba(24,24,24,0.8) 0%, rgba(24,24,24,0.2) 50%, transparent 100%);
+/* --- Letterbox Frame — cinema aspect ratio cue --- */
+.hero-cinema::before,
+.hero-cinema::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0;
+  z-index: 10;
+  background: #000000;
+  pointer-events: none;
+  will-change: transform;
+  transition: height 0.8s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.hero-cinema::before {
+  top: 0;
+  height: clamp(0px, 3dvh, 32px);
+}
+.hero-cinema::after {
+  bottom: 0;
+  height: clamp(0px, 6dvh, 64px);
 }
 
+/* --- Hero Background Layer --- */
+.hero-cinema-bg {
+  position: absolute; inset: 0; z-index: 0;
+  background-size: cover; background-position: center top;
+  will-change: transform;
+  animation: kenBurnsHero 20s ease-in-out infinite alternate;
+}
+.hero-cinema-bg::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(
+    ellipse 120% 80% at 50% 40%,
+    transparent 0%,
+    rgba(24, 24, 24, 0.15) 40%,
+    rgba(24, 24, 24, 0.65) 80%,
+    rgba(24, 24, 24, 0.92) 100%
+  );
+}
+/* Slide transition state — hidden, will fade in */
+.hero-cinema-bg-transitioning {
+  opacity: 0;
+  transition: opacity 1.2s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.hero-cinema-bg-active {
+  opacity: 1;
+  transition: opacity 1.2s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+@keyframes kenBurnsHero {
+  0%   { transform: scale(1) translate(0, 0); }
+  100% { transform: scale(1.06) translate(-1%, -0.5%); }
+}
+
+/* --- Hero Content — sits above the bg, overlaid with dramatic vignette --- */
 .hero-cinema-content {
-  position: absolute; bottom: 0; left: 0; right: 0; z-index: 2;
-  padding: 56px 48px 0 48px;
+  position: relative; z-index: 5;
+  display: flex; flex-direction: column; justify-content: flex-end;
+  min-height: 100dvh;
+  padding: clamp(28px, 8vh, 96px) clamp(16px, 5vw, 5rem) clamp(48px, 10vh, 80px);
 }
 
+/* --- Eyebrow tag — microscopic pill, Ferrari style --- */
+.hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  font-family: var(--ferrari-font); font-size: 11px; font-weight: 600;
+  line-height: 1.4; letter-spacing: 1.4px; text-transform: uppercase;
+  color: var(--ferrari-primary);
+  margin-bottom: clamp(8px, 2vh, 20px);
+  opacity: 0; transform: translateY(12px);
+  animation: heroRevealStagger 1s 0.1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+.hero-eyebrow::before {
+  content: '';
+  display: block; width: 24px; height: 1px;
+  background: var(--ferrari-primary);
+}
+
+/* --- Hero Title --- */
 .hero-cinema-title {
-  font-family: var(--ferrari-font); font-size: 80px; font-weight: 500;
-  line-height: 1.05; letter-spacing: -1.6px; color: var(--ferrari-ink);
-  max-width: 800px;
+  font-family: var(--ferrari-font); font-size: clamp(36px, 8vw, 80px);
+  font-weight: 500; line-height: 1.05; letter-spacing: -1.6px;
+  color: var(--ferrari-ink); max-width: 860px;
+  opacity: 0; transform: translateY(16px);
+  animation: heroRevealStagger 1s 0.25s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  text-wrap: balance;
+}
+.hero-cinema-title .highlight {
+  color: var(--ferrari-primary);
+  position: relative; display: inline;
+}
+.hero-cinema-title .highlight::after {
+  content: ''; position: absolute;
+  left: -2px; right: -2px; bottom: 0.05em; height: 0.3em;
+  background: linear-gradient(180deg, transparent, rgba(218, 41, 28, 0.15));
+  z-index: -1;
 }
 
+/* --- Hero Subtitle --- */
+.hero-cinema-subtitle {
+  font-family: var(--ferrari-font); font-size: clamp(14px, 2vw, 18px);
+  font-weight: 400; line-height: 1.6;
+  color: var(--ferrari-body); max-width: 620px;
+  margin-top: clamp(12px, 2vh, 24px);
+  opacity: 0; transform: translateY(12px);
+  animation: heroRevealStagger 1s 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* --- Hero CTA row --- */
+.hero-cinema-ctas {
+  display: flex; flex-wrap: wrap; gap: 1rem;
+  margin-top: clamp(20px, 3vh, 36px);
+  opacity: 0; transform: translateY(12px);
+  animation: heroRevealStagger 1s 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes heroRevealStagger {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- Film Grain Overlay — fixed, pointer-events-none, subtle analog texture --- */
+.hero-film-grain {
+  position: fixed; inset: 0; z-index: 50;
+  pointer-events: none;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 200px 200px;
+  will-change: opacity;
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-film-grain { display: none; }
+}
+
+/* --- Responsive --- */
 @media (max-width: 640px) {
-  .hero-cinema-title { font-size: 32px; }
-  .hero-cinema-content { padding: 28px 16px 24px 16px; }
+  .hero-cinema-content { padding: 40px 16px 48px; }
+  .hero-cinema-title { letter-spacing: -0.8px; }
+  .hero-cinema::before { height: 0; }
+  .hero-cinema::after { height: clamp(0px, 4dvh, 32px); }
 }
-
 @media (min-width: 641px) and (max-width: 1024px) {
-  .hero-cinema-title { font-size: 56px; }
+  .hero-cinema-title { letter-spacing: -1.2px; }
 }
 
 /* ========================================================================
@@ -1291,6 +1417,180 @@ main {
 }
 
 /* ========================================================================
+   CINEMATIC ELEVATION — Shared page-level enhancements
+   ======================================================================== */
+
+/* --- Cinematic page entry (all pages) --- */
+@keyframes cinematicPageIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.cinematic-enter-page {
+  animation: cinematicPageIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* --- Page header pattern — Ferrari display typography --- */
+.page-header-eyebrow {
+  font-family: var(--ferrari-font); font-size: 11px; font-weight: 600;
+  line-height: 1.4; letter-spacing: 1.4px; text-transform: uppercase;
+  color: var(--ferrari-primary);
+}
+.page-header-title {
+  font-family: var(--ferrari-font); font-size: clamp(28px, 5vw, 56px);
+  font-weight: 500; line-height: 1.1; letter-spacing: -1.12px;
+  color: var(--ferrari-ink);
+}
+.page-header-subtitle {
+  font-family: var(--ferrari-font); font-size: 16px; font-weight: 400;
+  line-height: 1.6; color: var(--ferrari-body); max-width: 640px;
+}
+
+/* --- Offer cards — cinematic elevation, Ferrari palette --- */
+.offer-card {
+  border: 1px solid var(--ferrari-hairline);
+  transition: border-color 0.3s ease, transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.offer-card:hover {
+  border-color: var(--ferrari-primary);
+  transform: translateY(-2px);
+}
+.offer-card.highlight-card {
+  border-color: var(--ferrari-primary);
+  box-shadow: inset 0 0 0 1px rgba(218, 41, 28, 0.2);
+}
+
+/* --- Offer badge — Ferrari accent (replaces gold) --- */
+.offer-badge-accent {
+  background: rgba(218, 41, 28, 0.15);
+  color: var(--ferrari-primary);
+  border: 1px solid rgba(218, 41, 28, 0.25);
+  font-family: var(--ferrari-font); font-size: 11px; font-weight: 600;
+  letter-spacing: 0.05em; text-transform: uppercase;
+  border-radius: 9999px; padding: 3px 10px;
+}
+.offer-discount-badge {
+  background: var(--ferrari-primary);
+  color: var(--ferrari-on-primary);
+  font-size: 11px; font-weight: 700;
+  border-radius: 9999px; padding: 3px 10px;
+}
+
+/* --- Offer card image header — cinema atmosphere gradient --- */
+.offer-image-header {
+  min-height: 9rem;
+  background-size: cover; background-position: center;
+  position: relative;
+}
+.offer-image-header::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(24,24,24,0.1), rgba(24,24,24,0.7));
+}
+
+/* --- Cinema filter — Ferrari input style --- */
+.cinema-filter {
+  background: var(--ferrari-canvas-elevated);
+  border: 1px solid var(--ferrari-hairline);
+  color: var(--ferrari-ink);
+  border-radius: 4px;
+  font-family: var(--ferrari-font); font-size: 14px;
+  transition: border-color 0.2s ease;
+}
+.cinema-filter:focus {
+  border-color: var(--ferrari-primary);
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(218, 41, 28, 0.15);
+}
+
+/* --- Show picker — cinematic overlay --- */
+.show-picker-overlay {
+  backdrop-filter: blur(12px);
+  background: rgba(24, 24, 24, 0.85);
+}
+.show-picker-btn {
+  transition: transform 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
+}
+.show-picker-btn:hover {
+  transform: translateY(-1px);
+  border-color: var(--ferrari-primary);
+}
+
+/* --- Payment & status cards — semantic color fixes --- */
+.status-icon-success {
+  background: rgba(3, 144, 74, 0.12);
+  color: var(--ferrari-semantic-success);
+}
+.status-icon-pending {
+  background: rgba(218, 41, 28, 0.08);
+  color: var(--ferrari-primary);
+}
+.status-icon-failed {
+  background: rgba(241, 58, 44, 0.12);
+  color: var(--ferrari-semantic-warning);
+}
+
+/* --- Countdown card — Ferrari style (replaces amber) --- */
+.countdown-card {
+  border-left: 4px solid var(--ferrari-primary);
+}
+.countdown-card .countdown-timer {
+  color: var(--ferrari-primary);
+}
+
+/* --- Pagamento banner offerta/abbonamento — unified --- */
+.promo-banner-accent {
+  background: rgba(218, 41, 28, 0.08);
+  border: 1px solid rgba(218, 41, 28, 0.25);
+}
+
+/* --- Border token fix — unify hairline variants --- */
+.border-hairline-soft  { border-color: var(--ferrari-hairline); }
+
+/* --- Subscription cards — elevated --- */
+.subscription-card {
+  border: 1px solid var(--ferrari-hairline);
+  background: var(--ferrari-canvas-elevated);
+  transition: border-color 0.3s ease, transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.subscription-card:hover {
+  border-color: var(--ferrari-primary);
+  transform: translateY(-2px);
+}
+
+/* --- Scheda film — poster spotlight frame --- */
+.film-poster-frame {
+  position: relative;
+  overflow: hidden;
+}
+.film-poster-frame::after {
+  content: '';
+  position: absolute; inset: 0;
+  border: 1px solid rgba(255,255,255,0.06);
+  pointer-events: none;
+}
+
+/* --- Esito acquisto — success card frame --- */
+.esito-icon-circle {
+  width: 80px; height: 80px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 0;
+}
+
+/* --- Skeleton loading pulse (cinematic upgrade over spinner) --- */
+@keyframes skeletonPulse {
+  0%, 100% { opacity: 0.3; }
+  50%      { opacity: 0.6; }
+}
+.skeleton-pulse {
+  animation: skeletonPulse 2s ease-in-out infinite;
+  background: var(--ferrari-canvas-elevated);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton-pulse { animation: none; }
+}
+
+/* ========================================================================
    Ferrari Accessibility — Reduced Motion
    ======================================================================== */
 
@@ -1380,6 +1680,219 @@ html.light .navbar-ferrari {
 
 html.light .footer-ferrari {
   background: var(--ferrari-canvas-elevated);
+}
+
+/* ========================================================================
+   SKELETON SHIMMER — Premium loading state (replaces spinner)
+   ======================================================================== */
+
+@keyframes shimmerSlide {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.skeleton {
+  position: relative; overflow: hidden;
+  background: var(--ferrari-canvas-elevated);
+}
+.skeleton::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255,255,255,0.03) 35%,
+    rgba(255,255,255,0.06) 50%,
+    rgba(255,255,255,0.03) 65%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmerSlide 2.5s ease-in-out infinite;
+}
+.skeleton-rounded { border-radius: 4px; }
+.skeleton-text   { height: 14px; width: 70%; border-radius: 4px; }
+.skeleton-title  { height: 22px; width: 55%; border-radius: 4px; }
+.skeleton-poster { aspect-ratio: 2/3; border-radius: 0; }
+.skeleton-circle { border-radius: 50%; }
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton::after { animation: none; }
+}
+
+/* ========================================================================
+   RIPPLE CLICK EFFECT — Material-like wave from click point
+   ======================================================================== */
+
+.ripple-container {
+  position: relative; overflow: hidden;
+}
+.ripple-effect {
+  position: absolute; border-radius: 50%;
+  background: rgba(255,255,255,0.2);
+  transform: scale(0);
+  animation: rippleBurst 0.65s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  pointer-events: none;
+}
+@keyframes rippleBurst {
+  to { transform: scale(4); opacity: 0; }
+}
+
+/* ========================================================================
+   MAGNETIC HOVER — Button follows cursor slightly
+   ======================================================================== */
+
+.magnetic-btn {
+  transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1);
+  will-change: transform;
+}
+
+/* ========================================================================
+   ENHANCED SPOTLIGHT — Card borders illuminate on cursor proximity
+   ======================================================================== */
+
+.card-spotlight-enhanced {
+  position: relative; overflow: hidden;
+  --spot-x: 50%; --spot-y: 50%;
+  transition: border-color 0.3s ease;
+}
+.card-spotlight-enhanced::before {
+  content: '';
+  position: absolute; inset: 0; z-index: 1;
+  background: radial-gradient(
+    700px circle at var(--spot-x) var(--spot-y),
+    rgba(218, 41, 28, 0.08),
+    transparent 50%
+  );
+  opacity: 0;
+  transition: opacity 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: none;
+}
+.card-spotlight-enhanced:hover::before {
+  opacity: 1;
+}
+
+/* ========================================================================
+   FLUID ISLAND NAVBAR — Floating glass pill detached from top
+   ======================================================================== */
+
+.navbar-fluid-island {
+  position: fixed; top: 0; left: 50%; transform: translateX(-50%);
+  z-index: 50;
+  background: rgba(24, 24, 24, 0.88);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.03) inset,
+              0 4px 24px rgba(0, 0, 0, 0.3);
+  width: 100%;
+  padding: 0 1.5rem;
+  height: 52px;
+  display: flex; align-items: center;
+  transition: background 0.3s ease, box-shadow 0.3s ease;
+}
+/* Glass effect intensifies on scroll */
+.navbar-fluid-island.scrolled {
+  background: rgba(24, 24, 24, 0.95);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
+}
+
+/* Hamburger morph lines */
+.hamburger-line {
+  display: block; width: 20px; height: 1.5px;
+  background: var(--ferrari-ink);
+  border-radius: 1px;
+  transition: all 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+  transform-origin: center;
+}
+.hamburger-open .hamburger-line:nth-child(1) {
+  transform: translateY(6px) rotate(45deg);
+}
+.hamburger-open .hamburger-line:nth-child(2) {
+  opacity: 0; transform: scaleX(0);
+}
+.hamburger-open .hamburger-line:nth-child(3) {
+  transform: translateY(-6px) rotate(-45deg);
+}
+
+/* Mobile menu — sidebar slide-in with semi-transparent backdrop */
+.mobile-menu-backdrop {
+  position: fixed; inset: 0; z-index: 54;
+  background: rgba(0, 0, 0, 0.45);
+  opacity: 0; visibility: hidden;
+  transition: opacity 0.35s cubic-bezier(0.32, 0.72, 0, 1),
+              visibility 0.35s;
+}
+.mobile-menu-backdrop.open {
+  opacity: 1; visibility: visible;
+}
+
+.mobile-menu-overlay {
+  position: fixed; top: 0; left: 0; bottom: 0; z-index: 55;
+  width: min(82vw, 340px);
+  background: var(--ferrari-canvas);
+  border-right: 1px solid var(--ferrari-hairline);
+  display: flex; flex-direction: column;
+  padding: 5rem 1.75rem 2rem;
+  transform: translateX(-100%);
+  transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1);
+  overflow-y: auto;
+}
+.mobile-menu-overlay.open {
+  transform: translateX(0);
+}
+.mobile-menu-link {
+  display: block;
+  font-family: var(--ferrari-font); font-size: 20px;
+  font-weight: 500; line-height: 1.3; letter-spacing: -0.3px;
+  color: var(--ferrari-ink);
+  padding: 0.85rem 0;
+  border-bottom: 1px solid var(--ferrari-hairline);
+  opacity: 0; transform: translateX(-12px);
+  transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  text-decoration: none;
+}
+.mobile-menu-overlay.open .mobile-menu-link {
+  opacity: 1; transform: translateX(0);
+}
+.mobile-menu-link:nth-child(1) { transition-delay: 0.06s; }
+.mobile-menu-link:nth-child(2) { transition-delay: 0.12s; }
+.mobile-menu-link:nth-child(3) { transition-delay: 0.18s; }
+.mobile-menu-link:nth-child(4) { transition-delay: 0.24s; }
+.mobile-menu-link:nth-child(5) { transition-delay: 0.30s; }
+.mobile-menu-link:nth-child(6) { transition-delay: 0.36s; }
+
+@media (min-width: 1024px) {
+  .navbar-fluid-island {
+    max-width: 720px;
+  }
+}
+
+/* ========================================================================
+   SCROLL REVEAL ENHANCED — Blur + fade + slide via IntersectionObserver
+   ======================================================================== */
+
+.reveal-cinematic {
+  opacity: 0;
+  transform: translateY(32px);
+  filter: blur(8px);
+  transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+              transform 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+              filter 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.reveal-cinematic.revealed {
+  opacity: 1;
+  transform: translateY(0);
+  filter: blur(0);
+}
+.reveal-cinematic-delay-1 { transition-delay: 0.1s; }
+.reveal-cinematic-delay-2 { transition-delay: 0.2s; }
+.reveal-cinematic-delay-3 { transition-delay: 0.3s; }
+.reveal-cinematic-delay-4 { transition-delay: 0.4s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal-cinematic {
+    opacity: 1; transform: none; filter: none; transition: none;
+  }
 }
 
 /* ========================================================================

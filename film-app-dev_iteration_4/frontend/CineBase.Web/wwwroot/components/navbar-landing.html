@@ -1,81 +1,76 @@
-<!-- Ferrari Style Navbar — top-nav-on-dark, 64px -->
-<nav class="fixed top-0 left-0 right-0 z-50 bg-canvas">
-  <div class="max-w-[1440px] mx-auto px-10 h-14 flex items-center justify-between">
-    <!-- Left: MENU + hamburger -->
-    <button id="mobile-menu-toggle" class="flex items-center gap-2 text-ink uppercase text-sm tracking-widest font-normal">
-      <i class="fa-solid fa-bars text-xl"></i>
-      <span>MENU</span>
-    </button>
+<!-- Sticky Navbar — full-width, follows scroll -->
+<nav id="main-nav" class="navbar-fluid-island">
+  <!-- Left: Hamburger (3 morphing lines) -->
+  <button id="mobile-menu-toggle" class="flex flex-col gap-[5px] p-2 -ml-2" aria-label="Menu">
+    <span class="hamburger-line"></span>
+    <span class="hamburger-line"></span>
+    <span class="hamburger-line"></span>
+  </button>
 
-    <!-- Center: Logo -->
-    <a href="/index.html" class="absolute left-1/2 -translate-x-1/2">
-      <span class="text-2xl font-normal tracking-[4px] uppercase text-ink">CINEBASE</span>
+  <!-- Center: Logo (desktop only) -->
+  <a href="/index.html" class="hidden lg:block absolute left-1/2 -translate-x-1/2">
+    <span class="text-base font-medium tracking-[4px] uppercase text-ink">CINEBASE</span>
+  </a>
+
+  <!-- Right: Actions -->
+  <div class="flex items-center gap-4 ml-auto">
+    <a href="/programmazione.html" class="hidden lg:inline-flex text-ink hover:text-ferrari-primary transition-colors duration-300 uppercase tracking-widest text-xs font-medium">
+      Film
+    </a>
+    <a href="/offerte.html" class="hidden lg:inline-flex text-ink hover:text-ferrari-primary transition-colors duration-300 uppercase tracking-widest text-xs font-medium">
+      Offerte
+    </a>
+    <a href="/tmdb-search.html" class="text-ink hover:text-ferrari-primary transition-colors duration-300" title="Cerca film">
+      <i class="fa-solid fa-magnifying-glass"></i>
     </a>
 
-    <!-- Right: Actions -->
-    <div class="flex items-center gap-6">
-      <a href="/offerte.html" class="hidden lg:inline-flex text-ink hover:text-ferrari-primary transition-colors uppercase tracking-widest text-sm">
-        Offerte
-      </a>
-      <a href="/tmdb-search.html" class="text-ink hover:text-ferrari-primary transition-colors" title="Cerca film">
-        <i class="fa-solid fa-magnifying-glass text-lg"></i>
-      </a>
-      
-      <div id="user-dropdown" class="hidden relative">
-        <button id="user-menu-toggle" class="text-ink hover:text-ferrari-primary transition-colors">
-          <i class="fa-solid fa-user text-lg"></i>
+    <div id="user-dropdown" class="hidden relative">
+      <button id="user-menu-toggle" class="text-ink hover:text-ferrari-primary transition-colors duration-300">
+        <i class="fa-solid fa-user"></i>
+      </button>
+      <div id="user-menu" class="hidden absolute right-0 mt-3 w-48 bg-canvas-elevated border border-hairline z-[60]">
+        <a href="/profilo.html" id="desktop-user-name-link" class="block px-4 py-2.5 text-sm text-ink hover:text-ferrari-primary hover:bg-white/5 transition-colors duration-200">
+          <i class="fa-solid fa-user mr-2 w-4"></i><span id="desktop-user-name">Profilo</span>
+        </a>
+        <a href="/profilo.html#prenotazioni" class="block px-4 py-2.5 text-sm text-ink hover:text-ferrari-primary hover:bg-white/5 transition-colors duration-200">
+          <i class="fa-solid fa-ticket mr-2 w-4"></i>Prenotazioni
+        </a>
+        <hr class="my-1 border-hairline">
+        <button id="logout-btn" class="w-full text-left px-4 py-2.5 text-sm text-ferrari-semantic-warning hover:bg-white/5 transition-colors duration-200">
+          <i class="fa-solid fa-sign-out-alt mr-2 w-4"></i>Logout
         </button>
-        <div id="user-menu" class="hidden absolute right-0 mt-4 w-48 bg-canvas-elevated border border-hairline py-2 z-50">
-          <a href="/profilo.html" id="desktop-user-name-link" class="block px-4 py-2 text-sm text-ink hover:text-ferrari-primary hover:bg-white/5">
-            <i class="fa-solid fa-user mr-2"></i><span id="desktop-user-name">Profilo</span>
-          </a>
-          <a href="/profilo.html#prenotazioni" class="block px-4 py-2 text-sm text-ink hover:text-ferrari-primary hover:bg-white/5">
-            <i class="fa-solid fa-ticket mr-2"></i>Prenotazioni
-          </a>
-          <hr class="my-2 border-hairline">
-          <button id="logout-btn" class="w-full text-left px-4 py-2 text-sm text-ferrari-semantic-warning hover:bg-white/5">
-            <i class="fa-solid fa-sign-out-alt mr-2"></i>Logout
-          </button>
-        </div>
       </div>
-      
-      <a href="/login.html" id="login-btn" class="text-ink hover:text-ferrari-primary transition-colors">
-        <i class="fa-solid fa-user text-lg"></i>
-      </a>
-      <a href="/dashboard.html" id="admin-area-btn" class="hidden text-ferrari-primary hover:text-ferrari-primary-hover text-sm uppercase tracking-widest admin-only">
-        ADMIN
-      </a>
     </div>
+
+    <a href="/login.html" id="login-btn" class="text-ink hover:text-ferrari-primary transition-colors duration-300">
+      <i class="fa-solid fa-user"></i>
+    </a>
+    <a href="/dashboard.html" id="admin-area-btn" class="hidden text-ferrari-primary hover:text-ferrari-hover text-xs uppercase tracking-widest font-semibold admin-only transition-colors duration-200">
+      Admin
+    </a>
   </div>
 </nav>
 
-<!-- Mobile Menu — Full Screen Dark -->
-<div id="mobile-menu" class="hidden fixed left-0 top-0 bottom-0 w-1/2 sm:w-1/3 lg:w-1/4 z-[60] bg-canvas border-r border-hairline overflow-y-auto">
-  <div class="flex flex-col h-full">
-    <div class="flex items-center justify-between px-8 py-6 border-b border-hairline">
-      <span class="text-xl tracking-[4px] uppercase text-ink">MENU</span>
-      <button id="mobile-menu-close" class="text-ink hover:text-ferrari-primary transition-colors">
-        <i class="fa-solid fa-xmark text-2xl"></i>
-      </button>
-    </div>
-    <div class="flex-1 flex flex-col justify-center px-8">
-      <a href="/index.html" class="mobile-nav-link py-4 text-3xl uppercase tracking-wider text-ink hover:text-ferrari-primary transition-colors border-b border-hairline">Home</a>
-      <a href="/programmazione.html" class="mobile-nav-link py-4 text-3xl uppercase tracking-wider text-ink hover:text-ferrari-primary transition-colors border-b border-hairline">Programmazione</a>
-      <a href="/my-cinemas.html" class="mobile-nav-link py-4 text-3xl uppercase tracking-wider text-ink hover:text-ferrari-primary transition-colors border-b border-hairline">Cinema</a>
-      <a href="/offerte.html" class="mobile-nav-link py-4 text-3xl uppercase tracking-wider text-ink hover:text-ferrari-primary transition-colors border-b border-hairline">Offerte</a>
-      <a href="/profilo.html" class="mobile-nav-link py-4 text-3xl uppercase tracking-wider text-ink hover:text-ferrari-primary transition-colors border-b border-hairline">Profilo</a>
-      <a href="/dashboard.html" id="mobile-admin-area-btn" class="hidden mobile-nav-link py-4 text-3xl uppercase tracking-wider text-ferrari-primary hover:text-ferrari-primary-hover transition-colors border-b border-hairline admin-only">Area Admin</a>
-    </div>
-    <div class="px-8 py-6 border-t border-hairline">
-      <div id="mobile-auth-links" class="space-y-4">
-        <a href="/login.html" class="btn-tertiary w-full text-center">ACCEDI</a>
-        <a href="/registrazione.html" class="btn-primary w-full text-center">REGISTRATI</a>
-      </div>
-      <div id="mobile-user-menu" class="hidden space-y-4">
-        <p id="mobile-user-name" class="text-ferrari-primary text-lg uppercase tracking-wider"></p>
-        <button id="mobile-logout-btn" class="btn-tertiary w-full text-center text-ferrari-semantic-warning">LOGOUT</button>
-      </div>
-    </div>
+<!-- Mobile Menu Backdrop (click to close) -->
+<div id="mobile-menu-backdrop" class="mobile-menu-backdrop"></div>
+
+<!-- Mobile Menu — Sidebar slide-in -->
+<div id="mobile-menu" class="mobile-menu-overlay">
+  <div class="flex flex-col gap-1">
+    <a href="/index.html" class="mobile-menu-link">Home</a>
+    <a href="/programmazione.html" class="mobile-menu-link">Programmazione</a>
+    <a href="/my-cinemas.html" class="mobile-menu-link">Cinema</a>
+    <a href="/offerte.html" class="mobile-menu-link">Offerte</a>
+    <a href="/profilo.html" class="mobile-menu-link">Profilo</a>
+    <a href="/dashboard.html" id="mobile-admin-area-btn" class="hidden mobile-menu-link text-ferrari-primary admin-only">Area Admin</a>
+  </div>
+  <div class="mt-8 flex flex-col gap-3" id="mobile-auth-links">
+    <a href="/login.html" class="btn-outline w-full text-center text-sm">Accedi</a>
+    <a href="/registrazione.html" class="btn-primary w-full text-center text-sm ripple-container magnetic-btn">Registrati</a>
+  </div>
+  <div id="mobile-user-menu" class="hidden mt-8 flex flex-col gap-3">
+    <p id="mobile-user-name" class="text-ferrari-primary uppercase tracking-wider text-center text-sm"></p>
+    <button id="mobile-logout-btn" class="btn-outline w-full text-center text-sm text-ferrari-semantic-warning">Logout</button>
   </div>
 </div>
 
@@ -90,9 +85,40 @@
   const mobileUserMenu = document.getElementById('mobile-user-menu');
   const mobileUserName = document.getElementById('mobile-user-name');
   const mobileLogoutBtn = document.getElementById('mobile-logout-btn');
-  const mobileMenuClose = document.getElementById('mobile-menu-close');
   const mobileMenu = document.getElementById('mobile-menu');
   const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+  const mobileMenuBackdrop = document.getElementById('mobile-menu-backdrop');
+  const mainNav = document.getElementById('main-nav');
+
+  // Intensify glass on scroll
+  if (mainNav) {
+    var scrollTicking = false;
+    window.addEventListener('scroll', function() {
+      if (!scrollTicking) {
+        requestAnimationFrame(function() {
+          if (window.scrollY > 10) {
+            mainNav.classList.add('scrolled');
+          } else {
+            mainNav.classList.remove('scrolled');
+          }
+          scrollTicking = false;
+        });
+        scrollTicking = true;
+      }
+    }, { passive: true });
+  }
+
+  function openMenu() {
+    if (mobileMenu) mobileMenu.classList.add('open');
+    if (mobileMenuToggle) mobileMenuToggle.classList.add('hamburger-open');
+    if (mobileMenuBackdrop) mobileMenuBackdrop.classList.add('open');
+  }
+
+  function closeMenu() {
+    if (mobileMenu) mobileMenu.classList.remove('open');
+    if (mobileMenuToggle) mobileMenuToggle.classList.remove('hamburger-open');
+    if (mobileMenuBackdrop) mobileMenuBackdrop.classList.remove('open');
+  }
 
   function normalizeRole(role) {
     if (role == null) return '';
@@ -105,14 +131,12 @@
 
   function updateAuthUI() {
     if (typeof Auth === 'undefined' || !Auth) {
-      console.log('[navbar] Auth non definito');
       document.querySelectorAll('.admin-only').forEach(function(el) { el.classList.add('hidden'); });
       return;
     }
     var isLoggedIn = Auth.isLoggedIn();
     var role = normalizeRole(isLoggedIn ? (Auth.getUserRole() || null) : null);
     var isAdminOrPowerUser = role === 'admin' || role === 'poweruser';
-    console.log('[navbar] isLoggedIn=' + isLoggedIn + ' role=' + role + ' token=' + (Auth.getAccessToken() ? Auth.getAccessToken().substring(0, 20) + '...' : 'null'));
 
     if (isLoggedIn && Auth.getUser()) {
       var user = Auth.getUser();
@@ -137,11 +161,35 @@
     });
   }
 
+  // Hamburger morph toggle
+  if (mobileMenuToggle && mobileMenu) {
+    mobileMenuToggle.addEventListener('click', function() {
+      if (mobileMenu.classList.contains('open')) {
+        closeMenu();
+      } else {
+        openMenu();
+      }
+    });
+    // Prevent navbar.js from adding duplicate listener
+    mobileMenuToggle.dataset.menuBound = 'true';
+  }
+
+  // Backdrop click closes menu
+  if (mobileMenuBackdrop) {
+    mobileMenuBackdrop.addEventListener('click', closeMenu);
+  }
+
+  // Close menu on link click
+  if (mobileMenu) {
+    mobileMenu.querySelectorAll('a').forEach(function(link) {
+      link.addEventListener('click', closeMenu);
+      link.dataset.menuCloseBound = 'true';
+    });
+  }
+
   if (userMenuToggle) userMenuToggle.addEventListener('click', function() { if (userMenu) userMenu.classList.toggle('hidden'); });
   if (logoutBtn) logoutBtn.addEventListener('click', function() { Auth && Auth.logout().then(function() { window.location.href = '/index.html'; }).catch(function() { window.location.href = '/index.html'; }); });
   if (mobileLogoutBtn) mobileLogoutBtn.addEventListener('click', function() { Auth && Auth.logout().then(function() { window.location.href = '/index.html'; }).catch(function() { window.location.href = '/index.html'; }); });
-  if (mobileMenuClose) mobileMenuClose.addEventListener('click', function() { if (mobileMenu) mobileMenu.classList.add('hidden'); });
-  // mobile-menu-toggle e' gestito da navbar.js
 
   document.addEventListener('click', function(e) {
     if (userMenuToggle && userMenu && !userMenuToggle.contains(e.target) && !userMenu.contains(e.target)) { userMenu.classList.add('hidden'); }
@@ -155,4 +203,3 @@
   document.addEventListener('components:loaded', updateAuthUI);
 })();
 </script>
-

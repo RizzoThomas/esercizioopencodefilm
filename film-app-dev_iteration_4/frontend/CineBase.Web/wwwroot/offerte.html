@@ -11,91 +11,55 @@
 
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-  <link href="/css/styles.css?v=5" rel="stylesheet">
+  <link href="/css/styles.css?v=9" rel="stylesheet">
 
-  <style>
-    .offer-card {
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      transition: border-color .2s ease, transform .2s ease, box-shadow .2s ease;
-    }
-    .offer-card:hover {
-      border-color: var(--ferrari-primary, #FF2800);
-      transform: translateY(-2px);
-      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
-    }
-    .highlight-card {
-      border-color: rgba(212, 175, 55, 0.5);
-      box-shadow: 0 0 0 1px rgba(212, 175, 55, 0.15), 0 18px 50px rgba(0, 0, 0, 0.35);
-    }
-    .badge-gold {
-      background: linear-gradient(135deg, rgba(212, 175, 55, 0.25), rgba(212, 175, 55, 0.08));
-      color: #F5D36A;
-      border: 1px solid rgba(212, 175, 55, 0.35);
-    }
-    .cinema-filter {
-      background: rgba(12, 12, 12, 0.92);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      color: #F5F5F5;
-    }
-    .offer-image-header {
-      min-height: 9rem;
-    }
-    .show-picker-overlay {
-      backdrop-filter: blur(10px);
-    }
-    .show-picker-btn {
-      transition: transform .15s ease, border-color .15s ease, background-color .15s ease;
-    }
-    .show-picker-btn:hover {
-      transform: translateY(-1px);
-      border-color: var(--ferrari-primary, #FF2800);
-    }
-  </style>
 </head>
 
-<body class="bg-canvas text-ink font-sans">
+<body class="bg-canvas text-ink font-sans cinematic-enter-page">
   <div id="navbar-container"></div>
 
-  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-24">
-    <div class="flex items-end justify-between gap-4 mb-8">
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 pt-24">
+    <div class="flex items-end justify-between gap-4 mb-10">
       <div>
-        <p class="text-ferrari-primary uppercase tracking-[0.25em] text-sm mb-2">Promozioni</p>
-        <h1 class="text-3xl md:text-4xl font-bold text-ink">Offerte Speciali</h1>
-        <p class="text-body mt-2 max-w-2xl">Combo cinema per risparmiare su biglietti e snack. Scegli l'offerta e poi seleziona lo spettacolo.</p>
+        <p class="page-header-eyebrow mb-3">Promozioni</p>
+        <h1 class="page-header-title">Offerte Speciali</h1>
+        <p class="page-header-subtitle mt-3">Combo cinema per risparmiare su biglietti e snack. Scegli l'offerta e poi seleziona lo spettacolo.</p>
       </div>
       <a href="/programmazione.html" class="btn-outline hidden sm:inline-flex">
         <i class="fa-solid fa-film mr-2"></i>Vai alla programmazione
       </a>
     </div>
 
-    <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+    <div class="flex flex-wrap items-center justify-between gap-4 mb-8">
       <div class="flex items-center gap-3">
         <label for="cinema-filter" class="text-sm uppercase tracking-[0.2em] text-body">Cinema</label>
-        <select id="cinema-filter" class="cinema-filter rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-ferrari-primary">
+        <select id="cinema-filter" class="cinema-filter px-4 py-2">
           <option value="">Tutti i cinema</option>
         </select>
       </div>
     </div>
 
-    <div id="loading-state" class="text-center py-16">
-      <i class="fa-solid fa-spinner fa-spin text-4xl mb-4 text-ferrari-primary"></i>
-      <p class="text-body">Caricamento offerte...</p>
+    <div id="loading-state" class="text-center py-20">
+      <div class="inline-flex flex-col items-center gap-4">
+        <i class="fa-solid fa-spinner fa-spin text-3xl text-ferrari-primary"></i>
+        <p class="text-body">Caricamento offerte...</p>
+      </div>
     </div>
 
-    <div id="error-state" class="hidden text-center py-16 card-ferrari">
+    <div id="error-state" class="hidden text-center py-20 card-ferrari">
       <i class="fa-solid fa-circle-exclamation text-5xl text-ferrari-semantic-warning mb-4"></i>
       <h2 class="text-xl font-semibold text-ink mb-2">Impossibile caricare le offerte</h2>
-      <p id="error-message" class="text-body mb-4"></p>
+      <p id="error-message" class="text-body mb-6"></p>
       <button id="retry-button" class="btn-primary">Riprova</button>
     </div>
 
     <div id="offers-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 hidden"></div>
 
-    <section class="mt-14">
-      <div class="flex items-end justify-between gap-4 mb-6">
+    <section class="mt-16">
+      <div class="flex items-end justify-between gap-4 mb-8">
         <div>
-          <p class="text-ferrari-primary uppercase tracking-[0.25em] text-sm mb-2">Abbonamenti</p>
-          <h2 class="text-2xl md:text-3xl font-bold text-ink">Piani mensili e annuali</h2>
+          <p class="page-header-eyebrow mb-3">Abbonamenti</p>
+          <h2 class="page-header-title">Piani mensili e annuali</h2>
         </div>
       </div>
       <div id="subscriptions-loading" class="text-center py-12 card-ferrari">
@@ -109,30 +73,34 @@
   <div id="footer-container"></div>
   <div id="toast-container" class="fixed bottom-4 right-4 z-50"></div>
 
-  <script src="/js/utils.js?v=20260419b"></script>
+  <script src="/js/utils.js?v=2"></script>
   <script src="/js/api.js?v=final"></script>
-  <script src="/js/auth.js?v=20260419b"></script>
-  <script src="/js/template-loader.js?v=20260419b"></script>
-  <script src="/js/navbar.js?v=20260419b"></script>
-  <script src="/js/aceternity-effects.js"></script>
+  <script src="/js/auth.js?v=2"></script>
+  <script src="/js/template-loader.js?v=4"></script>
+  <script src="/js/navbar.js?v=4"></script>
+  <script src="/js/aceternity-effects.js?v=2"></script>
   <script>
     function formatCurrency(value) {
       const amount = Number(value || 0);
       return amount.toLocaleString('it-IT', { style: 'currency', currency: 'EUR' });
     }
 
-    function getCardGradient(tipo, includePopcorn) {
+    function getOfferImage(tipo, includePopcorn) {
+      // Cinema-themed Unsplash photos
       if (tipo === 'biglietti_popcorn' || (includePopcorn || 0) > 0) {
-        return 'from-amber-900/60 via-red-900/40 to-canvas';
+        return 'https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?w=800&h=400&fit=crop'; // popcorn cinema
       }
-      return 'from-blue-900/60 via-indigo-900/40 to-canvas';
+      return 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=800&h=400&fit=crop'; // cinema seats
     }
 
-    function getCardEmoji(tipo, includePopcorn) {
-      if (tipo === 'biglietti_popcorn' || (includePopcorn || 0) > 0) {
-        return '🍿';
-      }
-      return '🎬';
+    function getSubscriptionImage(tipo) {
+      const images = {
+        'mensile':  'https://images.unsplash.com/photo-1478720568477-152d9b164e26?w=800&h=400&fit=crop', // projector
+        'annuale':  'https://images.unsplash.com/photo-1585647347483-22b66260dfff?w=800&h=400&fit=crop', // tickets
+        'premium':  'https://images.unsplash.com/photo-1514306191717-452ec28c7814?w=800&h=400&fit=crop', // cinema screen
+        'vip':      'https://images.unsplash.com/photo-1595769816263-9b910be24d5f?w=800&h=400&fit=crop', // luxury theater
+      };
+      return images[tipo] || images['mensile'];
     }
 
     function renderOfferCard(offerta) {
@@ -143,24 +111,24 @@
       const itemsText = extraItems.length ? extraItems.join(' + ') : 'Contenuto variabile';
       const price = formatCurrency(offerta.prezzo);
       const originalPrice = offerta.prezzoOriginale ? formatCurrency(offerta.prezzoOriginale) : '';
-      const gradient = getCardGradient(offerta.tipo, offerta.includePopcorn);
-      const emoji = getCardEmoji(offerta.tipo, offerta.includePopcorn);
+      const imageUrl = getOfferImage(offerta.tipo, offerta.includePopcorn);
 
       return `
-        <article class="offer-card ${offerta.inEvidenza ? 'highlight-card' : ''} card-ferrari p-0 flex flex-col h-full relative overflow-hidden">
-          <div class="h-36 bg-gradient-to-br ${gradient} flex items-center justify-center relative offer-image-header">
-            <span class="text-6xl drop-shadow-lg">${emoji}</span>
-            ${offerta.cinemaNome ? `<span class="absolute bottom-2 left-3 px-2 py-0.5 rounded text-[10px] uppercase tracking-wider bg-black/40 text-white/80 backdrop-blur-sm">${offerta.cinemaNome}</span>` : ''}
+        <article class="offer-card ${offerta.inEvidenza ? 'highlight-card' : ''} card-ferrari p-0 flex flex-col h-full relative overflow-hidden card-spotlight-enhanced group">
+          <div class="h-44 relative overflow-hidden">
+            <img src="${imageUrl}" alt="${offerta.nome}" class="w-full h-full object-cover transition-transform duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:scale-105" loading="lazy">
+            <div class="absolute inset-0 bg-gradient-to-t from-[#181818] via-transparent to-transparent"></div>
+            ${offerta.cinemaNome ? `<span class="absolute bottom-2 left-3 px-2 py-0.5 text-[10px] uppercase tracking-wider bg-black/50 text-white/90">${offerta.cinemaNome}</span>` : ''}
           </div>
           <div class="absolute top-3 left-3 flex flex-col gap-1.5 z-10">
-            ${offerta.inEvidenza ? '<span class="badge-gold px-3 py-1 rounded-full text-xs font-semibold backdrop-blur-sm">🏆 Migliore Offerta</span>' : ''}
-            ${offerta.scontoPercentuale > 0 ? `<span class="px-3 py-1 rounded-full bg-red-500/95 text-white text-xs font-bold backdrop-blur-sm shadow-lg shadow-red-500/20">−${offerta.scontoPercentuale}%</span>` : ''}
+            ${offerta.inEvidenza ? '<span class="offer-badge-accent">Migliore Offerta</span>' : ''}
+            ${offerta.scontoPercentuale > 0 ? `<span class="offer-discount-badge">\u2212${offerta.scontoPercentuale}%</span>` : ''}
           </div>
           <div class="p-6 flex-1 flex flex-col">
             <div class="flex-1">
               <div class="mb-4">
-                <p class="text-ferrari-primary uppercase tracking-[0.2em] text-xs mb-1">${offerta.tipo || 'Offerta'}</p>
-                <h2 class="text-xl font-bold text-ink leading-tight">${offerta.nome}</h2>
+                <p class="text-ferrari-primary uppercase tracking-[0.15em] text-xs mb-1.5">${offerta.tipo || 'Offerta'}</p>
+                <h2 class="ferrari-title-md text-ink leading-tight">${offerta.nome}</h2>
               </div>
               <p class="text-body mb-4 leading-relaxed text-sm">${offerta.descrizione || ''}</p>
               <div class="space-y-1.5 text-sm text-ink/90">
@@ -175,8 +143,53 @@
                   ${originalPrice ? `<span class="text-xs text-body/60 line-through">${originalPrice}</span>` : ''}
                 </div>
               </div>
-              <button class="btn-primary text-sm whitespace-nowrap offer-acquista-btn" data-offer-id="${offerta.id}" data-cinema-id="${offerta.cinemaId || ''}">
+              <button class="btn-primary text-sm whitespace-nowrap offer-acquista-btn ripple-container magnetic-btn" data-offer-id="${offerta.id}" data-cinema-id="${offerta.cinemaId || ''}">
                 Acquista
+              </button>
+            </div>
+          </div>
+        </article>
+      `;
+    }
+
+    function renderSubscriptionCard(abbonamento) {
+      const price = formatCurrency(abbonamento.prezzo);
+      const annualPrice = abbonamento.prezzoAnnuale ? formatCurrency(abbonamento.prezzoAnnuale) : '';
+      const annualSavings = abbonamento.prezzoAnnuale ? Math.max(0, Math.round((abbonamento.prezzo * 12 - abbonamento.prezzoAnnuale) * 100) / 100) : 0;
+      const popcornText = abbonamento.includePopcornPerMese > 0
+        ? `${abbonamento.includePopcornPerMese} popcorn/mese`
+        : 'Nessun popcorn incluso';
+      const imageUrl = getSubscriptionImage(abbonamento.tipo);
+
+      return `
+        <article class="subscription-card card-ferrari p-0 flex flex-col h-full overflow-hidden card-spotlight-enhanced group">
+          <div class="h-36 relative overflow-hidden">
+            <img src="${imageUrl}" alt="${abbonamento.nome}" class="w-full h-full object-cover transition-transform duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:scale-105" loading="lazy">
+            <div class="absolute inset-0 bg-gradient-to-t from-[#181818] via-transparent to-transparent"></div>
+          </div>
+          <div class="p-6 flex-1 flex flex-col">
+            <div class="flex-1">
+              <div class="flex flex-wrap items-start justify-between gap-3 mb-4">
+                <div>
+                  <p class="text-ferrari-primary uppercase tracking-[0.15em] text-xs mb-2">${abbonamento.tipo}</p>
+                  <h3 class="ferrari-title-md text-ink">${abbonamento.nome}</h3>
+                </div>
+                ${abbonamento.scontoPercentuale > 0 ? `<span class="offer-discount-badge">\u2212${abbonamento.scontoPercentuale}%</span>` : ''}
+              </div>
+              <p class="text-body mb-5 leading-relaxed">${abbonamento.descrizione || ''}</p>
+              <div class="space-y-2 text-sm text-ink/90">
+                <div class="flex items-center gap-2"><i class="fa-solid fa-ticket text-ferrari-primary"></i><span>${abbonamento.numeroBigliettiPerMese} biglietti/mese</span></div>
+                <div class="flex items-center gap-2"><i class="fa-solid fa-popcorn text-ferrari-primary"></i><span>${popcornText}</span></div>
+              </div>
+            </div>
+            <div class="mt-6 pt-4 border-t border-hairline space-y-3">
+              <div>
+                <p class="text-xs uppercase tracking-[0.2em] text-body">Prezzo mensile</p>
+                <p class="text-2xl font-bold text-ink">${price}</p>
+              </div>
+              ${annualPrice ? `<p class="text-sm text-body">Annuale: <span class="text-ink font-semibold">${annualPrice}</span> \u00b7 risparmi ${formatCurrency(annualSavings)}</p>` : ''}
+              <button class="btn-primary inline-flex justify-center w-full sm:w-auto subscription-action-btn ripple-container magnetic-btn" data-subscription-id="${abbonamento.id}" data-subscription-name="${abbonamento.nome}">
+                ${typeof Auth !== 'undefined' && Auth.isLoggedIn() ? 'Attiva' : 'Accedi'}
               </button>
             </div>
           </div>
@@ -193,14 +206,14 @@
         : 'Nessun popcorn incluso';
 
       return `
-        <article class="offer-card card-ferrari p-6 flex flex-col h-full">
+        <article class="subscription-card card-ferrari p-6 flex flex-col h-full">
           <div class="flex-1">
             <div class="flex flex-wrap items-start justify-between gap-3 mb-4">
               <div>
-                <p class="text-ferrari-primary uppercase tracking-[0.2em] text-xs mb-2">${abbonamento.tipo}</p>
-                <h3 class="text-2xl font-bold text-ink">${abbonamento.nome}</h3>
+                <p class="text-ferrari-primary uppercase tracking-[0.15em] text-xs mb-2">${abbonamento.tipo}</p>
+                <h3 class="ferrari-title-md text-ink">${abbonamento.nome}</h3>
               </div>
-              ${abbonamento.scontoPercentuale > 0 ? `<span class="px-3 py-1 rounded-full bg-red-500/15 text-red-400 text-xs font-semibold">−${abbonamento.scontoPercentuale}%</span>` : ''}
+              ${abbonamento.scontoPercentuale > 0 ? `<span class="offer-discount-badge">−${abbonamento.scontoPercentuale}%</span>` : ''}
             </div>
             <p class="text-body mb-5 leading-relaxed">${abbonamento.descrizione || ''}</p>
             <div class="space-y-2 text-sm text-ink/90">
@@ -238,37 +251,42 @@
 
       const overlay = document.createElement('div');
       overlay.dataset.showPickerOverlay = 'true';
-      overlay.className = 'show-picker-overlay fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4';
+      overlay.className = 'fixed inset-0 bg-black/60 z-50 flex items-start justify-center pt-[8vh] p-4';
       overlay.innerHTML = `
-        <div class="bg-canvas-elevated border border-hairline rounded-2xl p-6 max-w-2xl w-full max-h-[85vh] overflow-y-auto shadow-2xl">
-          <div class="flex items-start justify-between gap-4 mb-5">
+        <div class="bg-canvas-elevated border border-hairline w-full max-w-xl flex flex-col" style="max-height:82vh">
+          <!-- Header — sticky -->
+          <div class="flex items-start justify-between gap-3 p-5 pb-3 border-b border-hairline shrink-0">
             <div>
-              <p class="text-ferrari-primary uppercase tracking-[0.25em] text-xs mb-2">Seleziona spettacolo</p>
-              <h3 class="text-2xl font-bold text-ink">Scegli dove usare l'offerta</h3>
-              <p class="text-body text-sm mt-1">Seleziona uno spettacolo disponibile per proseguire al pagamento.</p>
+              <p class="text-ferrari-primary uppercase tracking-[0.15em] text-[11px] font-semibold mb-1">Seleziona spettacolo</p>
+              <h3 class="text-lg font-bold text-ink">Scegli dove usare l'offerta</h3>
             </div>
-            <button class="text-body hover:text-ink text-2xl close-picker-btn" aria-label="Chiudi">&times;</button>
+            <button class="text-body hover:text-ink text-xl close-picker-btn leading-none mt-0.5" aria-label="Chiudi">&times;</button>
           </div>
-          <div class="space-y-3">
+
+          <!-- Show list — scrollable -->
+          <div class="overflow-y-auto flex-1 p-3 space-y-1.5">
             ${shows.map((s) => {
               const showDate = s.startAtUtc ? new Date(s.startAtUtc).toLocaleString('it-IT', { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : 'Data non disponibile';
               return `
-                <button class="show-picker-btn w-full text-left p-4 rounded-xl bg-canvas border border-hairline transition-colors"
+                <button class="show-picker-btn w-full text-left p-3 bg-canvas border border-hairline hover:border-ferrari-primary transition-colors group"
                   data-show-id="${s.id}">
-                  <div class="flex items-start justify-between gap-4">
+                  <div class="flex items-center justify-between gap-3">
                     <div class="min-w-0">
-                      <p class="text-lg font-semibold text-ink truncate">${s.filmTitolo || 'Film'}</p>
-                      <p class="text-sm text-body mt-1">${showDate}</p>
-                      <p class="text-sm text-body mt-1">${s.cinemaNome || ''}${s.salaNome ? ` · Sala ${s.salaNome}` : ''}</p>
+                      <p class="text-sm font-semibold text-ink truncate group-hover:text-ferrari-primary transition-colors">${s.filmTitolo || 'Film'}</p>
+                      <p class="text-xs text-body mt-0.5">${showDate} · ${s.cinemaNome || ''}${s.salaNome ? ` · ${s.salaNome}` : ''}</p>
                     </div>
-                    <div class="shrink-0 text-ferrari-primary">
-                      <i class="fa-solid fa-ticket text-xl"></i>
+                    <div class="shrink-0 text-ferrari-primary opacity-70 group-hover:opacity-100 transition-opacity">
+                      <i class="fa-solid fa-arrow-right text-sm"></i>
                     </div>
                   </div>
                 </button>`;
             }).join('')}
           </div>
-          <button class="mt-5 w-full btn-outline text-sm close-picker-btn">Annulla</button>
+
+          <!-- Footer — sticky -->
+          <div class="p-3 pt-0 border-t border-hairline shrink-0">
+            <button class="w-full btn-outline text-sm py-2 close-picker-btn">Annulla</button>
+          </div>
         </div>`;
 
       document.body.appendChild(overlay);

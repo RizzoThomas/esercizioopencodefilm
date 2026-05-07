@@ -13,6 +13,7 @@ let countdownInterval = null;
 let keepAliveInterval = null;
 let pollInterval = null;
 let zoomIndex = DEFAULT_ZOOM_INDEX;
+let offertaData = null; // Dati offerta se si acquista da un'offerta
 
 document.addEventListener('DOMContentLoaded', async () => {
   if (!Auth?.isLoggedIn?.()) {
@@ -26,6 +27,17 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (!showId) {
     showError('Parametro showId mancante');
     return;
+  }
+
+  // Carica dati offerta se presente
+  const offertaId = params.get('offertaId');
+  if (offertaId) {
+    try {
+      const offers = Array.isArray(await API.getOfferte())
+        ? await API.getOfferte()
+        : (await API.getOfferte())?.$values || (await API.getOfferte())?.items || [];
+      offertaData = offers.find(o => String(o.id) === String(offertaId)) || null;
+    } catch { /* non bloccare il flusso */ }
   }
 
   await loadSeatMap();
@@ -444,6 +456,9 @@ function updateSummary() {
   const totalEl = document.getElementById('summary-total');
   const btnContinue = document.getElementById('btn-continue');
   const countdownCard = document.getElementById('countdown-card');
+  const offertaRow = document.getElementById('summary-offerta-row');
+  const offertaLabel = document.getElementById('summary-offerta-label');
+  const offertaAmount = document.getElementById('summary-offerta-amount');
 
   const selected = getSelectedSeats();
   countEl.textContent = selected.length;
@@ -451,8 +466,19 @@ function updateSummary() {
   const priceBase = seatMap?.prezzoBase || 0;
   const supplement = seatMap?.supplementoSala || 0;
   const unitPrice = priceBase + supplement;
-  const total = selected.length * unitPrice;
-  totalEl.textContent = formatCurrency(total);
+  const rawTotal = selected.length * unitPrice;
+
+  // Mostra info offerta se presente
+  if (offertaData && offertaRow && offertaAmount && offertaLabel) {
+    const offerPrice = offertaData.prezzo || rawTotal;
+    offertaLabel.textContent = `Offerta "${offertaData.nome}"`;
+    offertaAmount.textContent = formatCurrency(offerPrice);
+    offertaRow.classList.remove('hidden');
+    totalEl.textContent = formatCurrency(offerPrice);
+  } else {
+    if (offertaRow) offertaRow.classList.add('hidden');
+    totalEl.textContent = formatCurrency(rawTotal);
+  }
 
   if (selected.length > 0) {
     list.innerHTML = selected.map(s =>
@@ -573,6 +599,16 @@ function setupActions() {
     if (selectedSeatIds.size === 0 || !holdToken) {
       showToast('Seleziona almeno un posto', 'warning');
       return;
+    }
+
+    // Controllo offerta: se l'offerta include più biglietti di quelli selezionati, avvisa
+    if (offertaData && offertaData.numeroBiglietti && selectedSeatIds.size < offertaData.numeroBiglietti) {
+      const mancanti = offertaData.numeroBiglietti - selectedSeatIds.size;
+      const conferma = confirm(
+        `L'offerta "${offertaData.nome}" include ${offertaData.numeroBiglietti} biglietti, ma hai selezionato solo ${selectedSeatIds.size} posto/i.\n\n` +
+        `Proseguendo perderai ${mancanti} biglietto/i incluso/i nell'offerta.\n\nVuoi continuare comunque?`
+      );
+      if (!conferma) return;
     }
 
     btnContinue.disabled = true;

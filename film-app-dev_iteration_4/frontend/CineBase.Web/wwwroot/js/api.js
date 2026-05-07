@@ -493,7 +493,7 @@ deleteFilm: (id) => apiFetch(`/films/${id}`, { method: 'DELETE' }),
   getOrdine: (orderId) => apiFetch(`/checkout/orders/${orderId}`),
 
   // Checkout - Paga ordine
-  payOrdine: (orderId, metodoPagamento, importoCreditoRichiesto, idempotencyKey, codiceVoucher) => {
+  payOrdine: (orderId, metodoPagamento, importoCreditoRichiesto, idempotencyKey, codiceVoucher, offertaId) => {
     const headers = {};
     if (idempotencyKey) headers['Idempotency-Key'] = idempotencyKey;
     const body = {
@@ -502,6 +502,7 @@ deleteFilm: (id) => apiFetch(`/films/${id}`, { method: 'DELETE' }),
       idempotencyKey: idempotencyKey || undefined
     };
     if (codiceVoucher) body.codiceVoucher = codiceVoucher;
+    if (offertaId) body.offertaId = parseInt(offertaId);
     return apiFetch(`/checkout/orders/${orderId}/pay`, {
       method: 'POST',
       headers,

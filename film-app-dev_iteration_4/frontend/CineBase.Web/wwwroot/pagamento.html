@@ -13,14 +13,14 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
     rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-  <link href="/css/styles.css?v=5" rel="stylesheet">
+  <link href="/css/styles.css?v=8" rel="stylesheet">
   <script src="/js/route-guard.js"></script>
 </head>
 
-<body class="bg-canvas text-ink font-sans">
+<body class="bg-canvas text-ink font-sans cinematic-enter-page">
   <div id="navbar-container"></div>
 
-  <main class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+  <main class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-6 pt-24">
     <!-- Loading State -->
     <div id="loading-state" class="text-center py-16">
       <i class="fa-solid fa-spinner fa-spin text-4xl mb-4 text-ferrari-primary"></i>
@@ -39,7 +39,7 @@
 
     <!-- Main Content -->
     <div id="main-content" class="hidden">
-      <h1 class="text-2xl font-bold text-ink mb-6">
+      <h1 class="ferrari-display-lg text-ink mb-6">
         <i class="fa-solid fa-credit-card text-ferrari-primary mr-2"></i>Pagamento
       </h1>
 
@@ -47,7 +47,7 @@
       <div id="order-summary-card" class="card-ferrari p-6 mb-6">
         <h2 class="text-lg font-bold text-ink mb-4">Riepilogo Ordine</h2>
         <div id="order-summary" class="space-y-3"></div>
-        <div class="border-t border-hairline-variant/20 pt-4 mt-4">
+        <div class="border-t border-hairline pt-4 mt-4">
           <div class="flex justify-between text-xl font-bold text-ink">
             <span>Totale da pagare</span>
             <span id="order-total"></span>
@@ -63,8 +63,8 @@
       </div>
 
       <!-- Abbonamento banner -->
-      <div id="abbonamento-banner" class="hidden card-ferrari p-4 mb-4 bg-yellow-500/10 border border-yellow-500/30">
-        <p class="text-sm text-yellow-400 uppercase tracking-wider mb-1">Attivazione Abbonamento</p>
+      <div id="abbonamento-banner" class="hidden card-ferrari p-4 mb-4 promo-banner-accent">
+        <p class="text-sm text-ferrari-primary uppercase tracking-wider mb-1">Attivazione Abbonamento</p>
         <p class="text-lg font-bold text-ink" id="abbonamento-banner-name"></p>
         <p class="text-sm text-body" id="abbonamento-banner-desc"></p>
       </div>
@@ -174,13 +174,13 @@
 
   <div id="toast-container" class="fixed bottom-4 right-4 z-50"></div>
 
-  <script src="/js/utils.js?v=20260419b"></script>
+  <script src="/js/utils.js?v=2"></script>
   <script src="/js/api.js?v=final"></script>
-  <script src="/js/auth.js?v=20260419b"></script>
-  <script src="/js/template-loader.js?v=20260419b"></script>
-  <script src="/js/navbar.js?v=20260419b"></script>
-  <script src="/js/aceternity-effects.js"></script>
-  <script src="/js/pages/pagamento.js?v=fix4"></script>
+  <script src="/js/auth.js?v=2"></script>
+  <script src="/js/template-loader.js?v=4"></script>
+  <script src="/js/navbar.js?v=4"></script>
+  <script src="/js/aceternity-effects.js?v=2"></script>
+  <script src="/js/pages/pagamento.js?v=fix6""></script>
 </body>
 
 </html>

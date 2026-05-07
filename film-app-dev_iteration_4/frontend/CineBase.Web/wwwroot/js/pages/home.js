@@ -100,10 +100,16 @@ function getDirectorName(film) {
 
 function initFeaturedFilms(entries) {
   featuredEntries = entries;
+
+  // Hide skeleton, show grid
+  const skeleton = document.getElementById('featured-skeleton');
+  const grid = document.getElementById('featured-grid');
+  if (skeleton) skeleton.classList.add('hidden');
+  if (grid) grid.classList.remove('hidden');
+
   if (!featuredEntries.length) {
-    const featuredGrid = document.getElementById("featured-grid");
-    featuredGrid.innerHTML =
-      '<p class="text-ink col-span-full text-center">Nessun film disponibile</p>';
+    grid.innerHTML =
+      '<p class="text-ink col-span-full text-center py-12">Nessun film disponibile</p>';
     return;
   }
 

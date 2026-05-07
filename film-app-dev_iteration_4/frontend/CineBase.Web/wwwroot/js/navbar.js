@@ -33,22 +33,34 @@ function setActiveNavLink() {
 function setupMobileMenu() {
   const menuToggle = document.getElementById('mobile-menu-toggle');
   const mobileMenu = document.getElementById('mobile-menu');
+  const backdrop = document.getElementById('mobile-menu-backdrop');
 
   if (!menuToggle || !mobileMenu) return;
   if (menuToggle.dataset.menuBound === 'true') return;
 
+  function openMenu() {
+    mobileMenu.classList.add('open');
+    menuToggle.classList.add('hamburger-open');
+    if (backdrop) backdrop.classList.add('open');
+  }
+  function closeMenu() {
+    mobileMenu.classList.remove('open');
+    menuToggle.classList.remove('hamburger-open');
+    if (backdrop) backdrop.classList.remove('open');
+  }
+
   menuToggle.addEventListener('click', () => {
-    mobileMenu.classList.toggle('hidden');
+    if (mobileMenu.classList.contains('open')) { closeMenu(); } else { openMenu(); }
   });
+
+  if (backdrop) {
+    backdrop.addEventListener('click', closeMenu);
+  }
 
   const mobileLinks = mobileMenu.querySelectorAll('a');
   mobileLinks.forEach(link => {
     if (link.dataset.menuCloseBound === 'true') return;
-
-    link.addEventListener('click', () => {
-      mobileMenu.classList.add('hidden');
-    });
-
+    link.addEventListener('click', closeMenu);
     link.dataset.menuCloseBound = 'true';
   });
 
