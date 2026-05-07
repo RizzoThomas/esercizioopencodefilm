@@ -264,6 +264,8 @@ async function handlePayment() {
   btnPay.disabled = true;
   btnPay.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>Elaborazione pagamento...';
 
+  let method = 'carta'; // hoisted for catch-block access
+
   try {
     // Refresh order state — prevent paying an already-paid order
     try { ordine = await API.getOrdine(orderId); } catch {}
@@ -272,7 +274,7 @@ async function handlePayment() {
       return;
     }
 
-    const method = document.querySelector('input[name="payment-method"]:checked')?.value || 'carta';
+    method = document.querySelector('input[name="payment-method"]:checked')?.value || 'carta';
     let importoCreditoRichiesto = null;
 
     if (method === 'credito') {
@@ -331,7 +333,23 @@ async function handlePayment() {
       btnPay.innerHTML = '<i class="fa-solid fa-lock mr-2"></i><span id="pay-button-text">Riprova pagamento</span>';
     }
   } catch (error) {
-    // 409: order not in payable state (seats expired, already paid, etc.)
+    // Credit payment: backend transaction may have succeeded even if response errored.
+    // Poll order status before redirecting anywhere.
+    if (method === 'credito' && error?.status === 409) {
+      showToast('Verifica stato pagamento...', 'warning');
+      const paid = await pollOrderPaid(orderId, 4, 1500);
+      if (paid) {
+        window.location.href = `/esito-acquisto.html?orderId=${orderId}&success=true`;
+        return;
+      }
+      showToast('I posti selezionati non sono pi\u00f9 disponibili. Torna alla selezione posti.', 'warning');
+      setTimeout(function() {
+        window.location.href = '/acquista.html?showId=' + (ordine?.showId || '');
+      }, 2500);
+      return;
+    }
+
+    // 409 for non-credit payments: order not in payable state (seats expired, etc.)
     if (error?.status === 409) {
       showToast('I posti selezionati non sono pi\u00f9 disponibili. Torna alla selezione posti.', 'warning');
       setTimeout(function() {

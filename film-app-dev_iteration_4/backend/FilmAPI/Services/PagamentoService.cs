@@ -2,6 +2,7 @@ using FilmAPI.Data;
 using FilmAPI.DTO;
 using FilmAPI.Model;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace FilmAPI.Services;
@@ -9,6 +10,7 @@ namespace FilmAPI.Services;
 public class PagamentoService : IPagamentoService
 {
     private readonly FilmDbContext _db;
+    private readonly IServiceScopeFactory _scopeFactory;
     private readonly IStripePaymentGateway _stripeGateway;
     private readonly ICreditoService _creditoService;
     private readonly ICheckoutService _checkoutService;
@@ -19,6 +21,7 @@ public class PagamentoService : IPagamentoService
 
     public PagamentoService(
         FilmDbContext db,
+        IServiceScopeFactory scopeFactory,
         IStripePaymentGateway stripeGateway,
         ICreditoService creditoService,
         ICheckoutService checkoutService,
@@ -28,6 +31,7 @@ public class PagamentoService : IPagamentoService
         ILogger<PagamentoService> logger)
     {
         _db = db;
+        _scopeFactory = scopeFactory;
         _stripeGateway = stripeGateway;
         _creditoService = creditoService;
         _checkoutService = checkoutService;
@@ -431,7 +435,14 @@ public class PagamentoService : IPagamentoService
 
     private async Task TrySendOrderTicketsEmailAsync(int orderId)
     {
-        var ordine = await _db.Ordini
+        // Use a separate scope to avoid DbContext concurrency with the main request flow.
+        using var scope = _scopeFactory.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<FilmDbContext>();
+        var bigliettoService = scope.ServiceProvider.GetRequiredService<IBigliettoService>();
+        var pdfService = scope.ServiceProvider.GetRequiredService<IPdfService>();
+        var emailService = scope.ServiceProvider.GetRequiredService<IEmailService>();
+
+        var ordine = await db.Ordini
             .FirstOrDefaultAsync(o => o.Id == orderId);
 
         if (ordine is null || ordine.Stato != OrdineState.Paid || ordine.TicketEmailSentAtUtc.HasValue)
@@ -439,10 +450,10 @@ public class PagamentoService : IPagamentoService
 
         try
         {
-            var ticketDocument = await _bigliettoService.GetOrderTicketDocumentAsync(orderId);
-            var pdfBytes = _pdfService.GenerateOrderTicketsPdf(ticketDocument);
+            var ticketDocument = await bigliettoService.GetOrderTicketDocumentAsync(orderId);
+            var pdfBytes = pdfService.GenerateOrderTicketsPdf(ticketDocument);
             var fileName = $"biglietti-{ticketDocument.CodiceOrdine}.pdf";
-            var result = await _emailService.SendOrderTicketsAsync(ticketDocument, pdfBytes, fileName);
+            var result = await emailService.SendOrderTicketsAsync(ticketDocument, pdfBytes, fileName);
 
             if (result.Success)
             {
@@ -460,7 +471,7 @@ public class PagamentoService : IPagamentoService
             ordine.TicketEmailLastError = TruncateEmailError(ex.Message);
         }
 
-        await _db.SaveChangesAsync();
+        await db.SaveChangesAsync();
     }
 
     private async Task<OrdineSummaryDTO> GetOrderSummaryAsync(int orderId, int userId)
