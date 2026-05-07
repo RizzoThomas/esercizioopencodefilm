@@ -482,19 +482,27 @@ deleteFilm: (id) => apiFetch(`/films/${id}`, { method: 'DELETE' }),
   getOrdine: (orderId) => apiFetch(`/checkout/orders/${orderId}`),
 
   // Checkout - Paga ordine
-  payOrdine: (orderId, metodoPagamento, importoCreditoRichiesto, idempotencyKey) => {
+  payOrdine: (orderId, metodoPagamento, importoCreditoRichiesto, idempotencyKey, codiceVoucher) => {
     const headers = {};
     if (idempotencyKey) headers['Idempotency-Key'] = idempotencyKey;
+    const body = {
+      metodoPagamento,
+      importoCreditoRichiesto: importoCreditoRichiesto || null,
+      idempotencyKey: idempotencyKey || undefined
+    };
+    if (codiceVoucher) body.codiceVoucher = codiceVoucher;
     return apiFetch(`/checkout/orders/${orderId}/pay`, {
       method: 'POST',
       headers,
-      body: JSON.stringify({
-        metodoPagamento,
-        importoCreditoRichiesto: importoCreditoRichiesto || null,
-        idempotencyKey: idempotencyKey || undefined
-      })
+      body: JSON.stringify(body)
     });
   },
+
+  getOfferte: () => apiFetch('/offerte'),
+  acquistaOfferta: (offertaId, showId) => apiFetch('/offerte/' + offertaId + '/acquista', {
+    method: 'POST',
+    body: JSON.stringify({ showId: showId })
+  }),
 
   // Checkout - Annulla ordine pendente
   cancelOrdine: (orderId) => apiFetch(`/checkout/orders/${orderId}/cancel`, {

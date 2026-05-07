@@ -176,11 +176,13 @@ function setupPaymentOptions() {
 function onPaymentMethodChange(method) {
   const stripeInfoSection = document.getElementById('stripe-info-section');
   const sliderSection = document.getElementById('credit-slider-section');
+  const ticketCodeSection = document.getElementById('ticket-code-section');
   const saldo = creditoData?.saldoAttuale || 0;
   const totale = ordine?.totaleLordo || 0;
 
   sliderSection.classList.add('hidden');
   stripeInfoSection.classList.add('hidden');
+  ticketCodeSection?.classList.add('hidden');
 
   switch (method) {
     case 'carta':
@@ -195,6 +197,9 @@ function onPaymentMethodChange(method) {
       slider.max = Math.min(saldo, Math.max(0, totale - 0.01));
       slider.value = Math.min(saldo, Math.max(0, totale - 0.01));
       updateSplitDisplay();
+      break;
+    case 'ticket':
+      ticketCodeSection?.classList.remove('hidden');
       break;
   }
 
@@ -231,6 +236,8 @@ function updatePayButtonText() {
     btnText.textContent = `Paga ${formatCurrency(totale)} con credito`;
   } else if (method === 'misto' && amount <= 0) {
     btnText.textContent = `Paga ${formatCurrency(totale)} con credito`;
+  } else if (method === 'ticket') {
+    btnText.textContent = 'Riscatta voucher';
   } else {
     btnText.textContent = `Paga ${formatCurrency(amount)} con carta`;
   }
@@ -298,6 +305,23 @@ async function handlePayment() {
       console.log('[PAGAMENTO] Paying with credit, orderId=' + orderId);
       const result = await API.payOrdine(orderId, metodoPagamento, importoCreditoRichiesto, idempotencyKey);
       console.log('[PAGAMENTO] Credit payment result:', result);
+      window.location.replace('/esito-acquisto.html?orderId=' + orderId + '&success=true');
+      return;
+    }
+
+    if (method === 'ticket') {
+      const codiceVoucher = document.getElementById('ticket-code-input')?.value?.trim();
+      if (!codiceVoucher) {
+        showToast('Inserisci il codice del voucher.', 'warning');
+        btnPay.disabled = false;
+        btnPay.innerHTML = '<i class="fa-solid fa-lock mr-2"></i><span id="pay-button-text">Paga</span>';
+        return;
+      }
+      const metodoPagamento = 'Ticket';
+      const idempotencyKey = 'pay-' + orderId + '-' + Date.now();
+      console.log('[PAGAMENTO] Paying with ticket, orderId=' + orderId + ' code=' + codiceVoucher);
+      const result = await API.payOrdine(orderId, metodoPagamento, null, idempotencyKey, codiceVoucher);
+      console.log('[PAGAMENTO] Ticket payment result:', result);
       window.location.replace('/esito-acquisto.html?orderId=' + orderId + '&success=true');
       return;
     }

@@ -19,6 +19,8 @@ public class DataSeeder
     {
         await SeedAdminAsync();
         await SeedCategorieAsync();
+        await SeedOfferteAsync();
+        await SeedVoucherAsync();
         await SeedDevDataAsync();
     }
 
@@ -77,6 +79,70 @@ public class DataSeeder
         await SeedDevFilmsAsync();
         await SeedDevSaleAsync();
         await SeedDevShowsAsync();
+    }
+
+    private async Task SeedOfferteAsync()
+    {
+        if (_context.Offerte.Any())
+            return;
+
+        _context.Offerte.AddRange(new[]
+        {
+            new Offerta
+            {
+                Nome = "Pacchetto Famiglia",
+                Descrizione = "5 biglietti a prezzo promozionale per serate in famiglia.",
+                Tipo = "solo_biglietti",
+                Prezzo = 35m,
+                NumeroBiglietti = 5,
+                IncludePopcorn = 0,
+                Attiva = true,
+                CreatedAtUtc = DateTime.UtcNow
+            },
+            new Offerta
+            {
+                Nome = "Serata Cinema",
+                Descrizione = "3 biglietti con popcorn inclusi per una serata completa.",
+                Tipo = "biglietti_popcorn",
+                Prezzo = 28m,
+                NumeroBiglietti = 3,
+                IncludePopcorn = 3,
+                Attiva = true,
+                CreatedAtUtc = DateTime.UtcNow
+            },
+            new Offerta
+            {
+                Nome = "Coppia",
+                Descrizione = "2 biglietti con popcorn per una serata in due.",
+                Tipo = "biglietti_popcorn",
+                Prezzo = 18m,
+                NumeroBiglietti = 2,
+                IncludePopcorn = 2,
+                Attiva = true,
+                CreatedAtUtc = DateTime.UtcNow
+            }
+        });
+
+        await _context.SaveChangesAsync();
+    }
+
+    private async Task SeedVoucherAsync()
+    {
+        if (_context.Vouchers.Any(v => v.Codice == "CINEBASE50"))
+            return;
+
+        _context.Vouchers.Add(new Voucher
+        {
+            Codice = "CINEBASE50",
+            ImportoIniziale = 50m,
+            SaldoResiduo = 50m,
+            Stato = "attivo",
+            DataScadenza = null,
+            UserId = null,
+            CreatedAtUtc = DateTime.UtcNow
+        });
+
+        await _context.SaveChangesAsync();
     }
 
     private async Task SeedDevCinemasAsync()

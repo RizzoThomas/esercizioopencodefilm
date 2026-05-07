@@ -101,6 +101,16 @@
             </div>
             <i class="fa-solid fa-money-bill-transfer text-body"></i>
           </label>
+
+          <!-- Usa Ticket (Voucher) -->
+          <label class="payment-option-card" id="option-ticket">
+            <input type="radio" name="payment-method" value="ticket" class="mr-3">
+            <div class="flex-1">
+              <p class="font-semibold text-ink">Usa Ticket / Voucher</p>
+              <p class="text-sm text-body">Riscatta un codice ticket prepagato</p>
+            </div>
+            <i class="fa-solid fa-ticket text-body"></i>
+          </label>
         </div>
 
         <!-- Credit slider for mixed payment -->
@@ -114,6 +124,16 @@
             <span id="credit-amount-label"></span>
             <span id="card-amount-label"></span>
           </div>
+        </div>
+
+        <!-- Ticket code input -->
+        <div id="ticket-code-section" class="hidden mt-4 p-4 bg-canvas-elevated">
+          <label class="block text-sm font-medium text-ink mb-2">
+            Inserisci il codice del voucher
+          </label>
+          <input type="text" id="ticket-code-input" 
+            class="w-full px-4 py-3 bg-canvas border border-hairline text-ink placeholder:text-body/50 focus:border-ferrari-primary focus:outline-none"
+            placeholder="es. CINEBASE50" maxlength="50">
         </div>
       </div>
 
@@ -146,7 +166,7 @@
   <script src="/js/template-loader.js?v=20260419b"></script>
   <script src="/js/navbar.js?v=20260419b"></script>
   <script src="/js/aceternity-effects.js"></script>
-  <script src="/js/pages/pagamento.js?v=fix3"></script>
+  <script src="/js/pages/pagamento.js?v=fix4"></script>
 </body>
 
 </html>

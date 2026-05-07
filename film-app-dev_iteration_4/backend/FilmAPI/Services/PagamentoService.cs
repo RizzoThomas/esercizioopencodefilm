@@ -82,6 +82,53 @@ public class PagamentoService : IPagamentoService
         ordine.NumeroBiglietti = holdStates.Count;
         ordine.ImportoCredito = split.ImportoCredito;
         ordine.ImportoCarta = split.ImportoCarta;
+
+        if (metodo == "ticket")
+        {
+            if (string.IsNullOrWhiteSpace(dto.CodiceVoucher))
+                throw new ArgumentException("CodiceVoucher obbligatorio per il pagamento ticket.");
+
+            var now = DateTime.UtcNow;
+            var voucherCode = dto.CodiceVoucher.Trim();
+            var voucher = await _db.Vouchers.FirstOrDefaultAsync(v => v.Codice == voucherCode);
+
+            if (voucher is null)
+                throw new KeyNotFoundException("Voucher non trovato.");
+
+            if (!string.Equals(voucher.Stato, "attivo", StringComparison.OrdinalIgnoreCase))
+                throw new InvalidOperationException("Voucher non attivo.");
+
+            if (voucher.DataScadenza.HasValue && voucher.DataScadenza.Value <= now)
+                throw new InvalidOperationException("Voucher scaduto.");
+
+            if (voucher.SaldoResiduo < total)
+                throw new InvalidOperationException("Saldo voucher insufficiente.");
+
+            if (ordine.CreditoRiservato > 0)
+            {
+                await ReleaseReservedCreditIfNeededAsync(ordine);
+            }
+
+            await _db.SaveChangesAsync();
+            await FinalizePaidOrderAsync(ordine.Id, null, skipCreditoDebit: true);
+
+            voucher.SaldoResiduo = decimal.Round(voucher.SaldoResiduo - total, 2, MidpointRounding.AwayFromZero);
+            if (voucher.SaldoResiduo <= 0m)
+            {
+                voucher.SaldoResiduo = 0m;
+                voucher.Stato = "utilizzato";
+            }
+
+            await _db.SaveChangesAsync();
+
+            return new PayOrdineResponseDTO
+            {
+                StatoPagamento = "Paid",
+                RequiresCardAction = false,
+                Ordine = await GetOrderSummaryAsync(ordine.Id, ordine.UserId)
+            };
+        }
+
         await _db.SaveChangesAsync();
 
         if (split.ImportoCarta == 0)
@@ -364,7 +411,7 @@ public class PagamentoService : IPagamentoService
             ?? throw new KeyNotFoundException("Ordine non trovato dopo annullamento.");
     }
 
-    private async Task FinalizePaidOrderAsync(int orderId, string? paymentIntentId)
+    private async Task FinalizePaidOrderAsync(int orderId, string? paymentIntentId, bool skipCreditoDebit = false)
     {
         await using var transaction = await _db.Database.BeginTransactionAsync();
 
@@ -406,7 +453,7 @@ public class PagamentoService : IPagamentoService
             ordine.ImportoCredito = ordine.CreditoRiservato;
             ordine.CreditoRiservato = 0m;
         }
-        else if (ordine.ImportoCredito > 0)
+        else if (!skipCreditoDebit && ordine.ImportoCredito > 0)
         {
             await _creditoService.ApplyOrderDebitAsync(
                 ordine.UserId,
@@ -512,6 +559,7 @@ public class PagamentoService : IPagamentoService
             "carta" or "card" => "card",
             "credito" or "credit" => "credit",
             "misto" or "mixed" => "mixed",
+            "ticket" or "voucher" => "ticket",
             _ => throw new ArgumentException("MetodoPagamento non supportato. Usare Carta, Credito o Misto.")
         };
     }
@@ -525,6 +573,7 @@ public class PagamentoService : IPagamentoService
                 ? (total, 0m)
                 : throw new InvalidOperationException("Credito insufficiente per completare il pagamento."),
             "mixed" => ComputeMixedSplit(total, availableCredit, requestedCredit),
+            "ticket" => (total, 0m),
             _ => throw new ArgumentException("MetodoPagamento non supportato.")
         };
     }

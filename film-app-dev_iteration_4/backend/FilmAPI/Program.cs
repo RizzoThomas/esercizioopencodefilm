@@ -277,6 +277,7 @@ app.MapProgrammazioneEndpoints();
 app.MapSaleEndpoints();
 app.MapShowsEndpoints();
 app.MapCheckoutEndpoints();
+app.MapOfferteEndpoints();
 app.MapCreditoEndpoints();
 app.MapPagamentoEndpoints();
 app.MapValidazioneBigliettiEndpoints();

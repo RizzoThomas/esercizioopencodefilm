@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="it-IT">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CineBase - Offerte Speciali</title>
+
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script src="/js/tailwind-config.js"></script>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="/css/styles.css?v=5" rel="stylesheet">
+
+  <style>
+    .offer-card {
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      transition: border-color .2s ease, transform .2s ease, box-shadow .2s ease;
+    }
+    .offer-card:hover {
+      border-color: var(--ferrari-primary, #FF2800);
+      transform: translateY(-2px);
+      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
+    }
+  </style>
+</head>
+
+<body class="bg-canvas text-ink font-sans">
+  <div id="navbar-container"></div>
+
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-24">
+    <div class="flex items-end justify-between gap-4 mb-8">
+      <div>
+        <p class="text-ferrari-primary uppercase tracking-[0.25em] text-sm mb-2">Promozioni</p>
+        <h1 class="text-3xl md:text-4xl font-bold text-ink">Offerte Speciali</h1>
+        <p class="text-body mt-2 max-w-2xl">Combo cinema per risparmiare su biglietti e snack. Scegli l'offerta e poi seleziona lo spettacolo.</p>
+      </div>
+      <a href="/programmazione.html" class="btn-outline hidden sm:inline-flex">
+        <i class="fa-solid fa-film mr-2"></i>Vai alla programmazione
+      </a>
+    </div>
+
+    <div id="loading-state" class="text-center py-16">
+      <i class="fa-solid fa-spinner fa-spin text-4xl mb-4 text-ferrari-primary"></i>
+      <p class="text-body">Caricamento offerte...</p>
+    </div>
+
+    <div id="error-state" class="hidden text-center py-16 card-ferrari">
+      <i class="fa-solid fa-circle-exclamation text-5xl text-ferrari-semantic-warning mb-4"></i>
+      <h2 class="text-xl font-semibold text-ink mb-2">Impossibile caricare le offerte</h2>
+      <p id="error-message" class="text-body mb-4"></p>
+      <button id="retry-button" class="btn-primary">Riprova</button>
+    </div>
+
+    <div id="offers-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 hidden"></div>
+  </main>
+
+  <div id="footer-container"></div>
+  <div id="toast-container" class="fixed bottom-4 right-4 z-50"></div>
+
+  <script src="/js/utils.js?v=20260419b"></script>
+  <script src="/js/api.js?v=final"></script>
+  <script src="/js/auth.js?v=20260419b"></script>
+  <script src="/js/template-loader.js?v=20260419b"></script>
+  <script src="/js/navbar.js?v=20260419b"></script>
+  <script src="/js/aceternity-effects.js"></script>
+  <script>
+    function formatCurrency(value) {
+      const amount = Number(value || 0);
+      return amount.toLocaleString('it-IT', { style: 'currency', currency: 'EUR' });
+    }
+
+    function renderOfferCard(offerta) {
+      const extraItems = [];
+      if ((offerta.numeroBiglietti || 0) > 0) extraItems.push(`${offerta.numeroBiglietti} biglietti`);
+      if ((offerta.includePopcorn || 0) > 0) extraItems.push(`${offerta.includePopcorn} popcorn`);
+
+      const itemsText = extraItems.length ? extraItems.join(' + ') : 'Contenuto variabile';
+      const price = formatCurrency(offerta.prezzo);
+
+      return `
+        <article class="offer-card card-ferrari p-6 flex flex-col h-full">
+          <div class="flex-1">
+            <div class="flex items-start justify-between gap-4 mb-4">
+              <div>
+                <p class="text-ferrari-primary uppercase tracking-[0.2em] text-xs mb-2">${offerta.tipo || 'Offerta'}</p>
+                <h2 class="text-2xl font-bold text-ink">${offerta.nome}</h2>
+              </div>
+              <div class="shrink-0 px-3 py-1 rounded-full bg-ferrari-primary/10 text-ferrari-primary text-sm font-semibold">
+                ${price}
+              </div>
+            </div>
+            <p class="text-body mb-5 leading-relaxed">${offerta.descrizione || ''}</p>
+            <div class="space-y-2 text-sm text-ink/90">
+              <div class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-ferrari-primary"></i><span>${itemsText}</span></div>
+            </div>
+          </div>
+          <div class="mt-6 pt-4 border-t border-hairline flex items-center justify-between gap-4">
+            <div>
+              <p class="text-xs uppercase tracking-[0.2em] text-body">Prezzo</p>
+              <p class="text-2xl font-bold text-ink">${price}</p>
+            </div>
+            <button class="btn-primary whitespace-nowrap" data-offer-id="${offerta.id}">
+              Acquista
+            </button>
+          </div>
+        </article>
+      `;
+    }
+
+    async function loadOffers() {
+      const loading = document.getElementById('loading-state');
+      const errorState = document.getElementById('error-state');
+      const grid = document.getElementById('offers-grid');
+
+      loading.classList.remove('hidden');
+      errorState.classList.add('hidden');
+      grid.classList.add('hidden');
+
+      try {
+        const offers = await API.getOfferte();
+        grid.innerHTML = (offers || []).map(renderOfferCard).join('') || `
+          <div class="col-span-full text-center py-12 card-ferrari">
+            <p class="text-body">Nessuna offerta disponibile al momento.</p>
+          </div>
+        `;
+
+        grid.querySelectorAll('[data-offer-id]').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const offerId = btn.getAttribute('data-offer-id');
+            window.location.href = `/programmazione.html?offertaId=${encodeURIComponent(offerId)}`;
+          });
+        });
+
+        loading.classList.add('hidden');
+        grid.classList.remove('hidden');
+      } catch (error) {
+        loading.classList.add('hidden');
+        errorState.classList.remove('hidden');
+        document.getElementById('error-message').textContent = error?.message || 'Errore durante il caricamento delle offerte.';
+      }
+    }
+
+    document.getElementById('retry-button').addEventListener('click', loadOffers);
+    document.addEventListener('DOMContentLoaded', loadOffers);
+  </script>
+</body>
+
+</html>

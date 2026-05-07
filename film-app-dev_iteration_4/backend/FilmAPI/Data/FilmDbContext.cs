@@ -38,6 +38,8 @@ public class FilmDbContext : DbContext
     public DbSet<Ordine> Ordini { get; set; }
     public DbSet<Biglietto> Biglietti { get; set; }
     public DbSet<MovimentoCredito> MovimentiCredito { get; set; }
+    public DbSet<Offerta> Offerte { get; set; }
+    public DbSet<Voucher> Vouchers { get; set; }
 
     // ─── Iteration 5: Auth & Security ─────────────────────────────
     public DbSet<UserExternalLogin> UserExternalLogins { get; set; }
@@ -337,6 +339,12 @@ public class FilmDbContext : DbContext
                   .WithMany()
                   .HasForeignKey(b => b.ValidatoCinemaId)
                   .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<Voucher>(entity =>
+        {
+            entity.HasIndex(e => e.Codice)
+                  .IsUnique();
         });
 
         modelBuilder.Entity<MovimentoCredito>(entity =>

@@ -5,6 +5,7 @@ public class PayOrdineRequestDTO
     public string MetodoPagamento { get; set; } = string.Empty;
     public decimal? ImportoCreditoRichiesto { get; set; }
     public string? IdempotencyKey { get; set; }
+    public string? CodiceVoucher { get; init; }
 }
 
 public class PayOrdineResponseDTO
