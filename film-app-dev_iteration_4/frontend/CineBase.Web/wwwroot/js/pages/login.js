@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const params = new URLSearchParams(window.location.search);
   const expired = params.get('expired');
-  const redirect = params.get('redirect');
+  const redirect = params.get('returnUrl') || params.get('redirect');
   const socialError = params.get('error');
 
   // Errore social login

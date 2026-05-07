@@ -204,10 +204,22 @@
               <p class="text-2xl font-bold text-ink">${price}</p>
             </div>
             ${annualPrice ? `<p class="text-sm text-body">Annuale: <span class="text-ink font-semibold">${annualPrice}</span> · risparmi ${formatCurrency(annualSavings)}</p>` : ''}
-            <a href="/registrazione.html" class="btn-primary inline-flex justify-center w-full sm:w-auto">Scopri</a>
+            <button class="btn-primary inline-flex justify-center w-full sm:w-auto subscription-action-btn" data-subscription-id="${abbonamento.id}" data-subscription-name="${abbonamento.nome}">
+              ${typeof Auth !== 'undefined' && Auth.isLoggedIn() ? 'Attiva' : 'Accedi'}
+            </button>
           </div>
         </article>
       `;
+    }
+
+    function showToast(message, type) {
+      const container = document.getElementById('toast-container');
+      if (!container) return;
+      const toast = document.createElement('div');
+      toast.className = 'px-4 py-3 rounded-lg text-sm font-medium mb-2 ' + (type === 'info' ? 'bg-ferrari-primary/20 text-ink border border-ferrari-primary/30' : 'bg-canvas-elevated text-ink border border-hairline');
+      toast.textContent = message;
+      container.appendChild(toast);
+      setTimeout(() => toast.remove(), 4000);
     }
 
     function normalizeCollection(data) {
@@ -278,6 +290,17 @@
             <p class="text-body">Nessun abbonamento disponibile al momento.</p>
           </div>
         `;
+
+        grid.querySelectorAll('.subscription-action-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            if (typeof Auth !== 'undefined' && Auth.isLoggedIn()) {
+              showToast('🎬 Abbonamento "' + btn.dataset.subscriptionName + '" — funzione in arrivo! Contatta il cinema per attivarlo.', 'info');
+            } else {
+              window.location.href = '/login.html?redirect=' + encodeURIComponent('/offerte.html');
+            }
+          });
+        });
+
         loading.classList.add('hidden');
         grid.classList.remove('hidden');
       } catch (error) {
