@@ -207,6 +207,117 @@ public class EmailService : IEmailService
 """;
     }
 
+    public async Task<EmailSendResult> SendVoucherPurchaseAsync(string recipientEmail, string recipientName, string voucherCode, decimal importo, DateTime? scadenzaUtc, CancellationToken cancellationToken = default)
+    {
+        if (!HasCompleteConfiguration())
+        {
+            return new EmailSendResult
+            {
+                Success = false,
+                ErrorMessage = "Configurazione SMTP incompleta. Verificare le variabili SMTP_* del backend."
+            };
+        }
+
+        if (string.IsNullOrWhiteSpace(recipientEmail))
+        {
+            return new EmailSendResult
+            {
+                Success = false,
+                ErrorMessage = "Email destinatario non disponibile per il voucher."
+            };
+        }
+
+        try
+        {
+            var smtpHost = _smtpHost!;
+            var smtpUser = _smtpUser!;
+            var smtpPassword = _smtpPassword!.Replace(" ", string.Empty);
+            var fromEmail = _fromEmail!;
+
+            var message = new MimeMessage();
+            message.From.Add(new MailboxAddress(_fromName, fromEmail));
+            message.To.Add(MailboxAddress.Parse(recipientEmail));
+            message.Subject = $"CineBase - Voucher {voucherCode}";
+
+            var bodyBuilder = new BodyBuilder
+            {
+                TextBody = BuildVoucherTextBody(recipientName, voucherCode, importo, scadenzaUtc),
+                HtmlBody = BuildVoucherHtmlBody(recipientName, voucherCode, importo, scadenzaUtc)
+            };
+
+            message.Body = bodyBuilder.ToMessageBody();
+
+            using var client = new SmtpClient();
+            client.Timeout = 15000;
+
+            try
+            {
+                await client.ConnectAsync(smtpHost, _smtpPort, SecureSocketOptions.StartTls, cancellationToken);
+            }
+            catch (SocketException) when (_smtpPort == 587)
+            {
+                using var client2 = new SmtpClient { Timeout = 15000 };
+                await client2.ConnectAsync(smtpHost, 465, SecureSocketOptions.SslOnConnect, cancellationToken);
+                await client2.AuthenticateAsync(smtpUser, smtpPassword, cancellationToken);
+                await client2.SendAsync(message, cancellationToken);
+                await client2.DisconnectAsync(true, cancellationToken);
+                return new EmailSendResult { Success = true, SentAtUtc = DateTime.UtcNow };
+            }
+
+            await client.AuthenticateAsync(smtpUser, smtpPassword, cancellationToken);
+            await client.SendAsync(message, cancellationToken);
+            await client.DisconnectAsync(true, cancellationToken);
+
+            return new EmailSendResult { Success = true, SentAtUtc = DateTime.UtcNow };
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Invio email voucher fallito per {Email}", recipientEmail);
+            return new EmailSendResult
+            {
+                Success = false,
+                ErrorMessage = $"Errore invio email: {ex.Message}"
+            };
+        }
+    }
+
+    private static string BuildVoucherTextBody(string recipientName, string voucherCode, decimal importo, DateTime? scadenzaUtc)
+    {
+        var builder = new StringBuilder();
+        builder.AppendLine($"Ciao {recipientName},");
+        builder.AppendLine();
+        builder.AppendLine("Il tuo voucher CineBase è stato creato con successo.");
+        builder.AppendLine($"Codice: {voucherCode}");
+        builder.AppendLine($"Importo: {FormatAmount(importo)} EUR");
+        if (scadenzaUtc.HasValue)
+            builder.AppendLine($"Scadenza: {FormatShowDateTime(scadenzaUtc.Value)}");
+        builder.AppendLine();
+        builder.AppendLine("Conservalo per i prossimi acquisti.");
+        return builder.ToString();
+    }
+
+    private static string BuildVoucherHtmlBody(string recipientName, string voucherCode, decimal importo, DateTime? scadenzaUtc)
+    {
+        var name = WebUtility.HtmlEncode(recipientName);
+        var code = WebUtility.HtmlEncode(voucherCode);
+        var amount = FormatAmount(importo);
+        var expiry = scadenzaUtc.HasValue ? $"<p><strong>Scadenza:</strong> {FormatShowDateTime(scadenzaUtc.Value)}</p>" : string.Empty;
+
+        return $"""
+<html>
+  <body style="font-family: Arial, sans-serif; color: #111827; line-height: 1.5;">
+    <h1 style="margin-bottom: 8px;">Voucher CineBase creato</h1>
+    <p>Ciao {name},</p>
+    <p>Il tuo voucher è pronto.</p>
+    <p><strong>Codice:</strong> {code}</p>
+    <p><strong>Importo:</strong> {amount} EUR</p>
+    {expiry}
+    <p>Conservalo per i prossimi acquisti.</p>
+  </body>
+</html>
+""";
+    }
+
     private static string? ReadSetting(string name)
     {
         var value = Environment.GetEnvironmentVariable(name);

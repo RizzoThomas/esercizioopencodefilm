@@ -17,10 +17,15 @@
   <script src="/js/route-guard.js"></script>
 </head>
 
-<body class="bg-canvas text-ink font-sans">
+  <body class="bg-canvas text-ink font-sans">
   <div id="navbar-container"></div>
 
   <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <div id="offerta-banner" class="hidden mb-6 rounded-lg border border-ferrari-primary/30 bg-ferrari-primary/10 p-4">
+      <p class="font-semibold text-ink">Stai acquistando: <strong id="offerta-banner-name"></strong></p>
+      <p class="text-sm text-body mt-1">Seleziona uno spettacolo per continuare</p>
+    </div>
+
     <!-- Cinema Header -->
     <div id="cinema-header" class="card-ferrari mb-6 p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
       <div class="flex items-center gap-3">

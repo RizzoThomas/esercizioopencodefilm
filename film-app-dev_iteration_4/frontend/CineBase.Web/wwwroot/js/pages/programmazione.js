@@ -99,6 +99,8 @@ let userLocation = null;
 let cinemasLoaded = false;
 let modalSearchTerm = '';
 let currentFilms = [];
+let pendingOffertaId = null;
+let pendingOfferta = null;
 const FILMS_PAGE_SIZE = 20;
 const CAROUSEL_PAGE_SIZE = 8;
 let currentPage = 1;
@@ -106,6 +108,12 @@ let currentPagedResult = null;
 let isLoadingMoreCarousel = false;
 
 document.addEventListener('DOMContentLoaded', async () => {
+  const params = new URLSearchParams(window.location.search);
+  pendingOffertaId = params.get('offertaId') || sessionStorage.getItem('pending_offerta_id');
+  if (pendingOffertaId) {
+    sessionStorage.setItem('pending_offerta_id', pendingOffertaId);
+  }
+
   selectedCinemaId = await CinemaManager.syncCinemaPreferito();
 
   setupTabs();
@@ -126,6 +134,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   requestUserLocationInBackground();
+  await loadPendingOfferBanner();
 
   await Promise.all([
     filmsPromise,
@@ -133,6 +142,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     cinemasPromise
   ]);
 });
+
+async function loadPendingOfferBanner() {
+  const banner = document.getElementById('offerta-banner');
+  const nameEl = document.getElementById('offerta-banner-name');
+  if (!banner || !nameEl || !pendingOffertaId) return;
+
+  const offers = normalizeCollection(await API.getOfferte());
+  pendingOfferta = offers.find((offer) => String(offer.id) === String(pendingOffertaId)) || null;
+
+  if (pendingOfferta) {
+    nameEl.textContent = pendingOfferta.nome || 'Offerta selezionata';
+    banner.classList.remove('hidden');
+  }
+}
 
 function setupTabs() {
   document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -497,6 +520,12 @@ function renderFilmCard(film) {
       </div>
     </div>
   `;
+}
+
+function buildAcquistaUrl(showId) {
+  const url = `/acquista.html?showId=${showId}`;
+  if (!pendingOffertaId) return url;
+  return `${url}&offertaId=${encodeURIComponent(pendingOffertaId)}`;
 }
 
 function getCarouselVisibleEstimate(track) {

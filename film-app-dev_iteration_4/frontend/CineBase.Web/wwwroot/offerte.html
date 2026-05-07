@@ -266,7 +266,14 @@
         grid.querySelectorAll('[data-offer-id]').forEach((btn) => {
           btn.addEventListener('click', () => {
             const offerId = btn.getAttribute('data-offer-id');
-            window.location.href = `/programmazione.html?offertaId=${encodeURIComponent(offerId)}`;
+            if (!offerId) return;
+            sessionStorage.setItem('pending_offerta_id', offerId);
+            const targetUrl = `/programmazione.html?offertaId=${encodeURIComponent(offerId)}`;
+            if (typeof Auth !== 'undefined' && Auth.isLoggedIn && Auth.isLoggedIn()) {
+              window.location.assign(targetUrl);
+            } else {
+              window.location.assign(`/login.html?redirect=${encodeURIComponent(targetUrl)}`);
+            }
           });
         });
 

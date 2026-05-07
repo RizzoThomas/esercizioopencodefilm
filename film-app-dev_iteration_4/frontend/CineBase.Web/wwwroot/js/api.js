@@ -507,6 +507,7 @@ deleteFilm: (id) => apiFetch(`/films/${id}`, { method: 'DELETE' }),
     method: 'POST',
     body: JSON.stringify({ showId: showId })
   }),
+  getUserVouchers: () => apiFetch('/users/me/vouchers'),
 
   // Checkout - Annulla ordine pendente
   cancelOrdine: (orderId) => apiFetch(`/checkout/orders/${orderId}/cancel`, {
