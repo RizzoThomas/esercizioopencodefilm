@@ -588,7 +588,7 @@ function setupActions() {
 
       const params = new URLSearchParams(window.location.search);
       const offertaId = params.get('offertaId');
-      let url = '/pagamento.html?orderId=' + ordine.id;
+      let url = '/pagamento.html?orderId=' + encodeURIComponent(ordine.id);
       if (offertaId) url += '&offertaId=' + encodeURIComponent(offertaId);
       window.location.href = url;
     } catch (error) {

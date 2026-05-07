@@ -18,18 +18,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
-  if (offertaIdFromUrl && showIdFromUrl) {
-    paymentFlowMode = 'offerta';
-    await Promise.all([loadCredito(), loadFrontendConfig()]);
-    if (stripeStatusFromUrl === 'success') {
-      await finalizeOffertaAfterStripe(offertaIdFromUrl, showIdFromUrl);
-      return;
-    }
-    await loadOffertaPayment(offertaIdFromUrl, showIdFromUrl);
-    setupActions();
-    return;
-  }
-
   if (abbonamentoIdFromUrl) {
     paymentFlowMode = 'abbonamento';
     await Promise.all([loadCredito(), loadFrontendConfig()]);
@@ -51,6 +39,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   await Promise.all([loadOrdine(), loadCredito(), loadFrontendConfig()]);
+
+  if (offertaIdFromUrl) {
+    paymentFlowMode = 'offerta';
+    await loadOffertaDiscount(offertaIdFromUrl);
+  }
 
   if (!ordine) return;
   
@@ -93,7 +86,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         try { await API.cancelOrdine(orderId); } catch {}
         showToast('Pagamento non completato. Ordine annullato.', 'warning');
         setTimeout(() => {
-          window.location.href = `/acquista.html?showId=${ordine?.showId || ''}`;
+          const backUrl = new URL('/acquista.html', window.location.origin);
+          if (ordine?.showId) backUrl.searchParams.set('showId', ordine.showId);
+          if (offertaIdFromUrl) backUrl.searchParams.set('offertaId', offertaIdFromUrl);
+          window.location.href = backUrl.toString();
         }, 1500);
       }
     }
@@ -143,7 +139,7 @@ function hideOrderOnlyControls() {
   document.getElementById('order-summary-card')?.classList.add('hidden');
 }
 
-async function loadOffertaPayment(offertaId, showId) {
+async function loadOffertaDiscount(offertaId) {
   try {
     const offers = normalizeCollection(await API.getOfferte());
     const offerta = offers.find((offer) => String(offer.id) === String(offertaId)) || null;
@@ -151,52 +147,19 @@ async function loadOffertaPayment(offertaId, showId) {
 
     hideOrderOnlyControls();
     document.getElementById('offerta-banner')?.classList.remove('hidden');
-    document.getElementById('offerta-banner').classList.remove('hidden');
     document.getElementById('offerta-banner-name').textContent = offerta.nome || 'Offerta';
     document.getElementById('offerta-banner-desc').textContent = offerta.descrizione || '';
 
-    hideLoading();
-    document.getElementById('main-content').classList.remove('hidden');
-
-    document.getElementById('order-summary').innerHTML = `
-      <div class="flex justify-between text-sm">
-        <span class="text-body">Biglietti</span>
-        <span class="font-medium text-ink">${offerta.numeroBiglietti || 0}</span>
-      </div>
-      <div class="flex justify-between text-sm">
-        <span class="text-body">Popcorn</span>
-        <span class="font-medium text-ink">${offerta.includePopcorn || 0}</span>
-      </div>
-    `;
+    ordine = ordine || {};
+    ordine.totaleLordo = offerta.prezzo;
+    ordine.offertaId = offertaId;
+    window._offertaData = { id: offertaId, nome: offerta.nome, prezzo: offerta.prezzo };
 
     document.getElementById('order-total').textContent = formatCurrency(offerta.prezzo);
-    window._offertaData = { id: offertaId, showId, prezzo: offerta.prezzo, nome: offerta.nome };
-    ordine = { totaleLordo: offerta.prezzo, showId };
 
-    setupPaymentOptions();
-    onPaymentMethodChange(document.querySelector('input[name="payment-method"]:checked')?.value || 'carta');
+    updatePayButtonText();
   } catch (e) {
     showError(e?.message || 'Offerta non trovata');
-  }
-}
-
-async function finalizeOffertaAfterStripe(offertaId, showId) {
-  const marker = `offerta-finalized-${offertaId}-${showId}`;
-  if (sessionStorage.getItem(marker)) {
-    window.location.href = '/profilo.html';
-    return;
-  }
-
-  try {
-    const result = await API.acquistaOfferta(offertaId, showId);
-    sessionStorage.setItem(marker, '1');
-    if (result?.id) {
-      window.location.href = '/esito-acquisto.html?orderId=' + result.id + '&success=true';
-      return;
-    }
-    throw new Error('Finalizzazione offerta fallita');
-  } catch (e) {
-    showError(e?.message || 'Finalizzazione offerta fallita');
   }
 }
 
@@ -305,6 +268,15 @@ function renderOrderSummary() {
       <span class="font-mono text-ink">${ordine.codiceOrdine}</span>
     </div>
   `;
+
+  if (window._offertaData) {
+    container.insertAdjacentHTML('beforeend', `
+      <div class="flex justify-between text-sm text-ferrari-primary">
+        <span>Offerta applicata</span>
+        <span class="font-medium">${window._offertaData.nome || 'Offerta'}</span>
+      </div>
+    `);
+  }
 
   document.getElementById('order-total').textContent = formatCurrency(ordine.totaleLordo);
   updatePayButtonText();
@@ -452,38 +424,6 @@ async function handlePayment() {
       return;
     }
 
-    if (window._offertaData) {
-      const method = document.querySelector('input[name="payment-method"]:checked')?.value || 'carta';
-      if (method === 'credito') {
-        try {
-          const result = await API.acquistaOfferta(window._offertaData.id, window._offertaData.showId);
-          if (result?.id) {
-            window.location.href = '/esito-acquisto.html?orderId=' + result.id + '&success=true';
-            return;
-          }
-          throw new Error('Risposta acquisto offerta non valida');
-        } catch (e) {
-          showToast('Errore: ' + (e?.message || 'pagamento offerta'), 'danger');
-          btnPay.disabled = false;
-          btnPay.innerHTML = '<i class="fa-solid fa-lock mr-2"></i><span id="pay-button-text">Riprova pagamento</span>';
-          return;
-        }
-      }
-
-      const idempotencyKey = `offerta-${window._offertaData.id}-${Date.now()}`;
-      const session = await API.createOffertaStripeCheckoutSession(window._offertaData.id, window._offertaData.showId, idempotencyKey);
-
-      if (session?.stripeCheckoutUrl) {
-        window.location.href = session.stripeCheckoutUrl;
-        return;
-      }
-
-      showToast('Errore nella creazione della sessione di pagamento', 'danger');
-      btnPay.disabled = false;
-      btnPay.innerHTML = '<i class="fa-solid fa-lock mr-2"></i><span id="pay-button-text">Riprova pagamento</span>';
-      return;
-    }
-
     if (window._abbonamentoData) {
       const method = document.querySelector('input[name="payment-method"]:checked')?.value || 'carta';
       if (method === 'credito') {
@@ -504,7 +444,7 @@ async function handlePayment() {
           }
 
           const err = await res.json().catch(() => ({}));
-          showToast(err.message || 'Errore', 'danger');
+          showToast(res.status === 409 ? 'Hai già un abbonamento attivo. Controlla il tuo profilo.' : (err.message || err.title || 'Errore attivazione'), 'danger');
         } catch (e) {
           showToast('Errore di rete', 'danger');
         }
@@ -539,7 +479,7 @@ async function handlePayment() {
         }
 
         const err = await res.json().catch(() => ({}));
-        showToast(err.message || 'Errore', 'danger');
+        showToast(res.status === 409 ? 'Hai già un abbonamento attivo. Controlla il tuo profilo.' : (err.message || err.title || 'Errore attivazione'), 'danger');
       } catch (e) {
         showToast('Errore di rete', 'danger');
       }
@@ -634,18 +574,34 @@ async function handlePayment() {
         window.location.href = `/esito-acquisto.html?orderId=${orderId}&success=true`;
         return;
       }
-      showToast('I posti selezionati non sono pi\u00f9 disponibili. Torna alla selezione posti.', 'warning');
+      if (paymentFlowMode === 'abbonamento') {
+        showToast('Hai già un abbonamento attivo. Controlla il tuo profilo.', 'danger');
+      } else {
+        showToast('I posti selezionati non sono pi\u00f9 disponibili. Torna alla selezione posti.', 'warning');
+      }
       setTimeout(function() {
-        window.location.href = '/acquista.html?showId=' + (ordine?.showId || '');
+        if (paymentFlowMode === 'abbonamento') return;
+        const backUrl = new URL('/acquista.html', window.location.origin);
+        if (ordine?.showId) backUrl.searchParams.set('showId', ordine.showId);
+        if (offertaIdFromUrl) backUrl.searchParams.set('offertaId', offertaIdFromUrl);
+        window.location.href = backUrl.toString();
       }, 2500);
       return;
     }
 
     // 409 for non-credit payments: order not in payable state (seats expired, etc.)
     if (error?.status === 409) {
-      showToast('I posti selezionati non sono pi\u00f9 disponibili. Torna alla selezione posti.', 'warning');
+      if (paymentFlowMode === 'abbonamento') {
+        showToast('Hai già un abbonamento attivo. Controlla il tuo profilo.', 'danger');
+      } else {
+        showToast('I posti selezionati non sono pi\u00f9 disponibili. Torna alla selezione posti.', 'warning');
+      }
       setTimeout(function() {
-        window.location.href = '/acquista.html?showId=' + (ordine?.showId || '');
+        if (paymentFlowMode === 'abbonamento') return;
+        const backUrl = new URL('/acquista.html', window.location.origin);
+        if (ordine?.showId) backUrl.searchParams.set('showId', ordine.showId);
+        if (offertaIdFromUrl) backUrl.searchParams.set('offertaId', offertaIdFromUrl);
+        window.location.href = backUrl.toString();
       }, 2500);
       return;
     }

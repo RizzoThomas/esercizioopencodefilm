@@ -75,9 +75,6 @@ async function loadUserSubscription() {
           <button onclick="toggleAutoRenew()" class="btn-outline text-xs px-3 py-1.5">
             <i class="fa-solid fa-rotate mr-1"></i>Rinnovo auto: ${sub.autoRinnovo ? 'ON' : 'OFF'}
           </button>
-          <button onclick="cancelUserSubscription()" class="btn-outline text-xs px-3 py-1.5 text-red-400 border-red-400/30">
-            <i class="fa-solid fa-xmark mr-1"></i>Cancella
-          </button>
         </div>
       </div>`;
   } catch (e) {
@@ -118,19 +115,6 @@ async function toggleAutoRenew() {
     if (res) {
       await loadUserSubscription();
       showToast('Auto-rinnovo aggiornato', 'success');
-    }
-  } catch (e) {
-    showToast('Errore', 'danger');
-  }
-}
-
-async function cancelUserSubscription() {
-  if (!confirm('Sei sicuro di voler cancellare l\'abbonamento?')) return;
-  try {
-    const res = await API.cancelSubscription();
-    if (res !== undefined) {
-      await loadUserSubscription();
-      showToast('Abbonamento cancellato', 'warning');
     }
   } catch (e) {
     showToast('Errore', 'danger');

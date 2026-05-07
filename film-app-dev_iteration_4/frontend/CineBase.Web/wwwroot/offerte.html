@@ -282,9 +282,9 @@
           const showId = btn.dataset.showId;
           if (!showId) return;
           close();
-          window.location.href = `/pagamento.html?offertaId=${encodeURIComponent(offerId)}&showId=${encodeURIComponent(showId)}`;
+            window.location.href = `/acquista.html?showId=${encodeURIComponent(showId)}&offertaId=${encodeURIComponent(offerId)}`;
+          });
         });
-      });
     }
 
     function normalizeCollection(data) {
