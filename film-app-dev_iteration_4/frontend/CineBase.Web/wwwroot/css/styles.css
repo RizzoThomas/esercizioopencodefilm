@@ -425,6 +425,55 @@ input[type='password']::-webkit-textfield-decoration-container {
   .hero-film-grain { display: none; }
 }
 
+/* --- Scanlines Overlay (CRT cinema effect) --- */
+.hero-scanlines {
+  position: absolute; inset: 0; z-index: 6; pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,0.04) 2px,
+    rgba(0,0,0,0.04) 4px
+  );
+}
+
+/* --- Breathing Card Pulse --- */
+.breathing-card {
+  animation: cardBreath 4s ease-in-out infinite;
+}
+@keyframes cardBreath {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(218, 41, 28, 0); }
+  50%      { box-shadow: 0 0 0 2px rgba(218, 41, 28, 0.15), 0 0 25px rgba(218, 41, 28, 0.06); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .breathing-card { animation: none; }
+}
+
+/* --- Animated Gradient Text (hero title) --- */
+.gradient-text {
+  color: var(--ferrari-ink);
+  background: linear-gradient(
+    135deg,
+    var(--ferrari-ink) 0%,
+    var(--ferrari-primary) 30%,
+    var(--ferrari-ink) 50%,
+    var(--ferrari-primary) 70%,
+    var(--ferrari-ink) 100%
+  );
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradientTextFlow 6s ease-in-out infinite;
+}
+@keyframes gradientTextFlow {
+  0%, 100% { background-position: 0% 50%; }
+  50%      { background-position: 100% 50%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .gradient-text { animation: none; }
+}
+
 /* --- Responsive --- */
 @media (max-width: 640px) {
   .hero-cinema-content { padding: 40px 16px 48px; }
@@ -1860,18 +1909,19 @@ html.light .footer-ferrari {
 .light-beams::before {
   content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 0;
   background:
-    linear-gradient(25deg, transparent 40%, rgba(218,41,28,0.04) 45%, transparent 50%),
-    linear-gradient(15deg, transparent 55%, rgba(218,41,28,0.03) 60%, transparent 65%),
-    linear-gradient(35deg, transparent 30%, rgba(255,255,255,0.02) 35%, transparent 40%);
-  background-size: 200% 200%;
+    linear-gradient(15deg, transparent 20%, rgba(218,41,28,0.12) 35%, transparent 50%),
+    linear-gradient(5deg, transparent 40%, rgba(218,41,28,0.08) 50%, transparent 60%),
+    linear-gradient(25deg, transparent 10%, rgba(255,255,255,0.04) 30%, transparent 45%);
+  background-size: 300% 200%;
   animation: beamSweep 12s ease-in-out infinite alternate;
 }
 @keyframes beamSweep {
-  0%   { background-position: 0% 0%; }
-  100% { background-position: 100% 100%; }
+  0%   { opacity: 0.4; background-position: 0% 0%; }
+  50%  { opacity: 0.9; }
+  100% { opacity: 0.4; background-position: 100% 50%; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .light-beams::before { animation: none; }
+  .light-beams::before { animation: none; opacity: 0.5; }
 }
 
 /* --- Floating Dust Particles (projector motes) --- */
@@ -1879,51 +1929,28 @@ html.light .footer-ferrari {
   position: relative; overflow: hidden;
 }
 .dust-particle {
-  position: absolute; z-index: 0; pointer-events: none;
+  position: absolute; z-index: 1; pointer-events: none;
   border-radius: 50%;
-  background: rgba(218, 41, 28, 0.15);
+  background: rgba(218, 41, 28, 0.25);
   animation: dustFloat linear infinite;
 }
 @keyframes dustFloat {
   0%   { transform: translateY(0) translateX(0) scale(1); opacity: 0; }
-  10%  { opacity: 0.6; }
-  90%  { opacity: 0.6; }
-  100% { transform: translateY(-200px) translateX(40px) scale(0.3); opacity: 0; }
+  10%  { opacity: 0.8; }
+  90%  { opacity: 0.8; }
+  100% { transform: translateY(-300px) translateX(60px) scale(0.2); opacity: 0; }
 }
 
-/* --- Animated Rotating Gradient Border --- */
+/* --- Animated Ring Glow Card --- */
 .ring-glow-card {
   position: relative;
-  border: 1px solid transparent;
-  transition: border-color 0.3s ease;
+  transition: box-shadow 0.4s ease;
 }
-.ring-glow-card::before {
-  content: ''; position: absolute; inset: -2px; z-index: -1;
-  border-radius: inherit;
-  background: conic-gradient(
-    from var(--ring-angle, 0deg),
-    transparent 60%,
-    rgba(218, 41, 28, 0.4) 80%,
-    transparent 100%
-  );
-  opacity: 0;
-  transition: opacity 0.4s ease;
-  animation: ringRotate 4s linear infinite;
-}
-.ring-glow-card:hover::before {
-  opacity: 1;
-}
-@keyframes ringRotate {
-  0%   { --ring-angle: 0deg; }
-  100% { --ring-angle: 360deg; }
-}
-@property --ring-angle {
-  syntax: '<angle>';
-  initial-value: 0deg;
-  inherits: false;
-}
-@media (prefers-reduced-motion: reduce) {
-  .ring-glow-card::before { animation: none; }
+.ring-glow-card:hover {
+  box-shadow:
+    0 0 0 2px rgba(218, 41, 28, 0.5),
+    0 0 30px rgba(218, 41, 28, 0.15),
+    inset 0 0 30px rgba(218, 41, 28, 0.05);
 }
 
 /* --- Glitch Effect on hover (film posters) --- */

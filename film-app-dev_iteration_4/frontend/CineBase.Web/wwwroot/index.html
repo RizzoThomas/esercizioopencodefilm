@@ -13,7 +13,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
     rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-  <link href="/css/styles.css?v=20" rel="stylesheet">
+  <link href="/css/styles.css?v=26" rel="stylesheet">
   <script src="/js/route-guard.js"></script>
 </head>
 
@@ -25,6 +25,12 @@
     <!-- Film grain overlay (fixed, subtle analog texture) -->
     <div class="hero-film-grain" aria-hidden="true"></div>
 
+    <!-- Dust particles layer (above bg, below content) -->
+    <div id="dust-layer" class="absolute inset-0 z-[4] pointer-events-none overflow-hidden" aria-hidden="true"></div>
+
+    <!-- Scanlines overlay -->
+    <div class="hero-scanlines" aria-hidden="true"></div>
+
     <!-- Iconic cinema background — fixed, Ken Burns animation -->
     <div id="hero-bg" class="hero-cinema-bg hero-cinema-bg-active"
          style="background-image: url('https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?w=1920&q=80');">
@@ -35,7 +41,7 @@
       <p class="hero-eyebrow">In programmazione ora</p>
       <h1 class="hero-cinema-title">
         CineBase,
-        <span class="highlight shimmer-text">la tua rete cinematografica</span>
+        <span class="highlight shimmer-text gradient-text">la tua rete cinematografica</span>
       </h1>
       <p class="hero-cinema-subtitle">
         Catalogo film, gestione sale, programmazione e biglietteria &mdash;
@@ -155,7 +161,7 @@
   <script src="/js/auth.js"></script>
   <script src="/js/template-loader.js?v=4"></script>
   <script src="/js/navbar.js?v=4"></script>
-  <script src="/js/aceternity-effects.js?v=4"></script>
+  <script src="/js/aceternity-effects.js?v=6"></script>
   <script src="/js/pages/home.js"></script>
 </body>
 

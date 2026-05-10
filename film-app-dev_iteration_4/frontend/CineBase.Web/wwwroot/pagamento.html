@@ -13,7 +13,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
     rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-  <link href="/css/styles.css?v=20" rel="stylesheet">
+  <link href="/css/styles.css?v=26" rel="stylesheet">
   <script src="/js/route-guard.js"></script>
 </head>
 
@@ -116,9 +116,9 @@
             <i class="fa-solid fa-money-bill-transfer text-body"></i>
           </label>
 
-          <!-- Usa Ticket (Voucher) -->
-          <label class="payment-option-card" id="option-ticket">
-            <input type="radio" name="payment-method" value="ticket" class="mr-3">
+          <!-- Usa Ticket (Voucher) — disabilitato -->
+          <label class="payment-option-card hidden" id="option-ticket">
+            <input type="radio" name="payment-method" value="ticket" class="mr-3" disabled>
             <div class="flex-1">
               <p class="font-semibold text-ink">Usa Ticket / Voucher</p>
               <p class="text-sm text-body">Riscatta un codice ticket prepagato</p>
@@ -140,14 +140,8 @@
           </div>
         </div>
 
-        <!-- Ticket code input -->
+        <!-- Ticket code input — disabilitato -->
         <div id="ticket-code-section" class="hidden mt-4 p-4 bg-canvas-elevated">
-          <label class="block text-sm font-medium text-ink mb-2">
-            Inserisci il codice del voucher
-          </label>
-          <input type="text" id="ticket-code-input" 
-            class="w-full px-4 py-3 bg-canvas border border-hairline text-ink placeholder:text-body/50 focus:border-ferrari-primary focus:outline-none"
-            placeholder="es. CINEBASE50" maxlength="50">
         </div>
       </div>
 
@@ -179,7 +173,7 @@
   <script src="/js/auth.js?v=2"></script>
   <script src="/js/template-loader.js?v=4"></script>
   <script src="/js/navbar.js?v=4"></script>
-  <script src="/js/aceternity-effects.js?v=4"></script>
+  <script src="/js/aceternity-effects.js?v=6"></script>
   <script src="/js/pages/pagamento.js?v=fix6""></script>
 </body>
 

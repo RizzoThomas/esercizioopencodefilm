@@ -476,19 +476,19 @@
     /* ====================================================================
        18. DUST PARTICLES — Floating projector motes in hero
        ==================================================================== */
-    dustParticles(selector = '.dust-particles') {
+    dustParticles(selector = '#dust-layer') {
       if (this.prefersReducedMotion) return;
       document.querySelectorAll(selector).forEach(container => {
-        const count = 20;
+        const count = 50;
         for (let i = 0; i < count; i++) {
           const particle = document.createElement('div');
           particle.className = 'dust-particle';
-          const size = 2 + Math.random() * 4;
+          const size = 3 + Math.random() * 8;
           particle.style.width = `${size}px`;
           particle.style.height = `${size}px`;
           particle.style.left = `${Math.random() * 100}%`;
-          particle.style.top = `${60 + Math.random() * 40}%`;
-          particle.style.animationDuration = `${8 + Math.random() * 12}s`;
+          particle.style.top = `${30 + Math.random() * 70}%`;
+          particle.style.animationDuration = `${5 + Math.random() * 15}s`;
           particle.style.animationDelay = `${Math.random() * 10}s`;
           container.appendChild(particle);
         }
@@ -512,7 +512,7 @@
       this.rippleClick('.ripple-container');
       this.magneticHover('.magnetic-btn');
       this.tiltCards('.tilt-card');
-      this.dustParticles('.dust-particles');
+      this.dustParticles('#dust-layer');
 
       // Scroll-triggered effects
       this.stickyScrollReveal('.sticky-reveal-container');
