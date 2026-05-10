@@ -11,7 +11,7 @@
 
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-  <link href="/css/styles.css?v=13" rel="stylesheet">
+  <link href="/css/styles.css?v=20" rel="stylesheet">
 
 </head>
 
@@ -79,7 +79,7 @@
   <script src="/js/auth.js?v=2"></script>
   <script src="/js/template-loader.js?v=4"></script>
   <script src="/js/navbar.js?v=4"></script>
-  <script src="/js/aceternity-effects.js?v=3"></script>
+  <script src="/js/aceternity-effects.js?v=4"></script>
   <script>
     function formatCurrency(value) {
       const amount = Number(value || 0);
@@ -115,7 +115,7 @@
       const imageUrl = getOfferImage(offerta.tipo, offerta.includePopcorn);
 
       return `
-        <article class="offer-card ${offerta.inEvidenza ? 'highlight-card' : ''} card-ferrari p-0 flex flex-col h-full relative overflow-hidden card-spotlight-enhanced group">
+        <article class="offer-card ${offerta.inEvidenza ? 'highlight-card' : ''} card-ferrari p-0 flex flex-col h-full relative overflow-hidden card-spotlight-enhanced group ring-glow-card">
           <div class="h-44 relative overflow-hidden">
             <img src="${imageUrl}" alt="${offerta.nome}" class="w-full h-full object-cover transition-transform duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:scale-105" loading="lazy">
             <div class="absolute inset-0 bg-gradient-to-t from-[#181818] via-transparent to-transparent"></div>
@@ -163,7 +163,7 @@
       const imageUrl = getSubscriptionImage(abbonamento.tipo);
 
       return `
-        <article class="subscription-card card-ferrari p-0 flex flex-col h-full overflow-hidden card-spotlight-enhanced group">
+        <article class="subscription-card card-ferrari p-0 flex flex-col h-full overflow-hidden card-spotlight-enhanced group ring-glow-card">
           <div class="h-36 relative overflow-hidden">
             <img src="${imageUrl}" alt="${abbonamento.nome}" class="w-full h-full object-cover transition-transform duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:scale-105" loading="lazy">
             <div class="absolute inset-0 bg-gradient-to-t from-[#181818] via-transparent to-transparent"></div>
