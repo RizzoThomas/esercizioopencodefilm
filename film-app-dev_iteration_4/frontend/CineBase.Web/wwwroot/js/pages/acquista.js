@@ -471,10 +471,20 @@ function updateSummary() {
   // Mostra info offerta se presente
   if (offertaData && offertaRow && offertaAmount && offertaLabel) {
     const offerPrice = offertaData.prezzo || rawTotal;
-    offertaLabel.textContent = `Offerta "${offertaData.nome}"`;
-    offertaAmount.textContent = formatCurrency(offerPrice);
+    const offerSeats = offertaData.numeroBiglietti || 0;
+    const extra = Math.max(0, selected.length - offerSeats);
+    const extraCost = extra * unitPrice;
+    const finalTotal = offerPrice + extraCost;
+
+    if (extra > 0) {
+      offertaLabel.textContent = `Offerta "${offertaData.nome}" (${offerSeats} posti)`;
+      offertaAmount.innerHTML = `${formatCurrency(offerPrice)} <span class="text-body text-xs">+ ${extra} extra</span>`;
+    } else {
+      offertaLabel.textContent = `Offerta "${offertaData.nome}"`;
+      offertaAmount.textContent = formatCurrency(offerPrice);
+    }
     offertaRow.classList.remove('hidden');
-    totalEl.textContent = formatCurrency(offerPrice);
+    totalEl.textContent = formatCurrency(finalTotal);
   } else {
     if (offertaRow) offertaRow.classList.add('hidden');
     totalEl.textContent = formatCurrency(rawTotal);
@@ -601,12 +611,21 @@ function setupActions() {
       return;
     }
 
-    // Controllo offerta: se l'offerta include più biglietti di quelli selezionati, avvisa
+    // Controllo offerta: se l'offerta include più biglietti di quelli selezionati, blocca
     if (offertaData && offertaData.numeroBiglietti && selectedSeatIds.size < offertaData.numeroBiglietti) {
       const mancanti = offertaData.numeroBiglietti - selectedSeatIds.size;
+      showToast(`L'offerta "${offertaData.nome}" richiede almeno ${offertaData.numeroBiglietti} posti. Selezionane altri ${mancanti}.`, 'warning');
+      return;
+    }
+
+    // Controllo offerta: se si selezionano più posti dell'offerta, avvisa del costo extra
+    if (offertaData && offertaData.numeroBiglietti && selectedSeatIds.size > offertaData.numeroBiglietti) {
+      const extra = selectedSeatIds.size - offertaData.numeroBiglietti;
+      const prezzoUnitario = (seatMap?.prezzoBase || 0) + (seatMap?.supplementoSala || 0);
+      const costoExtra = extra * prezzoUnitario;
       const conferma = confirm(
-        `L'offerta "${offertaData.nome}" include ${offertaData.numeroBiglietti} biglietti, ma hai selezionato solo ${selectedSeatIds.size} posto/i.\n\n` +
-        `Proseguendo perderai ${mancanti} biglietto/i incluso/i nell'offerta.\n\nVuoi continuare comunque?`
+        `L'offerta "${offertaData.nome}" include ${offertaData.numeroBiglietti} posti, ma ne hai selezionati ${selectedSeatIds.size}.\n\n` +
+        `${extra} posto/i extra ti costeranno ${formatCurrency(costoExtra)} al prezzo pieno di ${formatCurrency(prezzoUnitario)} ciascuno.\n\nVuoi continuare?`
       );
       if (!conferma) return;
     }

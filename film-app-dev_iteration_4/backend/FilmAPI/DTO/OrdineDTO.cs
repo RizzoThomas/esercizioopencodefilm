@@ -24,6 +24,7 @@ public class CreateCheckoutSessionRequestDTO
     public string MetodoPagamento { get; set; } = string.Empty;
     public decimal? ImportoCreditoRichiesto { get; set; }
     public string? IdempotencyKey { get; set; }
+    public int? OffertaId { get; init; }
 }
 
 public class CreateCheckoutSessionResponseDTO

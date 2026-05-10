@@ -557,7 +557,8 @@ async function handlePayment() {
       const idempotencyKey = `checkout-${orderId}-${Date.now()}`;
       const session = await API.createStripeCheckoutSession(orderId, {
         metodoPagamento: 'Misto',
-        importoCreditoRichiesto
+        importoCreditoRichiesto,
+        offertaId: offertaId || undefined
       }, idempotencyKey);
 
       if (session?.stripeCheckoutUrl) {
@@ -573,7 +574,8 @@ async function handlePayment() {
 
     const idempotencyKey = `checkout-${orderId}-${Date.now()}`;
     const session = await API.createStripeCheckoutSession(orderId, {
-      metodoPagamento: 'Carta'
+      metodoPagamento: 'Carta',
+      offertaId: offertaId || undefined
     }, idempotencyKey);
 
     if (session?.stripeCheckoutUrl) {

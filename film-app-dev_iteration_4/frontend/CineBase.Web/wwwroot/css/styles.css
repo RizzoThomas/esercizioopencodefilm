@@ -388,12 +388,6 @@ input[type='password']::-webkit-textfield-decoration-container {
   color: var(--ferrari-primary);
   position: relative; display: inline;
 }
-.hero-cinema-title .highlight::after {
-  content: ''; position: absolute;
-  left: -2px; right: -2px; bottom: 0.05em; height: 0.3em;
-  background: linear-gradient(180deg, transparent, rgba(218, 41, 28, 0.15));
-  z-index: -1;
-}
 
 /* --- Hero Subtitle --- */
 .hero-cinema-subtitle {
@@ -1696,21 +1690,22 @@ html.light .footer-ferrari {
   position: absolute;
   border-radius: 50%;
   filter: blur(80px);
-  pointer-events: none; z-index: 0;
-  opacity: 0.15;
+  pointer-events: none; z-index: 1;
+  opacity: 0.12;
 }
 .orb-bg::before {
-  width: 500px; height: 500px;
+  width: 450px; height: 450px;
   background: var(--ferrari-primary);
-  top: -150px; left: -100px;
+  top: 20%; left: 50%;
+  transform: translate(-50%, -50%);
   animation: orbFloat1 18s ease-in-out infinite alternate;
 }
 .orb-bg::after {
-  width: 400px; height: 400px;
+  width: 350px; height: 350px;
   background: var(--ferrari-primary);
-  bottom: -100px; right: -80px;
+  bottom: 30%; right: 40%;
   animation: orbFloat2 22s ease-in-out infinite alternate;
-  opacity: 0.1;
+  opacity: 0.06;
 }
 @keyframes orbFloat1 {
   0%   { transform: translate(0, 0) scale(1); }
@@ -1725,6 +1720,36 @@ html.light .footer-ferrari {
 }
 @media (prefers-reduced-motion: reduce) {
   .orb-bg::before, .orb-bg::after { animation: none; opacity: 0.08; }
+}
+/* Real element overlay that sits above cards */
+.orb-overlay {
+  position: absolute; inset: 0; z-index: 1;
+  pointer-events: none; overflow: hidden;
+}
+.orb-overlay::before,
+.orb-overlay::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.1;
+}
+.orb-overlay::before {
+  width: 450px; height: 450px;
+  background: var(--ferrari-primary);
+  top: 20%; left: 50%;
+  transform: translate(-50%, -50%);
+  animation: orbFloat1 18s ease-in-out infinite alternate;
+}
+.orb-overlay::after {
+  width: 350px; height: 350px;
+  background: var(--ferrari-primary);
+  bottom: 30%; right: 40%;
+  animation: orbFloat2 22s ease-in-out infinite alternate;
+  opacity: 0.06;
+}
+@media (prefers-reduced-motion: reduce) {
+  .orb-overlay::before, .orb-overlay::after { animation: none; opacity: 0.05; }
 }
 
 /* --- 3D Tilt Card Effect --- */
@@ -1827,6 +1852,79 @@ html.light .footer-ferrari {
 @media (prefers-reduced-motion: reduce) {
   .btn-primary-glow::after { animation: none; }
 }
+
+/* --- Glitch Effect on hover (film posters) --- */
+.glitch-hover {
+  position: relative; overflow: hidden;
+}
+.glitch-hover::before,
+.glitch-hover::after {
+  content: ''; position: absolute; inset: 0;
+  background: inherit;
+  background-size: cover;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none; z-index: 1;
+}
+.glitch-hover::before {
+  clip-path: inset(20% 0 40% 0);
+  transform: translate(-3px, 0);
+}
+.glitch-hover::after {
+  clip-path: inset(60% 0 20% 0);
+  transform: translate(3px, 0);
+}
+.glitch-hover:hover::before {
+  opacity: 0.6;
+  animation: glitchShift1 0.3s steps(2) infinite;
+}
+.glitch-hover:hover::after {
+  opacity: 0.6;
+  animation: glitchShift2 0.3s steps(2) infinite;
+}
+@keyframes glitchShift1 {
+  0%, 100% { transform: translate(-3px, 0); }
+  50%      { transform: translate(2px, -1px); }
+}
+@keyframes glitchShift2 {
+  0%, 100% { transform: translate(3px, 0); }
+  50%      { transform: translate(-2px, 1px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .glitch-hover:hover::before,
+  .glitch-hover:hover::after { animation: none; opacity: 0; }
+}
+
+/* --- Marquee scroller (cinema scroll text) --- */
+.marquee-wrapper {
+  overflow: hidden; width: 100%;
+  background: var(--ferrari-canvas-elevated);
+  border-top: 1px solid var(--ferrari-hairline);
+  border-bottom: 1px solid var(--ferrari-hairline);
+  padding: 12px 0;
+}
+.marquee-track {
+  display: flex; width: max-content;
+  animation: marqueeScroll 30s linear infinite;
+}
+@keyframes marqueeScroll {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.marquee-group {
+  display: flex; flex-shrink: 0;
+  gap: 2rem;
+}
+.marquee-item {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  font-family: var(--ferrari-font); font-size: 14px; font-weight: 500;
+  color: var(--ferrari-body); white-space: nowrap;
+  text-decoration: none; flex-shrink: 0;
+  transition: color 0.2s ease;
+}
+.marquee-item:hover { color: var(--ferrari-primary); }
+.marquee-item i { color: var(--ferrari-primary); }
+.marquee-item strong { color: var(--ferrari-ink); }
 
 /* --- Animated Dot Grid Background --- */
 .dot-grid-bg {
@@ -2178,8 +2276,9 @@ html.light .footer-ferrari {
 }
 
 .focus-card-blur {
-  filter: blur(4px) brightness(0.7);
-  opacity: 0.7;
+  filter: blur(2px) brightness(0.85);
+  opacity: 0.8;
+  transition: filter 0.3s ease, opacity 0.3s ease;
 }
 
 .focus-card-active {

@@ -180,7 +180,7 @@ function renderHeroCard(film, score) {
       <div class="absolute inset-0 bg-slate-950">
         <img src="${getCoverImage(film.copertinaPath)}"
              alt="${film.titolo}"
-              class="w-full h-full object-contain sm:object-cover object-top group-hover:scale-105 transition-transform duration-700 ease-out opacity-90">
+              class="w-full h-full object-contain sm:object-cover object-top group-hover:scale-105 transition-transform duration-700 ease-out opacity-90 glitch-hover">
         <!-- Gradiente scuro sul fondo per leggibilita migliorata anche col tema chiaro -->
         <div class="absolute inset-0 bg-gradient-to-t from-gray-950 via-gray-950/30 to-transparent lg:via-transparent lg:bg-gradient-to-r lg:from-gray-950 lg:to-transparent opacity-50"></div>
         <div class="absolute inset-0 bg-gradient-to-t from-gray-950/50 via-gray-950/20 to-transparent opacity-40"></div>
@@ -212,7 +212,7 @@ function renderCompactCard(film, score, originalIndex) {
   const badge = score > 0 ? "In Programmazione" : "Novità";
   
   return `
-    <div class="focus-card card-ferrari flex overflow-hidden group transition-all hover:ring-2 hover:ring-ferrari-primary/70 cursor-pointer animate-fade-in bg-canvas h-[180px] sm:h-[198px] lg:h-[213px]" onclick="setActiveFeatured(${originalIndex})">
+    <div class="focus-card card-ferrari flex overflow-hidden group transition-all hover:ring-2 hover:ring-ferrari-primary/70 cursor-pointer animate-fade-in bg-canvas h-[180px] sm:h-[198px] lg:h-[213px]" onclick="window.location.href='/scheda-film.html?id=${film.id}'">
       <div class="w-[28%] lg:w-[32%] bg-slate-800 relative overflow-hidden flex-shrink-0">
         <img src="${getCoverImage(film.copertinaPath)}"
              alt="${film.titolo}"

@@ -704,6 +704,17 @@ public class PagamentoService : IPagamentoService
         var holdStates = await LoadOrderHoldStatesAsync(ordine.Id);
         ValidateHoldStatesForPendingPayment(ordine, holdStates);
 
+        // Applica sconto offerta se presente
+        if (dto.OffertaId.HasValue && dto.OffertaId.Value > 0)
+        {
+            var offerta = await _db.Offerte.FirstOrDefaultAsync(o => o.Id == dto.OffertaId.Value);
+            if (offerta is not null)
+            {
+                ordine.TotaleLordo = offerta.Prezzo;
+                Console.WriteLine($"[STRIPE-CHECKOUT] Offerta applicata: id={offerta.Id} prezzo={offerta.Prezzo}");
+            }
+        }
+
         var total = CalculateTotal(ordine.Show!, holdStates.Count);
         // Se l'ordine ha già un TotaleLordo diverso (offerta applicata), mantienilo
         if (ordine.TotaleLordo > 0 && Math.Abs(ordine.TotaleLordo - total) > 0.01m)
