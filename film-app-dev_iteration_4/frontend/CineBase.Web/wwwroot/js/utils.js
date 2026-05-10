@@ -123,3 +123,21 @@ function getCoverImage(copertinaPath) {
   }
   return '/assets/images/defaults/cover-default.svg';
 }
+
+// Counter animation — anima un numero da 0 al target (21st.dev style)
+function animateCounter(el, target, duration = 1200) {
+  const start = 0;
+  const startTime = performance.now();
+  const isInt = Number.isInteger(target);
+  function update(now) {
+    const elapsed = now - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    // Easing out cubic
+    const eased = 1 - Math.pow(1 - progress, 3);
+    const current = start + (target - start) * eased;
+    el.textContent = isInt ? Math.round(current).toLocaleString('it-IT') : current.toLocaleString('it-IT', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    el.classList.add('counted');
+    if (progress < 1) requestAnimationFrame(update);
+  }
+  requestAnimationFrame(update);
+}

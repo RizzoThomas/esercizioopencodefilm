@@ -175,7 +175,8 @@ function renderHeroCard(film, score) {
     : `<a href="/programmazione.html" class="btn-outline-brand-light transform transition-transform hover:scale-105 backdrop-blur-sm">Scopri Orari</a>`;
 
   return `
-    <div class="focus-card card-ferrari overflow-hidden group transition-all lg:col-span-2 relative w-full max-w-full h-[118vw] min-h-[420px] max-h-[780px] lg:h-[930px] lg:max-h-none animate-fade-in">
+    <div class="focus-card card-ferrari overflow-hidden group transition-all lg:col-span-2 relative w-full max-w-full h-[118vw] min-h-[420px] max-h-[780px] lg:h-[930px] lg:max-h-none animate-fade-in card-glow-border tilt-card">
+      <div class="tilt-card-shine"></div>
       <div class="absolute inset-0 bg-slate-950">
         <img src="${getCoverImage(film.copertinaPath)}"
              alt="${film.titolo}"

@@ -1683,6 +1683,226 @@ html.light .footer-ferrari {
 }
 
 /* ========================================================================
+   21st.dev INSPIRED EFFECTS
+   ======================================================================== */
+
+/* --- Floating Gradient Orbs Background --- */
+.orb-bg {
+  position: relative; overflow: hidden;
+}
+.orb-bg::before,
+.orb-bg::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  pointer-events: none; z-index: 0;
+  opacity: 0.15;
+}
+.orb-bg::before {
+  width: 500px; height: 500px;
+  background: var(--ferrari-primary);
+  top: -150px; left: -100px;
+  animation: orbFloat1 18s ease-in-out infinite alternate;
+}
+.orb-bg::after {
+  width: 400px; height: 400px;
+  background: var(--ferrari-primary);
+  bottom: -100px; right: -80px;
+  animation: orbFloat2 22s ease-in-out infinite alternate;
+  opacity: 0.1;
+}
+@keyframes orbFloat1 {
+  0%   { transform: translate(0, 0) scale(1); }
+  50%  { transform: translate(80px, 60px) scale(1.15); }
+  100% { transform: translate(-20px, -30px) scale(0.9); }
+}
+@keyframes orbFloat2 {
+  0%   { transform: translate(0, 0) scale(1); }
+  33%  { transform: translate(-50px, -40px) scale(1.2); }
+  66%  { transform: translate(30px, 20px) scale(0.85); }
+  100% { transform: translate(-10px, 10px) scale(1.05); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .orb-bg::before, .orb-bg::after { animation: none; opacity: 0.08; }
+}
+
+/* --- 3D Tilt Card Effect --- */
+.tilt-card {
+  perspective: 1000px;
+  transform-style: preserve-3d;
+  transition: transform 0.1s ease-out;
+}
+.tilt-card-inner {
+  position: relative; width: 100%; height: 100%;
+  transform-style: preserve-3d;
+}
+.tilt-card-inner > * {
+  backface-visibility: hidden;
+}
+.tilt-card-shine {
+  position: absolute; inset: 0; z-index: 2;
+  pointer-events: none;
+  background: radial-gradient(
+    circle at var(--tilt-x, 50%) var(--tilt-y, 50%),
+    rgba(255, 255, 255, 0.06) 0%,
+    transparent 50%
+  );
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.tilt-card:hover .tilt-card-shine {
+  opacity: 1;
+}
+
+/* --- Shimmer Text Effect --- */
+.shimmer-text {
+  position: relative; display: inline-block;
+  background: linear-gradient(
+    110deg,
+    var(--ferrari-ink) 30%,
+    rgba(218, 41, 28, 0.3) 40%,
+    var(--ferrari-ink) 50%
+  );
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmerSlide 4s ease-in-out infinite;
+}
+@keyframes shimmerText {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+.shimmer-text {
+  animation: shimmerText 4s ease-in-out infinite;
+}
+
+/* --- Animated Gradient Section Divider --- */
+.section-divider-glow {
+  position: relative; height: 1px;
+  background: var(--ferrari-hairline);
+  overflow: visible;
+  margin: 0;
+}
+.section-divider-glow::after {
+  content: '';
+  position: absolute; top: 0; left: 0; height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--ferrari-primary) 20%,
+    var(--ferrari-primary) 80%,
+    transparent 100%
+  );
+  animation: dividerPulse 3s ease-in-out infinite alternate;
+}
+@keyframes dividerPulse {
+  0%   { width: 30%; left: 35%; opacity: 0.4; }
+  100% { width: 50%; left: 25%; opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .section-divider-glow::after {
+    animation: none; width: 40%; left: 30%; opacity: 0.6;
+  }
+}
+
+/* --- Pulse Glow CTA --- */
+.btn-primary-glow {
+  position: relative;
+  overflow: visible;
+}
+.btn-primary-glow::after {
+  content: '';
+  position: absolute; inset: -2px; z-index: -1;
+  border-radius: inherit;
+  background: var(--ferrari-primary);
+  opacity: 0;
+  animation: ctaPulse 2.5s ease-in-out infinite;
+}
+@keyframes ctaPulse {
+  0%, 100% { opacity: 0; transform: scale(1); }
+  50%      { opacity: 0.25; transform: scale(1.03); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .btn-primary-glow::after { animation: none; }
+}
+
+/* --- Animated Dot Grid Background --- */
+.dot-grid-bg {
+  position: relative;
+}
+.dot-grid-bg::before {
+  content: '';
+  position: absolute; inset: 0;
+  pointer-events: none; z-index: 0;
+  background-image: radial-gradient(
+    circle at center,
+    rgba(218, 41, 28, 0.06) 1px,
+    transparent 1px
+  );
+  background-size: 32px 32px;
+  opacity: 0.5;
+  mask-image: radial-gradient(
+    ellipse 80% 60% at 50% 40%,
+    black 30%,
+    transparent 70%
+  );
+  -webkit-mask-image: radial-gradient(
+    ellipse 80% 60% at 50% 40%,
+    black 30%,
+    transparent 70%
+  );
+}
+@media (prefers-reduced-motion: reduce) {
+  .dot-grid-bg::before { opacity: 0.3; }
+}
+/* Subtle movement on the dot grid via parent scroll — handled by JS if needed */
+
+/* --- Gradient Border Glow Card --- */
+.card-glow-border {
+  position: relative;
+  transition: border-color 0.4s ease;
+}
+.card-glow-border::before {
+  content: '';
+  position: absolute; inset: -1px; z-index: -1;
+  border-radius: inherit;
+  background: linear-gradient(
+    135deg,
+    transparent 30%,
+    rgba(218, 41, 28, 0) 50%,
+    transparent 70%
+  );
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+.card-glow-border:hover::before {
+  background: linear-gradient(
+    135deg,
+    rgba(218, 41, 28, 0.3) 0%,
+    rgba(218, 41, 28, 0.08) 50%,
+    rgba(218, 41, 28, 0.3) 100%
+  );
+  opacity: 1;
+}
+.card-glow-border:hover {
+  border-color: rgba(218, 41, 28, 0.4);
+}
+
+/* --- Counter Animation --- */
+.counter-animate {
+  display: inline-block;
+}
+@keyframes countUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.counter-animate.counted {
+  animation: countUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* ========================================================================
    SKELETON SHIMMER — Premium loading state (replaces spinner)
    ======================================================================== */
 
