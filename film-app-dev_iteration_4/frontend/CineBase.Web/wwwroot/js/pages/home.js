@@ -171,27 +171,24 @@ function renderHeroCard(film, score) {
   
   const isLoggedIn = typeof Auth !== 'undefined' && Auth?.isLoggedIn?.() || false;
   const cta = isLoggedIn
-    ? `<a href="/programmazione.html" class="btn-gold shadow-lg transform transition-transform hover:scale-105">Vai alla Programmazione</a>`
-    : `<a href="/programmazione.html" class="btn-outline-brand-light transform transition-transform hover:scale-105 backdrop-blur-sm">Scopri Orari</a>`;
+    ? `<a href="/programmazione.html" class="btn-primary text-sm">Vai alla Programmazione</a>`
+    : `<a href="/programmazione.html" class="btn-outline text-sm">Scopri Orari</a>`;
 
   return `
-    <div class="focus-card card-ferrari overflow-hidden group transition-all lg:col-span-2 relative w-full max-w-full h-[118vw] min-h-[420px] max-h-[780px] lg:h-[930px] lg:max-h-none animate-fade-in card-glow-border tilt-card breathing-card">
-      <div class="tilt-card-shine"></div>
+    <div class="focus-card card-ferrari cine-card lg:col-span-2 relative w-full max-w-full h-[118vw] min-h-[420px] max-h-[780px] lg:h-[930px] lg:max-h-none animate-fade-in">
       <div class="absolute inset-0 bg-slate-950">
         <img src="${getCoverImage(film.copertinaPath)}"
              alt="${film.titolo}"
-              class="w-full h-full object-contain sm:object-cover object-top group-hover:scale-105 transition-transform duration-700 ease-out opacity-90 glitch-hover">
-        <!-- Gradiente scuro sul fondo per leggibilita migliorata anche col tema chiaro -->
-        <div class="absolute inset-0 bg-gradient-to-t from-gray-950 via-gray-950/30 to-transparent lg:via-transparent lg:bg-gradient-to-r lg:from-gray-950 lg:to-transparent opacity-50"></div>
-        <div class="absolute inset-0 bg-gradient-to-t from-gray-950/50 via-gray-950/20 to-transparent opacity-40"></div>
+             class="w-full h-full object-cover object-top opacity-90">
+        <div class="cine-card-overlay"></div>
       </div>
-      
+
       <div class="absolute top-4 left-4 right-4 flex items-center justify-between z-10">
-        <span class="bg-ferrari-primary text-sm font-bold px-3 py-1 rounded shadow-md text-ink">${badge}</span>
+        <span class="bg-ferrari-primary text-sm font-bold px-3 py-1 rounded shadow-md text-white">${badge}</span>
         ${subBadge ? `<span class="bg-black/60 backdrop-blur-md text-white text-xs px-2 py-1 rounded border border-white/10">${subBadge}</span>` : ""}
       </div>
 
-      <div class="absolute bottom-0 left-0 right-0 p-6 lg:p-10 z-10 flex flex-col justify-end h-full">
+      <div class="cine-card-body absolute bottom-0 left-0 right-0 p-6 lg:p-10 z-10">
         <div class="flex flex-wrap gap-2 mb-3">
           ${badgeHtml}
         </div>
@@ -200,9 +197,10 @@ function renderHeroCard(film, score) {
           <span><i class="fa-solid fa-video mr-2 text-ferrari-primary"></i>${getDirectorName(film)}</span>
           ${film.durata ? `<span><i class="fa-regular fa-clock mr-1"></i>${film.durata} min</span>` : ""}
         </p>
-        <div class="flex">
-          ${cta}
-        </div>
+      </div>
+
+      <div class="cine-card-action z-20">
+        ${cta}
       </div>
     </div>
   `;

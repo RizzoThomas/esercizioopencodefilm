@@ -19,20 +19,37 @@
 
   function applyTheme(theme) {
     const root = document.documentElement;
+    if (theme === 'light') {
+      root.classList.add('light');
+    } else {
+      root.classList.remove('light');
+    }
     if (theme === 'dark') {
       root.classList.add('dark');
     } else {
       root.classList.remove('dark');
     }
     updateToggleIcons(theme);
+    updateHeroBackground(theme);
+  }
+
+  function updateHeroBackground(theme) {
+    const heroBg = document.getElementById('hero-bg');
+    if (!heroBg) return;
+    if (theme === 'light') {
+      heroBg.style.backgroundImage = "url('https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=1920&q=80')";
+    } else {
+      heroBg.style.backgroundImage = "url('https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?w=1920&q=80')";
+    }
   }
 
   function updateToggleIcons(theme) {
-    document.querySelectorAll('.theme-toggle-icon-sun').forEach(el => {
-      el.style.display = theme === 'dark' ? 'inline' : 'none';
-    });
-    document.querySelectorAll('.theme-toggle-icon-moon').forEach(el => {
-      el.style.display = theme === 'dark' ? 'none' : 'inline';
+    document.querySelectorAll('#theme-toggle i').forEach(el => {
+      if (theme === 'dark') {
+        el.className = 'fa-solid fa-moon';
+      } else {
+        el.className = 'fa-solid fa-sun';
+      }
     });
   }
 
@@ -56,6 +73,11 @@
 
   // Apply immediately (before DOMContentLoaded to prevent flash)
   applyTheme(getCurrentTheme());
+
+  // Re-apply icon states when navbar components load
+  document.addEventListener('components:loaded', function() {
+    applyTheme(getCurrentTheme());
+  });
 
   // Listen for system preference changes
   window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {

@@ -286,6 +286,8 @@ app.MapSegnalazioniEndpoints();
 app.MapDiagnosticEndpoints();
 app.MapTmdbEndpoints();
 app.MapSocialAuthEndpoints();
+app.MapChatEndpoints();
+app.MapAdminAnalyticsEndpoints();
 
 app.MapGet("/config/frontend", (FrontendRuntimeConfig config) => Results.Ok(new
 {

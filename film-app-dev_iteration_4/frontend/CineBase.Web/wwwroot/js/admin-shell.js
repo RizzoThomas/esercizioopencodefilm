@@ -1,212 +1,246 @@
 (() => {
   const ADMIN_PATHS = new Set([
-    '/dashboard.html',
-    '/films.html',
-    '/registi.html',
-    '/cinemas.html',
-    '/proiezioni.html',
-    '/categorie.html',
-    '/utenti.html',
-    '/utenti-detail.html',
-    '/validazione.html'
+    '/dashboard.html', '/films.html', '/registi.html', '/cinemas.html',
+    '/proiezioni.html', '/categorie.html', '/utenti.html', '/utenti-detail.html', '/validazione.html'
   ]);
 
   const PAGE_TITLES = {
-    '/dashboard.html': 'Dashboard',
-    '/films.html': 'Film',
-    '/registi.html': 'Registi',
-    '/cinemas.html': 'Cinema',
-    '/proiezioni.html': 'Proiezioni',
-    '/categorie.html': 'Categorie',
-    '/utenti.html': 'Utenti',
-    '/utenti-detail.html': 'Dettaglio Utente',
-    '/validazione.html': 'Validazione Biglietti'
+    '/dashboard.html': 'Dashboard', '/films.html': 'Film', '/registi.html': 'Registi',
+    '/cinemas.html': 'Cinema', '/proiezioni.html': 'Proiezioni', '/categorie.html': 'Categorie',
+    '/utenti.html': 'Utenti', '/utenti-detail.html': 'Dettaglio Utente', '/validazione.html': 'Validazione'
+  };
+
+  const PAGE_ICONS = {
+    '/dashboard.html': 'fa-gauge-high', '/films.html': 'fa-film', '/registi.html': 'fa-user',
+    '/cinemas.html': 'fa-building', '/proiezioni.html': 'fa-clock', '/categorie.html': 'fa-tags',
+    '/utenti.html': 'fa-users', '/validazione.html': 'fa-ticket-check'
   };
 
   function getUser() {
-    if (typeof Auth === 'undefined' || !Auth || typeof Auth.getUser !== 'function') return null;
-    return Auth.getUser();
+    return (typeof Auth !== 'undefined' && Auth?.getUser) ? Auth.getUser() : null;
   }
 
   function getUserRole() {
-    var user = getUser();
+    const user = getUser();
     if (!user) return null;
-    var role = String(user.ruolo || '').trim().toLowerCase();
-    if (role === '2' || role === 'admin') return 'admin';
-    if (role === '1' || role === 'poweruser') return 'poweruser';
-    if (role === '0' || role === 'user') return 'user';
-    return null;
+    const r = String(user.ruolo || '').trim().toLowerCase();
+    if (r === '2' || r === 'admin') return 'admin';
+    if (r === '1' || r === 'poweruser') return 'poweruser';
+    return 'user';
   }
 
-  function isAdmin() {
-    return getUserRole() === 'admin';
-  }
+  function isAdmin() { return getUserRole() === 'admin'; }
 
   function toggleSidebar() {
-    const sidebar = document.getElementById('admin-sidebar');
-    const backdrop = document.getElementById('admin-sidebar-backdrop');
-    if (!sidebar || !backdrop) return;
-    sidebar.classList.toggle('-translate-x-full');
-    backdrop.classList.toggle('hidden');
+    const sb = document.getElementById('admin-sidebar');
+    const bd = document.getElementById('admin-sidebar-backdrop');
+    if (!sb) return;
+    sb.classList.toggle('-translate-x-full');
+    if (bd) bd.classList.toggle('hidden');
   }
 
   function setActiveLinks() {
-    const currentPath = window.location.pathname.toLowerCase();
-    document.querySelectorAll('[data-admin-link]').forEach((el) => {
-      const href = (el.getAttribute('href') || '').toLowerCase();
-      if (href === currentPath) {
-        el.classList.add('active');
-      } else {
-        el.classList.remove('active');
-      }
+    const cp = window.location.pathname.toLowerCase();
+    document.querySelectorAll('[data-admin-link]').forEach(el => {
+      el.classList.toggle('active', (el.getAttribute('href') || '').toLowerCase() === cp);
     });
   }
 
   function updateUserUI() {
     const user = getUser();
-    const userNameEl = document.getElementById('admin-user-name');
-    const userAvatarEl = document.getElementById('admin-user-avatar');
-    const userMenuNameEl = document.getElementById('admin-user-menu-name');
-
-    if (userNameEl) userNameEl.textContent = user?.nome || user?.email || 'Utente';
-    if (userMenuNameEl) userMenuNameEl.textContent = user?.email || '';
-    if (userAvatarEl) {
-      const first = (user?.nome || 'U').charAt(0);
-      const second = (user?.cognome || 'N').charAt(0);
-      userAvatarEl.textContent = `${first}${second}`.toUpperCase();
+    const elName = document.getElementById('admin-user-name');
+    const elAvatar = document.getElementById('admin-user-avatar');
+    if (elName) elName.textContent = user?.nome || user?.email || 'Admin';
+    if (elAvatar) {
+      elAvatar.textContent = ((user?.nome || 'A').charAt(0) + (user?.cognome || 'd').charAt(0)).toUpperCase();
     }
   }
 
   function bindActions() {
-    const sidebarToggle = document.getElementById('admin-sidebar-toggle');
-    const backdrop = document.getElementById('admin-sidebar-backdrop');
+    document.getElementById('admin-sidebar-toggle')?.addEventListener('click', toggleSidebar);
+    document.getElementById('admin-sidebar-backdrop')?.addEventListener('click', toggleSidebar);
+    document.querySelectorAll('#admin-sidebar a[data-admin-link]').forEach(a => a.addEventListener('click', () => {
+      if (window.innerWidth < 768) toggleSidebar();
+    }));
+
     const userToggle = document.getElementById('admin-user-toggle');
     const userMenu = document.getElementById('admin-user-menu');
-    const logoutBtn = document.getElementById('admin-logout-btn');
-
-    if (sidebarToggle) sidebarToggle.addEventListener('click', toggleSidebar);
-    if (backdrop) backdrop.addEventListener('click', toggleSidebar);
-
     if (userToggle && userMenu) {
-      userToggle.addEventListener('click', () => {
-        userMenu.classList.toggle('hidden');
-      });
-      document.addEventListener('click', (event) => {
-        if (!userToggle.contains(event.target) && !userMenu.contains(event.target)) {
-          userMenu.classList.add('hidden');
-        }
+      userToggle.addEventListener('click', () => userMenu.classList.toggle('hidden'));
+      document.addEventListener('click', e => {
+        if (!userToggle.contains(e.target) && !userMenu.contains(e.target)) userMenu.classList.add('hidden');
       });
     }
 
-    const handleLogout = () => {
-      if (typeof Auth === 'undefined' || !Auth || typeof Auth.logout !== 'function') {
-        window.location.href = '/index.html';
-        return;
-      }
-      Auth.logout().finally(() => {
-        window.location.href = '/index.html';
-      });
-    };
-
-    if (logoutBtn) logoutBtn.addEventListener('click', handleLogout);
+    document.getElementById('admin-logout-btn')?.addEventListener('click', () => {
+      (Auth?.logout ? Auth.logout() : Promise.resolve()).finally(() => { window.location.href = '/index.html'; });
+    });
   }
 
   function renderShell(main) {
-    const currentPath = window.location.pathname.toLowerCase();
-    const pageTitle = PAGE_TITLES[currentPath] || 'Area Admin';
+    const cp = window.location.pathname.toLowerCase();
+    const title = PAGE_TITLES[cp] || 'Admin';
+    const icon = PAGE_ICONS[cp] || 'fa-gauge-high';
 
     const shell = document.createElement('div');
     shell.innerHTML = `
-      <div id="admin-shell-root">
-      <div id="admin-sidebar-backdrop" class="fixed inset-0 bg-black/50 z-40 hidden md:hidden"></div>
-      <div class="flex w-full min-h-screen">
-        <aside id="admin-sidebar" class="w-64 flex-shrink-0 flex flex-col fixed md:relative inset-y-0 left-0 z-50 -translate-x-full md:translate-x-0 transition-transform duration-300 bg-canvas">
-          <div class="p-6">
-            <a href="/index.html" class="flex items-center gap-3">
-              <div class="w-10 h-10 bg-ferrari-primary flex items-center justify-center text-ink">
-                <i class="fa-solid fa-film"></i>
-              </div>
-              <span class="text-xl font-bold text-ink">CineBase</span>
-            </a>
-          </div>
-          <nav class="flex-1 px-4 space-y-1">
-            <a data-admin-link href="/dashboard.html" class="admin-nav-link flex items-center gap-3 px-4 py-3 text-sm"><i class="fa-solid fa-gauge-high w-5"></i>Dashboard</a>
-            <a data-admin-link href="/films.html" class="admin-nav-link flex items-center gap-3 px-4 py-3 text-sm"><i class="fa-solid fa-film w-5"></i>Film</a>
-            <a data-admin-link href="/registi.html" class="admin-nav-link flex items-center gap-3 px-4 py-3 text-sm"><i class="fa-solid fa-user w-5"></i>Registi</a>
-            <a data-admin-link href="/cinemas.html" class="admin-nav-link flex items-center gap-3 px-4 py-3 text-sm"><i class="fa-solid fa-building w-5"></i>Cinema</a>
-            <a data-admin-link href="/proiezioni.html" class="admin-nav-link flex items-center gap-3 px-4 py-3 text-sm"><i class="fa-solid fa-clock w-5"></i>Proiezioni</a>
-            <a data-admin-link href="/categorie.html" class="admin-nav-link flex items-center gap-3 px-4 py-3 text-sm"><i class="fa-solid fa-tags w-5"></i>Categorie</a>
-            <a data-admin-link href="/utenti.html" class="admin-nav-link flex items-center gap-3 px-4 py-3 text-sm" data-role-required="admin"><i class="fa-solid fa-users w-5"></i>Utenti</a>
-            <a data-admin-link href="/validazione.html" class="admin-nav-link flex items-center gap-3 px-4 py-3 text-sm"><i class="fa-solid fa-ticket-check w-5"></i>Validazione</a>
-          </nav>
-          <div class="p-4 border-t border-hairline">
-            <a href="/profilo.html" class="flex items-center gap-3 px-4 py-3 text-sm text-body hover:text-ink transition-colors">
-              <i class="fa-solid fa-gear w-5"></i>Impostazioni
-            </a>
-          </div>
-        </aside>
+    <div id="admin-shell-root" class="flex h-screen overflow-hidden bg-[#0c0c0c]">
+      <!-- Backdrop mobile -->
+      <div id="admin-sidebar-backdrop" class="fixed inset-0 bg-black/60 z-40 hidden md:hidden backdrop-blur-sm"></div>
 
-        <div class="flex-1 min-h-screen overflow-x-auto">
-          <header class="bg-canvas sticky top-0 z-30">
-            <div class="px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between gap-4">
-              <div class="flex items-center gap-4">
-                <button id="admin-sidebar-toggle" class="md:hidden p-2 text-ink hover:text-ferrari-primary">
-                  <i class="fa-solid fa-bars text-xl"></i>
-                </button>
-                <h1 class="text-xl sm:text-2xl font-bold text-ink">${pageTitle}</h1>
-              </div>
-              <div class="flex items-center gap-3">
-                <div class="relative">
-                  <button id="admin-user-toggle" class="flex items-center gap-2 text-sm font-medium text-ink">
-                    <div id="admin-user-avatar" class="w-8 h-8 bg-ferrari-primary/20 rounded-full flex items-center justify-center text-ferrari-primary font-semibold">UN</div>
-                    <span id="admin-user-name" class="hidden sm:inline">Utente</span>
-                  </button>
-                  <div id="admin-user-menu" class="hidden absolute right-0 mt-2 w-56 bg-canvas-elevated rounded border border-hairline py-2">
-                    <p id="admin-user-menu-name" class="px-4 py-2 text-xs text-body"></p>
-                    <a href="/profilo.html" class="block px-4 py-2 text-sm text-ink hover:text-ferrari-primary hover:bg-white/5"><i class="fa-solid fa-user mr-2"></i>Profilo</a>
-                    <a href="/profilo.html#prenotazioni" class="block px-4 py-2 text-sm text-ink hover:text-ferrari-primary hover:bg-white/5"><i class="fa-solid fa-ticket mr-2"></i>Prenotazioni</a>
-                    <hr class="my-1 border-hairline">
-                    <button id="admin-logout-btn" class="w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-white/5"><i class="fa-solid fa-sign-out-alt mr-2"></i>Logout</button>
-                  </div>
-                </div>
-              </div>
+      <!-- Sidebar -->
+      <aside id="admin-sidebar"
+        class="w-64 flex-shrink-0 flex flex-col fixed md:relative inset-y-0 left-0 z-50
+               -translate-x-full md:translate-x-0 transition-transform duration-300
+               bg-[#0f0f0f] border-r border-[#1f1f1f]">
+        
+        <!-- Logo -->
+        <div class="px-5 py-5 border-b border-[#1f1f1f]">
+          <a href="/index.html" class="flex items-center gap-3">
+            <div class="w-9 h-9 bg-ferrari-primary flex items-center justify-center">
+              <i class="fa-solid fa-film text-white text-sm"></i>
             </div>
-          </header>
-          <div id="admin-shell-content"></div>
+            <div>
+              <span class="text-base font-bold text-white tracking-tight">CineBase</span>
+              <p class="text-[10px] text-[#666] uppercase tracking-widest">Admin</p>
+            </div>
+          </a>
         </div>
+
+        <!-- Nav -->
+        <nav class="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
+          <p class="px-3 mb-2 text-[10px] font-semibold uppercase tracking-widest text-[#555]">Menu</p>
+          <a data-admin-link href="/dashboard.html" class="admin-link"><i class="fa-solid fa-gauge-high w-5"></i>Dashboard</a>
+          <a data-admin-link href="/films.html" class="admin-link"><i class="fa-solid fa-film w-5"></i>Film</a>
+          <a data-admin-link href="/registi.html" class="admin-link"><i class="fa-solid fa-user w-5"></i>Registi</a>
+          <a data-admin-link href="/cinemas.html" class="admin-link"><i class="fa-solid fa-building w-5"></i>Cinema</a>
+          <a data-admin-link href="/proiezioni.html" class="admin-link"><i class="fa-solid fa-clock w-5"></i>Proiezioni</a>
+          <a data-admin-link href="/categorie.html" class="admin-link"><i class="fa-solid fa-tags w-5"></i>Categorie</a>
+          <p class="px-3 mt-4 mb-2 text-[10px] font-semibold uppercase tracking-widest text-[#555]">Gestione</p>
+          <a data-admin-link href="/utenti.html" class="admin-link" data-role-required="admin"><i class="fa-solid fa-users w-5"></i>Utenti</a>
+          <a data-admin-link href="/validazione.html" class="admin-link"><i class="fa-solid fa-ticket-check w-5"></i>Validazione</a>
+        </nav>
+
+        <!-- Bottom -->
+        <div class="p-3 border-t border-[#1f1f1f]">
+          <a href="/profilo.html" class="admin-link mb-1"><i class="fa-solid fa-gear w-5"></i>Impostazioni</a>
+        </div>
+      </aside>
+
+      <!-- Main content -->
+      <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
+        <!-- Top bar -->
+        <header class="flex-shrink-0 h-14 border-b border-[#1f1f1f] bg-[#0f0f0f]/80 backdrop-blur-md flex items-center px-4 lg:px-6 gap-4">
+          <button id="admin-sidebar-toggle" class="md:hidden p-2 -ml-2 text-[#888] hover:text-white">
+            <i class="fa-solid fa-bars text-lg"></i>
+          </button>
+          <div class="flex items-center gap-3 min-w-0">
+            <i class="fa-solid ${icon} text-ferrari-primary text-sm hidden sm:block"></i>
+            <h1 class="text-sm font-semibold text-white truncate">${title}</h1>
+          </div>
+          <div class="flex-1"></div>
+          
+          <!-- Theme toggle -->
+          <button id="admin-theme-toggle" class="p-2 text-[#888] hover:text-white transition-colors" title="Cambia tema">
+            <i class="fa-solid fa-moon text-sm"></i>
+          </button>
+
+          <!-- User -->
+          <div class="relative">
+            <button id="admin-user-toggle" class="flex items-center gap-2 text-sm text-[#ccc] hover:text-white transition-colors">
+              <div id="admin-user-avatar" class="w-7 h-7 bg-ferrari-primary/20 flex items-center justify-center text-ferrari-primary font-bold text-xs">AD</div>
+              <span id="admin-user-name" class="hidden sm:inline text-xs">Admin</span>
+              <i class="fa-solid fa-chevron-down text-[10px] text-[#555]"></i>
+            </button>
+            <div id="admin-user-menu" class="hidden absolute right-0 top-full mt-2 w-52 bg-[#1a1a1a] border border-[#2a2a2a] py-1.5 z-50">
+              <div class="px-4 py-2 border-b border-[#2a2a2a]">
+                <p class="text-xs font-medium text-white" id="admin-user-menu-name">admin@cinebase.it</p>
+              </div>
+              <a href="/profilo.html" class="flex items-center gap-2 px-4 py-2 text-xs text-[#aaa] hover:text-white hover:bg-white/5"><i class="fa-solid fa-user w-4"></i>Profilo</a>
+              <a href="/profilo.html#prenotazioni" class="flex items-center gap-2 px-4 py-2 text-xs text-[#aaa] hover:text-white hover:bg-white/5"><i class="fa-solid fa-ticket w-4"></i>Prenotazioni</a>
+              <hr class="my-1 border-[#2a2a2a]">
+              <button id="admin-logout-btn" class="w-full flex items-center gap-2 px-4 py-2 text-xs text-red-500 hover:bg-white/5 text-left"><i class="fa-solid fa-sign-out-alt w-4"></i>Logout</button>
+            </div>
+          </div>
+        </header>
+
+        <!-- Content -->
+        <main class="flex-1 overflow-y-auto bg-[#0c0c0c]" id="admin-shell-content"></main>
       </div>
-      </div>
+    </div>
+
+    <style>
+      .admin-link {
+        display: flex; align-items: center; gap: 0.75rem;
+        padding: 0.5rem 0.75rem; border-radius: 6px;
+        font-size: 0.8125rem; font-weight: 500;
+        color: #888; text-decoration: none;
+        transition: all 0.15s ease;
+      }
+      .admin-link:hover { color: #fff; background: rgba(255,255,255,0.04); }
+      .admin-link.active { color: #fff; background: rgba(218,41,28,0.12); }
+      .admin-link.active i { color: var(--ferrari-primary, #da291c); }
+      
+      /* Light theme admin overrides */
+      html.light #admin-shell-root { background: #f8f8f8; }
+      html.light #admin-sidebar { background: #fff; border-color: #e5e5e5; }
+      html.light #admin-sidebar .border-\[\#1f1f1f\] { border-color: #e5e5e5 !important; }
+      html.light .admin-link { color: #666; }
+      html.light .admin-link:hover { color: #111; background: rgba(0,0,0,0.03); }
+      html.light .admin-link.active { color: #111; background: rgba(218,41,28,0.06); }
+      html.light header.bg-\[\#0f0f0f\]\/80 { background: rgba(255,255,255,0.9) !important; border-color: #e5e5e5 !important; }
+      html.light header .text-white { color: #111 !important; }
+      html.light header .text-\[\#ccc\] { color: #555 !important; }
+      html.light header .text-\[\#888\] { color: #666 !important; }
+      html.light #admin-user-menu { background: #fff; border-color: #e5e5e5; }
+      html.light #admin-user-menu .text-\[\#aaa\] { color: #666 !important; }
+      html.light #admin-user-menu .border-\[\#2a2a2a\] { border-color: #e5e5e5 !important; }
+      html.light #admin-shell-content { background: #f8f8f8; }
+      html.light #admin-sidebar-backdrop { background: rgba(0,0,0,0.3); }
+    </style>
     `;
 
-    document.body.prepend(shell.firstElementChild);
+    document.body.prepend(shell);
+    
+    // Move main content into shell
     const target = document.getElementById('admin-shell-content');
-    if (!target) return;
-    main.className = '';
-    target.appendChild(main);
+    if (target) {
+      main.classList.add('p-4', 'lg:p-6');
+      target.appendChild(main);
+    }
+  }
+
+  function initThemeToggle() {
+    const btn = document.getElementById('admin-theme-toggle');
+    if (!btn || !window.CineBaseTheme) return;
+    function update() {
+      const t = window.CineBaseTheme.get();
+      btn.querySelector('i').className = t === 'dark' ? 'fa-solid fa-moon text-sm' : 'fa-solid fa-sun text-sm';
+    }
+    btn.addEventListener('click', () => { window.CineBaseTheme.toggle(); update(); });
+    update();
   }
 
   document.addEventListener('DOMContentLoaded', () => {
-    const pathname = window.location.pathname.toLowerCase();
-    if (!ADMIN_PATHS.has(pathname)) return;
+    const cp = window.location.pathname.toLowerCase();
+    if (!ADMIN_PATHS.has(cp)) return;
 
     const main = document.querySelector('main');
     if (!main) return;
 
-    const navbarContainer = document.getElementById('navbar-container');
-    const footerContainer = document.getElementById('footer-container');
-    if (navbarContainer) navbarContainer.remove();
-    if (footerContainer) footerContainer.remove();
+    // Remove landing navbar/footer
+    document.getElementById('navbar-container')?.remove();
+    document.getElementById('footer-container')?.remove();
 
     renderShell(main);
     bindActions();
     setActiveLinks();
     updateUserUI();
+    initThemeToggle();
 
-    // Nascondi link admin-only per PowerUser
+    // Hide admin-only links for PowerUser
     if (!isAdmin()) {
-      document.querySelectorAll('[data-role-required="admin"]').forEach(function(el) {
-        el.style.display = 'none';
-      });
+      document.querySelectorAll('[data-role-required="admin"]').forEach(el => el.style.display = 'none');
     }
   });
 })();

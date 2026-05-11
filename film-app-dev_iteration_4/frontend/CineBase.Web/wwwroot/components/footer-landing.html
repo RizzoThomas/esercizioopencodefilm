@@ -1,64 +1,70 @@
-<!-- Footer Ferrari Design — footer-dark -->
-<footer class="bg-canvas border-t border-hairline pt-16 pb-8">
-  <div class="container mx-auto px-4">
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
-      <!-- Brand Info -->
-      <div class="space-y-4">
-        <a href="/index.html" class="text-2xl font-bold text-ferrari-primary tracking-tight flex items-center gap-2">
-          🎬 CineBase
-        </a>
-        <p class="text-body leading-relaxed">
-          La piattaforma leader per la gestione centralizzata delle sale cinematografiche.
+<!-- Footer Premium — 21st.dev inspired, Ferrari dark -->
+<footer class="relative overflow-hidden bg-[#0a0a0a] text-white">
+  <!-- Gradient Glow -->
+  <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-gradient-to-b from-red-900/20 to-transparent blur-3xl pointer-events-none"></div>
+
+  <div class="relative z-10 max-w-7xl mx-auto px-6 pt-16 pb-8">
+    <div class="grid grid-cols-1 lg:grid-cols-5 gap-12 mb-10">
+
+      <!-- Brand (col-span-2) -->
+      <div class="lg:col-span-2 space-y-5">
+        <div class="flex items-center gap-3">
+          <span class="text-2xl font-bold tracking-tight text-white">🎬 CineBase</span>
+        </div>
+        <p class="text-[#888] text-sm leading-relaxed max-w-xs">
+          La piattaforma leader per la gestione centralizzata delle sale cinematografiche. Scopri film, prenota biglietti e gestisci il tuo cinema.
         </p>
       </div>
-      
-      <!-- Quick Links -->
-      <div>
-        <h4 class="text-lg font-bold mb-6 text-ink">Navigazione</h4>
-        <ul class="space-y-3 text-body">
-          <li><a href="/index.html" class="hover:text-ferrari-primary transition-colors">Home</a></li>
-          <li><a href="/programmazione.html" class="hover:text-ferrari-primary transition-colors">Programmazione</a></li>
-          <li><a href="/login.html" id="footer-login-link" class="hover:text-ferrari-primary transition-colors">Login</a></li>
-          <li><a href="/registrazione.html" id="footer-register-link" class="hover:text-ferrari-primary transition-colors">Registrati</a></li>
-          <li><a href="/profilo.html" id="footer-profile-link" class="hidden hover:text-ferrari-primary transition-colors">Profilo</a></li>
-          <li><a href="/prenotazioni.html" id="footer-bookings-link" class="hidden hover:text-ferrari-primary transition-colors">Prenotazioni</a></li>
-          <li><a href="/films.html" id="footer-films-link" class="hidden hover:text-ferrari-primary transition-colors admin-only">Film</a></li>
-          <li><a href="/cinemas.html" id="footer-cinemas-link" class="hidden hover:text-ferrari-primary transition-colors admin-only">Cinema</a></li>
-          <li><a href="/dashboard.html" id="footer-admin-link" class="hidden hover:text-ferrari-primary transition-colors admin-only">Area Admin</a></li>
-        </ul>
-      </div>
-      
-      <!-- Support -->
-      <div>
-        <h4 class="text-lg font-bold mb-6 text-ink">Supporto</h4>
-        <ul class="space-y-3 text-body">
-          <li><a href="#" class="hover:text-ferrari-primary transition-colors">Centro Assistenza</a></li>
-          <li><a href="#" class="hover:text-ferrari-primary transition-colors">Termini e Condizioni</a></li>
-          <li><a href="#" class="hover:text-ferrari-primary transition-colors">Privacy</a></li>
-        </ul>
-      </div>
-      
-      <!-- Social -->
-      <div>
-        <h4 class="text-lg font-bold mb-6 text-ink">Seguici</h4>
-        <div class="flex gap-4 mb-6">
-          <a href="#" class="w-10 h-10 bg-canvas-elevated flex items-center justify-center hover:bg-ferrari-primary transition-colors">
-            <i class="fa-brands fa-facebook text-ink"></i>
-          </a>
-          <a href="#" class="w-10 h-10 bg-canvas-elevated flex items-center justify-center hover:bg-ferrari-primary transition-colors">
-            <i class="fa-brands fa-instagram text-ink"></i>
-          </a>
-          <a href="#" class="w-10 h-10 bg-canvas-elevated flex items-center justify-center hover:bg-ferrari-primary transition-colors">
-            <i class="fa-brands fa-twitter text-ink"></i>
-          </a>
+
+      <!-- Links (col-span-3) -->
+      <div class="lg:col-span-3">
+        <div class="grid grid-cols-3 gap-8">
+          <div class="space-y-3">
+            <h4 class="text-xs font-semibold uppercase tracking-wider text-[#888]">Navigazione</h4>
+            <ul class="space-y-2.5">
+              <li><a href="/index.html" class="text-sm text-[#bbb] hover:text-white transition-colors">Home</a></li>
+              <li><a href="/programmazione.html" class="text-sm text-[#bbb] hover:text-white transition-colors">Programmazione</a></li>
+              <li><a href="/offerte.html" class="text-sm text-[#bbb] hover:text-white transition-colors">Offerte</a></li>
+              <li><a href="/my-cinemas.html" class="text-sm text-[#bbb] hover:text-white transition-colors">Cinema</a></li>
+            </ul>
+          </div>
+
+          <div class="space-y-3">
+            <h4 class="text-xs font-semibold uppercase tracking-wider text-[#888]">Account</h4>
+            <ul class="space-y-2.5">
+              <li><a href="/login.html" id="footer-login-link" class="text-sm text-[#bbb] hover:text-white transition-colors">Accedi</a></li>
+              <li><a href="/registrazione.html" id="footer-register-link" class="text-sm text-[#bbb] hover:text-white transition-colors">Registrati</a></li>
+              <li><a href="/profilo.html" id="footer-profile-link" class="hidden text-sm text-[#bbb] hover:text-white transition-colors">Profilo</a></li>
+              <li><a href="/dashboard.html" id="footer-admin-link" class="hidden text-sm text-ferrari-primary hover:text-red-400 transition-colors admin-only">Area Admin</a></li>
+            </ul>
+          </div>
+
+          <div class="space-y-3">
+            <h4 class="text-xs font-semibold uppercase tracking-wider text-[#888]">Supporto</h4>
+            <ul class="space-y-2.5">
+              <li><a href="#" class="text-sm text-[#bbb] hover:text-white transition-colors">Centro Assistenza</a></li>
+              <li><a href="#" class="text-sm text-[#bbb] hover:text-white transition-colors">Termini e Condizioni</a></li>
+              <li><a href="#" class="text-sm text-[#bbb] hover:text-white transition-colors">Privacy</a></li>
+            </ul>
+          </div>
         </div>
       </div>
     </div>
-    
-    <!-- Footer Bottom -->
-    <div class="border-t border-hairline pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-body">
-      <p>Sviluppato con ASP.NET Core + Tailwind CSS per scopo didattico.</p>
-      <p>© 2026 CineBase. Tutti i diritti riservati.</p>
+
+    <!-- Bottom bar -->
+    <div class="pt-6 border-t border-[#1a1a1a] flex flex-col md:flex-row justify-between items-center gap-4">
+      <div class="flex gap-3">
+        <a href="#" class="w-10 h-10 bg-[#141414] hover:bg-[#1f1f1f] border border-[#252525] flex items-center justify-center transition-all hover:scale-105">
+          <i class="fa-brands fa-facebook text-[#bbb] text-sm"></i>
+        </a>
+        <a href="#" class="w-10 h-10 bg-[#141414] hover:bg-[#1f1f1f] border border-[#252525] flex items-center justify-center transition-all hover:scale-105">
+          <i class="fa-brands fa-instagram text-[#bbb] text-sm"></i>
+        </a>
+        <a href="#" class="w-10 h-10 bg-[#141414] hover:bg-[#1f1f1f] border border-[#252525] flex items-center justify-center transition-all hover:scale-105">
+          <i class="fa-brands fa-x-twitter text-[#bbb] text-sm"></i>
+        </a>
+      </div>
+      <p class="text-xs text-[#555]">© 2026 CineBase. Tutti i diritti riservati.</p>
     </div>
   </div>
 </footer>
@@ -68,7 +74,6 @@
   const loginLink = document.getElementById('footer-login-link');
   const registerLink = document.getElementById('footer-register-link');
   const profileLink = document.getElementById('footer-profile-link');
-  const bookingsLink = document.getElementById('footer-bookings-link');
 
   function normalizeRole(role) {
     if (role == null) return '';
@@ -88,20 +93,14 @@
       if (loginLink) loginLink.classList.add('hidden');
       if (registerLink) registerLink.classList.add('hidden');
       if (profileLink) profileLink.classList.remove('hidden');
-      if (bookingsLink) bookingsLink.classList.remove('hidden');
     } else {
       if (loginLink) loginLink.classList.remove('hidden');
       if (registerLink) registerLink.classList.remove('hidden');
       if (profileLink) profileLink.classList.add('hidden');
-      if (bookingsLink) bookingsLink.classList.add('hidden');
     }
 
     document.querySelectorAll('footer .admin-only').forEach((el) => {
-      if (isAdminOrPowerUser) {
-        el.classList.remove('hidden');
-      } else {
-        el.classList.add('hidden');
-      }
+      el.classList.toggle('hidden', !isAdminOrPowerUser);
     });
   }
 
@@ -110,4 +109,3 @@
   window.updateFooterAuthUI = updateFooterAuthUI;
 })();
 </script>
-

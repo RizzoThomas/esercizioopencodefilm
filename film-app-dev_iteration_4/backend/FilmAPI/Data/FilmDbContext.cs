@@ -50,6 +50,9 @@ public class FilmDbContext : DbContext
     public DbSet<ExternalAuthExchangeCode> ExternalAuthExchangeCodes { get; set; }
     public DbSet<UserSecurityAuditLog> UserSecurityAuditLogs { get; set; }
 
+    // ─── Support Tickets ──────────────────────────────────────
+    public DbSet<SupportTicket> SupportTickets { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);

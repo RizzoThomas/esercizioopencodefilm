@@ -24,6 +24,11 @@
       <i class="fa-solid fa-magnifying-glass"></i>
     </a>
 
+    <!-- Theme Toggle -->
+    <button id="theme-toggle" class="text-ink hover:text-ferrari-primary transition-colors duration-300" title="Cambia tema" aria-label="Cambia tema chiaro/scuro">
+      <i class="fa-solid fa-moon"></i>
+    </button>
+
     <div id="user-dropdown" class="hidden relative">
       <button id="user-menu-toggle" class="text-ink hover:text-ferrari-primary transition-colors duration-300">
         <i class="fa-solid fa-user"></i>
@@ -158,6 +163,14 @@
     }
     document.querySelectorAll('.admin-only').forEach(function(el) {
       if (isAdminOrPowerUser) el.classList.remove('hidden'); else el.classList.add('hidden');
+    });
+  }
+
+  // Theme toggle
+  var themeToggle = document.getElementById('theme-toggle');
+  if (themeToggle && window.CineBaseTheme) {
+    themeToggle.addEventListener('click', function() {
+      window.CineBaseTheme.toggle();
     });
   }
 

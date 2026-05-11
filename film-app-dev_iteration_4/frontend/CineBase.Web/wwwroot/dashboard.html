@@ -13,18 +13,18 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
     rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-  <link href="/css/styles.css?v=26" rel="stylesheet">
+  <link href="/css/styles.css?v=29" rel="stylesheet">
   <script src="/js/route-guard.js"></script>
+  <script src="/js/theme.js"></script>
 </head>
 
 <body class="bg-canvas text-ink font-sans">
   <div id="navbar-container"></div>
-  <main class="px-4 sm:px-6 lg:px-8 py-8">
+  <main>
     <div class="flex items-center justify-between gap-4 mb-8">
-      <h2 class="text-xl sm:text-2xl ferrari-display-md text-ink">Overview</h2>
-      <button onclick="openProiezioneModal()" class="btn-primary whitespace-nowrap">
-        <span class="hidden sm:inline">Aggiungi Proiezione</span>
-        <span class="sm:hidden">+ Proiezione</span>
+      <div></div>
+      <button onclick="openProiezioneModal()" class="btn-primary whitespace-nowrap text-sm">
+        <i class="fa-solid fa-plus mr-2"></i>Aggiungi Proiezione
       </button>
     </div>
         <!-- Stats Grid -->
@@ -83,6 +83,62 @@
           </div>
         </div>
 
+        <!-- Analytics Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+          <!-- Top Films -->
+          <div class="card-ferrari overflow-hidden">
+            <div class="px-6 py-4 border-b border-hairline flex items-center gap-2">
+              <i class="fa-solid fa-fire text-ferrari-primary"></i>
+              <h2 class="text-sm font-semibold text-ink uppercase tracking-wider">Film più Prenotati</h2>
+            </div>
+            <div id="top-films-list" class="divide-y divide-hairline">
+              <div class="px-6 py-8 text-center text-body text-sm">Caricamento...</div>
+            </div>
+          </div>
+
+          <!-- Top Offerte -->
+          <div class="card-ferrari overflow-hidden">
+            <div class="px-6 py-4 border-b border-hairline flex items-center gap-2">
+              <i class="fa-solid fa-crown text-ferrari-primary"></i>
+              <h2 class="text-sm font-semibold text-ink uppercase tracking-wider">Offerte più Acquistate</h2>
+            </div>
+            <div id="top-offerte-list" class="divide-y divide-hairline">
+              <div class="px-6 py-8 text-center text-body text-sm">Caricamento...</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Revenue Overview -->
+        <div class="card-ferrari overflow-hidden mb-8">
+          <div class="px-6 py-4 border-b border-hairline flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <i class="fa-solid fa-chart-line text-ferrari-primary"></i>
+              <h2 class="text-sm font-semibold text-ink uppercase tracking-wider">Riepilogo Settimanale</h2>
+            </div>
+          </div>
+          <div class="p-6 grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div>
+              <p class="text-xs text-body uppercase tracking-wider mb-1">Ricavo Settimana</p>
+              <p class="text-2xl font-bold text-ferrari-primary" id="anal-revenue-week">-</p>
+              <p class="text-xs text-body mt-1" id="anal-revenue-change"></p>
+            </div>
+            <div>
+              <p class="text-xs text-body uppercase tracking-wider mb-1">Ordini Settimana</p>
+              <p class="text-2xl font-bold text-ink" id="anal-ordini-week">-</p>
+              <p class="text-xs text-body mt-1" id="anal-ordini-change"></p>
+            </div>
+            <div>
+              <p class="text-xs text-body uppercase tracking-wider mb-1">Nuovi Utenti</p>
+              <p class="text-2xl font-bold text-ink" id="anal-users-week">-</p>
+              <p class="text-xs text-body mt-1" id="anal-users-change"></p>
+            </div>
+            <div>
+              <p class="text-xs text-body uppercase tracking-wider mb-1">Utenti Totali</p>
+              <p class="text-2xl font-bold text-ink" id="anal-users-total">-</p>
+            </div>
+          </div>
+        </div>
+
         <!-- Proiezioni in Programma -->
         <div class="card-ferrari overflow-x-auto mb-8">
           <div class="px-6 py-4 border-b border-hairline">
@@ -136,6 +192,19 @@
             </div>
             <div id="segnalazioni-list" class="divide-y divide-hairline">
               <div class="px-6 py-8 text-center text-body">Caricamento segnalazioni...</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Support Tickets -->
+        <div class="mt-8">
+          <div class="card-ferrari overflow-x-auto">
+            <div class="px-6 py-4 border-b border-hairline flex items-center justify-between">
+              <h2 class="text-lg font-semibold text-ink"><i class="fa-solid fa-headset text-ferrari-primary mr-2"></i>Ticket Supporto</h2>
+              <span id="tickets-count" class="text-xs text-body"></span>
+            </div>
+            <div id="tickets-list" class="divide-y divide-hairline">
+              <div class="px-6 py-8 text-center text-body">Caricamento ticket...</div>
             </div>
           </div>
         </div>
@@ -200,7 +269,7 @@
   <script src="/js/utils.js"></script>
   <script src="/js/api.js?v=final"></script>
   <script src="/js/auth.js"></script>
-  <script src="/js/admin-shell.js"></script>
+  <script src="/js/admin-shell.js?v=2"></script>
   <script>
     function normalizeCollection(data) {
       if (Array.isArray(data)) return data;
@@ -240,6 +309,8 @@
         console.error('Error loading dashboard:', error);
       }
       loadSegnalazioni();
+      loadTickets();
+      loadAnalytics();
     });
 
     function getDashboardFilmTitle(filmId) {
@@ -400,8 +471,126 @@
         loadSegnalazioni();
       } catch { showToast('Errore', 'danger'); }
     }
+
+    // ── Support Tickets ────────────────────────────────
+    async function loadTickets() {
+      const list = document.getElementById('tickets-list');
+      const count = document.getElementById('tickets-count');
+      try {
+        const resp = await fetch((window.API_BASE_URL || 'http://localhost:5000') + '/admin/tickets', {
+          headers: { 'Authorization': 'Bearer ' + (window.Auth?.getAccessToken?.() || '') }
+        });
+        if (!resp.ok) {
+          list.innerHTML = '<div class="px-6 py-8 text-center text-body">Accesso negato</div>';
+          return;
+        }
+        const tickets = await resp.json();
+        if (!tickets.length) {
+          list.innerHTML = '<div class="px-6 py-8 text-center text-body">Nessun ticket</div>';
+          return;
+        }
+        count.textContent = tickets.length + ' ticket';
+        list.innerHTML = tickets.map(t => {
+          const date = new Date(t.creatoIl);
+          const statoClass = t.stato === 'Aperto' ? 'text-ferrari-primary' :
+                             t.stato === 'InCarico' ? 'text-amber-400' :
+                             t.stato === 'Risolto' ? 'text-emerald-400' : 'text-body';
+          const userLink = t.userId
+            ? `<a href="/utenti-detail.html?id=${t.userId}" class="text-ferrari-primary hover:underline font-medium">${t.nomeUtente || 'Utente #' + t.userId}</a>`
+            : (t.emailContatto ? `<span class="text-body">${t.emailContatto}</span>` : '<span class="text-body">Anonimo</span>');
+          const azioni = t.stato === 'Aperto'
+            ? `<button onclick="updateTicketStato(${t.id},1)" class="btn-tertiary text-xs flex-shrink-0 mr-2"><i class="fa-solid fa-user-check mr-1"></i>Prendi in carico</button>`
+            : t.stato === 'InCarico'
+            ? `<button onclick="updateTicketStato(${t.id},2)" class="btn-tertiary text-xs flex-shrink-0 mr-2 text-emerald-400"><i class="fa-solid fa-check mr-1"></i>Risolvi</button>`
+            : '';
+
+          return `<div class="px-6 py-4 flex items-start justify-between gap-4">
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 mb-1">
+                <span class="${statoClass} text-xs font-semibold uppercase">${t.stato}</span>
+                <span class="text-ink font-medium text-sm truncate">${t.oggetto}</span>
+              </div>
+              <p class="text-xs text-body line-clamp-2">${t.messaggio}</p>
+              <div class="flex flex-wrap gap-3 mt-1 text-xs text-body">
+                <span><i class="fa-solid fa-user mr-1"></i>${userLink}</span>
+                <span><i class="fa-regular fa-calendar mr-1"></i>${date.toLocaleDateString('it-IT', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' })}</span>
+              </div>
+            </div>
+            <div class="flex items-center gap-1 flex-shrink-0">
+              ${azioni}
+            </div>
+          </div>`;
+        }).join('');
+      } catch {
+        list.innerHTML = '<div class="px-6 py-8 text-center text-body">Errore caricamento ticket</div>';
+      }
+    }
+
+    async function updateTicketStato(id, stato) {
+      var stati = { 0: 'Aperto', 1: 'InCarico', 2: 'Risolto', 3: 'Chiuso' };
+      try {
+        var resp = await fetch((window.API_BASE_URL || 'http://localhost:5000') + '/admin/tickets/' + id + '/stato?stato=' + stato, {
+          method: 'PUT', headers: { 'Authorization': 'Bearer ' + (window.Auth?.getAccessToken?.() || '') }
+        });
+        if (resp.ok) { showToast('Ticket: ' + (stati[stato] || stato), 'success'); loadTickets(); }
+        else showToast('Errore', 'danger');
+      } catch { showToast('Errore', 'danger'); }
+    }
+
+    // ── Analytics ─────────────────────────────────────
+    async function loadAnalytics() {
+      var token = window.Auth?.getAccessToken?.() || '';
+      try {
+        var r = await fetch((window.API_BASE_URL || 'http://localhost:5000') + '/admin/analytics/overview', { headers: { 'Authorization': 'Bearer ' + token } });
+        if (!r.ok) return;
+        var d = await r.json();
+
+        document.getElementById('anal-revenue-week').textContent = '€' + (d.revenueThisWeek || 0).toLocaleString();
+        document.getElementById('anal-ordini-week').textContent = d.ordiniThisWeek || 0;
+        document.getElementById('anal-users-week').textContent = d.usersThisWeek || 0;
+        document.getElementById('anal-users-total').textContent = d.totalUsers || 0;
+
+        var revChange = d.revenueChange || 0;
+        var revEl = document.getElementById('anal-revenue-change');
+        revEl.textContent = (revChange >= 0 ? '▲' : '▼') + ' ' + Math.abs(revChange) + '% vs scorsa';
+        revEl.className = 'text-xs mt-1 ' + (revChange >= 0 ? 'text-emerald-400' : 'text-red-400');
+
+        var ordChange = d.ordiniLastWeek > 0 ? Math.round((d.ordiniThisWeek - d.ordiniLastWeek) / d.ordiniLastWeek * 100) : 0;
+        var ordEl = document.getElementById('anal-ordini-change');
+        ordEl.textContent = (ordChange >= 0 ? '▲' : '▼') + ' ' + Math.abs(ordChange) + '% vs scorsa';
+        ordEl.className = 'text-xs mt-1 ' + (ordChange >= 0 ? 'text-emerald-400' : 'text-red-400');
+      } catch (e) { console.log('Analytics overview error:', e); }
+
+      // Top films
+      try {
+        var fr = await fetch((window.API_BASE_URL || 'http://localhost:5000') + '/admin/analytics/top-films', { headers: { 'Authorization': 'Bearer ' + token } });
+        var films = await fr.json();
+        var fl = document.getElementById('top-films-list');
+        if (!films.length) { fl.innerHTML = '<div class="px-6 py-6 text-center text-body text-sm">Nessun dato</div>'; }
+        else {
+          fl.innerHTML = films.map(function(f, i) {
+            return '<div class="flex items-center gap-3 px-5 py-3 hover:bg-white/[0.02]"><span class="text-xs font-bold text-body w-5">' + (i+1) + '</span><div class="flex-1 min-w-0"><p class="text-sm text-ink font-medium truncate">' + f.titolo + '</p></div><span class="text-sm font-semibold text-ferrari-primary">' + f.prenotazioni + '</span></div>';
+          }).join('');
+        }
+      } catch (e) { console.log('Top films error:', e); }
+
+      // Top offerte
+      try {
+        var or = await fetch((window.API_BASE_URL || 'http://localhost:5000') + '/admin/analytics/top-offerte', { headers: { 'Authorization': 'Bearer ' + token } });
+        var offerte = await or.json();
+        var ol = document.getElementById('top-offerte-list');
+        if (!offerte.length) { ol.innerHTML = '<div class="px-6 py-6 text-center text-body text-sm">Nessun dato</div>'; }
+        else {
+          ol.innerHTML = offerte.map(function(o, i) {
+            return '<div class="flex items-center gap-3 px-5 py-3 hover:bg-white/[0.02]"><span class="text-xs font-bold text-body w-5">' + (i+1) + '</span><div class="flex-1 min-w-0"><p class="text-sm text-ink font-medium truncate">' + o.titolo + '</p></div><span class="text-sm font-semibold text-ferrari-primary">' + o.acquisti + ' venduti</span></div>';
+          }).join('');
+        }
+      } catch (e) { console.log('Top offerte error:', e); }
+    }
   </script>
   <div id="footer-container"></div>
+  <script src="/js/chat-widget.js?v=4"></script>
+  <script src="/js/alert-dialog.js"></script>
 </body>
 
 </html>

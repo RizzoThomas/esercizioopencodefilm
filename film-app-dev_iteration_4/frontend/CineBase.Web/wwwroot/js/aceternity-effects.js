@@ -402,9 +402,23 @@
        Usage: <div class="reveal-cinematic">...</div>
        ==================================================================== */
     cinematicScrollReveal(selector = '.reveal-cinematic') {
-      this.observe(selector, (el, visible) => {
-        if (visible) el.classList.add('revealed');
+      const els = document.querySelectorAll(selector);
+      if (!els.length) return;
+      if (this.prefersReducedMotion) {
+        els.forEach(el => el.classList.add('revealed'));
+        return;
+      }
+      const obs = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('revealed');
+          } else {
+            entry.target.classList.remove('revealed');
+          }
+        });
       }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+      els.forEach(el => obs.observe(el));
+      this._observers.push(obs);
     },
 
     /* ====================================================================

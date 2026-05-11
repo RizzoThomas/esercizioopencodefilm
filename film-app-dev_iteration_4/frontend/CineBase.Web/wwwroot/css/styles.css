@@ -425,17 +425,7 @@ input[type='password']::-webkit-textfield-decoration-container {
   .hero-film-grain { display: none; }
 }
 
-/* --- Scanlines Overlay (CRT cinema effect) --- */
-.hero-scanlines {
-  position: absolute; inset: 0; z-index: 6; pointer-events: none;
-  background: repeating-linear-gradient(
-    0deg,
-    transparent,
-    transparent 2px,
-    rgba(0,0,0,0.04) 2px,
-    rgba(0,0,0,0.04) 4px
-  );
-}
+/* --- Scanlines removed --- */
 
 /* --- Breathing Card Pulse --- */
 .breathing-card {
@@ -451,24 +441,13 @@ input[type='password']::-webkit-textfield-decoration-container {
 
 /* --- Animated Gradient Text (hero title) --- */
 .gradient-text {
-  color: var(--ferrari-ink);
-  background: linear-gradient(
-    135deg,
-    var(--ferrari-ink) 0%,
-    var(--ferrari-primary) 30%,
-    var(--ferrari-ink) 50%,
-    var(--ferrari-primary) 70%,
-    var(--ferrari-ink) 100%
-  );
-  background-size: 300% 100%;
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  animation: gradientTextFlow 6s ease-in-out infinite;
+  animation: gradientTextFlow 10s ease-in-out infinite;
 }
 @keyframes gradientTextFlow {
-  0%, 100% { background-position: 0% 50%; }
-  50%      { background-position: 100% 50%; }
+  0%   { background-position: 0% 50%; }
+  35%  { background-position: 100% 50%; }
+  65%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 @media (prefers-reduced-motion: reduce) {
   .gradient-text { animation: none; }
@@ -1451,8 +1430,8 @@ input[type="range"]::-webkit-slider-thumb {
 
 /* Page transition */
 @keyframes pageIn {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 main {
@@ -1465,8 +1444,8 @@ main {
 
 /* --- Cinematic page entry (all pages) --- */
 @keyframes cinematicPageIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 .cinematic-enter-page {
   animation: cinematicPageIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
@@ -1726,6 +1705,92 @@ html.light .footer-ferrari {
 }
 
 /* ========================================================================
+   THEME TOGGLE
+   ======================================================================== */
+
+#theme-toggle i {
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+#theme-toggle:hover i {
+  transform: rotate(-20deg) scale(1.1);
+}
+
+/* Smooth theme transitions on key properties */
+html {
+  transition: background-color 0.4s ease;
+}
+html.light body,
+html body {
+  transition: background-color 0.4s ease, color 0.4s ease;
+}
+html.light .card-ferrari,
+.card-ferrari {
+  transition: background-color 0.4s ease;
+}
+html.light .navbar-fluid-island {
+  background: rgba(255, 255, 255, 0.92);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.03) inset,
+              0 4px 24px rgba(0, 0, 0, 0.08);
+}
+html.light .navbar-fluid-island.scrolled {
+  background: rgba(255, 255, 255, 0.97);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
+}
+html.light .hamburger-line {
+  background: var(--ferrari-body-on-light);
+}
+
+/* Light theme — offer cards & subscriptions */
+html.light .offer-card {
+  background: #ffffff;
+}
+html.light .subscription-card {
+  background: #ffffff;
+}
+html.light .offer-image-header::after {
+  background: linear-gradient(180deg, rgba(255,255,255,0.1), rgba(255,255,255,0.7));
+}
+html.light .show-picker-overlay {
+  background: rgba(255, 255, 255, 0.85);
+}
+html.light .footer-ferrari {
+  background: var(--ferrari-canvas-elevated);
+  color: var(--ferrari-body);
+}
+html.light .footer-link-ferrari {
+  color: var(--ferrari-body);
+}
+html.light .footer-link-ferrari:hover {
+  color: var(--ferrari-ink);
+}
+
+/* Light theme — new premium footer */
+html.light footer.bg-\[\#0a0a0a\] {
+  background: #f5f5f5 !important;
+  color: #181818;
+}
+html.light footer .bg-\[\#141414\] {
+  background: #e8e8e8 !important;
+}
+html.light footer .border-\[\#1a1a1a\] {
+  border-color: #ddd !important;
+}
+html.light footer .border-\[\#252525\] {
+  border-color: #ddd !important;
+}
+html.light footer .text-\[\#888\],
+html.light footer .text-\[\#bbb\] {
+  color: #555 !important;
+}
+html.light footer .text-\[\#555\] {
+  color: #888 !important;
+}
+html.light footer .hover\:text-white:hover {
+  color: #da291c !important;
+}
+
+/* ========================================================================
    21st.dev INSPIRED EFFECTS
    ======================================================================== */
 
@@ -1830,26 +1895,28 @@ html.light .footer-ferrari {
 }
 
 /* --- Shimmer Text Effect --- */
+/* --- Shimmer Text (21st.dev stock pattern) --- */
+@keyframes shimmerSwipe {
+  from { background-position: 100% center; }
+  to   { background-position: 0% center; }
+}
+
 .shimmer-text {
-  position: relative; display: inline-block;
-  background: linear-gradient(
-    110deg,
-    var(--ferrari-ink) 30%,
-    rgba(218, 41, 28, 0.3) 40%,
-    var(--ferrari-ink) 50%
-  );
-  background-size: 200% 100%;
-  -webkit-background-clip: text;
+  display: inline-block; white-space: nowrap;
+  background-size: 250% 100%;
   background-clip: text;
-  -webkit-text-fill-color: transparent;
-  animation: shimmerSlide 4s ease-in-out infinite;
-}
-@keyframes shimmerText {
-  0%   { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
-}
-.shimmer-text {
-  animation: shimmerText 4s ease-in-out infinite;
+  -webkit-background-clip: text;
+  color: transparent;
+  background-image: linear-gradient(
+    90deg,
+    var(--ferrari-ink) 0%,
+    var(--ferrari-ink) 40%,
+    var(--ferrari-primary) 50%,
+    var(--ferrari-ink) 60%,
+    var(--ferrari-ink) 100%
+  );
+  background-repeat: no-repeat;
+  animation: shimmerSwipe 3s linear infinite;
 }
 
 /* --- Animated Gradient Section Divider --- */
@@ -2608,8 +2675,8 @@ html.light .footer-ferrari {
 
 /* --- 14. Cinematic Page Transition (enhanced) --- */
 @keyframes pageInCinematic {
-  from { opacity: 0; transform: translateY(12px) scale(0.995); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 .cinematic-enter {
@@ -2625,4 +2692,99 @@ html.light .footer-ferrari {
 .poster-reveal {
   animation: posterReveal 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
+
+/* ========================================================================
+   21st.dev TRAVELCARD — Adapted for CineBase film/offer cards
+   ======================================================================== */
+
+.cine-card {
+  position: relative; overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.cine-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+}
+.cine-card img {
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.cine-card:hover img {
+  transform: scale(1.08);
+}
+.cine-card-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.35) 50%, transparent 100%);
+  pointer-events: none;
+}
+.cine-card-body {
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.cine-card:hover .cine-card-body {
+  transform: translateY(-3.5rem);
+}
+.cine-card-action {
+  position: absolute; bottom: -4rem; left: 0; right: 0; padding: 0 1.5rem 1.5rem;
+  opacity: 0;
+  transition: all 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.cine-card:hover .cine-card-action {
+  bottom: 0; opacity: 1;
+}
+
+/* ========================================================================
+   21st.dev ALERT DIALOG — Modal confirm
+   ======================================================================== */
+
+.alert-overlay {
+  position: fixed; inset: 0; z-index: 9999;
+  background: rgba(0,0,0,0.7);
+  display: flex; align-items: center; justify-content: center;
+  animation: alertFadeIn 0.2s ease;
+}
+@keyframes alertFadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.alert-dialog {
+  background: var(--ferrari-canvas-elevated, #303030);
+  border: 1px solid var(--ferrari-hairline, #404040);
+  padding: 1.5rem; max-width: 28rem; width: 90%;
+  animation: alertZoomIn 0.25s cubic-bezier(0.22,1,0.36,1);
+}
+@keyframes alertZoomIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+.alert-dialog-title {
+  font-size: 1.1rem; font-weight: 600; color: var(--ferrari-ink);
+  display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;
+}
+.alert-dialog-desc {
+  font-size: 0.875rem; color: var(--ferrari-body); margin-bottom: 1.25rem; line-height: 1.5;
+}
+.alert-dialog-actions {
+  display: flex; justify-content: flex-end; gap: 0.75rem;
+}
+
+/* ========================================================================
+   21st.dev PROGRESS SPINNER — Animated circle
+   ======================================================================== */
+
+.progress-spinner {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 32px; height: 32px;
+}
+.progress-spinner svg {
+  width: 100%; height: 100%;
+  animation: spin 0.8s linear infinite;
+}
+.progress-spinner circle {
+  fill: none;
+  stroke: var(--ferrari-primary);
+  stroke-width: 3;
+  stroke-dasharray: 60;
+  stroke-dashoffset: 45;
+  stroke-linecap: round;
+}
+
+.progress-spinner-sm { width: 20px; height: 20px; }
+.progress-spinner-sm circle { stroke-width: 2.5; stroke-dasharray: 40; stroke-dashoffset: 30; }
+.progress-spinner-lg { width: 48px; height: 48px; }
+.progress-spinner-lg circle { stroke-width: 3.5; stroke-dasharray: 80; stroke-dashoffset: 60; }
 
