@@ -37,7 +37,7 @@
     const heroBg = document.getElementById('hero-bg');
     if (!heroBg) return;
     if (theme === 'light') {
-      heroBg.style.backgroundImage = "url('https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=1920&q=80')";
+      heroBg.style.backgroundImage = "url('/assets/images/cinema.jpg')";
     } else {
       heroBg.style.backgroundImage = "url('https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?w=1920&q=80')";
     }

@@ -70,18 +70,20 @@ public class PagamentoService : IPagamentoService
         ValidateHoldStatesForPendingPayment(ordine, holdStates);
 
         // Applica sconto offerta se presente
-        decimal? offertaPrezzo = null;
+        decimal? offertaTotal = null;
         if (dto.OffertaId.HasValue && dto.OffertaId.Value > 0)
         {
             var offerta = await _db.Offerte.FirstOrDefaultAsync(o => o.Id == dto.OffertaId.Value);
             if (offerta is not null)
             {
-                offertaPrezzo = offerta.Prezzo;
-                Console.WriteLine($"[PAY] Offerta applicata: id={offerta.Id} nome={offerta.Nome} prezzo={offerta.Prezzo}");
+                var unitPrice = CalculateTotal(ordine.Show!, 1);
+                var extraSeats = Math.Max(0, holdStates.Count - offerta.NumeroBiglietti);
+                offertaTotal = offerta.Prezzo + (extraSeats * unitPrice);
+                Console.WriteLine($"[PAY] Offerta applicata: id={offerta.Id} nome={offerta.Nome} prezzoOfferta={offerta.Prezzo} bigliettiOfferta={offerta.NumeroBiglietti} postiOrdine={holdStates.Count} extraSeats={extraSeats} unitPrice={unitPrice} total={offertaTotal}");
             }
         }
 
-        var total = offertaPrezzo ?? CalculateTotal(ordine.Show!, holdStates.Count);
+        var total = offertaTotal ?? CalculateTotal(ordine.Show!, holdStates.Count);
         var split = ComputePaymentSplit(metodo, total, ordine.User!.CreditoResiduo, dto.ImportoCreditoRichiesto);
 
         if (!string.IsNullOrWhiteSpace(ordine.StripePaymentIntentId)
@@ -704,20 +706,23 @@ public class PagamentoService : IPagamentoService
         var holdStates = await LoadOrderHoldStatesAsync(ordine.Id);
         ValidateHoldStatesForPendingPayment(ordine, holdStates);
 
+        var total = CalculateTotal(ordine.Show!, holdStates.Count);
+
         // Applica sconto offerta se presente
         if (dto.OffertaId.HasValue && dto.OffertaId.Value > 0)
         {
             var offerta = await _db.Offerte.FirstOrDefaultAsync(o => o.Id == dto.OffertaId.Value);
             if (offerta is not null)
             {
-                ordine.TotaleLordo = offerta.Prezzo;
-                Console.WriteLine($"[STRIPE-CHECKOUT] Offerta applicata: id={offerta.Id} prezzo={offerta.Prezzo}");
+                var unitPrice = CalculateTotal(ordine.Show!, 1);
+                var extraSeats = Math.Max(0, holdStates.Count - offerta.NumeroBiglietti);
+                var offertaTotal = offerta.Prezzo + (extraSeats * unitPrice);
+                ordine.TotaleLordo = offertaTotal;
+                total = offertaTotal;
+                Console.WriteLine($"[STRIPE-CHECKOUT] Offerta applicata: id={offerta.Id} nome={offerta.Nome} prezzoOfferta={offerta.Prezzo} bigliettiOfferta={offerta.NumeroBiglietti} postiOrdine={holdStates.Count} extraSeats={extraSeats} unitPrice={unitPrice} total={total}");
             }
         }
-
-        var total = CalculateTotal(ordine.Show!, holdStates.Count);
-        // Se l'ordine ha già un TotaleLordo diverso (offerta applicata), mantienilo
-        if (ordine.TotaleLordo > 0 && Math.Abs(ordine.TotaleLordo - total) > 0.01m)
+        else if (ordine.TotaleLordo > 0 && Math.Abs(ordine.TotaleLordo - total) > 0.01m)
         {
             total = ordine.TotaleLordo;
         }
