@@ -2822,3 +2822,52 @@ details.card-ferrari[open] summary i.fa-chevron-down {
   transform: rotate(180deg);
 }
 
+/* ========================================================================
+   Notifications Popover
+   ======================================================================== */
+
+.notif-popover {
+  animation: notifPopIn 0.18s cubic-bezier(0.22, 1, 0.36, 1);
+  transform-origin: top right;
+}
+@keyframes notifPopIn {
+  from { opacity: 0; transform: scale(0.92) translateY(-4px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.notif-popover-inner {
+  background: var(--ferrari-canvas-elevated, #303030);
+  border: 1px solid var(--ferrari-hairline, #303030);
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.04);
+}
+
+/* Carousel transition */
+.notif-carousel-enter {
+  animation: notifSlideIn 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+}
+@keyframes notifSlideIn {
+  from { opacity: 0; transform: translateX(12px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* Notification dot indicator */
+.notif-dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--ferrari-hairline);
+  transition: background 0.2s;
+}
+.notif-dot.active {
+  background: var(--ferrari-primary);
+}
+
+/* Scrollbar for notification list */
+#notif-list::-webkit-scrollbar { width: 3px; }
+#notif-list::-webkit-scrollbar-track { background: transparent; }
+#notif-list::-webkit-scrollbar-thumb {
+  background: var(--ferrari-hairline);
+  border-radius: 10px;
+}
+

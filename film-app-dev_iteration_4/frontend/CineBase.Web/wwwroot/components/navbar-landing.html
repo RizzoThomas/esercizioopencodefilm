@@ -24,6 +24,55 @@
       <i class="fa-solid fa-magnifying-glass"></i>
     </a>
 
+    <!-- Notification Bell + Dropdown -->
+    <div id="notif-container" class="relative">
+      <button id="notif-toggle" class="text-ink hover:text-ferrari-primary transition-colors duration-300 relative" title="Notifiche" aria-label="Notifiche">
+        <i class="fa-solid fa-bell"></i>
+        <span id="notif-badge" class="absolute -top-1.5 -right-2 bg-ferrari-primary text-white text-[9px] font-bold w-4 h-4 flex items-center justify-center rounded-full hidden">0</span>
+      </button>
+      <div id="notif-popover" class="notif-popover hidden absolute right-0 top-full mt-3 w-80 z-[70]">
+        <div class="notif-popover-inner">
+          <!-- Header -->
+          <div class="flex justify-between items-center border-b border-hairline px-4 py-3">
+            <h3 class="text-sm font-semibold text-ink">Notifiche</h3>
+            <button id="notif-view-toggle" class="text-body hover:text-ink transition-colors p-1 rounded hover:bg-white/5" title="Cambia visualizzazione">
+              <i id="notif-view-icon" class="fa-solid fa-list text-xs"></i>
+            </button>
+          </div>
+
+          <!-- Carousel View -->
+          <div id="notif-carousel" class="relative flex items-center py-3">
+            <button id="notif-prev" class="absolute left-1 z-10 text-body hover:text-ink p-1.5 rounded-full hover:bg-white/5 transition-colors">
+              <i class="fa-solid fa-chevron-left text-[10px]"></i>
+            </button>
+            <div id="notif-card" class="w-full mx-10 px-2 text-left">
+              <div class="flex items-center gap-2 mb-2 justify-between">
+                <div class="flex items-center gap-2">
+                  <i id="notif-card-icon" class="text-ferrari-primary text-sm"></i>
+                  <span id="notif-card-title" class="font-medium text-sm text-ink"></span>
+                </div>
+                <span id="notif-card-time" class="text-xs text-muted shrink-0"></span>
+              </div>
+              <p id="notif-card-desc" class="text-xs text-body leading-relaxed"></p>
+            </div>
+            <button id="notif-next" class="absolute right-1 z-10 text-body hover:text-ink p-1.5 rounded-full hover:bg-white/5 transition-colors">
+              <i class="fa-solid fa-chevron-right text-[10px]"></i>
+            </button>
+            <!-- Dots indicator -->
+            <div id="notif-dots" class="absolute bottom-0 left-0 right-0 flex justify-center gap-1.5 pb-1"></div>
+          </div>
+
+          <!-- List View (hidden by default) -->
+          <div id="notif-list" class="hidden max-h-80 overflow-y-auto divide-y divide-hairline"></div>
+
+          <!-- Empty state -->
+          <div id="notif-empty" class="hidden p-6 text-sm text-body text-center">
+            Nessuna notifica
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Theme Toggle -->
     <button id="theme-toggle" class="text-ink hover:text-ferrari-primary transition-colors duration-300" title="Cambia tema" aria-label="Cambia tema chiaro/scuro">
       <i class="fa-solid fa-moon"></i>
@@ -207,6 +256,144 @@
   document.addEventListener('click', function(e) {
     if (userMenuToggle && userMenu && !userMenuToggle.contains(e.target) && !userMenu.contains(e.target)) { userMenu.classList.add('hidden'); }
   });
+
+  // ── Notifications ──────────────────────────────
+  var notifContainer = document.getElementById('notif-container');
+  var notifPopover = document.getElementById('notif-popover');
+  var notifToggle = document.getElementById('notif-toggle');
+  var notifBadge = document.getElementById('notif-badge');
+  var notifCarousel = document.getElementById('notif-carousel');
+  var notifList = document.getElementById('notif-list');
+  var notifEmpty = document.getElementById('notif-empty');
+  var notifCardIcon = document.getElementById('notif-card-icon');
+  var notifCardTitle = document.getElementById('notif-card-title');
+  var notifCardTime = document.getElementById('notif-card-time');
+  var notifCardDesc = document.getElementById('notif-card-desc');
+  var notifDots = document.getElementById('notif-dots');
+  var notifViewToggle = document.getElementById('notif-view-toggle');
+  var notifViewIcon = document.getElementById('notif-view-icon');
+
+  // Cinema-relevant notifications
+  var notifications = [
+    { icon: 'fa-solid fa-film', title: 'Nuovo film in sala', desc: 'Dune - Parte Tre è ora in programmazione in tutti i cinema.', time: 'Adesso' },
+    { icon: 'fa-solid fa-tag', title: 'Offerta speciale', desc: 'Combo Cinema + Popcorn a €12.90 solo questa settimana!', time: '2 ore fa' },
+    { icon: 'fa-solid fa-ticket', title: 'Biglietto acquistato', desc: 'Conferma per Interstellar — domani ore 20:30, Sala IMAX.', time: '5 ore fa' },
+    { icon: 'fa-solid fa-clock', title: 'Promemoria', desc: 'Il tuo abbonamento Premium scade tra 3 giorni. Rinnova ora.', time: '1 giorno fa' },
+    { icon: 'fa-solid fa-star', title: 'Anteprima esclusiva', desc: 'Prenota i biglietti per l\'anteprima di sabato sera.', time: '2 giorni fa' }
+  ];
+
+  var currentIndex = 0;
+  var isCarousel = true;
+  var popoverOpen = false;
+
+  function updateBadge() {
+    if (notifBadge) {
+      notifBadge.textContent = notifications.length;
+      notifBadge.classList.toggle('hidden', notifications.length === 0);
+    }
+  }
+
+  function renderCarouselCard() {
+    if (!notifCardTitle) return;
+    var n = notifications[currentIndex];
+    if (!n) return;
+    notifCardIcon.className = n.icon + ' text-ferrari-primary text-sm';
+    notifCardTitle.textContent = n.title;
+    notifCardTime.textContent = n.time;
+    notifCardDesc.textContent = n.desc;
+    // Animate
+    var card = document.getElementById('notif-card');
+    if (card) { card.classList.remove('notif-carousel-enter'); void card.offsetWidth; card.classList.add('notif-carousel-enter'); }
+    // Update dots
+    if (notifDots) {
+      var dots = notifDots.querySelectorAll('.notif-dot');
+      dots.forEach(function(d, i) { d.classList.toggle('active', i === currentIndex); });
+    }
+  }
+
+  function showCarousel() {
+    isCarousel = true;
+    if (notifCarousel) notifCarousel.classList.remove('hidden');
+    if (notifList) notifList.classList.add('hidden');
+    if (notifViewIcon) { notifViewIcon.className = 'fa-solid fa-list text-xs'; }
+    renderCarouselCard();
+  }
+
+  function showList() {
+    isCarousel = false;
+    if (notifCarousel) notifCarousel.classList.add('hidden');
+    if (notifList) {
+      notifList.classList.remove('hidden');
+      notifList.innerHTML = notifications.map(function(n) {
+        return '<div class="px-4 py-3 hover:bg-white/[0.03] transition">' +
+          '<div class="flex justify-between items-center mb-1">' +
+            '<div class="flex items-center gap-2"><i class="' + n.icon + ' text-ferrari-primary text-xs"></i><span class="font-medium text-sm text-ink">' + n.title + '</span></div>' +
+            '<span class="text-xs text-muted">' + n.time + '</span>' +
+          '</div>' +
+          '<p class="text-xs text-body leading-relaxed">' + n.desc + '</p>' +
+        '</div>';
+      }).join('');
+    }
+    if (notifViewIcon) { notifViewIcon.className = 'fa-solid fa-grip text-xs'; }
+  }
+
+  function nextNotif() {
+    currentIndex = (currentIndex + 1) % notifications.length;
+    renderCarouselCard();
+  }
+
+  function prevNotif() {
+    currentIndex = (currentIndex - 1 + notifications.length) % notifications.length;
+    renderCarouselCard();
+  }
+
+  function openPopover() {
+    popoverOpen = true;
+    if (notifPopover) notifPopover.classList.remove('hidden');
+    if (isCarousel) showCarousel(); else showList();
+  }
+
+  function closePopover() {
+    popoverOpen = false;
+    if (notifPopover) notifPopover.classList.add('hidden');
+  }
+
+  // Build dots
+  if (notifDots) {
+    notifications.forEach(function(_, i) {
+      var dot = document.createElement('span');
+      dot.className = 'notif-dot' + (i === 0 ? ' active' : '');
+      notifDots.appendChild(dot);
+    });
+  }
+
+  // Events
+  if (notifToggle) {
+    notifToggle.addEventListener('click', function(e) {
+      e.stopPropagation();
+      popoverOpen ? closePopover() : openPopover();
+    });
+  }
+
+  if (notifViewToggle) {
+    notifViewToggle.addEventListener('click', function() {
+      isCarousel ? showList() : showCarousel();
+    });
+  }
+
+  document.getElementById('notif-prev')?.addEventListener('click', function(e) { e.stopPropagation(); prevNotif(); });
+  document.getElementById('notif-next')?.addEventListener('click', function(e) { e.stopPropagation(); nextNotif(); });
+
+  // Click outside closes popover
+  document.addEventListener('click', function(e) {
+    if (popoverOpen && notifContainer && !notifContainer.contains(e.target)) {
+      closePopover();
+    }
+  });
+
+  updateBadge();
+  // Initial render
+  renderCarouselCard();
 
   window.updateAuthUI = updateAuthUI;
   window.updateNavbarCinema = function() {};
