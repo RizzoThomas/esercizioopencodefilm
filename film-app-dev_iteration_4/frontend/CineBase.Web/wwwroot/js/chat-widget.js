@@ -47,37 +47,179 @@
     // FAB button — 21st.dev glowing style
     const fab = document.createElement('button');
     fab.id = 'cb-fab';
-    fab.setAttribute('style',
-      'position:fixed!important;bottom:24px!important;right:24px!important;z-index:2147483647!important;' +
-      'width:56px;height:56px;border-radius:50%!important;border:2px solid rgba(255,255,255,0.2)!important;cursor:pointer;' +
+    // Use transform for position so dragging doesn't break layout
+    fab.style.cssText =
+      'position:fixed!important;bottom:24px!important;right:24px!important;z-index:2147483647;' +
+      'width:56px;height:56px;border-radius:50%!important;border:2px solid rgba(255,255,255,0.2)!important;cursor:grab;' +
       'background:linear-gradient(135deg,rgba(218,41,28,0.9),rgba(180,30,20,0.9))!important;color:#fff;font-size:22px;' +
       'display:flex;align-items:center;justify-content:center;position:relative;overflow:visible;' +
       'box-shadow:0 0 20px rgba(218,41,28,0.7),0 0 40px rgba(180,30,20,0.5),0 0 60px rgba(150,20,10,0.3)!important;' +
-      'transition:transform 0.3s,box-shadow 0.3s');
-    
+      'touch-action:none;user-select:none;-webkit-user-select:none;transition:box-shadow 0.3s';
+    fab.title = 'Assistenza CineBase — trascinami!';
+
     // Inner 3D overlay
     const innerGlow = document.createElement('div');
     innerGlow.setAttribute('style',
       'position:absolute;inset:0;border-radius:50%;' +
       'background:linear-gradient(to bottom,rgba(255,255,255,0.2),transparent);opacity:0.3;pointer-events:none');
     fab.appendChild(innerGlow);
-    
+
     // Ping ring
     const pingRing = document.createElement('div');
     pingRing.setAttribute('style',
       'position:absolute;inset:-4px;border-radius:50%;' +
       'background:rgba(218,41,28,0.2);animation:cbPing 2s ease-out infinite;pointer-events:none');
     fab.appendChild(pingRing);
-    
+
     // Icon wrapper
     const iconWrap = document.createElement('span');
-    iconWrap.setAttribute('style', 'position:relative;z-index:10');
+    iconWrap.setAttribute('style', 'position:relative;z-index:10;pointer-events:none');
     iconWrap.innerHTML = '<i class="fa-solid fa-message"></i>';
     fab.appendChild(iconWrap);
-    
-    fab.title = 'Assistenza CineBase';
-    fab.onmouseenter = () => { fab.style.transform = 'scale(1.12) rotate(5deg)'; fab.style.boxShadow = '0 0 35px rgba(218,41,28,0.9),0 0 55px rgba(180,30,20,0.7),0 0 75px rgba(150,20,10,0.5)!important'; };
-    fab.onmouseleave = () => { fab.style.transform = 'scale(1) rotate(0deg)'; fab.style.boxShadow = '0 0 20px rgba(218,41,28,0.7),0 0 40px rgba(180,30,20,0.5),0 0 60px rgba(150,20,10,0.3)!important'; };
+
+    // ── Drag Physics ─────────────────────────────
+    var fabOffsetX = 24, fabOffsetY = 24; // current offset from right/bottom edges
+    var dragStartX = 0, dragStartY = 0;
+    var dragStartOffsetX = 0, dragStartOffsetY = 0;
+    var isDragging = false;
+    var hasMoved = false;
+    var velX = 0, velY = 0;
+    var physicsId = null;
+
+    function updateFabPosition() {
+      fab.style.right = fabOffsetX + 'px';
+      fab.style.bottom = fabOffsetY + 'px';
+    }
+
+    function clampToViewport() {
+      var maxX = window.innerWidth - 56 - 8;
+      var maxY = window.innerHeight - 56 - 8;
+      fabOffsetX = Math.max(8, Math.min(maxX, fabOffsetX));
+      fabOffsetY = Math.max(8, Math.min(maxY, fabOffsetY));
+    }
+
+    function startPhysics() {
+      if (physicsId) cancelAnimationFrame(physicsId);
+      var friction = 0.92;
+      var edgeSnap = 4; // pixels from edge to snap
+      var snapSpeed = 0.15;
+
+      function step() {
+        velX *= friction;
+        velY *= friction;
+
+        fabOffsetX -= velX;
+        fabOffsetY -= velY;
+
+        // Bounce off edges
+        var minX = 8, maxX = window.innerWidth - 56 - 8;
+        var minY = 8, maxY = window.innerHeight - 56 - 8;
+
+        if (fabOffsetX < minX) { fabOffsetX = minX; velX *= -0.4; }
+        if (fabOffsetX > maxX) { fabOffsetX = maxX; velX *= -0.4; }
+        if (fabOffsetY < minY) { fabOffsetY = minY; velY *= -0.4; }
+        if (fabOffsetY > maxY) { fabOffsetY = maxY; velY *= -0.4; }
+
+        // Snap to nearest edge when slow
+        if (Math.abs(velX) < 0.3 && Math.abs(velY) < 0.3) {
+          // Snap to nearest horizontal edge
+          if (fabOffsetX < (maxX - minX) / 2) {
+            fabOffsetX += (minX - fabOffsetX) * snapSpeed;
+          } else {
+            fabOffsetX += (maxX - fabOffsetX) * snapSpeed;
+          }
+          // Mild vertical snap too
+          if (fabOffsetY < (maxY - minY) / 2) {
+            fabOffsetY += (minY - fabOffsetY) * snapSpeed * 0.5;
+          } else {
+            fabOffsetY += (maxY - fabOffsetY) * snapSpeed * 0.5;
+          }
+
+          if (Math.abs(velX) < 0.01 && Math.abs(velY) < 0.01 &&
+              Math.abs(fabOffsetX - minX) < 0.5 || Math.abs(fabOffsetX - maxX) < 0.5) {
+            fabOffsetX = fabOffsetX < (maxX - minX) / 2 ? minX : maxX;
+            velX = 0; velY = 0;
+            updateFabPosition();
+            physicsId = null;
+            return;
+          }
+        }
+
+        updateFabPosition();
+        physicsId = requestAnimationFrame(step);
+      }
+      physicsId = requestAnimationFrame(step);
+    }
+
+    fab.addEventListener('pointerdown', function(e) {
+      fab.setPointerCapture(e.pointerId);
+      dragStartX = e.clientX;
+      dragStartY = e.clientY;
+      dragStartOffsetX = fabOffsetX;
+      dragStartOffsetY = fabOffsetY;
+      isDragging = true;
+      hasMoved = false;
+      velX = 0; velY = 0;
+      if (physicsId) { cancelAnimationFrame(physicsId); physicsId = null; }
+      fab.style.cursor = 'grabbing';
+      fab.style.transition = 'none';
+      e.preventDefault();
+    });
+
+    fab.addEventListener('pointermove', function(e) {
+      if (!isDragging) return;
+      var dx = dragStartX - e.clientX;
+      var dy = dragStartY - e.clientY;
+      if (Math.abs(dx) > 3 || Math.abs(dy) > 3) hasMoved = true;
+      if (!hasMoved) return;
+
+      // Calculate velocity (smoothed)
+      velX = velX * 0.5 + dx * 0.5;
+      velY = velY * 0.5 + dy * 0.5;
+
+      fabOffsetX = dragStartOffsetX + dx;
+      fabOffsetY = dragStartOffsetY + dy;
+      clampToViewport();
+      updateFabPosition();
+    });
+
+    fab.addEventListener('pointerup', function(e) {
+      isDragging = false;
+      fab.style.cursor = 'grab';
+      if (!hasMoved) {
+        // It was a click
+        fabOffsetX = dragStartOffsetX;
+        fabOffsetY = dragStartOffsetY;
+        updateFabPosition();
+        // Trigger click handler
+        open = !open;
+        if (open) {
+          panel.style.opacity = '1';
+          panel.style.visibility = 'visible';
+          panel.style.pointerEvents = 'all';
+          panel.style.transform = 'translateY(0) scale(1)';
+          fab.innerHTML = '<span style="position:relative;z-index:10;pointer-events:none"><i class="fa-solid fa-times"></i></span>';
+          inp.focus();
+          qrWrap.style.display = 'flex';
+          showQrBtn.style.display = 'none';
+        } else {
+          panel.style.opacity = '0';
+          panel.style.visibility = 'hidden';
+          panel.style.pointerEvents = 'none';
+          panel.style.transform = 'translateY(20px) scale(0.95)';
+          fab.innerHTML = '<span style="position:relative;z-index:10;pointer-events:none"><i class="fa-solid fa-message"></i></span>';
+        }
+        return;
+      }
+      // Start physics
+      startPhysics();
+    });
+
+    fab.addEventListener('pointercancel', function() {
+      isDragging = false;
+      fab.style.cursor = 'grab';
+      if (hasMoved) startPhysics();
+    });
 
     // Chat panel
     const panel = document.createElement('div');

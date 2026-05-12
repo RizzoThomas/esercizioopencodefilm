@@ -35,9 +35,14 @@
           <!-- Header -->
           <div class="flex justify-between items-center border-b border-hairline px-4 py-3">
             <h3 class="text-sm font-semibold text-ink">Notifiche</h3>
-            <button id="notif-view-toggle" class="text-body hover:text-ink transition-colors p-1 rounded hover:bg-white/5" title="Cambia visualizzazione">
-              <i id="notif-view-icon" class="fa-solid fa-list text-xs"></i>
-            </button>
+            <div class="flex items-center gap-1">
+              <button id="notif-clear-all" class="text-[10px] text-muted hover:text-ferrari-primary transition-colors px-1.5 py-0.5" title="Cancella tutte">
+                Cancella tutte
+              </button>
+              <button id="notif-view-toggle" class="text-body hover:text-ink transition-colors p-1 rounded hover:bg-white/5" title="Cambia visualizzazione">
+                <i id="notif-view-icon" class="fa-solid fa-list text-xs"></i>
+              </button>
+            </div>
           </div>
 
           <!-- Carousel View -->
@@ -257,7 +262,7 @@
     if (userMenuToggle && userMenu && !userMenuToggle.contains(e.target) && !userMenu.contains(e.target)) { userMenu.classList.add('hidden'); }
   });
 
-  // ── Notifications ──────────────────────────────
+  // ── Notifications (context-aware) ─────────────
   var notifContainer = document.getElementById('notif-container');
   var notifPopover = document.getElementById('notif-popover');
   var notifToggle = document.getElementById('notif-toggle');
@@ -273,42 +278,160 @@
   var notifViewToggle = document.getElementById('notif-view-toggle');
   var notifViewIcon = document.getElementById('notif-view-icon');
 
-  // Cinema-relevant notifications
-  var notifications = [
-    { icon: 'fa-solid fa-film', title: 'Nuovo film in sala', desc: 'Dune - Parte Tre è ora in programmazione in tutti i cinema.', time: 'Adesso' },
-    { icon: 'fa-solid fa-tag', title: 'Offerta speciale', desc: 'Combo Cinema + Popcorn a €12.90 solo questa settimana!', time: '2 ore fa' },
-    { icon: 'fa-solid fa-ticket', title: 'Biglietto acquistato', desc: 'Conferma per Interstellar — domani ore 20:30, Sala IMAX.', time: '5 ore fa' },
-    { icon: 'fa-solid fa-clock', title: 'Promemoria', desc: 'Il tuo abbonamento Premium scade tra 3 giorni. Rinnova ora.', time: '1 giorno fa' },
-    { icon: 'fa-solid fa-star', title: 'Anteprima esclusiva', desc: 'Prenota i biglietti per l\'anteprima di sabato sera.', time: '2 giorni fa' }
-  ];
-
+  var notifications = [];
   var currentIndex = 0;
   var isCarousel = true;
   var popoverOpen = false;
 
+  // Dynamic notification generators
+  function getEmptyNotifs() {
+    return [{
+      icon: 'fa-solid fa-lock',
+      title: 'Accedi per vedere le notifiche',
+      desc: 'Registrati o accedi per ricevere aggiornamenti su biglietti, offerte, rimborsi e molto altro.',
+      time: ''
+    }];
+  }
+
+  function getSampleNotifs() {
+    return [
+      { icon: 'fa-solid fa-ticket', title: 'Biglietto acquistato', desc: 'Conferma per Interstellar — domani ore 20:30, Sala IMAX.', time: '5 ore fa' },
+      { icon: 'fa-solid fa-clock', title: 'Promemoria abbonamento', desc: 'Il tuo abbonamento Premium scade tra 3 giorni. Rinnova ora per non perdere i vantaggi.', time: '1 giorno fa' },
+      { icon: 'fa-solid fa-tag', title: 'Nuova offerta disponibile', desc: 'Combo Cinema + Popcorn a €12.90 solo questa settimana! Approfittane subito.', time: '2 ore fa' },
+      { icon: 'fa-solid fa-rotate-left', title: 'Rimborso in arrivo', desc: 'Il film prenotato è stato cancellato. Riceverai un rimborso sul tuo credito entro 48 ore.', time: '3 ore fa' },
+      { icon: 'fa-solid fa-star', title: 'Anteprima esclusiva', desc: 'Prenota i biglietti per l\'anteprima di sabato sera. Posti limitati!', time: '2 giorni fa' }
+    ];
+  }
+
+  function loadNotifications() {
+    var prevCount = notifications.length;
+    var loggedIn = typeof Auth !== 'undefined' && Auth && Auth.isLoggedIn && Auth.isLoggedIn();
+    if (!loggedIn) {
+      notifications = getEmptyNotifs();
+    } else {
+      // TODO: fetch from /api/profilo/notifiche or compose from user data
+      notifications = getSampleNotifs();
+    }
+    // Detect new notifications vs previous
+    if (loggedIn && notifications.length > 0 && notifications.length !== prevCount) {
+      triggerBellPulse();
+    }
+    updateAll();
+  }
+
+  function triggerBellShake() {
+    if (!notifToggle) return;
+    notifToggle.classList.remove('bell-shake');
+    void notifToggle.offsetWidth;
+    notifToggle.classList.add('bell-shake');
+  }
+
+  function triggerBellPulse() {
+    if (!notifToggle) return;
+    notifToggle.classList.remove('bell-new-notif');
+    void notifToggle.offsetWidth;
+    notifToggle.classList.add('bell-new-notif');
+    // Remove red after 2.5s
+    setTimeout(function() { notifToggle.classList.remove('bell-new-notif'); }, 2500);
+  }
+
+  function updateAll() {
+    updateBadge();
+    rebuildDots();
+    if (isCarousel) { currentIndex = 0; renderCarouselCard(); }
+    else showList();
+    if (notifPopover && popoverOpen) {
+      if (isCarousel) { showCarousel(); } else { showList(); }
+    }
+  }
+
   function updateBadge() {
-    if (notifBadge) {
+    if (!notifBadge) return;
+    var loggedIn = typeof Auth !== 'undefined' && Auth && Auth.isLoggedIn && Auth.isLoggedIn();
+    if (!loggedIn) {
+      notifBadge.textContent = '0';
+      notifBadge.classList.add('hidden');
+    } else {
       notifBadge.textContent = notifications.length;
       notifBadge.classList.toggle('hidden', notifications.length === 0);
     }
   }
 
+  function rebuildDots() {
+    if (!notifDots) return;
+    notifDots.innerHTML = '';
+    notifications.forEach(function(_, i) {
+      var dot = document.createElement('span');
+      dot.className = 'notif-dot' + (i === 0 ? ' active' : '');
+      notifDots.appendChild(dot);
+    });
+  }
+
   function renderCarouselCard() {
     if (!notifCardTitle) return;
+    if (notifications.length === 0) {
+      notifCardIcon.className = 'fa-solid fa-bell-slash text-muted text-sm';
+      notifCardTitle.textContent = 'Nessuna notifica';
+      notifCardTime.textContent = '';
+      notifCardDesc.textContent = '';
+      if (notifDots) notifDots.innerHTML = '';
+      return;
+    }
     var n = notifications[currentIndex];
     if (!n) return;
     notifCardIcon.className = n.icon + ' text-ferrari-primary text-sm';
     notifCardTitle.textContent = n.title;
     notifCardTime.textContent = n.time;
-    notifCardDesc.textContent = n.desc;
-    // Animate
+    // Add delete button in carousel card
+    notifCardDesc.innerHTML = n.desc + ' <button class="notif-delete text-muted hover:text-ferrari-primary ml-1 text-[10px]" data-idx="' + currentIndex + '"><i class="fa-solid fa-xmark"></i></button>';
     var card = document.getElementById('notif-card');
     if (card) { card.classList.remove('notif-carousel-enter'); void card.offsetWidth; card.classList.add('notif-carousel-enter'); }
-    // Update dots
     if (notifDots) {
       var dots = notifDots.querySelectorAll('.notif-dot');
       dots.forEach(function(d, i) { d.classList.toggle('active', i === currentIndex); });
     }
+  }
+
+  function deleteNotif(idx) {
+    notifications.splice(idx, 1);
+    if (idx <= currentIndex && currentIndex > 0) currentIndex--;
+    if (currentIndex >= notifications.length) currentIndex = Math.max(0, notifications.length - 1);
+    updateBadge();
+    rebuildDots();
+    if (isCarousel) renderCarouselCard(); else showList();
+  }
+
+  function clearAllNotifs() {
+    notifications = [];
+    currentIndex = 0;
+    updateBadge();
+    rebuildDots();
+    if (notifDots) notifDots.innerHTML = '';
+    if (isCarousel) renderCarouselCard(); else showList();
+  }
+
+  function showList() {
+    isCarousel = false;
+    if (notifCarousel) notifCarousel.classList.add('hidden');
+    if (notifList) {
+      notifList.classList.remove('hidden');
+      if (notifications.length === 0) {
+        notifList.innerHTML = '<div class="p-6 text-sm text-body text-center">Nessuna notifica</div>';
+      } else {
+        notifList.innerHTML = notifications.map(function(n, i) {
+          return '<div class="px-4 py-3 hover:bg-white/[0.03] transition relative group">' +
+            '<button class="notif-delete absolute top-2 right-2 text-muted hover:text-ferrari-primary text-[10px] opacity-0 group-hover:opacity-100 transition-opacity" data-idx="' + i + '"><i class="fa-solid fa-xmark"></i></button>' +
+            '<div class="flex justify-between items-center mb-1 pr-4">' +
+              '<div class="flex items-center gap-2"><i class="' + n.icon + ' text-ferrari-primary text-xs"></i><span class="font-medium text-sm text-ink">' + n.title + '</span></div>' +
+              (n.time ? '<span class="text-xs text-muted">' + n.time + '</span>' : '') +
+            '</div>' +
+            '<p class="text-xs text-body leading-relaxed">' + n.desc + '</p>' +
+          '</div>';
+        }).join('');
+      }
+    }
+    if (notifViewIcon) { notifViewIcon.className = 'fa-solid fa-grip text-xs'; }
+  }
   }
 
   function showCarousel() {
@@ -328,7 +451,7 @@
         return '<div class="px-4 py-3 hover:bg-white/[0.03] transition">' +
           '<div class="flex justify-between items-center mb-1">' +
             '<div class="flex items-center gap-2"><i class="' + n.icon + ' text-ferrari-primary text-xs"></i><span class="font-medium text-sm text-ink">' + n.title + '</span></div>' +
-            '<span class="text-xs text-muted">' + n.time + '</span>' +
+            (n.time ? '<span class="text-xs text-muted">' + n.time + '</span>' : '') +
           '</div>' +
           '<p class="text-xs text-body leading-relaxed">' + n.desc + '</p>' +
         '</div>';
@@ -358,19 +481,11 @@
     if (notifPopover) notifPopover.classList.add('hidden');
   }
 
-  // Build dots
-  if (notifDots) {
-    notifications.forEach(function(_, i) {
-      var dot = document.createElement('span');
-      dot.className = 'notif-dot' + (i === 0 ? ' active' : '');
-      notifDots.appendChild(dot);
-    });
-  }
-
   // Events
   if (notifToggle) {
     notifToggle.addEventListener('click', function(e) {
       e.stopPropagation();
+      triggerBellShake();
       popoverOpen ? closePopover() : openPopover();
     });
   }
@@ -383,17 +498,47 @@
 
   document.getElementById('notif-prev')?.addEventListener('click', function(e) { e.stopPropagation(); prevNotif(); });
   document.getElementById('notif-next')?.addEventListener('click', function(e) { e.stopPropagation(); nextNotif(); });
+  document.getElementById('notif-clear-all')?.addEventListener('click', function(e) { e.stopPropagation(); clearAllNotifs(); });
 
-  // Click outside closes popover
+  // Event delegation for dynamically created delete buttons
+  if (notifPopover) {
+    notifPopover.addEventListener('click', function(e) {
+      var btn = e.target.closest('.notif-delete');
+      if (btn) {
+        e.stopPropagation();
+        var idx = parseInt(btn.getAttribute('data-idx'), 10);
+        if (!isNaN(idx) && idx >= 0 && idx < notifications.length) {
+          deleteNotif(idx);
+        }
+      }
+    });
+  }
+
   document.addEventListener('click', function(e) {
     if (popoverOpen && notifContainer && !notifContainer.contains(e.target)) {
       closePopover();
     }
   });
 
-  updateBadge();
-  // Initial render
-  renderCarouselCard();
+  loadNotifications();
+  // Reload on auth changes
+  document.addEventListener('components:loaded', loadNotifications);
+
+  // Chain updateAuthUI — wrap the original AFTER it's set
+  var _chainDone = false;
+  function _chainNotifReload() {
+    if (_chainDone) return;
+    // Wait one tick for other scripts to set window.updateAuthUI
+    setTimeout(function() {
+      var orig = window.updateAuthUI;
+      window.updateAuthUI = function() {
+        if (orig) orig();
+        loadNotifications();
+      };
+      _chainDone = true;
+    }, 50);
+  }
+  _chainNotifReload();
 
   window.updateAuthUI = updateAuthUI;
   window.updateNavbarCinema = function() {};
