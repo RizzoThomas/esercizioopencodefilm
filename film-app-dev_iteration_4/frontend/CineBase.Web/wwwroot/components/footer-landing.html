@@ -80,31 +80,113 @@
           <i class="fa-brands fa-x-twitter text-[#bbb] text-sm"></i>
         </a>
       </div>
-      <p class="text-xs text-[#555]">&copy; 2026 CineBase. Tutti i diritti riservati.</p>
+      <div class="flex items-center gap-4">
+        <button id="cookie-settings-link" class="text-xs text-[#555] hover:text-white transition-colors cursor-pointer bg-transparent border-0 p-0">
+          <i class="fa-solid fa-cookie-bite mr-1.5"></i>Impostazioni Cookie
+        </button>
+        <p class="text-xs text-[#555]">&copy; 2026 CineBase. Tutti i diritti riservati.</p>
+      </div>
     </div>
   </div>
 
-  <!-- Cookie Consent Banner -->
-  <div id="cookie-banner" class="fixed bottom-0 left-0 right-0 z-[9999] bg-[#0a0a0a] border-t border-[#252525] px-6 py-4 translate-y-full transition-transform duration-500 ease-in-out">
-    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-      <p class="text-xs text-[#bbb] leading-relaxed max-w-2xl">
-        Questo sito utilizza cookie tecnici necessari al funzionamento e cookie analitici per migliorare l'esperienza utente.
-        Leggi la <a href="/privacy.html" class="text-ferrari-primary underline hover:text-red-400">Privacy Policy</a> per maggiori informazioni.
-      </p>
-      <div class="flex gap-2 shrink-0">
-        <button id="cookie-accept" class="px-4 py-2 text-xs font-semibold uppercase tracking-wider bg-ferrari-primary text-white hover:bg-red-700 transition-colors">
-          Accetta
-        </button>
-        <button id="cookie-reject" class="px-4 py-2 text-xs font-semibold uppercase tracking-wider border border-[#555] text-[#bbb] hover:bg-[#1f1f1f] hover:text-white transition-colors">
-          Rifiuta
-        </button>
+  <!-- ================================================================
+       GDPR Cookie Consent Banner + Preferences Panel
+       ================================================================ -->
+  <div id="cookie-wall" class="fixed inset-0 z-[9998] bg-black/60 hidden opacity-0 transition-opacity duration-300"
+       aria-hidden="true"></div>
+
+  <!-- Main Cookie Banner -->
+  <div id="cookie-banner" class="fixed bottom-0 left-0 right-0 z-[9999] bg-[#0a0a0a] border-t border-[#252525] px-6 py-5 translate-y-full transition-transform duration-500 ease-in-out shadow-[0_-4px_24px_rgba(0,0,0,0.5)]">
+    <div class="max-w-7xl mx-auto">
+      <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+        <div class="flex-1 min-w-0">
+          <p class="text-sm font-semibold text-white mb-1.5"><i class="fa-solid fa-cookie-bite text-ferrari-primary mr-2"></i>Questo sito utilizza cookie</p>
+          <p class="text-xs text-[#bbb] leading-relaxed">
+            Utilizziamo cookie tecnici necessari, cookie analitici per capire l'utilizzo del sito e cookie di marketing per offrirti contenuti personalizzati. Puoi accettarli tutti, rifiutarli o <button type="button" id="cookie-customize-btn" class="text-ferrari-primary underline hover:text-red-400 bg-transparent border-0 cursor-pointer text-xs p-0">personalizzare le preferenze</button>.
+          </p>
+        </div>
+        <div class="flex gap-2 shrink-0">
+          <button id="cookie-accept-all" class="px-5 py-2.5 text-xs font-semibold uppercase tracking-wider bg-ferrari-primary text-white hover:bg-red-700 transition-colors">
+            Accetta tutti
+          </button>
+          <button id="cookie-reject-all" class="px-5 py-2.5 text-xs font-semibold uppercase tracking-wider bg-[#1f1f1f] text-[#bbb] border border-[#444] hover:bg-[#2a2a2a] hover:text-white hover:border-[#666] transition-colors">
+            Rifiuta tutti
+          </button>
+        </div>
       </div>
+    </div>
+  </div>
+
+  <!-- Cookie Preferences Panel (slide-up) -->
+  <div id="cookie-prefs" class="fixed inset-x-4 bottom-4 md:inset-x-auto md:left-1/2 md:-translate-x-1/2 md:w-[520px] max-w-[calc(100vw-2rem)] z-[9999] bg-[#0a0a0a] border border-[#252525] p-6 translate-y-[120%] transition-transform duration-400 ease-in-out opacity-0 pointer-events-none shadow-[0_-4px_24px_rgba(0,0,0,0.6)]">
+    <div class="flex items-center justify-between mb-5">
+      <h3 class="text-base font-semibold text-white flex items-center gap-2">
+        <i class="fa-solid fa-sliders text-ferrari-primary"></i> Preferenze Cookie
+      </h3>
+      <button id="cookie-prefs-close" class="text-[#666] hover:text-white transition-colors bg-transparent border-0 cursor-pointer text-lg" aria-label="Chiudi">
+        <i class="fa-solid fa-times"></i>
+      </button>
+    </div>
+
+    <p class="text-xs text-[#888] mb-5 leading-relaxed">
+      Scegli quali categorie di cookie autorizzare. I cookie necessari non possono essere disattivati. Per maggiori informazioni consulta la <a href="/privacy.html" target="_blank" class="text-ferrari-primary underline hover:text-red-400">Privacy Policy</a>.
+    </p>
+
+    <!-- Necessari (locked) -->
+    <div class="flex items-start justify-between py-3 border-b border-[#1a1a1a]">
+      <div class="flex-1 pr-4">
+        <p class="text-sm font-semibold text-white">Cookie Necessari</p>
+        <p class="text-xs text-[#888] mt-0.5">Essenziali per il sito: login, carrello, sicurezza. Sempre attivi.</p>
+      </div>
+      <label class="relative inline-flex items-center cursor-not-allowed opacity-60 shrink-0 mt-1">
+        <input type="checkbox" checked disabled class="sr-only">
+        <span class="w-9 h-5 bg-ferrari-primary rounded-full flex items-center justify-end px-0.5"></span>
+      </label>
+    </div>
+
+    <!-- Analitici -->
+    <div class="flex items-start justify-between py-3 border-b border-[#1a1a1a]">
+      <div class="flex-1 pr-4">
+        <p class="text-sm font-semibold text-white">Cookie Analitici</p>
+        <p class="text-xs text-[#888] mt-0.5">Ci aiutano a capire come navighi il sito (pagine, tempo) per migliorarlo.</p>
+      </div>
+      <label class="relative inline-flex items-center cursor-pointer shrink-0 mt-1">
+        <input type="checkbox" id="cookie-toggle-analytics" class="sr-only peer">
+        <span class="w-9 h-5 bg-[#333] peer-checked:bg-ferrari-primary rounded-full transition-colors flex items-center peer-checked:justify-end px-0.5">
+          <span class="w-4 h-4 bg-white rounded-full transition-transform"></span>
+        </span>
+      </label>
+    </div>
+
+    <!-- Marketing -->
+    <div class="flex items-start justify-between py-3 border-b border-[#1a1a1a] mb-5">
+      <div class="flex-1 pr-4">
+        <p class="text-sm font-semibold text-white">Cookie di Marketing</p>
+        <p class="text-xs text-[#888] mt-0.5">Usati per offerte e contenuti personalizzati in base ai tuoi interessi.</p>
+      </div>
+      <label class="relative inline-flex items-center cursor-pointer shrink-0 mt-1">
+        <input type="checkbox" id="cookie-toggle-marketing" class="sr-only peer">
+        <span class="w-9 h-5 bg-[#333] peer-checked:bg-ferrari-primary rounded-full transition-colors flex items-center peer-checked:justify-end px-0.5">
+          <span class="w-4 h-4 bg-white rounded-full transition-transform"></span>
+        </span>
+      </label>
+    </div>
+
+    <div class="flex gap-2">
+      <button id="cookie-save-prefs" class="flex-1 px-4 py-2.5 text-xs font-semibold uppercase tracking-wider bg-ferrari-primary text-white hover:bg-red-700 transition-colors">
+        Salva preferenze
+      </button>
+      <button id="cookie-accept-all-2" class="flex-1 px-4 py-2.5 text-xs font-semibold uppercase tracking-wider bg-[#1f1f1f] text-[#bbb] border border-[#444] hover:bg-[#2a2a2a] hover:text-white hover:border-[#666] transition-colors">
+        Accetta tutti
+      </button>
     </div>
   </div>
 </footer>
 
 <script>
 (function () {
+  const CONSENT_KEY = 'cinebase-cookie-consent';
+
   // ── Auth UI ──────────────────────────────────
   const loginLink = document.getElementById('footer-login-link');
   const registerLink = document.getElementById('footer-register-link');
@@ -134,7 +216,7 @@
       if (profileLink) profileLink.classList.add('hidden');
     }
 
-    document.querySelectorAll('footer .admin-only').forEach((el) => {
+    document.querySelectorAll('footer .admin-only').forEach(function (el) {
       el.classList.toggle('hidden', !isAdminOrPowerUser);
     });
   }
@@ -144,17 +226,16 @@
   window.updateFooterAuthUI = updateFooterAuthUI;
 
   // ── Newsletter ──────────────────────────────
-  const newsForm = document.getElementById('newsletter-form');
-  const newsEmail = document.getElementById('newsletter-email');
-  const newsMsg = document.getElementById('newsletter-msg');
+  var newsForm = document.getElementById('newsletter-form');
+  var newsEmail = document.getElementById('newsletter-email');
+  var newsMsg = document.getElementById('newsletter-msg');
   if (newsForm) {
     newsForm.addEventListener('submit', function (e) {
       e.preventDefault();
-      const email = newsEmail.value.trim();
+      var email = newsEmail.value.trim();
       if (!email) return;
       newsMsg.className = 'text-xs mt-2';
       newsMsg.classList.remove('hidden');
-      // Simulate subscription — no backend needed for now
       newsMsg.style.color = '#4ade80';
       newsMsg.textContent = '✅ Grazie per esserti iscritto alla newsletter!';
       newsEmail.value = '';
@@ -162,25 +243,109 @@
     });
   }
 
-  // ── Cookie Consent ──────────────────────────
+  // ── GDPR Cookie Consent ─────────────────────
   var banner = document.getElementById('cookie-banner');
-  var acceptBtn = document.getElementById('cookie-accept');
-  var rejectBtn = document.getElementById('cookie-reject');
+  var prefs = document.getElementById('cookie-prefs');
+  var wall = document.getElementById('cookie-wall');
+  var toggleAnalytics = document.getElementById('cookie-toggle-analytics');
+  var toggleMarketing = document.getElementById('cookie-toggle-marketing');
 
-  if (banner && !localStorage.getItem('cinebase-cookie-consent')) {
-    // Show banner on next frame
+  var savedConsent = localStorage.getItem(CONSENT_KEY);
+  var consentData = savedConsent ? JSON.parse(savedConsent) : null;
+
+  function getConsent() {
+    return consentData || { necessary: true, analytics: false, marketing: false, timestamp: null };
+  }
+
+  function saveConsent(analytics, marketing) {
+    consentData = {
+      necessary: true,
+      analytics: !!analytics,
+      marketing: !!marketing,
+      timestamp: new Date().toISOString()
+    };
+    localStorage.setItem(CONSENT_KEY, JSON.stringify(consentData));
+  }
+
+  function hideBanner() {
+    if (banner) {
+      banner.style.transform = 'translateY(100%)';
+      setTimeout(function () {
+        if (banner) banner.style.display = 'none';
+      }, 500);
+    }
+  }
+
+  function hidePrefs() {
+    if (prefs) {
+      prefs.style.transform = 'translateY(120%)';
+      prefs.style.opacity = '0';
+      prefs.style.pointerEvents = 'none';
+    }
+    if (wall) {
+      wall.classList.add('opacity-0');
+      setTimeout(function () { if (wall) wall.classList.add('hidden'); }, 300);
+    }
+  }
+
+  function showPrefs() {
+    if (prefs) {
+      prefs.style.transform = 'translateY(0)';
+      prefs.style.opacity = '1';
+      prefs.style.pointerEvents = 'all';
+    }
+    if (wall) {
+      wall.classList.remove('hidden');
+      requestAnimationFrame(function () { wall.classList.remove('opacity-0'); });
+    }
+    var c = getConsent();
+    if (toggleAnalytics) toggleAnalytics.checked = c.analytics;
+    if (toggleMarketing) toggleMarketing.checked = c.marketing;
+  }
+
+  function applyConsent(analytics, marketing) {
+    saveConsent(analytics, marketing);
+    hideBanner();
+    hidePrefs();
+  }
+
+  // Show banner if no consent saved
+  if (!consentData) {
     requestAnimationFrame(function () {
-      banner.style.transform = 'translateY(0)';
+      if (banner) banner.style.transform = 'translateY(0)';
     });
   }
 
-  function handleCookieConsent(choice) {
-    localStorage.setItem('cinebase-cookie-consent', choice);
-    banner.style.transform = 'translateY(100%)';
-    setTimeout(function () { banner.style.display = 'none'; }, 500);
-  }
+  // Accept All
+  document.getElementById('cookie-accept-all')?.addEventListener('click', function () { applyConsent(true, true); });
+  document.getElementById('cookie-accept-all-2')?.addEventListener('click', function () { applyConsent(true, true); });
 
-  if (acceptBtn) acceptBtn.addEventListener('click', function () { handleCookieConsent('accepted'); });
-  if (rejectBtn) rejectBtn.addEventListener('click', function () { handleCookieConsent('rejected'); });
+  // Reject All
+  document.getElementById('cookie-reject-all')?.addEventListener('click', function () { applyConsent(false, false); });
+
+  // Customize
+  document.getElementById('cookie-customize-btn')?.addEventListener('click', showPrefs);
+
+  // Save preferences
+  document.getElementById('cookie-save-prefs')?.addEventListener('click', function () {
+    applyConsent(
+      toggleAnalytics ? toggleAnalytics.checked : false,
+      toggleMarketing ? toggleMarketing.checked : false
+    );
+  });
+
+  // Close prefs
+  document.getElementById('cookie-prefs-close')?.addEventListener('click', hidePrefs);
+  if (wall) wall.addEventListener('click', hidePrefs);
+
+  // Footer "Impostazioni Cookie" link
+  document.getElementById('cookie-settings-link')?.addEventListener('click', showPrefs);
+
+  // Expose API
+  window.CineBaseCookies = {
+    getConsent: getConsent,
+    update: function (analytics, marketing) { applyConsent(analytics, marketing); },
+    show: showPrefs
+  };
 })();
 </script>
