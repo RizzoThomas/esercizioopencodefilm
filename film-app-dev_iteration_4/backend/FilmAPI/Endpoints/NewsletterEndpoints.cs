@@ -22,7 +22,7 @@ public static class NewsletterEndpoints
     public static void MapNewsletterEndpoints(this WebApplication app)
     {
         // ── Subscribe ────────────────────────────────────────
-        app.MapPost("/api/newsletter/subscribe", async (
+        app.MapPost("/api/newsletter/subscribe", (
             [FromBody] NewsletterSubscribeDTO dto,
             IEmailService emailService,
             ILogger<Program> logger,

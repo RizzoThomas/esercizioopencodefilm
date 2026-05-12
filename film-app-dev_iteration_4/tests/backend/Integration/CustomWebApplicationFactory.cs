@@ -454,6 +454,18 @@ public sealed class FakeEmailService : IEmailService
         lock (_lock) { _sentEmails.Add(new SentEmailRecord { RecipientEmail = recipientEmail, FileName = "password_reset" }); }
         return Task.FromResult(new EmailSendResult { Success = true, SentAtUtc = DateTime.UtcNow });
     }
+
+    public Task<EmailSendResult> SendNewsletterWelcomeAsync(string recipientEmail, string? recipientName, CancellationToken cancellationToken = default)
+    {
+        lock (_lock) { _sentEmails.Add(new SentEmailRecord { RecipientEmail = recipientEmail, FileName = "newsletter_welcome" }); }
+        return Task.FromResult(new EmailSendResult { Success = true, SentAtUtc = DateTime.UtcNow });
+    }
+
+    public Task<EmailSendResult> SendNewOffersNotificationAsync(string recipientEmail, string? recipientName, string offersHtml, CancellationToken cancellationToken = default)
+    {
+        lock (_lock) { _sentEmails.Add(new SentEmailRecord { RecipientEmail = recipientEmail, FileName = "new_offers_notification" }); }
+        return Task.FromResult(new EmailSendResult { Success = true, SentAtUtc = DateTime.UtcNow });
+    }
 }
 
 public sealed class SentEmailRecord
