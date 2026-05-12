@@ -473,7 +473,18 @@
   function openPopover() {
     popoverOpen = true;
     if (notifPopover) notifPopover.classList.remove('hidden');
-    if (isCarousel) showCarousel(); else showList();
+    if (notifications.length === 0) {
+      // Empty state
+      if (notifCarousel) notifCarousel.classList.add('hidden');
+      if (notifList) { notifList.classList.add('hidden'); }
+      if (notifEmpty) {
+        notifEmpty.innerHTML = '<i class="fa-solid fa-bell-slash text-2xl text-muted block mb-2"></i><p class="text-sm text-body">Non ci sono notifiche presenti</p>';
+        notifEmpty.classList.remove('hidden');
+      }
+    } else {
+      if (notifEmpty) notifEmpty.classList.add('hidden');
+      if (isCarousel) showCarousel(); else showList();
+    }
   }
 
   function closePopover() {
