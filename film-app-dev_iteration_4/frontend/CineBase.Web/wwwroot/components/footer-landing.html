@@ -95,30 +95,29 @@
   <div id="cookie-wall" class="fixed inset-0 z-[9998] bg-black/60 hidden opacity-0 transition-opacity duration-300"
        aria-hidden="true"></div>
 
-  <!-- Main Cookie Banner -->
-  <div id="cookie-banner" class="fixed bottom-0 left-0 right-0 z-[9999] bg-[#0a0a0a] border-t border-[#252525] px-6 py-5 translate-y-full transition-transform duration-500 ease-in-out shadow-[0_-4px_24px_rgba(0,0,0,0.5)]">
+  <!-- Main Cookie Banner — compact, Amazon-style -->
+  <div id="cookie-banner" class="fixed bottom-0 left-0 right-0 z-[9999] bg-[#0a0a0a] border-t border-[#252525] px-5 py-4 translate-y-full transition-transform duration-500 ease-in-out shadow-[0_-4px_24px_rgba(0,0,0,0.5)]">
     <div class="max-w-7xl mx-auto">
-      <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-        <div class="flex-1 min-w-0">
-          <p class="text-sm font-semibold text-white mb-1.5"><i class="fa-solid fa-cookie-bite text-ferrari-primary mr-2"></i>Questo sito utilizza cookie</p>
-          <p class="text-xs text-[#bbb] leading-relaxed">
-            Utilizziamo cookie tecnici necessari, cookie analitici per capire l'utilizzo del sito e cookie di marketing per offrirti contenuti personalizzati. Puoi accettarli tutti, rifiutarli o <button type="button" id="cookie-customize-btn" class="text-ferrari-primary underline hover:text-red-400 bg-transparent border-0 cursor-pointer text-xs p-0">personalizzare le preferenze</button>.
-          </p>
-        </div>
-        <div class="flex gap-2 shrink-0">
-          <button id="cookie-accept-all" class="px-5 py-2.5 text-xs font-semibold uppercase tracking-wider bg-ferrari-primary text-white hover:bg-red-700 transition-colors">
-            Accetta tutti
-          </button>
-          <button id="cookie-reject-all" class="px-5 py-2.5 text-xs font-semibold uppercase tracking-wider bg-[#1f1f1f] text-[#bbb] border border-[#444] hover:bg-[#2a2a2a] hover:text-white hover:border-[#666] transition-colors">
-            Rifiuta tutti
-          </button>
-        </div>
+      <p class="text-sm font-semibold text-white mb-2">Cookie e scelte pubblicitarie</p>
+      <p class="text-xs text-[#888] leading-relaxed mb-3 max-w-4xl">
+        Con il tuo consenso, utilizziamo cookie tecnici necessari, cookie analitici per capire come navighi il sito e cookie di marketing per mostrarti offerte personalizzate. Possiamo anche utilizzare informazioni fornite da terze parti. In ogni caso, usiamo cookie tecnici indispensabili per il funzionamento del sito (login, carrello, sicurezza) e per capire come migliorare i nostri servizi. Puoi modificare le tue scelte in qualsiasi momento cliccando su <b>Impostazioni Cookie</b> nel footer. Per maggiori informazioni, consulta la <a href="/privacy.html" class="text-ferrari-primary underline hover:text-red-400">Privacy Policy</a> e l'<a href="/privacy.html#cookie" class="text-ferrari-primary underline hover:text-red-400">Informativa sui Cookie</a>.
+      </p>
+      <div class="flex flex-wrap gap-2">
+        <button id="cookie-accept-all" class="px-4 py-2 text-xs font-semibold uppercase tracking-wider bg-ferrari-primary text-white hover:bg-red-700 transition-colors">
+          Accetta
+        </button>
+        <button id="cookie-reject-all" class="px-4 py-2 text-xs font-semibold uppercase tracking-wider bg-[#1f1f1f] text-[#bbb] border border-[#444] hover:bg-[#2a2a2a] hover:text-white hover:border-[#666] transition-colors">
+          Rifiuta
+        </button>
+        <button id="cookie-customize-btn" class="px-4 py-2 text-xs font-semibold uppercase tracking-wider bg-transparent text-[#bbb] border border-[#444] hover:bg-[#1f1f1f] hover:text-white hover:border-[#666] transition-colors">
+          Personalizza
+        </button>
       </div>
     </div>
   </div>
 
-  <!-- Cookie Preferences Panel (slide-up) -->
-  <div id="cookie-prefs" class="fixed inset-x-4 bottom-4 md:inset-x-auto md:left-1/2 md:-translate-x-1/2 md:w-[520px] max-w-[calc(100vw-2rem)] z-[9999] bg-[#0a0a0a] border border-[#252525] p-6 translate-y-[120%] transition-transform duration-400 ease-in-out opacity-0 pointer-events-none shadow-[0_-4px_24px_rgba(0,0,0,0.6)]">
+  <!-- Cookie Preferences Panel (centered modal) -->
+  <div id="cookie-prefs" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[520px] max-w-[calc(100vw-2rem)] max-h-[calc(100vh-4rem)] overflow-y-auto z-[9999] bg-[#0a0a0a] border border-[#252525] p-6 scale-95 opacity-0 pointer-events-none transition-all duration-300 ease-in-out shadow-[0_8px_40px_rgba(0,0,0,0.7)]">
     <div class="flex items-center justify-between mb-5">
       <h3 class="text-base font-semibold text-white flex items-center gap-2">
         <i class="fa-solid fa-sliders text-ferrari-primary"></i> Preferenze Cookie
@@ -278,9 +277,28 @@
 
   function hidePrefs() {
     if (prefs) {
-      prefs.style.transform = 'translateY(120%)';
       prefs.style.opacity = '0';
+      prefs.style.transform = 'translate(-50%, -50%) scale(0.95)';
       prefs.style.pointerEvents = 'none';
+    }
+    if (wall) {
+      wall.style.opacity = '0';
+      setTimeout(function () { if (wall) wall.classList.add('hidden'); }, 300);
+    }
+  }
+
+  function showPrefs() {
+    if (prefs) {
+      prefs.classList.remove('hidden');
+      requestAnimationFrame(function () {
+        prefs.style.opacity = '1';
+        prefs.style.transform = 'translate(-50%, -50%) scale(1)';
+        prefs.style.pointerEvents = 'all';
+      });
+    }
+    if (wall) {
+      wall.classList.remove('hidden');
+      requestAnimationFrame(function () { wall.style.opacity = '1'; });
     }
     if (wall) {
       wall.classList.add('opacity-0');
@@ -290,9 +308,12 @@
 
   function showPrefs() {
     if (prefs) {
-      prefs.style.transform = 'translateY(0)';
-      prefs.style.opacity = '1';
-      prefs.style.pointerEvents = 'all';
+      prefs.classList.remove('hidden');
+      requestAnimationFrame(function () {
+        prefs.classList.remove('scale-95', 'opacity-0');
+        prefs.classList.add('scale-100', 'opacity-100');
+        prefs.style.pointerEvents = 'all';
+      });
     }
     if (wall) {
       wall.classList.remove('hidden');
