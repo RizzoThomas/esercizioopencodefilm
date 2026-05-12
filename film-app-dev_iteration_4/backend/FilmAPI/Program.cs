@@ -288,6 +288,7 @@ app.MapTmdbEndpoints();
 app.MapSocialAuthEndpoints();
 app.MapChatEndpoints();
 app.MapAdminAnalyticsEndpoints();
+app.MapNewsletterEndpoints();
 
 app.MapGet("/config/frontend", (FrontendRuntimeConfig config) => Results.Ok(new
 {

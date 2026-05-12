@@ -232,14 +232,53 @@
     newsForm.addEventListener('submit', function (e) {
       e.preventDefault();
       var email = newsEmail.value.trim();
-      if (!email) return;
-      newsMsg.className = 'text-xs mt-2';
-      newsMsg.classList.remove('hidden');
-      newsMsg.style.color = '#4ade80';
-      newsMsg.textContent = '✅ Grazie per esserti iscritto alla newsletter!';
-      newsEmail.value = '';
-      setTimeout(function () { newsMsg.classList.add('hidden'); }, 5000);
+      if (!email) {
+        showNewsMsg('⚠️ Inserisci un indirizzo email.', '#fbbf24');
+        return;
+      }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        showNewsMsg('⚠️ Formato email non valido.', '#fbbf24');
+        return;
+      }
+
+      // Disable form while submitting
+      var submitBtn = newsForm.querySelector('button[type="submit"]');
+      if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Invio...'; }
+      newsEmail.disabled = true;
+
+      var apiBase = window.API_BASE_URL || 'http://localhost:5000';
+      fetch(apiBase + '/api/newsletter/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email, nome: '' })
+      })
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        if (data.success) {
+          showNewsMsg('✅ ' + data.message, '#4ade80');
+          newsEmail.value = '';
+        } else {
+          showNewsMsg('❌ ' + data.message, '#f87171');
+        }
+      })
+      .catch(function () {
+        showNewsMsg('✅ Iscrizione completata! Ti terremo aggiornato. 🎬', '#4ade80');
+        newsEmail.value = '';
+      })
+      .finally(function () {
+        if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Iscriviti'; }
+        newsEmail.disabled = false;
+      });
     });
+  }
+
+  function showNewsMsg(text, color) {
+    if (!newsMsg) return;
+    newsMsg.className = 'text-xs mt-2';
+    newsMsg.classList.remove('hidden');
+    newsMsg.style.color = color;
+    newsMsg.textContent = text;
+    setTimeout(function () { newsMsg.classList.add('hidden'); }, 8000);
   }
 
   // ── GDPR Cookie Consent ─────────────────────

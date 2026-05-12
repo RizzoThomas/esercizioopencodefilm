@@ -565,4 +565,202 @@ public class EmailService : IEmailService
             return TimeZoneInfo.FindSystemTimeZoneById("W. Europe Standard Time");
         }
     }
+
+    // ── Newsletter ─────────────────────────────────────────
+
+    public async Task<EmailSendResult> SendNewsletterWelcomeAsync(string recipientEmail, string? recipientName, CancellationToken cancellationToken = default)
+    {
+        if (!HasCompleteConfiguration())
+        {
+            return new EmailSendResult
+            {
+                Success = false,
+                ErrorMessage = "Configurazione SMTP incompleta."
+            };
+        }
+
+        if (string.IsNullOrWhiteSpace(recipientEmail))
+        {
+            return new EmailSendResult
+            {
+                Success = false,
+                ErrorMessage = "Email destinatario non disponibile."
+            };
+        }
+
+        try
+        {
+            var smtpHost = _smtpHost!;
+            var smtpUser = _smtpUser!;
+            var smtpPassword = _smtpPassword!.Replace(" ", string.Empty);
+            var fromEmail = _fromEmail!;
+            var name = WebUtility.HtmlEncode(recipientName ?? "Cinefilo");
+
+            var message = new MimeMessage();
+            message.From.Add(new MailboxAddress(_fromName, fromEmail));
+            message.To.Add(MailboxAddress.Parse(recipientEmail));
+            message.Subject = "🎬 Benvenuto nella newsletter CineBase!";
+
+            var bodyBuilder = new BodyBuilder
+            {
+                TextBody = BuildNewsletterWelcomeText(recipientName),
+                HtmlBody = BuildNewsletterWelcomeHtml(recipientName)
+            };
+
+            message.Body = bodyBuilder.ToMessageBody();
+
+            using var client = new SmtpClient { Timeout = 15000 };
+            await client.ConnectAsync(smtpHost, _smtpPort, SecureSocketOptions.StartTls, cancellationToken);
+            await client.AuthenticateAsync(smtpUser, smtpPassword, cancellationToken);
+            await client.SendAsync(message, cancellationToken);
+            await client.DisconnectAsync(true, cancellationToken);
+
+            return new EmailSendResult { Success = true, SentAtUtc = DateTime.UtcNow };
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Invio email benvenuto newsletter fallito per {Email}", recipientEmail);
+            return new EmailSendResult
+            {
+                Success = false,
+                ErrorMessage = $"Errore invio email: {ex.Message}"
+            };
+        }
+    }
+
+    public async Task<EmailSendResult> SendNewOffersNotificationAsync(string recipientEmail, string? recipientName, string offersHtml, CancellationToken cancellationToken = default)
+    {
+        if (!HasCompleteConfiguration())
+        {
+            return new EmailSendResult
+            {
+                Success = false,
+                ErrorMessage = "Configurazione SMTP incompleta."
+            };
+        }
+
+        if (string.IsNullOrWhiteSpace(recipientEmail))
+        {
+            return new EmailSendResult
+            {
+                Success = false,
+                ErrorMessage = "Email destinatario non disponibile."
+            };
+        }
+
+        try
+        {
+            var smtpHost = _smtpHost!;
+            var smtpUser = _smtpUser!;
+            var smtpPassword = _smtpPassword!.Replace(" ", string.Empty);
+            var fromEmail = _fromEmail!;
+            var name = WebUtility.HtmlEncode(recipientName ?? "Cinefilo");
+
+            var message = new MimeMessage();
+            message.From.Add(new MailboxAddress(_fromName, fromEmail));
+            message.To.Add(MailboxAddress.Parse(recipientEmail));
+            message.Subject = "🎟️ Nuove offerte CineBase!";
+
+            var textBody = $"Ciao {recipientName ?? "Cinefilo"},\n\n" +
+                           "Ci sono nuove offerte disponibili su CineBase!\n\n" +
+                           "Visita il sito per scoprire tutte le promozioni attive:\n" +
+                           "https://cinebase.it/offerte.html\n\n" +
+                           "CineBase Team";
+
+            var bodyBuilder = new BodyBuilder
+            {
+                TextBody = textBody,
+                HtmlBody = string.IsNullOrWhiteSpace(offersHtml)
+                    ? $"""
+<html>
+  <body style="font-family: Arial, sans-serif; color: #111827; line-height: 1.5;">
+    <h1 style="margin-bottom: 8px;">Nuove offerte CineBase</h1>
+    <p>Ciao {name},</p>
+    <p>Ci sono <strong>nuove offerte</strong> disponibili!</p>
+    <p style="margin: 24px 0;">
+      <a href="https://cinebase.it/offerte.html" style="background: #da291c; color: #fff; padding: 14px 32px;
+         text-decoration: none; font-weight: bold; text-transform: uppercase;
+         letter-spacing: 1.4px; display: inline-block;">
+        Scopri le offerte
+      </a>
+    </p>
+    <p style="color: #666; font-size: 0.85em;">Non vuoi più ricevere queste email? <a href="https://cinebase.it/privacy.html">Disiscriviti</a></p>
+    <p>CineBase Team</p>
+  </body>
+</html>
+"""
+                    : offersHtml
+            };
+
+            message.Body = bodyBuilder.ToMessageBody();
+
+            using var client = new SmtpClient { Timeout = 15000 };
+            await client.ConnectAsync(smtpHost, _smtpPort, SecureSocketOptions.StartTls, cancellationToken);
+            await client.AuthenticateAsync(smtpUser, smtpPassword, cancellationToken);
+            await client.SendAsync(message, cancellationToken);
+            await client.DisconnectAsync(true, cancellationToken);
+
+            return new EmailSendResult { Success = true, SentAtUtc = DateTime.UtcNow };
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Invio notifica offerte fallito per {Email}", recipientEmail);
+            return new EmailSendResult
+            {
+                Success = false,
+                ErrorMessage = $"Errore invio email: {ex.Message}"
+            };
+        }
+    }
+
+    private static string BuildNewsletterWelcomeText(string? recipientName)
+    {
+        var name = recipientName ?? "Cinefilo";
+        return $"Ciao {name},\n\n" +
+               "Grazie per esserti iscritto alla newsletter di CineBase! 🎬\n\n" +
+               "Riceverai aggiornamenti su:\n" +
+               "- Nuovi film in programmazione\n" +
+               "- Offerte speciali e promozioni\n" +
+               "- Eventi e anteprime esclusive\n\n" +
+               "Puoi disiscriverti in qualsiasi momento dalle Impostazioni Cookie nel footer del sito.\n\n" +
+               "A presto,\nCineBase Team";
+    }
+
+    private static string BuildNewsletterWelcomeHtml(string? recipientName)
+    {
+        var name = WebUtility.HtmlEncode(recipientName ?? "Cinefilo");
+        return $"""
+<html>
+  <body style="font-family: Arial, sans-serif; color: #111827; line-height: 1.5; background: #f9fafb; padding: 20px;">
+    <div style="max-width: 560px; margin: 0 auto; background: #fff; border-radius: 4px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+      <div style="background: #da291c; padding: 24px 32px;">
+        <h1 style="color: #fff; margin: 0; font-size: 20px; font-weight: 600; letter-spacing: 0.5px;">🎬 CineBase</h1>
+      </div>
+      <div style="padding: 32px;">
+        <h2 style="color: #111827; margin: 0 0 16px;">Benvenuto nella newsletter!</h2>
+        <p style="color: #374151; margin: 0 0 16px;">Ciao {name},</p>
+        <p style="color: #374151; margin: 0 0 16px;">Grazie per esserti iscritto! D'ora in poi riceverai:</p>
+        <ul style="color: #374151; padding-left: 20px; margin: 0 0 24px;">
+          <li style="margin-bottom: 8px;"><strong>Nuovi film</strong> in programmazione</li>
+          <li style="margin-bottom: 8px;"><strong>Offerte speciali</strong> e promozioni</li>
+          <li style="margin-bottom: 8px;"><strong>Anteprime esclusive</strong> ed eventi</li>
+        </ul>
+        <p style="margin: 24px 0 0;">
+          <a href="https://cinebase.it/programmazione.html" style="background: #da291c; color: #fff; padding: 14px 32px;
+             text-decoration: none; font-weight: bold; text-transform: uppercase;
+             letter-spacing: 1.4px; display: inline-block;">
+            Scopri la programmazione
+          </a>
+        </p>
+        <p style="color: #9ca3af; font-size: 12px; margin: 32px 0 0;">
+          Non vuoi più ricevere queste email? Disiscriviti dalle <a href="https://cinebase.it/privacy.html" style="color: #da291c;">Impostazioni</a>.</p>
+      </div>
+      <div style="background: #f3f4f6; padding: 16px 32px; text-align: center;">
+        <p style="color: #6b7280; font-size: 12px; margin: 0;">© 2026 CineBase. Tutti i diritti riservati.</p>
+      </div>
+    </div>
+  </body>
+</html>
+""";
+    }
 }
