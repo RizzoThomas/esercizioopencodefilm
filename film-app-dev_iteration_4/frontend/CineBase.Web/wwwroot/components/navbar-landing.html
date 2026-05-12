@@ -442,8 +442,8 @@
         notifList.innerHTML = '<div class="p-6 text-sm text-body text-center">Nessuna notifica</div>';
       } else {
         notifList.innerHTML = notifications.map(function(n, i) {
-          return '<div class="px-4 py-3 hover:bg-white/[0.03] transition relative group">' +
-            '<button class="notif-delete absolute top-2 right-2 text-muted hover:text-ferrari-primary text-[11px] opacity-0 group-hover:opacity-100 transition-opacity" data-idx="' + i + '" title="Rimuovi"><i class="fa-solid fa-xmark"></i></button>' +
+          return '<div class="px-4 py-3 hover:bg-white/[0.03] transition relative">' +
+            '<button class="notif-delete absolute top-2 right-2 text-muted hover:text-ferrari-primary text-[11px]" data-idx="' + i + '" title="Rimuovi"><i class="fa-solid fa-xmark"></i></button>' +
             '<div class="flex items-center gap-2 mb-1 pr-5">' +
               '<i class="' + n.icon + ' text-ferrari-primary text-xs"></i><span class="font-medium text-sm text-ink">' + n.title + '</span>' +
             '</div>' +
