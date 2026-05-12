@@ -288,6 +288,7 @@
   // Dynamic notification generators
   function getEmptyNotifs() {
     return [{
+      id: 'empty',
       icon: 'fa-solid fa-lock',
       title: 'Accedi per vedere le notifiche',
       desc: 'Registrati o accedi per ricevere aggiornamenti su biglietti, offerte, rimborsi e molto altro.',
@@ -297,11 +298,11 @@
 
   function getSampleNotifs() {
     return [
-      { icon: 'fa-solid fa-ticket', title: 'Biglietto acquistato', desc: 'Conferma per Interstellar — domani ore 20:30, Sala IMAX.', time: '5 ore fa' },
-      { icon: 'fa-solid fa-clock', title: 'Promemoria abbonamento', desc: 'Il tuo abbonamento Premium scade tra 3 giorni. Rinnova ora per non perdere i vantaggi.', time: '1 giorno fa' },
-      { icon: 'fa-solid fa-tag', title: 'Nuova offerta disponibile', desc: 'Combo Cinema + Popcorn a €12.90 solo questa settimana! Approfittane subito.', time: '2 ore fa' },
-      { icon: 'fa-solid fa-rotate-left', title: 'Rimborso in arrivo', desc: 'Il film prenotato è stato cancellato. Riceverai un rimborso sul tuo credito entro 48 ore.', time: '3 ore fa' },
-      { icon: 'fa-solid fa-star', title: 'Anteprima esclusiva', desc: 'Prenota i biglietti per l\'anteprima di sabato sera. Posti limitati!', time: '2 giorni fa' }
+      { id: 'biglietto', icon: 'fa-solid fa-ticket', title: 'Biglietto acquistato', desc: 'Conferma per Interstellar — domani ore 20:30, Sala IMAX.', time: '5 ore fa' },
+      { id: 'scadenza', icon: 'fa-solid fa-clock', title: 'Promemoria abbonamento', desc: 'Il tuo abbonamento Premium scade tra 3 giorni. Rinnova ora per non perdere i vantaggi.', time: '1 giorno fa' },
+      { id: 'offerta', icon: 'fa-solid fa-tag', title: 'Nuova offerta disponibile', desc: 'Combo Cinema + Popcorn a €12.90 solo questa settimana! Approfittane subito.', time: '2 ore fa' },
+      { id: 'rimborso', icon: 'fa-solid fa-rotate-left', title: 'Rimborso in arrivo', desc: 'Il film prenotato è stato cancellato. Riceverai un rimborso sul tuo credito entro 48 ore.', time: '3 ore fa' },
+      { id: 'anteprima', icon: 'fa-solid fa-star', title: 'Anteprima esclusiva', desc: 'Prenota i biglietti per l\'anteprima di sabato sera. Posti limitati!', time: '2 giorni fa' }
     ];
   }
 
@@ -310,9 +311,15 @@
     var loggedIn = typeof Auth !== 'undefined' && Auth && Auth.isLoggedIn && Auth.isLoggedIn();
     if (!loggedIn) {
       notifications = getEmptyNotifs();
+      localStorage.removeItem('cb-notifs-deleted');
     } else {
-      // TODO: fetch from /api/profilo/notifiche or compose from user data
-      notifications = getSampleNotifs();
+      // Load persisted deleted IDs
+      var deleted = [];
+      try { deleted = JSON.parse(localStorage.getItem('cb-notifs-deleted') || '[]'); } catch(e) { deleted = []; }
+      // Regenerate sample, filter out deleted
+      notifications = getSampleNotifs().filter(function(n) {
+        return deleted.indexOf(n.id) === -1;
+      });
     }
     // Detect new notifications vs previous
     if (loggedIn && notifications.length > 0 && notifications.length !== prevCount) {
@@ -396,8 +403,17 @@
     }
   }
 
+  function persistDeletedIds() {
+    var ids = notifications.map(function(n) { return n.id || ''; }).filter(Boolean);
+    // Save the complement — IDs that were originally there but now missing = deleted
+    var allIds = getSampleNotifs().map(function(n) { return n.id; });
+    var deleted = allIds.filter(function(id) { return ids.indexOf(id) === -1; });
+    localStorage.setItem('cb-notifs-deleted', JSON.stringify(deleted));
+  }
+
   function deleteNotif(idx) {
     notifications.splice(idx, 1);
+    persistDeletedIds();
     if (idx <= currentIndex && currentIndex > 0) currentIndex--;
     if (currentIndex >= notifications.length) currentIndex = Math.max(0, notifications.length - 1);
     updateBadge();
@@ -406,6 +422,9 @@
   }
 
   function clearAllNotifs() {
+    // Mark all as deleted
+    var allIds = getSampleNotifs().map(function(n) { return n.id; });
+    localStorage.setItem('cb-notifs-deleted', JSON.stringify(allIds));
     notifications = [];
     currentIndex = 0;
     updateBadge();
