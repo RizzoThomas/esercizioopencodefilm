@@ -50,15 +50,17 @@
             <button id="notif-prev" class="absolute left-1 z-10 text-body hover:text-ink p-1.5 rounded-full hover:bg-white/5 transition-colors">
               <i class="fa-solid fa-chevron-left text-[10px]"></i>
             </button>
-            <div id="notif-card" class="w-full mx-10 px-2 text-left">
-              <div class="flex items-center gap-2 mb-2 justify-between">
-                <div class="flex items-center gap-2">
-                  <i id="notif-card-icon" class="text-ferrari-primary text-sm"></i>
-                  <span id="notif-card-title" class="font-medium text-sm text-ink"></span>
-                </div>
-                <span id="notif-card-time" class="text-xs text-muted shrink-0"></span>
+            <div id="notif-card" class="w-full mx-10 px-2 text-left relative">
+              <!-- Delete button — top right -->
+              <button class="notif-delete absolute -top-1 -right-1 text-muted hover:text-ferrari-primary text-[11px] p-0.5" data-idx="0" title="Rimuovi">
+                <i class="fa-solid fa-xmark"></i>
+              </button>
+              <div class="flex items-center gap-2 mb-1.5 pr-4">
+                <i id="notif-card-icon" class="text-ferrari-primary text-sm"></i>
+                <span id="notif-card-title" class="font-medium text-sm text-ink"></span>
               </div>
-              <p id="notif-card-desc" class="text-xs text-body leading-relaxed"></p>
+              <p id="notif-card-desc" class="text-xs text-body leading-relaxed mb-2"></p>
+              <span id="notif-card-time" class="text-[10px] text-muted"></span>
             </div>
             <button id="notif-next" class="absolute right-1 z-10 text-body hover:text-ink p-1.5 rounded-full hover:bg-white/5 transition-colors">
               <i class="fa-solid fa-chevron-right text-[10px]"></i>
@@ -382,8 +384,10 @@
     notifCardIcon.className = n.icon + ' text-ferrari-primary text-sm';
     notifCardTitle.textContent = n.title;
     notifCardTime.textContent = n.time;
-    // Add delete button in carousel card
-    notifCardDesc.innerHTML = n.desc + ' <button class="notif-delete text-muted hover:text-ferrari-primary ml-1 text-[10px]" data-idx="' + currentIndex + '"><i class="fa-solid fa-xmark"></i></button>';
+    notifCardDesc.textContent = n.desc;
+    // Update delete button idx
+    var delBtn = document.querySelector('#notif-card .notif-delete');
+    if (delBtn) delBtn.setAttribute('data-idx', String(currentIndex));
     var card = document.getElementById('notif-card');
     if (card) { card.classList.remove('notif-carousel-enter'); void card.offsetWidth; card.classList.add('notif-carousel-enter'); }
     if (notifDots) {
@@ -420,12 +424,12 @@
       } else {
         notifList.innerHTML = notifications.map(function(n, i) {
           return '<div class="px-4 py-3 hover:bg-white/[0.03] transition relative group">' +
-            '<button class="notif-delete absolute top-2 right-2 text-muted hover:text-ferrari-primary text-[10px] opacity-0 group-hover:opacity-100 transition-opacity" data-idx="' + i + '"><i class="fa-solid fa-xmark"></i></button>' +
-            '<div class="flex justify-between items-center mb-1 pr-4">' +
-              '<div class="flex items-center gap-2"><i class="' + n.icon + ' text-ferrari-primary text-xs"></i><span class="font-medium text-sm text-ink">' + n.title + '</span></div>' +
-              (n.time ? '<span class="text-xs text-muted">' + n.time + '</span>' : '') +
+            '<button class="notif-delete absolute top-2 right-2 text-muted hover:text-ferrari-primary text-[11px] opacity-0 group-hover:opacity-100 transition-opacity" data-idx="' + i + '" title="Rimuovi"><i class="fa-solid fa-xmark"></i></button>' +
+            '<div class="flex items-center gap-2 mb-1 pr-5">' +
+              '<i class="' + n.icon + ' text-ferrari-primary text-xs"></i><span class="font-medium text-sm text-ink">' + n.title + '</span>' +
             '</div>' +
-            '<p class="text-xs text-body leading-relaxed">' + n.desc + '</p>' +
+            '<p class="text-xs text-body leading-relaxed mb-1.5">' + n.desc + '</p>' +
+            (n.time ? '<span class="text-[10px] text-muted">' + n.time + '</span>' : '') +
           '</div>';
         }).join('');
       }
