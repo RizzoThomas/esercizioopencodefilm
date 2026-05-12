@@ -121,8 +121,9 @@ var RouteGuard = (function () {
     var permission = PAGE_PERMISSIONS[pageKey];
     if (!permission) return true;
 
+    // On anonymousOnly pages (login, register), NEVER refresh — let user log in fresh
     var isLoggedIn = isTokenValid();
-    if (!isLoggedIn) {
+    if (!isLoggedIn && !permission.anonymousOnly) {
       var refreshed = await tryProactiveRefresh();
       if (refreshed) {
         isLoggedIn = isTokenValid();
