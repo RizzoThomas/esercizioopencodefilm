@@ -133,21 +133,64 @@
   <div class="marquee-wrapper">
     <div class="marquee-track">
       <div class="marquee-group">
-        <a href="/programmazione.html" class="marquee-item"><i class="fa-solid fa-film"></i><strong>Nuove uscite</strong> ogni settimana</a>
-        <a href="/programmazione.html" class="marquee-item"><i class="fa-solid fa-ticket"></i><strong>Prenota</strong> il tuo posto</a>
-        <a href="/offerte.html" class="marquee-item"><i class="fa-solid fa-popcorn"></i><strong>Offerte combo</strong> cinema + snack</a>
-        <span class="marquee-item"><i class="fa-solid fa-star"></i><strong>IMAX</strong> &middot; Dolby Atmos</span>
-        <a href="/my-cinemas.html" class="marquee-item"><i class="fa-solid fa-location-dot"></i><strong>3 cinema</strong> in tutta Italia</a>
+        <a href="/programmazione.html" class="marquee-item"><i class="fa-solid fa-film"></i><strong>Nuove uscite</strong><span> ogni settimana</span></a>
+        <a href="/programmazione.html" class="marquee-item"><i class="fa-solid fa-ticket"></i><strong>Prenota</strong><span> il tuo posto</span></a>
+        <a href="/offerte.html" class="marquee-item"><i class="fa-solid fa-popcorn"></i><strong>Offerte combo</strong><span> cinema + snack</span></a>
+        <span class="marquee-item"><i class="fa-solid fa-star"></i><strong>IMAX</strong><span> &middot; Dolby Atmos</span></span>
+        <a href="/my-cinemas.html" class="marquee-item"><i class="fa-solid fa-location-dot"></i><strong>Cinema</strong><span> in Italia</span></a>
       </div>
       <div class="marquee-group">
-        <a href="/programmazione.html" class="marquee-item"><i class="fa-solid fa-film"></i><strong>Nuove uscite</strong> ogni settimana</a>
-        <a href="/programmazione.html" class="marquee-item"><i class="fa-solid fa-ticket"></i><strong>Prenota</strong> il tuo posto</a>
-        <a href="/offerte.html" class="marquee-item"><i class="fa-solid fa-popcorn"></i><strong>Offerte combo</strong> cinema + snack</a>
-        <span class="marquee-item"><i class="fa-solid fa-star"></i><strong>IMAX</strong> &middot; Dolby Atmos</span>
-        <a href="/my-cinemas.html" class="marquee-item"><i class="fa-solid fa-location-dot"></i><strong>3 cinema</strong> in tutta Italia</a>
+        <a href="/programmazione.html" class="marquee-item"><i class="fa-solid fa-film"></i><strong>Nuove uscite</strong><span> ogni settimana</span></a>
+        <a href="/programmazione.html" class="marquee-item"><i class="fa-solid fa-ticket"></i><strong>Prenota</strong><span> il tuo posto</span></a>
+        <a href="/offerte.html" class="marquee-item"><i class="fa-solid fa-popcorn"></i><strong>Offerte combo</strong><span> cinema + snack</span></a>
+        <span class="marquee-item"><i class="fa-solid fa-star"></i><strong>IMAX</strong><span> &middot; Dolby Atmos</span></span>
+        <a href="/my-cinemas.html" class="marquee-item"><i class="fa-solid fa-location-dot"></i><strong>Cinema</strong><span> in Italia</span></a>
       </div>
     </div>
   </div>
+
+  <script>
+  // Seamless infinite marquee — clones + smooth scroll, no visible reset
+  (function(){
+    var track = document.querySelector('.marquee-track');
+    if (!track) return;
+    var orig = track.querySelector('.marquee-group');
+    if (!orig) return;
+
+    // Clone groups so we always have visible buffer (no gray gaps)
+    var cloneCount = 5; // total = 1 original + 5 clones = 6 groups
+    for (var i = 0; i < cloneCount; i++) {
+      track.appendChild(orig.cloneNode(true));
+    }
+
+    var speed = 0.6; // px per frame
+    var pos = 0;
+    var groupCount = 0;
+    var cycle = 0;
+
+    function measure() {
+      var g = track.querySelectorAll('.marquee-group');
+      groupCount = g.length;
+      // track.offsetWidth / number of groups = exact width of one group incl. any gap
+      cycle = groupCount > 0 ? track.offsetWidth / groupCount : 0;
+      if (cycle <= 0) cycle = g[0] ? g[0].offsetWidth : 1000;
+    }
+
+    function step() {
+      pos -= speed;
+      // Reset by one cycle when we've scrolled past the first group
+      // With many clones, this reset is completely invisible
+      if (pos <= -cycle) pos += cycle;
+      track.style.transform = 'translate3d(' + pos.toFixed(4) + 'px, 0, 0)';
+      requestAnimationFrame(step);
+    }
+
+    measure();
+    var ro = new ResizeObserver(measure);
+    ro.observe(track);
+    requestAnimationFrame(step);
+  })();
+  </script>
 
   <div id="footer-container"></div>
 

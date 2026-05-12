@@ -1791,6 +1791,23 @@ html.light footer .hover\:text-white:hover {
 }
 
 /* ========================================================================
+   Light Theme — Hero retains cinematic dark overlay
+   Text stays white (identical to dark mode)
+   ======================================================================== */
+
+html.light .hero-cinema-title {
+  color: #ffffff;
+}
+
+html.light .shimmer-text {
+  --ferrari-ink: #ffffff;
+}
+
+html.light .hero-cinema-subtitle {
+  color: #969696;
+}
+
+/* ========================================================================
    21st.dev INSPIRED EFFECTS
    ======================================================================== */
 
@@ -2072,18 +2089,21 @@ html.light footer .hover\:text-white:hover {
 }
 .marquee-track {
   display: flex; width: max-content;
-  animation: marqueeScroll 30s linear infinite;
-}
-@keyframes marqueeScroll {
-  0%   { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
+  gap: 0;
+  will-change: transform;
 }
 .marquee-group {
   display: flex; flex-shrink: 0;
-  gap: 2rem;
+  gap: 3.5rem;
+  white-space: nowrap;
+  margin-right: 3.5rem;
+}
+.marquee-group a,
+.marquee-group span {
+  white-space: nowrap;
 }
 .marquee-item {
-  display: inline-flex; align-items: center; gap: 0.5rem;
+  display: flex; align-items: center; gap: 0.5rem;
   font-family: var(--ferrari-font); font-size: 14px; font-weight: 500;
   color: var(--ferrari-body); white-space: nowrap;
   text-decoration: none; flex-shrink: 0;

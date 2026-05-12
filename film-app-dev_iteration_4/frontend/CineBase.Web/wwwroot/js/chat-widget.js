@@ -1,5 +1,6 @@
 /**
- * CineBase Chat Widget v2 — Minimal, robust, fixed overlay
+ * CineBase Chat Widget v3 — Minimal, robust, fixed overlay
+ * + Quick replies with stock answers
  */
 (function () {
   'use strict';
@@ -7,6 +8,30 @@
 
   const API_BASE = window.API_BASE_URL || 'http://localhost:5000';
   let failed = 0, open = false;
+
+  // ── Stock FAQ ─────────────────────────────────────
+  const STOCK_QA = [
+    {
+      q: '🎬 Film in programmazione',
+      a: 'Puoi consultare la programmazione completa nella sezione <b>Programmazione</b> del nostro sito. Troverai tutti i film attualmente in sala, orari e tipologia di sala (2D, 3D, IMAX).<br><br>👉 <a href="/programmazione.html" style="color:#da291c;text-decoration:underline">Vai alla programmazione</a>'
+    },
+    {
+      q: '🎟️ Come acquistare un biglietto',
+      a: 'Per acquistare un biglietto:<br>1. Scegli il film dalla <b>Programmazione</b><br>2. Seleziona data e orario<br>3. Scegli il posto in sala<br>4. Procedi al pagamento<br><br>Puoi pagare con carta di credito, debito o PayPal.'
+    },
+    {
+      q: '🍿 Offerte e promozioni',
+      a: 'Abbiamo diverse offerte attive:<br>• <b>Combo Cinema + Snack</b>: biglietto + popcorn + bevanda a prezzo speciale<br>• <b>Offerte famiglia</b>: sconti per gruppi<br>• <b>Abbonamento CineBase</b>: cinema illimitato ogni mese<br><br>👉 <a href="/offerte.html" style="color:#da291c;text-decoration:underline">Scopri le offerte</a>'
+    },
+    {
+      q: '📍 Dove si trovano i cinema',
+      a: 'CineBase ha <b>3 cinema</b> in tutta Italia. Puoi trovare indirizzi, mappe e contatti nella sezione <b>I Nostri Cinema</b> del sito.<br><br>👉 <a href="/my-cinemas.html" style="color:#da291c;text-decoration:underline">Vedi i cinema</a>'
+    },
+    {
+      q: '📝 Come registrarsi',
+      a: 'La registrazione è gratuita e veloce! Clicca su <b>Registrati</b> nel menu in alto, inserisci email e password, e in pochi secondi avrai accesso a tutte le funzionalità: prenotazioni, cronologia acquisti e offerte personalizzate.<br><br>👉 <a href="/registrazione.html" style="color:#da291c;text-decoration:underline">Registrati ora</a>'
+    }
+  ];
 
   function init() {
     if (!document.body) { setTimeout(init, 30); return; }
@@ -79,8 +104,60 @@
     Object.assign(msgs.style, {
       flex:'1', overflowY:'auto', padding:'14px', display:'flex', flexDirection:'column', gap:'8px'
     });
-    msgs.innerHTML = '<div style="max-width:85%;align-self:flex-start;padding:10px 12px;background:var(--ferrari-canvas-elevated,#303030);color:var(--ferrari-ink,#fff);font-size:13px;line-height:1.5">Ciao! 👋 Sono l\'assistente di <b>CineBase</b>. Chiedimi informazioni su programmazione, biglietti, offerte e altro!</div>';
+    msgs.innerHTML = '<div style="max-width:85%;align-self:flex-start;padding:10px 12px;background:var(--ferrari-canvas-elevated,#303030);color:var(--ferrari-ink,#fff);font-size:13px;line-height:1.5">Ciao! 👋 Sono l\'assistente di <b>CineBase</b>. Scegli una domanda qui sotto o scrivimi liberamente!</div>';
     panel.appendChild(msgs);
+
+    // ── Quick reply chips ──────────────────────────
+    const qrWrap = document.createElement('div');
+    Object.assign(qrWrap.style, {
+      padding:'8px 10px 10px', display:'flex', flexWrap:'wrap', gap:'5px',
+      borderTop:'1px solid var(--ferrari-hairline,#303030)',
+      background:'var(--ferrari-canvas,#181818)',
+      maxHeight:'112px', overflowY:'auto'
+    });
+    STOCK_QA.forEach(item => {
+      const chip = document.createElement('button');
+      Object.assign(chip.style, {
+        padding:'5px 10px', border:'1px solid var(--ferrari-hairline,#303030)',
+        background:'var(--ferrari-canvas-elevated,#303030)',
+        color:'var(--ferrari-ink,#fff)',
+        fontSize:'11px', fontWeight:'500', lineHeight:'1.3',
+        cursor:'pointer', borderRadius:'9999px', whiteSpace:'nowrap',
+        fontFamily:'inherit', transition:'all 0.15s'
+      });
+      chip.textContent = item.q;
+      chip.onmouseenter = () => { chip.style.borderColor = '#da291c'; chip.style.background = 'rgba(218,41,28,0.15)'; };
+      chip.onmouseleave = () => { chip.style.borderColor = 'var(--ferrari-hairline,#303030)'; chip.style.background = 'var(--ferrari-canvas-elevated,#303030)'; };
+      chip.onclick = () => {
+        handleStockClick(item);
+        // Close chips after click
+        qrWrap.style.display = 'none';
+      };
+      qrWrap.appendChild(chip);
+    });
+
+    // Button to re-show chips
+    const showQrBtn = document.createElement('button');
+    Object.assign(showQrBtn.style, {
+      display:'none', alignSelf:'flex-start', marginTop:'4px',
+      padding:'4px 10px', border:'1px dashed var(--ferrari-hairline,#303030)',
+      background:'transparent', color:'var(--ferrari-body,#969696)',
+      fontSize:'11px', cursor:'pointer', borderRadius:'9999px',
+      fontFamily:'inherit', transition:'all 0.15s'
+    });
+    showQrBtn.textContent = '+ Domande frequenti';
+    showQrBtn.onmouseenter = () => { showQrBtn.style.borderColor = '#da291c'; showQrBtn.style.color = '#da291c'; };
+    showQrBtn.onmouseleave = () => { showQrBtn.style.borderColor = 'var(--ferrari-hairline,#303030)'; showQrBtn.style.color = 'var(--ferrari-body,#969696)'; };
+    showQrBtn.onclick = () => {
+      qrWrap.style.display = 'flex';
+      showQrBtn.style.display = 'none';
+    };
+
+    panel.appendChild(qrWrap);
+
+    // "More questions" button (hidden until first interaction)
+    showQrBtn.style.display = 'none';
+    msgs.appendChild(showQrBtn);
 
     // Input row
     const row = document.createElement('div');
@@ -119,7 +196,9 @@
     tf.appendChild(tSub);
     tf.appendChild(tMsg);
     tf.appendChild(tBtn);
-    panel.appendChild(tf);
+
+    // Insert ticket form AFTER messages area
+    panel.insertBefore(tf, qrWrap);
 
     document.documentElement.appendChild(fab);
     document.documentElement.appendChild(panel);
@@ -134,6 +213,9 @@
         panel.style.transform = 'translateY(0) scale(1)';
         fab.innerHTML = '<i class="fa-solid fa-times"></i>';
         inp.focus();
+        // Reset chips visibility
+        qrWrap.style.display = 'flex';
+        showQrBtn.style.display = 'none';
       } else {
         panel.style.opacity = '0';
         panel.style.visibility = 'hidden';
@@ -147,11 +229,18 @@
     function addMsg(text, cls) {
       const d = document.createElement('div');
       d.style.cssText = cls === 'user'
-        ? 'max-width:85%;align-self:flex-end;padding:10px 12px;background:#da291c;color:#fff;font-size:13px;line-height:1.5'
-        : 'max-width:85%;align-self:flex-start;padding:10px 12px;background:var(--ferrari-canvas-elevated,#303030);color:var(--ferrari-ink,#fff);font-size:13px;line-height:1.5';
+        ? 'max-width:97%;align-self:flex-end;padding:10px 12px;background:#da291c;color:#fff;font-size:13px;line-height:1.5;border-radius:8px 8px 4px 8px'
+        : 'max-width:97%;align-self:flex-start;padding:10px 12px;background:var(--ferrari-canvas-elevated,#303030);color:var(--ferrari-ink,#fff);font-size:13px;line-height:1.5;border-radius:8px 8px 8px 4px';
       d.innerHTML = text;
       msgs.appendChild(d);
       scroll();
+    }
+
+    function handleStockClick(item) {
+      addMsg(item.q, 'user');
+      addMsg(item.a, 'bot');
+      // Show "altre domande" button
+      showQrBtn.style.display = 'inline-block';
     }
 
     send.onclick = async () => {
@@ -159,6 +248,10 @@
       if (!txt) return;
       addMsg(txt, 'user');
       inp.value = '';
+      // Hide chips on custom message
+      qrWrap.style.display = 'none';
+      // Show "domande frequenti" button
+      showQrBtn.style.display = 'inline-block';
       try {
         const r = await fetch(API_BASE + '/api/chat', {
           method:'POST', headers:{'Content-Type':'application/json'},
