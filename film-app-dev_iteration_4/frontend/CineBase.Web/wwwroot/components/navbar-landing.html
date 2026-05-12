@@ -464,24 +464,6 @@
     renderCarouselCard();
   }
 
-  function showList() {
-    isCarousel = false;
-    if (notifCarousel) notifCarousel.classList.add('hidden');
-    if (notifList) {
-      notifList.classList.remove('hidden');
-      notifList.innerHTML = notifications.map(function(n) {
-        return '<div class="px-4 py-3 hover:bg-white/[0.03] transition">' +
-          '<div class="flex justify-between items-center mb-1">' +
-            '<div class="flex items-center gap-2"><i class="' + n.icon + ' text-ferrari-primary text-xs"></i><span class="font-medium text-sm text-ink">' + n.title + '</span></div>' +
-            (n.time ? '<span class="text-xs text-muted">' + n.time + '</span>' : '') +
-          '</div>' +
-          '<p class="text-xs text-body leading-relaxed">' + n.desc + '</p>' +
-        '</div>';
-      }).join('');
-    }
-    if (notifViewIcon) { notifViewIcon.className = 'fa-solid fa-grip text-xs'; }
-  }
-
   function nextNotif() {
     currentIndex = (currentIndex + 1) % notifications.length;
     renderCarouselCard();
