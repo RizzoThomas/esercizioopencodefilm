@@ -2808,3 +2808,17 @@ html.light .hero-cinema-subtitle {
 .progress-spinner-lg { width: 48px; height: 48px; }
 .progress-spinner-lg circle { stroke-width: 3.5; stroke-dasharray: 80; stroke-dashoffset: 60; }
 
+/* ========================================================================
+   Details / Summary Accordion
+   ======================================================================== */
+
+details.card-ferrari[open] {
+  border-color: var(--ferrari-primary);
+}
+details.card-ferrari summary::-webkit-details-marker {
+  display: none;
+}
+details.card-ferrari[open] summary i.fa-chevron-down {
+  transform: rotate(180deg);
+}
+

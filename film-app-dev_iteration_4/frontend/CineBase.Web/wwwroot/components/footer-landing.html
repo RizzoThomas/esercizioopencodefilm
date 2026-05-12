@@ -9,11 +9,24 @@
       <!-- Brand (col-span-2) -->
       <div class="lg:col-span-2 space-y-5">
         <div class="flex items-center gap-3">
-          <span class="text-2xl font-bold tracking-tight text-white">🎬 CineBase</span>
+          <span class="text-2xl font-bold tracking-tight text-white">&zwnj;🎬 CineBase</span>
         </div>
         <p class="text-[#888] text-sm leading-relaxed max-w-xs">
           La piattaforma leader per la gestione centralizzata delle sale cinematografiche. Scopri film, prenota biglietti e gestisci il tuo cinema.
         </p>
+
+        <!-- Newsletter -->
+        <div class="pt-2">
+          <h4 class="text-xs font-semibold uppercase tracking-wider text-[#888] mb-3">Newsletter</h4>
+          <form id="newsletter-form" class="flex gap-2">
+            <input type="email" id="newsletter-email" placeholder="La tua email" required
+              class="flex-1 px-3 py-2 text-xs bg-[#141414] border border-[#252525] text-white placeholder-[#555] outline-none focus:border-ferrari-primary transition-colors">
+            <button type="submit" class="px-4 py-2 text-xs font-semibold uppercase tracking-wider bg-ferrari-primary text-white hover:bg-red-700 transition-colors">
+              Iscriviti
+            </button>
+          </form>
+          <p id="newsletter-msg" class="text-xs mt-2 hidden"></p>
+        </div>
       </div>
 
       <!-- Links (col-span-3) -->
@@ -42,9 +55,9 @@
           <div class="space-y-3">
             <h4 class="text-xs font-semibold uppercase tracking-wider text-[#888]">Supporto</h4>
             <ul class="space-y-2.5">
-              <li><a href="#" class="text-sm text-[#bbb] hover:text-white transition-colors">Centro Assistenza</a></li>
-              <li><a href="#" class="text-sm text-[#bbb] hover:text-white transition-colors">Termini e Condizioni</a></li>
-              <li><a href="#" class="text-sm text-[#bbb] hover:text-white transition-colors">Privacy</a></li>
+              <li><a href="/assistenza.html" class="text-sm text-[#bbb] hover:text-white transition-colors">Centro Assistenza</a></li>
+              <li><a href="/termini.html" class="text-sm text-[#bbb] hover:text-white transition-colors">Termini e Condizioni</a></li>
+              <li><a href="/privacy.html" class="text-sm text-[#bbb] hover:text-white transition-colors">Privacy</a></li>
             </ul>
           </div>
         </div>
@@ -54,23 +67,45 @@
     <!-- Bottom bar -->
     <div class="pt-6 border-t border-[#1a1a1a] flex flex-col md:flex-row justify-between items-center gap-4">
       <div class="flex gap-3">
-        <a href="#" class="w-10 h-10 bg-[#141414] hover:bg-[#1f1f1f] border border-[#252525] flex items-center justify-center transition-all hover:scale-105">
+        <a href="https://facebook.com/CineBase" target="_blank" rel="noopener" class="w-10 h-10 bg-[#141414] hover:bg-[#1f1f1f] border border-[#252525] flex items-center justify-center transition-all hover:scale-105"
+           title="Facebook">
           <i class="fa-brands fa-facebook text-[#bbb] text-sm"></i>
         </a>
-        <a href="#" class="w-10 h-10 bg-[#141414] hover:bg-[#1f1f1f] border border-[#252525] flex items-center justify-center transition-all hover:scale-105">
+        <a href="https://instagram.com/CineBase" target="_blank" rel="noopener" class="w-10 h-10 bg-[#141414] hover:bg-[#1f1f1f] border border-[#252525] flex items-center justify-center transition-all hover:scale-105"
+           title="Instagram">
           <i class="fa-brands fa-instagram text-[#bbb] text-sm"></i>
         </a>
-        <a href="#" class="w-10 h-10 bg-[#141414] hover:bg-[#1f1f1f] border border-[#252525] flex items-center justify-center transition-all hover:scale-105">
+        <a href="https://twitter.com/CineBase" target="_blank" rel="noopener" class="w-10 h-10 bg-[#141414] hover:bg-[#1f1f1f] border border-[#252525] flex items-center justify-center transition-all hover:scale-105"
+           title="X (Twitter)">
           <i class="fa-brands fa-x-twitter text-[#bbb] text-sm"></i>
         </a>
       </div>
-      <p class="text-xs text-[#555]">© 2026 CineBase. Tutti i diritti riservati.</p>
+      <p class="text-xs text-[#555]">&copy; 2026 CineBase. Tutti i diritti riservati.</p>
+    </div>
+  </div>
+
+  <!-- Cookie Consent Banner -->
+  <div id="cookie-banner" class="fixed bottom-0 left-0 right-0 z-[9999] bg-[#0a0a0a] border-t border-[#252525] px-6 py-4 translate-y-full transition-transform duration-500 ease-in-out">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <p class="text-xs text-[#bbb] leading-relaxed max-w-2xl">
+        Questo sito utilizza cookie tecnici necessari al funzionamento e cookie analitici per migliorare l'esperienza utente.
+        Leggi la <a href="/privacy.html" class="text-ferrari-primary underline hover:text-red-400">Privacy Policy</a> per maggiori informazioni.
+      </p>
+      <div class="flex gap-2 shrink-0">
+        <button id="cookie-accept" class="px-4 py-2 text-xs font-semibold uppercase tracking-wider bg-ferrari-primary text-white hover:bg-red-700 transition-colors">
+          Accetta
+        </button>
+        <button id="cookie-reject" class="px-4 py-2 text-xs font-semibold uppercase tracking-wider border border-[#555] text-[#bbb] hover:bg-[#1f1f1f] hover:text-white transition-colors">
+          Rifiuta
+        </button>
+      </div>
     </div>
   </div>
 </footer>
 
 <script>
 (function () {
+  // ── Auth UI ──────────────────────────────────
   const loginLink = document.getElementById('footer-login-link');
   const registerLink = document.getElementById('footer-register-link');
   const profileLink = document.getElementById('footer-profile-link');
@@ -107,5 +142,45 @@
   updateFooterAuthUI();
   document.addEventListener('components:loaded', updateFooterAuthUI);
   window.updateFooterAuthUI = updateFooterAuthUI;
+
+  // ── Newsletter ──────────────────────────────
+  const newsForm = document.getElementById('newsletter-form');
+  const newsEmail = document.getElementById('newsletter-email');
+  const newsMsg = document.getElementById('newsletter-msg');
+  if (newsForm) {
+    newsForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+      const email = newsEmail.value.trim();
+      if (!email) return;
+      newsMsg.className = 'text-xs mt-2';
+      newsMsg.classList.remove('hidden');
+      // Simulate subscription — no backend needed for now
+      newsMsg.style.color = '#4ade80';
+      newsMsg.textContent = '✅ Grazie per esserti iscritto alla newsletter!';
+      newsEmail.value = '';
+      setTimeout(function () { newsMsg.classList.add('hidden'); }, 5000);
+    });
+  }
+
+  // ── Cookie Consent ──────────────────────────
+  var banner = document.getElementById('cookie-banner');
+  var acceptBtn = document.getElementById('cookie-accept');
+  var rejectBtn = document.getElementById('cookie-reject');
+
+  if (banner && !localStorage.getItem('cinebase-cookie-consent')) {
+    // Show banner on next frame
+    requestAnimationFrame(function () {
+      banner.style.transform = 'translateY(0)';
+    });
+  }
+
+  function handleCookieConsent(choice) {
+    localStorage.setItem('cinebase-cookie-consent', choice);
+    banner.style.transform = 'translateY(100%)';
+    setTimeout(function () { banner.style.display = 'none'; }, 500);
+  }
+
+  if (acceptBtn) acceptBtn.addEventListener('click', function () { handleCookieConsent('accepted'); });
+  if (rejectBtn) rejectBtn.addEventListener('click', function () { handleCookieConsent('rejected'); });
 })();
 </script>
