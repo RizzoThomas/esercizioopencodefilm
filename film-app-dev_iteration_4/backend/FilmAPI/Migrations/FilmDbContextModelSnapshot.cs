@@ -503,6 +503,71 @@ namespace FilmAPI.Migrations
                     b.ToTable("MovimentiCredito");
                 });
 
+            modelBuilder.Entity("FilmAPI.Model.Notifica", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Descrizione")
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)");
+
+                    b.Property<string>("Icona")
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<bool>("Letto")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("Tipo")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<string>("Titolo")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Notifiche");
+                });
+
+            modelBuilder.Entity("FilmAPI.Model.NotificaSoppressa", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("SourceId")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("NotificheSoppresse");
+                });
+
             modelBuilder.Entity("FilmAPI.Model.Offerta", b =>
                 {
                     b.Property<int>("Id")
@@ -1456,6 +1521,28 @@ namespace FilmAPI.Migrations
                     b.Navigation("OperatoreUser");
 
                     b.Navigation("Ordine");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("FilmAPI.Model.Notifica", b =>
+                {
+                    b.HasOne("FilmAPI.Model.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("FilmAPI.Model.NotificaSoppressa", b =>
+                {
+                    b.HasOne("FilmAPI.Model.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("User");
                 });
