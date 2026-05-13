@@ -306,11 +306,18 @@
 
   function loadNotifications() {
     var prevCount = notifications.length;
+    var loggedIn = typeof Auth !== 'undefined' && Auth && Auth.isLoggedIn && Auth.isLoggedIn();
+    if (!loggedIn) {
+      notifications = getEmptyNotifs();
+      updateAll();
+      return;
+    }
 
-    // Wait for Auth to be ready (max 3s)
-    function waitForAuth(attempts) {
-      attempts = attempts || 0;
-      if (attempts > 12) { // 12 * 250ms = 3s timeout
+    // Fetch real notifications from API
+    API.getNotifications().then(function(data) {
+      if (data && data.length > 0) {
+        notifications = data;
+      } else {
         notifications = [{
           id: 'empty',
           icon: 'fa-solid fa-bell-slash',
@@ -318,37 +325,19 @@
           desc: '',
           time: ''
         }];
-        updateAll();
-        return;
       }
-      var loggedIn = typeof Auth !== 'undefined' && Auth && Auth.isLoggedIn && Auth.isLoggedIn();
-      if (!loggedIn) {
-        notifications = getEmptyNotifs();
-        updateAll();
-        return;
-      }
-
-      // Try fetching real notifications from API
-      API.getNotifications().then(function(data) {
-        if (data && data.length > 0) {
-          notifications = data;
-        } else {
-          notifications = [{
-            id: 'empty',
-            icon: 'fa-solid fa-bell-slash',
-            title: 'Nessuna notifica',
-            desc: '',
-            time: ''
-          }];
-        }
-        if (notifications.length !== prevCount) triggerBellPulse();
-        updateAll();
-      }).catch(function() {
-        // Retry if auth token not ready yet (401)
-        setTimeout(function() { waitForAuth(attempts + 1); }, 250);
-      });
-    }
-    waitForAuth();
+      if (notifications.length !== prevCount) triggerBellPulse();
+      updateAll();
+    }).catch(function() {
+      notifications = [{
+        id: 'empty',
+        icon: 'fa-solid fa-bell-slash',
+        title: 'Nessuna notifica',
+        desc: '',
+        time: ''
+      }];
+      updateAll();
+    });
   }
 
   function triggerBellShake() {
