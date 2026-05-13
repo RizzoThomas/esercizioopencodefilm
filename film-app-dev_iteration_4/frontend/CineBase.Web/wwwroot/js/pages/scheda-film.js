@@ -644,3 +644,66 @@ function getUserLocation() {
 }
 
 window.selectCinema = selectCinema;
+
+// ─── Watchlist ──────────────────────────────────────────
+let isWatchlistSaved = false;
+
+async function checkWatchlistStatus() {
+  const auth = getAuthSafe();
+  if (!auth || !auth.isLoggedIn()) return;
+
+  try {
+    const result = await API.checkWatchlist(parseInt(filmId, 10));
+    isWatchlistSaved = result.isSaved;
+    updateWatchlistIcon();
+  } catch {
+    // ignore - user not logged in or error
+  }
+}
+
+function updateWatchlistIcon() {
+  const icon = document.getElementById('watchlist-icon');
+  if (!icon) return;
+  if (isWatchlistSaved) {
+    icon.className = 'fa-solid fa-bookmark text-ferrari-primary';
+  } else {
+    icon.className = 'fa-regular fa-bookmark';
+  }
+}
+
+async function toggleWatchlist() {
+  const auth = getAuthSafe();
+  if (!auth || !auth.isLoggedIn()) {
+    window.location.href = '/login.html?redirect=' + encodeURIComponent(window.location.href);
+    return;
+  }
+
+  try {
+    if (isWatchlistSaved) {
+      await API.removeFromWatchlist(parseInt(filmId, 10));
+      isWatchlistSaved = false;
+      showToast('Film rimosso dalla watchlist');
+    } else {
+      await API.addToWatchlist(parseInt(filmId, 10));
+      isWatchlistSaved = true;
+      showToast('Film salvato nella watchlist!');
+    }
+    updateWatchlistIcon();
+  } catch {
+    showToast('Errore, riprova', 'danger');
+  }
+}
+
+// Check watchlist status after film loads
+const _origLoadFilm = loadFilm;
+loadFilm = async function() {
+  await _origLoadFilm();
+  // Wait a tick for DOM to settle, then check watchlist
+  setTimeout(async () => {
+    if (document.getElementById('watchlist-icon')) {
+      await checkWatchlistStatus();
+    }
+  }, 100);
+};
+
+window.toggleWatchlist = toggleWatchlist;

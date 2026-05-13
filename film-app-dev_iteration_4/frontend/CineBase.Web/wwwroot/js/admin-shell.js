@@ -37,6 +37,10 @@
     if (!sb) return;
     sb.classList.toggle('-translate-x-full');
     if (bd) bd.classList.toggle('hidden');
+    // Hamburger animation
+    document.querySelectorAll('#admin-sidebar-toggle').forEach(function(el) {
+      el.classList.toggle('hamburger-open');
+    });
   }
 
   function setActiveLinks() {
@@ -84,7 +88,7 @@
 
     const shell = document.createElement('div');
     shell.innerHTML = `
-    <div id="admin-shell-root" class="flex h-screen overflow-hidden bg-[#0c0c0c]">
+    <div id="admin-shell-root" class="flex h-screen overflow-hidden bg-[#f5f5f5]">
       <!-- Backdrop mobile -->
       <div id="admin-sidebar-backdrop" class="fixed inset-0 bg-black/60 z-40 hidden md:hidden backdrop-blur-sm"></div>
 
@@ -92,31 +96,31 @@
       <aside id="admin-sidebar"
         class="w-64 flex-shrink-0 flex flex-col fixed md:relative inset-y-0 left-0 z-50
                -translate-x-full md:translate-x-0 transition-transform duration-300
-               bg-[#0f0f0f] border-r border-[#1f1f1f]">
+               bg-[#fff] border-r border-[#e5e5e5]">
         
         <!-- Logo -->
-        <div class="px-5 py-5 border-b border-[#1f1f1f]">
+        <div class="px-5 py-5 border-b border-[#e5e5e5]">
           <a href="/index.html" class="flex items-center gap-3">
             <div class="w-9 h-9 bg-ferrari-primary flex items-center justify-center">
               <i class="fa-solid fa-film text-white text-sm"></i>
             </div>
             <div>
-              <span class="text-base font-bold text-white tracking-tight">CineBase</span>
-              <p class="text-[10px] text-[#666] uppercase tracking-widest">Admin</p>
+              <span class="text-base font-bold text-[#111] tracking-tight">CineBase</span>
+              <p class="text-[10px] text-[#888] uppercase tracking-widest">Admin</p>
             </div>
           </a>
         </div>
 
         <!-- Nav -->
         <nav class="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
-          <p class="px-3 mb-2 text-[10px] font-semibold uppercase tracking-widest text-[#555]">Menu</p>
+          <p class="px-3 mb-2 text-[10px] font-semibold uppercase tracking-widest text-[#999]">Menu</p>
           <a data-admin-link href="/dashboard.html" class="admin-link"><i class="fa-solid fa-gauge-high w-5"></i>Dashboard</a>
           <a data-admin-link href="/films.html" class="admin-link"><i class="fa-solid fa-film w-5"></i>Film</a>
           <a data-admin-link href="/registi.html" class="admin-link"><i class="fa-solid fa-user w-5"></i>Registi</a>
           <a data-admin-link href="/cinemas.html" class="admin-link"><i class="fa-solid fa-building w-5"></i>Cinema</a>
           <a data-admin-link href="/proiezioni.html" class="admin-link"><i class="fa-solid fa-clock w-5"></i>Proiezioni</a>
           <a data-admin-link href="/categorie.html" class="admin-link"><i class="fa-solid fa-tags w-5"></i>Categorie</a>
-          <p class="px-3 mt-4 mb-2 text-[10px] font-semibold uppercase tracking-widest text-[#555]">Gestione</p>
+          <p class="px-3 mt-4 mb-2 text-[10px] font-semibold uppercase tracking-widest text-[#999]">Gestione</p>
           <a data-admin-link href="/utenti.html" class="admin-link" data-role-required="admin"><i class="fa-solid fa-users w-5"></i>Utenti</a>
           <a data-admin-link href="/validazione.html" class="admin-link"><i class="fa-solid fa-ticket-check w-5"></i>Validazione</a>
         </nav>
@@ -130,27 +134,27 @@
       <!-- Main content -->
       <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
         <!-- Top bar -->
-        <header class="flex-shrink-0 h-14 border-b border-[#1f1f1f] bg-[#0f0f0f]/80 backdrop-blur-md flex items-center px-4 lg:px-6 gap-4">
-          <button id="admin-sidebar-toggle" class="md:hidden p-2 -ml-2 text-[#888] hover:text-white">
-            <i class="fa-solid fa-bars text-lg"></i>
+        <header class="flex-shrink-0 h-14 border-b border-[#e5e5e5] bg-white/90 backdrop-blur-md flex items-center px-4 lg:px-6 gap-4">
+          <button id="admin-sidebar-toggle" class="md:hidden p-2 -ml-2 flex flex-col gap-[5px] text-[#555] hover:text-[#111]">
+            <span class="hamburger-line"></span>
+            <span class="hamburger-line"></span>
+            <span class="hamburger-line"></span>
           </button>
           <div class="flex items-center gap-3 min-w-0">
             <i class="fa-solid ${icon} text-ferrari-primary text-sm hidden sm:block"></i>
-            <h1 class="text-sm font-semibold text-white truncate">${title}</h1>
+            <h1 class="text-sm font-semibold text-[#111] truncate">${title}</h1>
           </div>
           <div class="flex-1"></div>
           
-          <!-- Theme toggle -->
-          <button id="admin-theme-toggle" class="p-2 text-[#888] hover:text-white transition-colors" title="Cambia tema">
+          <button id="admin-theme-toggle" class="p-2 text-[#555] hover:text-[#111] transition-colors" title="Cambia tema">
             <i class="fa-solid fa-moon text-sm"></i>
           </button>
 
-          <!-- User -->
           <div class="relative">
-            <button id="admin-user-toggle" class="flex items-center gap-2 text-sm text-[#ccc] hover:text-white transition-colors">
+            <button id="admin-user-toggle" class="flex items-center gap-2 text-sm text-[#333] hover:text-[#111] transition-colors">
               <div id="admin-user-avatar" class="w-7 h-7 bg-ferrari-primary/20 flex items-center justify-center text-ferrari-primary font-bold text-xs">AD</div>
               <span id="admin-user-name" class="hidden sm:inline text-xs">Admin</span>
-              <i class="fa-solid fa-chevron-down text-[10px] text-[#555]"></i>
+              <i class="fa-solid fa-chevron-down text-[10px] text-[#999]"></i>
             </button>
             <div id="admin-user-menu" class="hidden absolute right-0 top-full mt-2 w-52 bg-[#1a1a1a] border border-[#2a2a2a] py-1.5 z-50">
               <div class="px-4 py-2 border-b border-[#2a2a2a]">
@@ -165,7 +169,7 @@
         </header>
 
         <!-- Content -->
-        <main class="flex-1 overflow-y-auto bg-[#0c0c0c]" id="admin-shell-content"></main>
+        <main class="flex-1 overflow-y-auto bg-[#f5f5f5]" id="admin-shell-content"></main>
       </div>
     </div>
 
@@ -174,29 +178,26 @@
         display: flex; align-items: center; gap: 0.75rem;
         padding: 0.5rem 0.75rem; border-radius: 6px;
         font-size: 0.8125rem; font-weight: 500;
-        color: #888; text-decoration: none;
+        color: #555; text-decoration: none;
         transition: all 0.15s ease;
       }
-      .admin-link:hover { color: #fff; background: rgba(255,255,255,0.04); }
-      .admin-link.active { color: #fff; background: rgba(218,41,28,0.12); }
+      .admin-link:hover { color: #111; background: rgba(0,0,0,0.04); }
+      .admin-link.active { color: #111; background: rgba(218,41,28,0.08); }
       .admin-link.active i { color: var(--ferrari-primary, #da291c); }
       
       /* Light theme admin overrides */
-      html.light #admin-shell-root { background: #f8f8f8; }
+      html.light #admin-shell-root { background: #f5f5f5; }
       html.light #admin-sidebar { background: #fff; border-color: #e5e5e5; }
       html.light #admin-sidebar .border-\[\#1f1f1f\] { border-color: #e5e5e5 !important; }
       html.light .admin-link { color: #666; }
       html.light .admin-link:hover { color: #111; background: rgba(0,0,0,0.03); }
       html.light .admin-link.active { color: #111; background: rgba(218,41,28,0.06); }
-      html.light header.bg-\[\#0f0f0f\]\/80 { background: rgba(255,255,255,0.9) !important; border-color: #e5e5e5 !important; }
-      html.light header .text-white { color: #111 !important; }
-      html.light header .text-\[\#ccc\] { color: #555 !important; }
-      html.light header .text-\[\#888\] { color: #666 !important; }
+      html.light header.bg-white\/90 { background: rgba(255,255,255,0.9) !important; border-color: #e5e5e5 !important; }
+      html.light #admin-shell-content { background: #f5f5f5; }
+      html.light #admin-sidebar-backdrop { background: rgba(0,0,0,0.3); }
       html.light #admin-user-menu { background: #fff; border-color: #e5e5e5; }
       html.light #admin-user-menu .text-\[\#aaa\] { color: #666 !important; }
       html.light #admin-user-menu .border-\[\#2a2a2a\] { border-color: #e5e5e5 !important; }
-      html.light #admin-shell-content { background: #f8f8f8; }
-      html.light #admin-sidebar-backdrop { background: rgba(0,0,0,0.3); }
     </style>
     `;
 
@@ -211,14 +212,29 @@
   }
 
   function initThemeToggle() {
-    const btn = document.getElementById('admin-theme-toggle');
-    if (!btn || !window.CineBaseTheme) return;
-    function update() {
-      const t = window.CineBaseTheme.get();
-      btn.querySelector('i').className = t === 'dark' ? 'fa-solid fa-moon text-sm' : 'fa-solid fa-sun text-sm';
-    }
-    btn.addEventListener('click', () => { window.CineBaseTheme.toggle(); update(); });
-    update();
+    var btn = document.getElementById('admin-theme-toggle');
+    if (!btn) return;
+    btn.addEventListener('click', function() {
+      var root = document.documentElement;
+      var isLight = root.classList.contains('light');
+      if (isLight) {
+        root.classList.remove('light');
+        try { localStorage.setItem('cinebase-theme', 'dark'); } catch(e) {}
+      } else {
+        root.classList.add('light');
+        try { localStorage.setItem('cinebase-theme', 'light'); } catch(e) {}
+      }
+      // Update icon
+      var icon = btn.querySelector('i');
+      if (icon) icon.className = root.classList.contains('light') ? 'fa-solid fa-sun text-sm' : 'fa-solid fa-moon text-sm';
+      // Sync landing toggle icon if present
+      document.querySelectorAll('#theme-toggle i').forEach(function(el) {
+        el.className = root.classList.contains('light') ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+      });
+    });
+    // Sync icon on page load
+    var icon = btn.querySelector('i');
+    if (icon) icon.className = document.documentElement.classList.contains('light') ? 'fa-solid fa-sun text-sm' : 'fa-solid fa-moon text-sm';
   }
 
   document.addEventListener('DOMContentLoaded', () => {

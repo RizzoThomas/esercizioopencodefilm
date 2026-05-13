@@ -75,6 +75,8 @@ public class CinemaCardDTO
     public string Indirizzo { get; set; } = string.Empty;
     public List<string> TipologieSalePresenti { get; set; } = new();
     public double? DistanzaKm { get; set; }
+    public double? Latitudine { get; set; }
+    public double? Longitudine { get; set; }
 }
 
 public class CinemaScheduleDayDTO

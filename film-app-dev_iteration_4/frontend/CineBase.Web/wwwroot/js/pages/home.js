@@ -231,3 +231,68 @@ function renderCompactCard(film, score, originalIndex) {
 window.handlePrenotaFilm = function(filmId) {
   window.location.href = `/programmazione.html`;
 };
+
+// ─── AI Recommendations ──────────────────────────────────
+async function loadRecommendations() {
+  // Wait for auth
+  var tries = 0;
+  var auth = null;
+  while (tries < 20) {
+    auth = getAuthSafe();
+    if (auth && typeof auth.isLoggedIn === 'function') break;
+    await new Promise(r => setTimeout(r, 250));
+    tries++;
+  }
+
+  if (!auth || !auth.isLoggedIn()) return;
+
+  const section = document.getElementById('recommendations-section');
+  if (!section) return;
+
+  section.classList.remove('hidden');
+
+  try {
+    var token = auth.getAccessToken();
+    if (!token) { section.classList.add('hidden'); return; }
+
+    const response = await fetch((window.API_BASE_URL || 'http://localhost:5000') + '/recommendations', {
+      headers: { 'Authorization': 'Bearer ' + token }
+    });
+    if (!response.ok) throw new Error('Not available');
+
+    const data = await response.json();
+    const items = data.items || [];
+    const subtitle = document.getElementById('recommendations-subtitle');
+    if (subtitle && data.source === 'personalized') {
+      subtitle.textContent = 'Suggerimenti basati sui tuoi gusti cinematografici';
+    }
+
+    const grid = document.getElementById('recommendations-grid');
+    if (items.length === 0) {
+      grid.innerHTML = '<p class="text-body text-sm col-span-full text-center py-4">Nessun suggerimento al momento. Guarda qualche film per ricevere consigli personalizzati!</p>';
+      return;
+    }
+
+    grid.innerHTML = items.slice(0, 5).map(f => `
+      <div class="card-ferrari overflow-hidden group cursor-pointer"
+           onclick="window.location.href='/scheda-film.html?id=${f.id}'">
+        <div class="aspect-[2/3] overflow-hidden">
+          <img src="${getCoverImage(f.copertina)}" alt="${f.titolo}"
+            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            loading="lazy" decoding="async">
+        </div>
+        <div class="p-3">
+          <h3 class="font-semibold text-sm text-ink group-hover:text-ferrari-primary transition-colors line-clamp-2">${f.titolo}</h3>
+          <p class="text-xs text-body mt-1">${f.regista || '—'}</p>
+          <p class="text-[10px] text-ferrari-primary mt-2 italic">✦ ${f.motivo}</p>
+        </div>
+      </div>
+    `).join('');
+  } catch (e) {
+    // Backend not available or no data - hide gracefully
+    section.classList.add('hidden');
+  }
+}
+
+// Start loading after a delay so auth is ready
+setTimeout(loadRecommendations, 1000);

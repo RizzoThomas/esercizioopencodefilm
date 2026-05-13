@@ -33,8 +33,8 @@ async function loadLayoutComponents() {
 
   if (!navbarContainer && !footerContainer) return;
 
-  const landingPaths = new Set(['/', '/index.html', '/programmazione.html', '/scheda-film.html', '/my-cinemas.html', '/login.html', '/registrazione.html', '/profilo.html', '/acquista.html', '/pagamento.html', '/esito-acquisto.html', '/tmdb-search.html', '/forgot-password.html', '/reset-password.html', '/enable-2fa.html', '/offerte.html', '/validazione.html', '/social-login-complete.html']);
-  const adminShellPaths = new Set(['/films.html', '/registi.html', '/cinemas.html', '/proiezioni.html', '/categorie.html']);
+  const landingPaths = new Set(['/', '/index.html', '/programmazione.html', '/scheda-film.html', '/my-cinemas.html', '/my-watchlist.html', '/login.html', '/registrazione.html', '/profilo.html', '/acquista.html', '/pagamento.html', '/esito-acquisto.html', '/tmdb-search.html', '/forgot-password.html', '/reset-password.html', '/enable-2fa.html', '/offerte.html', '/validazione.html', '/social-login-complete.html']);
+  const adminShellPaths = new Set(['/films.html', '/registi.html', '/cinemas.html', '/proiezioni.html', '/categorie.html', '/dashboard.html', '/utenti.html', '/utenti-detail.html', '/validazione.html']);
   if (adminShellPaths.has(window.location.pathname)) {
     document.dispatchEvent(new Event('components:loaded'));
     return;

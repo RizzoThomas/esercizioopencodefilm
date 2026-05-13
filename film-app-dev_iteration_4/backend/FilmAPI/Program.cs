@@ -289,6 +289,8 @@ app.MapSocialAuthEndpoints();
 app.MapChatEndpoints();
 app.MapAdminAnalyticsEndpoints();
 app.MapNewsletterEndpoints();
+app.MapWatchlistEndpoints();
+app.MapRecommendationsEndpoints();
 
 app.MapGet("/config/frontend", (FrontendRuntimeConfig config) => Results.Ok(new
 {

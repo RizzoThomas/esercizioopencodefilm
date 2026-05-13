@@ -2,12 +2,19 @@
 <nav class="fixed top-0 left-0 right-0 z-50 bg-canvas md:hidden">
   <div class="px-4 py-3 flex items-center justify-between">
     <div class="flex items-center gap-3">
-      <button id="admin-sidebar-toggle" class="p-2 text-ink hover:text-ferrari-primary" aria-label="Menu">
-        <i class="fa-solid fa-bars text-xl"></i>
+      <button id="admin-sidebar-toggle" class="p-2 -ml-2 flex flex-col gap-[5px] text-ink hover:text-ferrari-primary" aria-label="Menu">
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
       </button>
       <a href="/index.html" class="flex items-center gap-2">
         <span class="text-lg font-bold tracking-wider uppercase text-ink">CineBase</span>
       </a>
+    </div>
+    <div class="flex items-center gap-3">
+      <button id="admin-theme-toggle" class="p-2 text-ink hover:text-ferrari-primary" title="Cambia tema" aria-label="Cambia tema chiaro/scuro">
+        <i class="fa-solid fa-moon"></i>
+      </button>
     </div>
   </div>
 </nav>

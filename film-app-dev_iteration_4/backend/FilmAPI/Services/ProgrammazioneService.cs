@@ -189,7 +189,9 @@ public class ProgrammazioneService : IProgrammazioneService
                 Citta = c.Citta,
                 Indirizzo = c.Indirizzo,
                 TipologieSalePresenti = tipologie,
-                DistanzaKm = distanza != null ? Math.Round(distanza.Value, 2) : null
+                DistanzaKm = distanza != null ? Math.Round(distanza.Value, 2) : null,
+                Latitudine = c.Latitudine,
+                Longitudine = c.Longitudine
             };
         }).ToList();
 
@@ -342,7 +344,9 @@ public class ProgrammazioneService : IProgrammazioneService
                 Nome = c.Nome,
                 Citta = c.Citta,
                 Indirizzo = c.Indirizzo,
-                TipologieSalePresenti = tipologie
+                TipologieSalePresenti = tipologie,
+                Latitudine = c.Latitudine,
+                Longitudine = c.Longitudine
             };
         }).ToList();
     }

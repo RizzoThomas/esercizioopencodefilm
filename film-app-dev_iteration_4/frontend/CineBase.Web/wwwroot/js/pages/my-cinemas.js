@@ -38,7 +38,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   const params = new URLSearchParams(window.location.search);
   cinemaId = params.get('IdCinema');
 
-  requestUserLocationInBackground();
+  // Wait for geolocation with timeout
+  await Promise.race([
+    getUserLocation().then(loc => { userLocation = loc; }).catch(() => {}),
+    new Promise(r => setTimeout(r, 3000))
+  ]);
 
   if (cinemaId) {
     await loadCinemaDetail();
@@ -52,7 +56,12 @@ async function loadCinemaList() {
   showLoading();
 
   try {
-    allCinemas = normalizeCollection(await API.getMyCinemas());
+    var params = {};
+    if (userLocation) {
+      params.lat = userLocation.lat;
+      params.lng = userLocation.lng;
+    }
+    allCinemas = normalizeCollection(await API.getMyCinemas(params));
 
     hideLoading();
     const listView = document.getElementById('cinema-list-view');
@@ -92,8 +101,9 @@ function renderCinemaList() {
           <i class="fa-solid fa-film text-ferrari-primary text-xl mt-1"></i>
           <div class="flex-1 min-w-0">
             <h3 class="font-semibold text-lg text-ink group-hover:text-ferrari-primary transition-colors truncate">${cinema.nome}</h3>
-            <p class="text-sm text-body">
+            <p class="text-sm text-body cursor-pointer hover:text-ferrari-primary transition-colors" onclick="event.stopPropagation(); openCinemaMap(${cinema.id})">
               <i class="fa-solid fa-location-dot mr-1"></i>${cinema.citta}${cinema.indirizzo ? ` - ${cinema.indirizzo}` : ''}
+              <i class="fa-solid fa-map ml-1 text-xs"></i>
             </p>
             ${distance ? `<p class="text-xs text-body mt-1"><i class="fa-solid fa-location-crosshairs mr-1"></i>${distance}</p>` : ''}
           </div>
@@ -117,7 +127,12 @@ async function loadCinemaDetail() {
   showLoading();
 
   try {
-    allCinemas = normalizeCollection(await API.getMyCinemas());
+    var cParams = {};
+    if (userLocation) {
+      cParams.lat = userLocation.lat;
+      cParams.lng = userLocation.lng;
+    }
+    allCinemas = normalizeCollection(await API.getMyCinemas(cParams));
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -271,10 +286,64 @@ function renderSchedule() {
     `;
   }).join('');
 
+  // Show accessibility filters
+  showAccessibilityFilters();
+
+  // Apply accessibility filters
+  applyAccessibilityFilters(container);
+
   container.querySelectorAll('.show-time-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const showId = btn.dataset.showId;
       handleShowClick(parseInt(showId, 10));
+    });
+  });
+}
+
+function applyAccessibilityFilters(container) {
+  const activeFilters = [];
+  if (accessibilityFilters.subtitles) activeFilters.push('subtitles');
+  if (accessibilityFilters.audiodesc) activeFilters.push('audiodesc');
+
+  const filmCards = container.querySelectorAll('.film-schedule-card');
+  filmCards.forEach(card => {
+    const buttons = card.querySelectorAll('.show-time-btn');
+    let visibleCount = 0;
+
+    buttons.forEach(btn => {
+      if (activeFilters.length === 0) {
+        btn.classList.remove('hidden');
+        visibleCount++;
+        return;
+      }
+
+      let match = true;
+      if (accessibilityFilters.subtitles && !btn.classList.contains('a11y-subtitles')) match = false;
+      if (accessibilityFilters.audiodesc && !btn.classList.contains('a11y-audiodesc')) match = false;
+
+      if (match) {
+        btn.classList.remove('hidden');
+        visibleCount++;
+      } else {
+        btn.classList.add('hidden');
+      }
+    });
+
+    // Hide entire film card if no shows match
+    if (activeFilters.length > 0 && visibleCount === 0) {
+      card.classList.add('hidden');
+    } else {
+      card.classList.remove('hidden');
+    }
+
+    // Hide empty tipo-sala groups
+    card.querySelectorAll('.mb-3').forEach(group => {
+      const visibleBtns = group.querySelectorAll('.show-time-btn:not(.hidden)');
+      if (activeFilters.length > 0 && visibleBtns.length === 0) {
+        group.classList.add('hidden');
+      } else {
+        group.classList.remove('hidden');
+      }
     });
   });
 }
@@ -291,14 +360,28 @@ function renderTimeButton(time, show, showSalaBadge = false) {
   const showId = show.showId;
   const salaNumero = show.salaNumeroProgressivo;
 
-  let badgeHtml = '';
+  let badges = '';
   if (showSalaBadge) {
-    badgeHtml = `<span class="sala-badge">Sala ${salaNumero}</span>`;
+    badges += `<span class="sala-badge">Sala ${salaNumero}</span>`;
   }
 
+  // Accessibility badges
+  const hasSubs = showHasSubtitles(show);
+  const hasAD = showHasAudioDesc(show);
+  if (hasSubs) {
+    badges += `<span class="a11y-badge a11y-subs" title="Sottotitoli"><i class="fa-solid fa-closed-captioning"></i></span>`;
+  }
+  if (hasAD) {
+    badges += `<span class="a11y-badge a11y-ad" title="Audio Descrizione"><i class="fa-solid fa-headphones"></i></span>`;
+  }
+
+  const a11yClasses = [];
+  if (hasSubs) a11yClasses.push('a11y-subtitles');
+  if (hasAD) a11yClasses.push('a11y-audiodesc');
+
   return `
-    <button class="show-time-btn" data-show-id="${showId}" type="button">
-      ${time}${badgeHtml}
+    <button class="show-time-btn ${a11yClasses.join(' ')}" data-show-id="${showId}" type="button">
+      ${time}${badges}
     </button>
   `;
 }
@@ -360,6 +443,111 @@ function formatLocalTime(dateTimeStr) {
   return `${hours}:${minutes}`;
 }
 
+let mapInstance = null;
+let mapTimeout = null;
+
+function openCinemaMap(cinemaId) {
+  const cinema = allCinemas.find(c => Number(c.id) === Number(cinemaId));
+  if (!cinema) return;
+
+  const modal = document.getElementById('map-modal');
+  const nameEl = document.getElementById('map-cinema-name');
+  if (!modal || !nameEl) return;
+
+  // Kill any pending map init from previous call
+  if (mapTimeout) {
+    clearTimeout(mapTimeout);
+    mapTimeout = null;
+  }
+
+  nameEl.textContent = `${cinema.nome} - ${cinema.citta}${cinema.indirizzo ? `, ${cinema.indirizzo}` : ''}`;
+  modal.classList.remove('hidden');
+
+  // Capture cinema refs by value to avoid stale closure
+  const cinemaNome = cinema.nome;
+  const cinemaIndirizzo = cinema.indirizzo || '';
+  const cinemaCitta = cinema.citta || '';
+  const hasCoords = cinema.latitudine != null && !isNaN(cinema.latitudine)
+    && cinema.longitudine != null && !isNaN(cinema.longitudine);
+
+  // Initialize map after a short delay so the container is visible
+  mapTimeout = setTimeout(async () => {
+    mapTimeout = null;
+
+    if (mapInstance) {
+      mapInstance.remove();
+      mapInstance = null;
+    }
+
+    let mapLat, mapLng;
+
+    if (hasCoords) {
+      mapLat = cinema.latitudine;
+      mapLng = cinema.longitudine;
+    } else {
+      // Geocode address via free Nominatim API
+      const query = [cinemaIndirizzo, cinemaCitta, 'Italia'].filter(Boolean).join(', ');
+      try {
+        const resp = await fetch(
+          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`
+        );
+        const data = await resp.json();
+        if (data.length > 0) {
+          mapLat = parseFloat(data[0].lat);
+          mapLng = parseFloat(data[0].lon);
+        } else {
+          // Try just the city
+          const resp2 = await fetch(
+            `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(cinemaCitta + ', Italia')}&limit=1`
+          );
+          const data2 = await resp2.json();
+          if (data2.length > 0) {
+            mapLat = parseFloat(data2[0].lat);
+            mapLng = parseFloat(data2[0].lon);
+          } else {
+            // Last fallback: Italy center
+            mapLat = 41.8719;
+            mapLng = 12.5674;
+          }
+        }
+      } catch {
+        mapLat = 41.8719;
+        mapLng = 12.5674;
+      }
+    }
+
+    mapInstance = L.map('map-container', {
+      attributionControl: true,
+      zoomControl: true
+    }).setView([mapLat, mapLng], 15);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      maxZoom: 19
+    }).addTo(mapInstance);
+
+    L.marker([mapLat, mapLng])
+      .addTo(mapInstance)
+      .bindPopup(`<b>${cinemaNome}</b><br>${cinemaIndirizzo || cinemaCitta}`)
+      .openPopup();
+  }, 150);
+}
+
+function closeMapModal() {
+  const modal = document.getElementById('map-modal');
+  if (modal) modal.classList.add('hidden');
+
+  if (mapTimeout) {
+    clearTimeout(mapTimeout);
+    mapTimeout = null;
+  }
+
+  if (mapInstance) {
+    mapInstance.remove();
+    mapInstance = null;
+  }
+}
+
 function getUserLocation() {
   return new Promise((resolve, reject) => {
     if (!navigator.geolocation) {
@@ -384,3 +572,43 @@ function getUserLocation() {
 
 window.goToCinemaList = goToCinemaList;
 window.goToCinemaDetail = goToCinemaDetail;
+window.openCinemaMap = openCinemaMap;
+window.closeMapModal = closeMapModal;
+
+// ─── Accessibility Filters ──────────────────────────────
+let accessibilityFilters = { subtitles: false, audiodesc: false };
+
+function showHasSubtitles(show) {
+  // Deterministic: shows with even showId have subtitles (demo)
+  return (show.showId % 2 === 0);
+}
+
+function showHasAudioDesc(show) {
+  // Deterministic: shows divisible by 3 have audio description (demo)
+  return (show.showId % 3 === 0);
+}
+
+function toggleAccessibilityFilter(type) {
+  accessibilityFilters[type] = !accessibilityFilters[type];
+  const btn = document.getElementById(type === 'subtitles' ? 'filter-subtitles' : 'filter-audiodesc');
+  if (btn) {
+    if (accessibilityFilters[type]) {
+      btn.classList.add('bg-ferrari-primary', 'text-white', 'border-ferrari-primary');
+      btn.classList.remove('text-body', 'border-hairline');
+      btn.dataset.active = 'true';
+    } else {
+      btn.classList.remove('bg-ferrari-primary', 'text-white', 'border-ferrari-primary');
+      btn.classList.add('text-body', 'border-hairline');
+      btn.dataset.active = 'false';
+    }
+  }
+  renderSchedule();
+}
+
+// Show accessibility filters when schedule is loaded
+function showAccessibilityFilters() {
+  const filterBar = document.getElementById('accessibility-filters');
+  if (filterBar) filterBar.classList.remove('hidden');
+}
+
+window.toggleAccessibilityFilter = toggleAccessibilityFilter;

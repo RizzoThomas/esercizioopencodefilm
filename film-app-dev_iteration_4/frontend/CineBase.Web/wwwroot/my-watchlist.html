@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="it-IT">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CineBase - La Mia Watchlist</title>
+
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script src="/js/tailwind-config.js"></script>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="/css/styles.css?v=30" rel="stylesheet">
+  <script src="/js/route-guard.js"></script>
+  <script src="/js/theme.js"></script>
+</head>
+
+<body class="bg-canvas text-ink font-sans">
+  <div id="navbar-container"></div>
+
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-6">
+    <h1 class="text-2xl md:text-3xl font-bold text-ink mb-6">
+      <i class="fa-solid fa-bookmark text-ferrari-primary mr-2"></i>La Mia Watchlist
+    </h1>
+
+    <div id="loading-state" class="text-center py-16">
+      <i class="fa-solid fa-spinner fa-spin text-4xl mb-4 text-ferrari-primary"></i>
+      <p class="text-body">Caricamento...</p>
+    </div>
+
+    <div id="watchlist-grid" class="hidden grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+    </div>
+
+    <div id="empty-state" class="hidden text-center py-16">
+      <i class="fa-regular fa-bookmark text-6xl text-body mb-4"></i>
+      <h3 class="text-xl font-semibold text-ink mb-2">Nessun film salvato</h3>
+      <p class="text-body mb-6">Salva i film che vuoi vedere dalla scheda film</p>
+      <a href="/index.html" class="btn-primary text-white px-6 py-2 inline-block">Scopri i film</a>
+    </div>
+
+    <div id="error-state" class="hidden text-center py-16">
+      <i class="fa-solid fa-circle-exclamation text-6xl text-ferrari-semantic-warning mb-4"></i>
+      <h3 class="text-xl font-semibold text-ink mb-2">Accesso richiesto</h3>
+      <p class="text-body mb-4" id="error-msg">Accedi per vedere la tua watchlist</p>
+      <a href="/login.html?redirect=/my-watchlist.html" class="btn-primary text-white px-6 py-2 inline-block">Accedi</a>
+    </div>
+  </main>
+
+  <div id="footer-container"></div>
+  <div id="toast-container" class="fixed bottom-4 right-4 z-50"></div>
+
+  <script src="/js/utils.js"></script>
+  <script src="/js/api.js?v=final"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/template-loader.js?v=5"></script>
+  <script src="/js/navbar.js?v=4"></script>
+  <script src="/js/chat-widget.js?v=4"></script>
+  <script src="/js/alert-dialog.js"></script>
+  <script>
+    function getCoverImage(path) {
+      if (!path) return '/assets/images/default-cover.svg';
+      if (path.startsWith('http')) return path;
+      return `/assets/${path.replace(/^\/+/, '')}`;
+    }
+
+    function hideAll() {
+      ['loading-state', 'watchlist-grid', 'empty-state', 'error-state'].forEach(id => {
+        var el = document.getElementById(id);
+        if (el) el.classList.add('hidden');
+      });
+    }
+
+    function waitForAuth() {
+      return new Promise(function(resolve) {
+        var tries = 0;
+        function check() {
+          tries++;
+          var a = getAuthSafe();
+          if (a && typeof a.isLoggedIn === 'function') {
+            resolve(a);
+          } else if (tries > 20) {
+            resolve(null);
+          } else {
+            setTimeout(check, 250);
+          }
+        }
+        check();
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', async function() {
+      var auth = await waitForAuth();
+
+      if (!auth || !auth.isLoggedIn()) {
+        hideAll();
+        document.getElementById('error-state').classList.remove('hidden');
+        document.getElementById('error-msg').textContent = 'Accedi per vedere la tua watchlist';
+        return;
+      }
+
+      try {
+        var items = await API.getWatchlist();
+        hideAll();
+
+        if (!items || !items.length) {
+          document.getElementById('empty-state').classList.remove('hidden');
+          return;
+        }
+
+        var grid = document.getElementById('watchlist-grid');
+        grid.classList.remove('hidden');
+
+        grid.innerHTML = items.map(function(item) {
+          return `
+            <div class="card-ferrari overflow-hidden group cursor-pointer"
+                 onclick="window.location.href='/scheda-film.html?id=${item.id}'">
+              <div class="aspect-[2/3] overflow-hidden">
+                <img src="${getCoverImage(item.copertinaPath)}" alt="${item.titolo}"
+                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  loading="lazy" decoding="async">
+              </div>
+              <div class="p-4">
+                <h3 class="font-semibold text-ink group-hover:text-ferrari-primary transition-colors line-clamp-2">
+                  ${item.titolo}
+                </h3>
+                <p class="text-sm text-body mt-1">${item.registaNome || '—'}</p>
+                <div class="flex items-center gap-3 mt-2 text-xs text-body">
+                  ${item.anno ? '<span><i class="fa-regular fa-calendar mr-1"></i>' + item.anno + '</span>' : ''}
+                  ${item.durataMinuti ? '<span><i class="fa-regular fa-clock mr-1"></i>' + item.durataMinuti + 'min</span>' : ''}
+                </div>
+                <p class="text-xs text-body mt-2">
+                  <i class="fa-regular fa-bookmark mr-1"></i>Salvato il ${new Date(item.salvatoIl).toLocaleDateString('it-IT')}
+                </p>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+      } catch (error) {
+        hideAll();
+        var errEl = document.getElementById('error-state');
+        errEl.classList.remove('hidden');
+        document.getElementById('error-msg').textContent = 'Errore nel caricamento. Riprova più tardi.';
+        console.error('Errore watchlist:', error);
+      }
+    });
+  </script>
+</body>
+
+</html>

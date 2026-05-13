@@ -13,19 +13,39 @@ public static class ChatEndpoints
 {
     private static readonly HttpClient _http = new() { Timeout = TimeSpan.FromSeconds(10) };
     private static readonly string? _geminiKey = Environment.GetEnvironmentVariable("GEMINI_API_KEY");
-    private static readonly string _geminiUrl = "https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent";
+    private static readonly string _geminiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
 
-    private const string SystemPrompt = @"Sei l'assistente virtuale di CineBase, una piattaforma di gestione cinematografica con 3 cinema in Italia.
-Rispondi in italiano, in modo breve e utile (max 3 frasi). 
-Se l'utente chiede informazioni su programmazione, biglietti, registrazione, offerte, prenotazioni, cinema o profilo, indirizzalo alle pagine giuste:
-- Programmazione: /programmazione.html
-- Offerte: /offerte.html
-- Registrazione: /registrazione.html
-- Login: /login.html
-- Profilo: /profilo.html
-- Cinema: /my-cinemas.html
-- Home: /index.html
-Non inventare informazioni. Se non sai rispondere, suggerisci di inviare un ticket di supporto.";
+    private const string SystemPrompt = @"Sei l'assistente virtuale di CineBase, una piattaforma di gestione cinematografica con 3 cinema in Italia (Milano, Roma, Napoli).
+
+IL SITO HA QUESTE PAGINE:
+- /index.html — Homepage con film in evidenza e hero cinematico
+- /programmazione.html — Programmazione film con scelta cinema, data, orari e acquisto biglietti
+- /login.html — Accesso con email/password o Google/Microsoft
+- /registrazione.html — Creazione nuovo account
+- /offerte.html — Offerte speciali (pacchetti combo) e abbonamenti mensili/annuali
+- /my-cinemas.html — I 3 cinema CineBase con indirizzi e servizi
+- /profilo.html — Profilo utente, prenotazioni, biglietti, impostazioni
+- /scheda-film.html?id=X — Dettaglio di un film specifico
+- /acquista.html — Selezione posti e acquisto biglietti
+- /pagamento.html — Pagamento con Stripe (carta) o credito
+- /tmdb-search.html — Ricerca film nel database TMDB
+
+COME FUNZIONA:
+- L'utente sceglie un cinema, una data, un film e un orario
+- Seleziona i posti sulla mappa interattiva (max 8)
+- Paga con carta di credito o credito prepagato
+- Riceve i biglietti via email in PDF
+- Offre abbonamenti mensili/annuali con biglietti e popcorn inclusi
+
+REGOLE:
+- Rispondi SEMPRE in italiano, in modo breve e utile (max 3-4 frasi)
+- Per domande su film/programmazione/biglietti: linka /programmazione.html
+- Per domande su account/registrazione: linka /registrazione.html o /login.html
+- Per domande su offerte/prezzi: linka /offerte.html
+- Per domande su dove sono i cinema: linka /my-cinemas.html
+- NON inventare informazioni che non ti ho dato
+- Se non sai rispondere, suggerisci di usare il pulsante 'Invia Ticket' per contattare il team di supporto
+- Sii amichevole ma professionale, usa emoji con moderazione";
 
     public static void MapChatEndpoints(this WebApplication app)
     {
@@ -121,9 +141,8 @@ Non inventare informazioni. Se non sai rispondere, suggerisci di inviare un tick
     {
         var payload = new
         {
-            system_instruction = new { parts = new[] { new { text = SystemPrompt } } },
             contents = new[] {
-                new { role = "user", parts = new[] { new { text = userMessage } } }
+                new { role = "user", parts = new[] { new { text = $"{SystemPrompt}\n\nDomanda dell'utente: {userMessage}" } } }
             },
             generationConfig = new { maxOutputTokens = 300, temperature = 0.7 }
         };
@@ -163,7 +182,7 @@ Non inventare informazioni. Se non sai rispondere, suggerisci di inviare un tick
     private static readonly Dictionary<string, string[]> Faq = new(StringComparer.OrdinalIgnoreCase)
     {
         ["programmazione"] = new[] { "programmazion", "film", "spettacol", "orari", "proiezion", "uscit", "quando" },
-        ["biglietti"] = new[] { "bigliett", "acquist", "compr", "prezz", "cost", "pagar", "pagament", "ticket", "comprare" },
+        ["biglietti"] = new[] { "bigli", "acquist", "compr", "prezz", "cost", "pagar", "pagament", "ticket", "comprare", "blgli", "bilgl" },
         ["registrazione"] = new[] { "registr", "iscriv", "creare account", "account nuov", "registrazion" },
         ["login"] = new[] { "acced", "access", "entrar", "login", "password" },
         ["offerte"] = new[] { "offert", "promozion", "scont", "abbonament", "voucher", "promo" },

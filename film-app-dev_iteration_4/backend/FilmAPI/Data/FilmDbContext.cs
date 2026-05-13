@@ -42,6 +42,7 @@ public class FilmDbContext : DbContext
     public DbSet<Abbonamento> Abbonamenti { get; set; }
     public DbSet<Voucher> Vouchers { get; set; }
     public DbSet<UserSubscription> UserSubscriptions { get; set; }
+    public DbSet<WatchlistItem> WatchlistItems { get; set; }
 
     // ─── Iteration 5: Auth & Security ─────────────────────────────
     public DbSet<UserExternalLogin> UserExternalLogins { get; set; }
@@ -172,6 +173,22 @@ public class FilmDbContext : DbContext
                   .WithMany()
                   .HasForeignKey(e => e.ActorUserId)
                   .OnDelete(DeleteBehavior.SetNull);
+        });
+
+        modelBuilder.Entity<WatchlistItem>(entity =>
+        {
+            entity.HasIndex(e => new { e.UserId, e.FilmId }).IsUnique();
+            entity.HasIndex(e => e.UserId);
+
+            entity.HasOne(e => e.User)
+                  .WithMany()
+                  .HasForeignKey(e => e.UserId)
+                  .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(e => e.Film)
+                  .WithMany()
+                  .HasForeignKey(e => e.FilmId)
+                  .OnDelete(DeleteBehavior.Cascade);
         });
 
         modelBuilder.Entity<RefreshToken>(entity =>

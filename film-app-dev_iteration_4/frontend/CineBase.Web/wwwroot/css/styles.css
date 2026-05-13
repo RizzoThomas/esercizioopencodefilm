@@ -2365,6 +2365,7 @@ html.light .hero-cinema-subtitle {
 .mobile-menu-link:nth-child(4) { transition-delay: 0.24s; }
 .mobile-menu-link:nth-child(5) { transition-delay: 0.30s; }
 .mobile-menu-link:nth-child(6) { transition-delay: 0.36s; }
+.mobile-menu-link:nth-child(7) { transition-delay: 0.42s; }
 
 @media (min-width: 1024px) {
   .navbar-fluid-island {
@@ -2905,5 +2906,173 @@ details.card-ferrari[open] summary i.fa-chevron-down {
 #notif-list::-webkit-scrollbar-thumb {
   background: var(--ferrari-hairline);
   border-radius: 10px;
+}
+
+/* ─── Accessibility Badges ─────────────────────────────── */
+.a11y-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  margin-left: 3px;
+  vertical-align: middle;
+}
+.a11y-subs {
+  background: rgba(59, 130, 246, 0.15);
+  color: #60a5fa;
+}
+.a11y-ad {
+  background: rgba(168, 85, 247, 0.15);
+  color: #c084fc;
+}
+.show-time-btn.hidden {
+  display: none !important;
+}
+.film-schedule-card .mb-3.hidden {
+  display: none !important;
+}
+
+/* ─── Flag Wave Animation ──────────────────────────────── */
+.flag-wave {
+  display: inline-flex;
+  transition: transform 0.2s ease;
+}
+.flag-wave:hover {
+  animation: flag-wave 0.6s ease-in-out;
+}
+@keyframes flag-wave {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-8deg) scale(1.1); }
+  50% { transform: rotate(5deg) scale(1.05); }
+  75% { transform: rotate(-3deg); }
+}
+
+/* ─── Admin Shell Theme Overrides ──────────────────────── */
+/* Dark mode (default) — override the inline light styles */
+#admin-shell-root {
+  background: var(--ferrari-canvas) !important;
+}
+#admin-shell-content {
+  background: var(--ferrari-canvas) !important;
+}
+#admin-sidebar {
+  background: #1a1a1a !important;
+  border-color: #2a2a2a !important;
+}
+#admin-sidebar .border-\[\#e5e5e5\] {
+  border-color: #2a2a2a !important;
+}
+#admin-sidebar .text-\[\#111\] {
+  color: #ffffff !important;
+}
+#admin-sidebar .text-\[\#888\],
+#admin-sidebar .text-\[\#999\] {
+  color: #aaa !important;
+}
+/* Admin sidebar links — dark mode text on dark bg */
+.admin-link {
+  color: #ddd !important;
+}
+.admin-link:hover {
+  color: var(--ferrari-primary) !important;
+  background: rgba(218,41,28,0.08) !important;
+}
+.admin-link.active {
+  color: var(--ferrari-primary) !important;
+  background: rgba(218,41,28,0.12) !important;
+}
+/* Admin header top bar */
+#admin-shell-root header {
+  background: var(--ferrari-canvas-elevated) !important;
+  border-color: #2a2a2a !important;
+}
+#admin-shell-root header .text-\[\#111\] {
+  color: #ffffff !important;
+}
+#admin-shell-root header .text-\[\#555\],
+#admin-shell-root header .text-\[\#333\] {
+  color: #ccc !important;
+}
+#admin-shell-root header .text-\[\#555\]:hover,
+#admin-shell-root header .text-\[\#333\]:hover {
+  color: #fff !important;
+}
+#admin-shell-root header .border-\[\#e5e5e5\] {
+  border-color: #2a2a2a !important;
+}
+/* Admin user menu — dark mode */
+#admin-user-menu {
+  background: #1a1a1a !important;
+  border-color: #2a2a2a !important;
+}
+#admin-user-menu .text-\[\#aaa\] {
+  color: #bbb !important;
+}
+#admin-user-menu .border-\[\#2a2a2a\] {
+  border-color: #333 !important;
+}
+
+/* Light mode */
+html.light #admin-shell-root {
+  background: #f5f5f5 !important;
+}
+html.light #admin-shell-content {
+  background: #f5f5f5 !important;
+}
+html.light #admin-sidebar {
+  background: #ffffff !important;
+  border-color: #e5e5e5 !important;
+}
+html.light #admin-sidebar .border-\[\#e5e5e5\] {
+  border-color: #e5e5e5 !important;
+}
+html.light #admin-sidebar .text-\[\#111\] {
+  color: #111 !important;
+}
+html.light #admin-sidebar .text-\[\#888\],
+html.light #admin-sidebar .text-\[\#999\] {
+  color: #888 !important;
+}
+html.light .admin-link {
+  color: #333 !important;
+}
+html.light .admin-link:hover {
+  color: var(--ferrari-primary) !important;
+  background: rgba(218,41,28,0.06) !important;
+}
+html.light .admin-link.active {
+  color: var(--ferrari-primary) !important;
+  background: rgba(218,41,28,0.06) !important;
+}
+html.light #admin-shell-root header {
+  background: rgba(255, 255, 255, 0.9) !important;
+  border-color: #e5e5e5 !important;
+}
+html.light #admin-shell-root header .text-\[\#111\] {
+  color: #111 !important;
+}
+html.light #admin-shell-root header .text-\[\#555\],
+html.light #admin-shell-root header .text-\[\#333\] {
+  color: #555 !important;
+}
+html.light #admin-shell-root header .text-\[\#555\]:hover,
+html.light #admin-shell-root header .text-\[\#333\]:hover {
+  color: #111 !important;
+}
+html.light #admin-shell-root header .border-\[\#e5e5e5\] {
+  border-color: #e5e5e5 !important;
+}
+html.light #admin-user-menu {
+  background: #fff !important;
+  border-color: #e5e5e5 !important;
+}
+html.light #admin-user-menu .text-\[\#aaa\] {
+  color: #666 !important;
+}
+html.light #admin-user-menu .border-\[\#2a2a2a\] {
+  border-color: #e5e5e5 !important;
 }
 

@@ -170,6 +170,7 @@ public class StripePaymentGateway : IStripePaymentGateway
         var options = new SessionCreateOptions
         {
             Mode = "payment",
+            PaymentMethodTypes = new List<string> { "card" },
             SuccessUrl = request.SuccessUrl,
             CancelUrl = request.CancelUrl,
             LineItems = new List<SessionLineItemOptions>

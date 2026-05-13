@@ -55,9 +55,11 @@ public static class ProgrammazioneEndpoints
 
     private static void MapMyCinemas(WebApplication app)
     {
-        app.MapGet("/my-cinemas", async (IProgrammazioneService service) =>
+        app.MapGet("/my-cinemas", async (IProgrammazioneService service, double? lat, double? lng) =>
         {
-            var results = await service.GetMyCinemasAsync();
+            var results = lat.HasValue && lng.HasValue
+                ? await service.GetCinemasAsync(lat, lng)
+                : await service.GetMyCinemasAsync();
             return Results.Ok(results);
         }).AllowAnonymous();
 

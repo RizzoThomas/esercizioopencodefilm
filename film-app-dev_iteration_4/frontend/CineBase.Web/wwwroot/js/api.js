@@ -448,13 +448,28 @@ deleteFilm: (id) => apiFetch(`/films/${id}`, { method: 'DELETE' }),
   },
 
   // My cinemas - lista cinema
-  getMyCinemas: () => apiFetch('/my-cinemas'),
+  getMyCinemas: (params = {}) => {
+    var qs = '';
+    if (params.lat != null && params.lng != null) {
+      qs = '?lat=' + params.lat + '&lng=' + params.lng;
+    }
+    return apiFetch('/my-cinemas' + qs);
+  },
 
   // My cinemas - programmazione giornaliera cinema
   getCinemaSchedule: (cinemaId, date) => {
     const query = date ? `?date=${date}` : '';
     return apiFetch(`/my-cinemas/${cinemaId}/schedule${query}`);
   },
+
+  // Watchlist
+  getWatchlist: () => apiFetch('/watchlist'),
+  checkWatchlist: (filmId) => apiFetch(`/watchlist/check/${filmId}`),
+  addToWatchlist: (filmId) => apiFetch(`/watchlist/${filmId}`, { method: 'POST' }),
+  removeFromWatchlist: (filmId) => apiFetch(`/watchlist/${filmId}`, { method: 'DELETE' }),
+
+  // Recommendations AI
+  getRecommendations: () => apiFetch('/recommendations'),
 
   // Checkout - Seat map
   getSeatMap: (showId) => apiFetch(`/checkout/shows/${showId}/seat-map`),

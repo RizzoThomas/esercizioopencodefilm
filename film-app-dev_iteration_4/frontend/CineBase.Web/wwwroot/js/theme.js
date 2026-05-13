@@ -44,12 +44,9 @@
   }
 
   function updateToggleIcons(theme) {
-    document.querySelectorAll('#theme-toggle i').forEach(el => {
-      if (theme === 'dark') {
-        el.className = 'fa-solid fa-moon';
-      } else {
-        el.className = 'fa-solid fa-sun';
-      }
+    var iconClass = theme === 'dark' ? 'fa-solid fa-moon' : 'fa-solid fa-sun';
+    document.querySelectorAll('#theme-toggle i, #admin-theme-toggle i').forEach(function(el) {
+      el.className = iconClass;
     });
   }
 
