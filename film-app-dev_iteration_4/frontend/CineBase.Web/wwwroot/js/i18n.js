@@ -152,15 +152,24 @@
     });
   }
 
-  // Run on every DOM change (catches dynamically loaded content like navbar)
-  if (document.body) translatePage();
-  var observer = new MutationObserver(function() { translatePage(); });
+  // Run on every DOM change — but guard against re-entrancy to avoid infinite loops
+  var _translating = false;
+  function safeTranslate() {
+    if (_translating) return;
+    _translating = true;
+    try { translatePage(); } finally { _translating = false; }
+  }
+
+  if (document.body) safeTranslate();
+  document.addEventListener('DOMContentLoaded', safeTranslate);
+  var observer = new MutationObserver(function() {
+    if (!_translating) safeTranslate();
+  });
   if (document.body) {
-    observer.observe(document.body, { childList: true, subtree: true, characterData: true });
+    observer.observe(document.body, { childList: true, subtree: true });
   } else {
     document.addEventListener('DOMContentLoaded', function() {
-      observer.observe(document.body, { childList: true, subtree: true, characterData: true });
-      translatePage();
+      observer.observe(document.body, { childList: true, subtree: true });
     });
   }
 })();
