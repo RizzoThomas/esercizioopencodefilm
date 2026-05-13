@@ -431,8 +431,10 @@ public class PagamentoService : IPagamentoService
 
         var ordine = await _db.Ordini
             .Include(o => o.User)
-            .Include(o => o.Show)
-            .ThenInclude(s => s!.Sala)
+            .Include(o => o.Show!)
+            .ThenInclude(s => s.Sala)
+            .Include(o => o.Show!)
+            .ThenInclude(s => s.Film)
             .FirstOrDefaultAsync(o => o.Id == orderId);
 
         if (ordine is null)
@@ -501,6 +503,21 @@ public class PagamentoService : IPagamentoService
         await _bigliettoService.EmitTicketsForOrderAsync(ordine.Id);
 
         await _db.SaveChangesAsync();
+
+        // Create notification for the user
+        var titoloFilm = ordine.Show?.Film?.Titolo ?? "film";
+        var notifica = new Notifica
+        {
+            UserId = ordine.UserId,
+            Tipo = "biglietto",
+            Titolo = "Biglietto acquistato",
+            Descrizione = $"Acquisto confermato per {titoloFilm} — {ordine.NumeroBiglietti} biglietto/i. Codice: {ordine.CodiceOrdine}",
+            Icona = "fa-solid fa-ticket",
+            CreatedAtUtc = now
+        };
+        _db.Notifiche.Add(notifica);
+        await _db.SaveChangesAsync();
+
         await transaction.CommitAsync();
     }
 

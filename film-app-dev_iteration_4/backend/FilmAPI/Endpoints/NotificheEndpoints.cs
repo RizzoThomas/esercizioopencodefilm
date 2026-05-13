@@ -23,10 +23,9 @@ public static class NotificheEndpoints
                 .ToListAsync(ct);
 
             var result = new List<object>();
-            var toPersist = new List<Notifica>();
             var now = DateTime.UtcNow;
 
-            // 1) Persisted notifications (skip deleted ones)
+            // Persisted notifications (skip deleted ones)
             var notificheDb = await db.Notifiche
                 .Where(n => n.UserId == userId.Value)
                 .OrderByDescending(n => n.CreatedAtUtc)
@@ -39,30 +38,8 @@ public static class NotificheEndpoints
                 if (deletedIds.Contains(sid)) continue;
                 result.Add(new { id = sid, icon = n.Icona ?? GetDefaultIcon(n.Tipo), title = n.Titolo, desc = n.Descrizione ?? "", time = FormatRelativeTime(n.CreatedAtUtc), createdAt = n.CreatedAtUtc });
             }
-
-            // 2) Auto-genera da ordini recenti (biglietto acquistato)
-            var ordiniRecenti = await db.Ordini
-                .Include(o => o.Show!).ThenInclude(s => s!.Film)
-                .Where(o => o.UserId == userId.Value && o.Stato == OrdineState.Paid)
-                .OrderByDescending(o => o.PaidAtUtc ?? o.CreatedAtUtc)
-                .Take(5)
-                .ToListAsync(ct);
-
-            foreach (var o in ordiniRecenti)
-            {
-                var sid = "ord_" + o.Id;
-                if (deletedIds.Contains(sid)) continue;
-                if (result.Any(r => (string)r.GetType().GetProperty("id")?.GetValue(r, null) == sid)) continue;
-
-                var titoloFilm = o.Show?.Film?.Titolo ?? "film";
-                // Persist so it doesn't get lost
-                var notif = new Notifica { UserId = userId.Value, Tipo = "biglietto", Titolo = "Biglietto acquistato", Descrizione = $"Conferma per {titoloFilm} — {o.NumeroBiglietti} biglietto/i.", Icona = "fa-solid fa-ticket", CreatedAtUtc = o.PaidAtUtc ?? o.CreatedAtUtc };
-                db.Notifiche.Add(notif);
-                await db.SaveChangesAsync(ct);
-                result.Add(new { id = "db_" + notif.Id, icon = "fa-solid fa-ticket", title = "Biglietto acquistato", desc = $"Conferma per {titoloFilm} — {o.NumeroBiglietti} biglietto/i.", time = FormatRelativeTime(o.PaidAtUtc ?? o.CreatedAtUtc), createdAt = o.PaidAtUtc ?? o.CreatedAtUtc });
-            }
-
-            // 3) Auto-genera promemoria per show nelle prossime 72h
+            
+            // Auto-genera promemoria per show nelle prossime 72h
             var prossimiShow = await db.Ordini
                 .Include(o => o.Show!).ThenInclude(s => s!.Film)
                 .Include(o => o.Show!).ThenInclude(s => s!.Cinema)
