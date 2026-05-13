@@ -291,6 +291,7 @@ app.MapAdminAnalyticsEndpoints();
 app.MapNewsletterEndpoints();
 app.MapWatchlistEndpoints();
 app.MapRecommendationsEndpoints();
+app.MapNotificheEndpoints();
 
 app.MapGet("/config/frontend", (FrontendRuntimeConfig config) => Results.Ok(new
 {

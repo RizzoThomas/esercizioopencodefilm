@@ -309,21 +309,29 @@
     var loggedIn = typeof Auth !== 'undefined' && Auth && Auth.isLoggedIn && Auth.isLoggedIn();
     if (!loggedIn) {
       notifications = getEmptyNotifs();
-      localStorage.removeItem('cb-notifs-deleted');
-    } else {
-      // Load persisted deleted IDs
-      var deleted = [];
-      try { deleted = JSON.parse(localStorage.getItem('cb-notifs-deleted') || '[]'); } catch(e) { deleted = []; }
-      // Regenerate sample, filter out deleted
-      notifications = getSampleNotifs().filter(function(n) {
-        return deleted.indexOf(n.id) === -1;
-      });
+      updateAll();
+      return;
     }
-    // Detect new notifications vs previous
-    if (loggedIn && notifications.length > 0 && notifications.length !== prevCount) {
-      triggerBellPulse();
-    }
-    updateAll();
+
+    // Fetch real notifications from API
+    API.getNotifications().then(function(data) {
+      if (data && data.length > 0) {
+        notifications = data;
+      } else {
+        notifications = [{
+          id: 'empty',
+          icon: 'fa-solid fa-bell-slash',
+          title: 'Nessuna notifica',
+          desc: 'Non hai ancora notifiche. Acquista un biglietto per riceverne!',
+          time: ''
+        }];
+      }
+      if (notifications.length !== prevCount) triggerBellPulse();
+      updateAll();
+    }).catch(function() {
+      notifications = getEmptyNotifs();
+      updateAll();
+    });
   }
 
   function triggerBellShake() {
@@ -410,8 +418,14 @@
   }
 
   function deleteNotif(idx) {
+    var n = notifications[idx];
+    if (!n) return;
+    var notifId = n.id || n._id;
+    // Call API if real notification (not "empty" placeholder)
+    if (notifId && notifId !== 'empty' && typeof API !== 'undefined' && API.deleteNotification) {
+      API.deleteNotification(notifId).catch(function() {});
+    }
     notifications.splice(idx, 1);
-    persistDeletedIds();
     if (idx <= currentIndex && currentIndex > 0) currentIndex--;
     if (currentIndex >= notifications.length) currentIndex = Math.max(0, notifications.length - 1);
     updateBadge();
@@ -420,9 +434,12 @@
   }
 
   function clearAllNotifs() {
-    // Mark all as deleted
-    var allIds = getSampleNotifs().map(function(n) { return n.id; });
-    localStorage.setItem('cb-notifs-deleted', JSON.stringify(allIds));
+    // Delete each via API
+    notifications.forEach(function(n) {
+      if (n.id && n.id !== 'empty' && typeof API !== 'undefined' && API.deleteNotification) {
+        API.deleteNotification(n.id).catch(function() {});
+      }
+    });
     notifications = [];
     currentIndex = 0;
     updateBadge();

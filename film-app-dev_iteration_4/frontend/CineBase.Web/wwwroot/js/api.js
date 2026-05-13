@@ -471,6 +471,10 @@ deleteFilm: (id) => apiFetch(`/films/${id}`, { method: 'DELETE' }),
   // Recommendations AI
   getRecommendations: () => apiFetch('/recommendations'),
 
+  // Notifications
+  getNotifications: () => apiFetch('/notifications'),
+  deleteNotification: (id) => apiFetch(`/notifications/${id}`, { method: 'DELETE' }),
+
   // Checkout - Seat map
   getSeatMap: (showId) => apiFetch(`/checkout/shows/${showId}/seat-map`),
 
