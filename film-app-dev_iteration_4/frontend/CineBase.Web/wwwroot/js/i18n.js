@@ -87,7 +87,7 @@
     'Impostazioni': 'Settings', 'Report Esportabili': 'Export Reports',
     'Scarica CSV': 'Download CSV',
     'Esporta i dati delle vendite in formato CSV': 'Export sales data as CSV',
-    'Da': 'From', 'A': 'To',
+    'Data da': 'From date', 'Data a': 'To date',
     'Errore download report': 'Download error',
 
     // Admin alerts
@@ -111,81 +111,56 @@
   };
 
   function translatePage() {
-    if (LANG === 'it') return; // Nothing to translate
+    if (LANG === 'it') return;
 
     var strings = Object.keys(EN);
     var values = Object.values(EN);
 
-    // Translate all text nodes
-    var walker = document.createTreeWalker(document.body, 4 /* NodeFilter.SHOW_TEXT */, null, false);
+    // Translate all text nodes in body
+    var walker = document.createTreeWalker(document.body, 4, null, false);
     var nodes = [];
     while (walker.nextNode()) nodes.push(walker.currentNode);
 
     nodes.forEach(function(node) {
       var text = node.nodeValue;
       if (!text || text.trim().length < 2) return;
-      // Skip script/style content
       var p = node.parentElement;
-      if (!p || p.tagName === 'SCRIPT' || p.tagName === 'STYLE') return;
+      if (!p || p.tagName === 'SCRIPT' || p.tagName === 'STYLE' || p.tagName === 'TEXTAREA') return;
 
       for (var i = 0; i < strings.length; i++) {
+        if (strings[i].length <= 2) continue; // Skip very short keys to avoid false matches
         if (text.indexOf(strings[i]) !== -1) {
           node.nodeValue = text.split(strings[i]).join(values[i]);
-          text = node.nodeValue; // chain replacements
+          text = node.nodeValue;
         }
       }
     });
 
-    // Translate placeholder attributes
-    document.querySelectorAll('[placeholder]').forEach(function(el) {
-      for (var i = 0; i < strings.length; i++) {
-        if (el.getAttribute('placeholder').indexOf(strings[i]) !== -1) {
-          el.setAttribute('placeholder', el.getAttribute('placeholder').split(strings[i]).join(values[i]));
+    // Translate placeholder, title, aria-label attributes
+    ['placeholder', 'title', 'aria-label'].forEach(function(attr) {
+      document.querySelectorAll('[' + attr + ']').forEach(function(el) {
+        var val = el.getAttribute(attr);
+        if (!val) return;
+        for (var i = 0; i < strings.length; i++) {
+          if (strings[i].length <= 2) continue;
+          if (val.indexOf(strings[i]) !== -1) {
+            el.setAttribute(attr, val.split(strings[i]).join(values[i]));
+            val = el.getAttribute(attr);
+          }
         }
-      }
-    });
-
-    // Translate title attributes
-    document.querySelectorAll('[title]').forEach(function(el) {
-      for (var i = 0; i < strings.length; i++) {
-        if (el.getAttribute('title') && el.getAttribute('title').indexOf(strings[i]) !== -1) {
-          el.setAttribute('title', el.getAttribute('title').split(strings[i]).join(values[i]));
-        }
-      }
-    });
-
-    // Translate aria-label
-    document.querySelectorAll('[aria-label]').forEach(function(el) {
-      for (var i = 0; i < strings.length; i++) {
-        if (el.getAttribute('aria-label') && el.getAttribute('aria-label').indexOf(strings[i]) !== -1) {
-          el.setAttribute('aria-label', el.getAttribute('aria-label').split(strings[i]).join(values[i]));
-        }
-      }
+      });
     });
   }
 
-  // Export API
-  window.CineBaseLang = {
-    lang: LANG,
-    set: function(lang) {
-      localStorage.setItem('cinebase-lang', lang);
-      // Reload to apply translations cleanly
-      window.location.reload();
-    },
-    t: function(key) {
-      if (LANG === 'it') return key;
-      return EN[key] || key;
-    }
-  };
-
-  // Run on DOMContentLoaded and after dynamic content loads
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', translatePage);
+  // Run on every DOM change (catches dynamically loaded content like navbar)
+  if (document.body) translatePage();
+  var observer = new MutationObserver(function() { translatePage(); });
+  if (document.body) {
+    observer.observe(document.body, { childList: true, subtree: true, characterData: true });
   } else {
-    translatePage();
+    document.addEventListener('DOMContentLoaded', function() {
+      observer.observe(document.body, { childList: true, subtree: true, characterData: true });
+      translatePage();
+    });
   }
-  // Also run after components are loaded
-  document.addEventListener('components:loaded', translatePage);
-  // And after any dynamic content change
-  setTimeout(translatePage, 500);
 })();
