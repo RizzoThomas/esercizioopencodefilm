@@ -2931,24 +2931,6 @@ details.card-ferrari[open] summary i.fa-chevron-down {
 .show-time-btn.hidden {
   display: none !important;
 }
-.film-schedule-card .mb-3.hidden {
-  display: none !important;
-}
-
-/* ─── Flag Wave Animation ──────────────────────────────── */
-.flag-wave {
-  display: inline-flex;
-  transition: transform 0.2s ease;
-}
-.flag-wave:hover {
-  animation: flag-wave 0.6s ease-in-out;
-}
-@keyframes flag-wave {
-  0%, 100% { transform: rotate(0deg); }
-  25% { transform: rotate(-8deg) scale(1.1); }
-  50% { transform: rotate(5deg) scale(1.05); }
-  75% { transform: rotate(-3deg); }
-}
 
 /* ─── Admin Shell Theme Overrides ──────────────────────── */
 /* Dark mode (default) — override the inline light styles */

@@ -74,23 +74,6 @@
       </div>
     </div>
 
-    <!-- Language / Settings -->
-    <div class="relative">
-      <button id="lang-toggle" class="text-ink hover:text-ferrari-primary transition-colors duration-300 flag-wave" title="Lingua" aria-label="Cambia lingua">
-        <span id="lang-flag-icon" class="text-xl leading-none">🇮🇹</span>
-      </button>
-      <div id="settings-menu" class="hidden absolute right-0 mt-3 w-44 bg-canvas-elevated border border-hairline z-[60]">
-        <button onclick="CineBaseLang.set('it')" class="w-full text-left px-4 py-2.5 text-sm text-ink hover:text-ferrari-primary hover:bg-white/5 transition-colors duration-200 flex items-center justify-between">
-          <span><span class="text-base mr-2">🇮🇹</span>Italiano</span>
-          <span id="lang-check-it" class="text-ferrari-primary text-xs">✓</span>
-        </button>
-        <button onclick="CineBaseLang.set('en')" class="w-full text-left px-4 py-2.5 text-sm text-ink hover:text-ferrari-primary hover:bg-white/5 transition-colors duration-200 flex items-center justify-between">
-          <span><span class="text-base mr-2">🇬🇧</span>English</span>
-          <span id="lang-check-en" class="text-ferrari-primary hidden text-xs">✓</span>
-        </button>
-      </div>
-    </div>
-
     <!-- Theme Toggle -->
     <button id="theme-toggle" class="text-ink hover:text-ferrari-primary transition-colors duration-300" title="Cambia tema" aria-label="Cambia tema chiaro/scuro">
       <i class="fa-solid fa-moon"></i>
@@ -244,38 +227,6 @@
       window.CineBaseTheme.toggle();
     });
   }
-
-  // Settings menu toggle
-  var langToggle = document.getElementById('lang-toggle');
-  var settingsMenu = document.getElementById('settings-menu');
-  if (langToggle && settingsMenu) {
-    langToggle.addEventListener('click', function(e) {
-      e.stopPropagation();
-      settingsMenu.classList.toggle('hidden');
-      if (userMenu) userMenu.classList.add('hidden');
-    });
-    document.addEventListener('click', function(e) {
-      if (!langToggle.contains(e.target) && !settingsMenu.contains(e.target)) {
-        settingsMenu.classList.add('hidden');
-      }
-    });
-  }
-
-  // Language system
-  window.CineBaseLang = {
-    _lang: localStorage.getItem('cinebase-lang') || 'it',
-    set: function(lang) {
-      this._lang = lang;
-      localStorage.setItem('cinebase-lang', lang);
-      document.getElementById('lang-flag-icon').textContent = lang === 'en' ? '🇬🇧' : '🇮🇹';
-      document.getElementById('lang-check-it').classList.toggle('hidden', lang !== 'it');
-      document.getElementById('lang-check-en').classList.toggle('hidden', lang !== 'en');
-      settingsMenu.classList.add('hidden');
-    }
-  };
-  // Init flag
-  document.getElementById('lang-flag-icon').textContent = window.CineBaseLang._lang === 'en' ? '🇬🇧' : '🇮🇹';
-  document.getElementById('lang-check-' + window.CineBaseLang._lang)?.classList.remove('hidden');
 
   // Hamburger morph toggle
   if (mobileMenuToggle && mobileMenu) {
