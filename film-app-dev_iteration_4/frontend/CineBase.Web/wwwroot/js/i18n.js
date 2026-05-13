@@ -152,24 +152,20 @@
     });
   }
 
-  // Run on every DOM change — but guard against re-entrancy to avoid infinite loops
-  var _translating = false;
-  function safeTranslate() {
-    if (_translating) return;
-    _translating = true;
-    try { translatePage(); } finally { _translating = false; }
+  // Run translate on page ready + after components load + final safety timeout
+  function scheduleTranslate() {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', function() {
+        translatePage();
+        // Re-run after template-loader injects navbar/footer
+        document.addEventListener('components:loaded', translatePage);
+        // Final safety net
+        setTimeout(translatePage, 1000);
+      });
+    } else {
+      translatePage();
+      setTimeout(translatePage, 500);
+    }
   }
-
-  if (document.body) safeTranslate();
-  document.addEventListener('DOMContentLoaded', safeTranslate);
-  var observer = new MutationObserver(function() {
-    if (!_translating) safeTranslate();
-  });
-  if (document.body) {
-    observer.observe(document.body, { childList: true, subtree: true });
-  } else {
-    document.addEventListener('DOMContentLoaded', function() {
-      observer.observe(document.body, { childList: true, subtree: true });
-    });
-  }
+  scheduleTranslate();
 })();
