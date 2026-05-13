@@ -10,30 +10,37 @@ public static class NotificheEndpoints
     {
         var group = app.MapGroup("/notifications").RequireAuthorization();
 
-        // ── GET: tutte le notifiche utente (con auto-generazione da dati reali) ──
+        // ── GET: tutte le notifiche ──
         group.MapGet("/", async (HttpContext http, FilmDbContext db, CancellationToken ct) =>
         {
             var userId = GetUserId(http);
             if (userId == null) return Results.Unauthorized();
 
-            // 1) Fetch persisted notifications
+            // Get list of deleted source IDs for this user
+            var deletedIds = await db.NotificheSoppresse
+                .Where(d => d.UserId == userId.Value)
+                .Select(d => d.SourceId)
+                .ToListAsync(ct);
+
+            var result = new List<object>();
+            var toPersist = new List<Notifica>();
+            var now = DateTime.UtcNow;
+
+            // 1) Persisted notifications (skip deleted ones)
             var notificheDb = await db.Notifiche
                 .Where(n => n.UserId == userId.Value)
                 .OrderByDescending(n => n.CreatedAtUtc)
                 .Take(20)
                 .ToListAsync(ct);
 
-            var result = notificheDb.Select(n => new
+            foreach (var n in notificheDb)
             {
-                id = n.Id.ToString(),
-                icon = n.Icona ?? GetDefaultIcon(n.Tipo),
-                title = n.Titolo,
-                desc = n.Descrizione ?? "",
-                time = FormatRelativeTime(n.CreatedAtUtc),
-                createdAt = n.CreatedAtUtc
-            }).ToList();
+                var sid = "db_" + n.Id;
+                if (deletedIds.Contains(sid)) continue;
+                result.Add(new { id = sid, icon = n.Icona ?? GetDefaultIcon(n.Tipo), title = n.Titolo, desc = n.Descrizione ?? "", time = FormatRelativeTime(n.CreatedAtUtc), createdAt = n.CreatedAtUtc });
+            }
 
-            // 2) Auto-genera notifiche da ordini recenti
+            // 2) Auto-genera da ordini recenti (biglietto acquistato)
             var ordiniRecenti = await db.Ordini
                 .Include(o => o.Show!).ThenInclude(s => s!.Film)
                 .Where(o => o.UserId == userId.Value && o.Stato == OrdineState.Paid)
@@ -43,28 +50,19 @@ public static class NotificheEndpoints
 
             foreach (var o in ordiniRecenti)
             {
-                var notifId = "ord_" + o.Id;
-                if (result.Any(r => r.id == notifId)) continue;
+                var sid = "ord_" + o.Id;
+                if (deletedIds.Contains(sid)) continue;
+                if (result.Any(r => (string)r.GetType().GetProperty("id")?.GetValue(r, null) == sid)) continue;
 
-                // Check if already persisted
-                var alreadySaved = await db.Notifiche.AnyAsync(n => n.UserId == userId && n.Tipo == "biglietto" && n.Titolo.Contains(o.CodiceOrdine ?? ""), ct);
-                if (alreadySaved) { result.Add(new { id = notifId, icon = "fa-solid fa-ticket", title = "Biglietto acquistato", desc = $"Conferma per {o.Show?.Film?.Titolo ?? "film"} — {o.NumeroBiglietti} biglietto/i.", time = FormatRelativeTime(o.PaidAtUtc ?? o.CreatedAtUtc), createdAt = o.PaidAtUtc ?? o.CreatedAtUtc }); continue; }
-
-                // Auto-persist
-                db.Notifiche.Add(new Notifica
-                {
-                    UserId = userId.Value,
-                    Tipo = "biglietto",
-                    Titolo = "Biglietto acquistato",
-                    Descrizione = $"Conferma per {o.Show?.Film?.Titolo ?? "film"} — {o.NumeroBiglietti} biglietto/i.",
-                    Icona = "fa-solid fa-ticket",
-                    CreatedAtUtc = o.PaidAtUtc ?? o.CreatedAtUtc
-                });
-                result.Add(new { id = notifId, icon = "fa-solid fa-ticket", title = "Biglietto acquistato", desc = $"Conferma per {o.Show?.Film?.Titolo ?? "film"} — {o.NumeroBiglietti} biglietto/i.", time = FormatRelativeTime(o.PaidAtUtc ?? o.CreatedAtUtc), createdAt = o.PaidAtUtc ?? o.CreatedAtUtc });
+                var titoloFilm = o.Show?.Film?.Titolo ?? "film";
+                // Persist so it doesn't get lost
+                var notif = new Notifica { UserId = userId.Value, Tipo = "biglietto", Titolo = "Biglietto acquistato", Descrizione = $"Conferma per {titoloFilm} — {o.NumeroBiglietti} biglietto/i.", Icona = "fa-solid fa-ticket", CreatedAtUtc = o.PaidAtUtc ?? o.CreatedAtUtc };
+                db.Notifiche.Add(notif);
+                await db.SaveChangesAsync(ct);
+                result.Add(new { id = "db_" + notif.Id, icon = "fa-solid fa-ticket", title = "Biglietto acquistato", desc = $"Conferma per {titoloFilm} — {o.NumeroBiglietti} biglietto/i.", time = FormatRelativeTime(o.PaidAtUtc ?? o.CreatedAtUtc), createdAt = o.PaidAtUtc ?? o.CreatedAtUtc });
             }
 
-            // 3) Auto-genera promemoria per show imminenti
-            var now = DateTime.UtcNow;
+            // 3) Auto-genera promemoria per show nelle prossime 72h
             var prossimiShow = await db.Ordini
                 .Include(o => o.Show!).ThenInclude(s => s!.Film)
                 .Include(o => o.Show!).ThenInclude(s => s!.Cinema)
@@ -75,37 +73,40 @@ public static class NotificheEndpoints
 
             foreach (var o in prossimiShow)
             {
-                var notifId = "promemoria_" + o.Id;
-                if (result.Any(r => r.id == notifId)) continue;
+                var sid = "prom_" + o.Id;
+                if (deletedIds.Contains(sid)) continue;
+                if (result.Any(r => (string)r.GetType().GetProperty("id")?.GetValue(r, null) == sid)) continue;
+
                 var showStart = o.Show!.StartAtUtc;
-                var oreMancanti = (showStart - now).TotalHours;
-                var tempoLabel = oreMancanti < 24 ? $"tra {Math.Round(oreMancanti)} ore" : $"tra {Math.Round(oreMancanti / 24)} giorni";
-                result.Add(new { id = notifId, icon = "fa-solid fa-clock", title = "Promemoria spettacolo", desc = $"«{o.Show.Film?.Titolo}» — {o.Show.Cinema?.Nome} — {o.Show.StartAtUtc:dd/MM HH:mm} ({tempoLabel})", time = "ora", createdAt = now });
+                var oreMancanti = (int)(showStart - now).TotalHours;
+                var tempoLabel = oreMancanti < 24 ? $"tra {oreMancanti}h" : $"tra {oreMancanti / 24}g";
+                var notif = new Notifica { UserId = userId.Value, Tipo = "promemoria", Titolo = "Promemoria spettacolo", Descrizione = $"«{o.Show.Film?.Titolo}» — {o.Show.Cinema?.Nome} — {o.Show.StartAtUtc:dd/MM HH:mm} ({tempoLabel})", Icona = "fa-solid fa-clock", CreatedAtUtc = now };
+                db.Notifiche.Add(notif);
+                await db.SaveChangesAsync(ct);
+                result.Add(new { id = "db_" + notif.Id, icon = "fa-solid fa-clock", title = "Promemoria spettacolo", desc = $"«{o.Show.Film?.Titolo}» — {o.Show.Cinema?.Nome} — {o.Show.StartAtUtc:dd/MM HH:mm} ({tempoLabel})", time = "ora", createdAt = now });
             }
 
-            // 4) Salva notifiche auto-generate (per averle persistenti al prossimo giro)
-            await db.SaveChangesAsync(ct);
-
-            return Results.Ok(result.OrderByDescending(r => r.createdAt).ToList());
+            return Results.Ok(result.OrderByDescending(r => {
+                var p = r.GetType().GetProperty("createdAt")?.GetValue(r, null);
+                return p is DateTime dt ? dt : DateTime.MinValue;
+            }).ToList());
         });
 
-        // ── DELETE: elimina notifica ──
+        // ── DELETE ──
         group.MapDelete("/{id}", async (string id, HttpContext http, FilmDbContext db, CancellationToken ct) =>
         {
             var userId = GetUserId(http);
             if (userId == null) return Results.Unauthorized();
 
-            // Parse id: could be DB id (int) or auto-generated (ord_123, promemoria_123)
-            if (int.TryParse(id, out var numericId))
+            if (id.StartsWith("db_") && int.TryParse(id[3..], out var numericId))
             {
                 var notif = await db.Notifiche.FirstOrDefaultAsync(n => n.Id == numericId && n.UserId == userId, ct);
-                if (notif == null) return Results.NotFound();
-                db.Notifiche.Remove(notif);
-                await db.SaveChangesAsync(ct);
+                if (notif != null) db.Notifiche.Remove(notif);
             }
-            // For auto-generated notifications (ord_X, promemoria_X), just mark them
-            // by creating a "deleted" tracking entry (we store deletion preference)
-            // Or simply acknowledge delete — they'll regenerate if conditions still met
+
+            // Track deleted auto-generated source IDs so they never reappear
+            db.NotificheSoppresse.Add(new NotificaSoppressa { UserId = userId.Value, SourceId = id });
+            await db.SaveChangesAsync(ct);
             return Results.Ok(new { success = true });
         });
     }

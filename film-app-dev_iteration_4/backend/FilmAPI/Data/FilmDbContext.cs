@@ -44,6 +44,7 @@ public class FilmDbContext : DbContext
     public DbSet<UserSubscription> UserSubscriptions { get; set; }
     public DbSet<WatchlistItem> WatchlistItems { get; set; }
     public DbSet<Notifica> Notifiche { get; set; }
+    public DbSet<NotificaSoppressa> NotificheSoppresse { get; set; }
 
     // ─── Iteration 5: Auth & Security ─────────────────────────────
     public DbSet<UserExternalLogin> UserExternalLogins { get; set; }
