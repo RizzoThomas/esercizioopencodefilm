@@ -373,8 +373,9 @@
       notifBadge.textContent = '0';
       notifBadge.classList.add('hidden');
     } else {
-      notifBadge.textContent = notifications.length;
-      notifBadge.classList.toggle('hidden', notifications.length === 0);
+      var realCount = notifications.filter(function(n) { return n.id !== 'empty'; }).length;
+      notifBadge.textContent = realCount;
+      notifBadge.classList.toggle('hidden', realCount === 0);
     }
   }
 
