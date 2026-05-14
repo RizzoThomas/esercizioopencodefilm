@@ -25,21 +25,7 @@ public static class NotificheEndpoints
             var result = new List<object>();
             var now = DateTime.UtcNow;
 
-            // Persisted notifications (skip deleted ones)
-            var notificheDb = await db.Notifiche
-                .Where(n => n.UserId == userId.Value)
-                .OrderByDescending(n => n.CreatedAtUtc)
-                .Take(20)
-                .ToListAsync(ct);
-
-            foreach (var n in notificheDb)
-            {
-                var sid = "db_" + n.Id;
-                if (deletedIds.Contains(sid)) continue;
-                result.Add(new { id = sid, icon = n.Icona ?? GetDefaultIcon(n.Tipo), title = n.Titolo, desc = n.Descrizione ?? "", time = FormatRelativeTime(n.CreatedAtUtc), createdAt = n.CreatedAtUtc });
-            }
-            
-            // Auto-genera promemoria per show nelle prossime 72h
+            // Prima: determina show attivi (prossime 72h) per filtrare promemoria scaduti
             var prossimiShow = await db.Ordini
                 .Include(o => o.Show!).ThenInclude(s => s!.Film)
                 .Include(o => o.Show!).ThenInclude(s => s!.Cinema)
@@ -48,19 +34,59 @@ public static class NotificheEndpoints
                 .Take(10)
                 .ToListAsync(ct);
 
+            var activeShowPatterns = new HashSet<string>();
+            foreach (var o in prossimiShow)
+            {
+                activeShowPatterns.Add($"«{o.Show!.Film?.Titolo}» — {o.Show!.Cinema?.Nome} — {o.Show!.StartAtUtc:dd/MM HH:mm}");
+            }
+
+            // Persisted notifications (skip deleted ones, filter stale promemoria)
+            var notificheDb = await db.Notifiche
+                .Where(n => n.UserId == userId.Value)
+                .OrderByDescending(n => n.CreatedAtUtc)
+                .Take(20)
+                .ToListAsync(ct);
+
+            var seenPromemoria = new HashSet<string>();
+            foreach (var n in notificheDb)
+            {
+                var sid = "db_" + n.Id;
+                if (deletedIds.Contains(sid)) continue;
+
+                // Promemoria: deduplica e scarta se lo show è già passato
+                if (n.Tipo == "promemoria" && !string.IsNullOrEmpty(n.Descrizione))
+                {
+                    var lastParen = n.Descrizione.LastIndexOf(" (");
+                    var key = lastParen > 0 ? n.Descrizione[..lastParen] : n.Descrizione;
+                    if (!activeShowPatterns.Contains(key)) continue; // show passato → nascondi
+                    if (!seenPromemoria.Add(key)) continue;          // già mostrato
+                }
+
+                result.Add(new { id = sid, icon = n.Icona ?? GetDefaultIcon(n.Tipo), title = n.Titolo, desc = n.Descrizione ?? "", time = FormatRelativeTime(n.CreatedAtUtc), createdAt = n.CreatedAtUtc });
+            }
+            
+            // Auto-genera promemoria per show attivi (solo se non già presente in DB)
+
             foreach (var o in prossimiShow)
             {
                 var sid = "prom_" + o.Id;
                 if (deletedIds.Contains(sid)) continue;
-                if (result.Any(r => (string)r.GetType().GetProperty("id")?.GetValue(r, null) == sid)) continue;
 
                 var showStart = o.Show!.StartAtUtc;
+                var showDesc = $"«{o.Show.Film?.Titolo}» — {o.Show.Cinema?.Nome} — {o.Show.StartAtUtc:dd/MM HH:mm}";
+
+                // Evita duplicati: se esiste già un promemoria per questo show nel DB, non crearne un altro
+                var alreadyExists = await db.Notifiche
+                    .AnyAsync(n => n.UserId == userId.Value && n.Tipo == "promemoria"
+                        && n.Descrizione != null && n.Descrizione.StartsWith(showDesc), ct);
+                if (alreadyExists) continue;
+
                 var oreMancanti = (int)(showStart - now).TotalHours;
                 var tempoLabel = oreMancanti < 24 ? $"tra {oreMancanti}h" : $"tra {oreMancanti / 24}g";
-                var notif = new Notifica { UserId = userId.Value, Tipo = "promemoria", Titolo = "Promemoria spettacolo", Descrizione = $"«{o.Show.Film?.Titolo}» — {o.Show.Cinema?.Nome} — {o.Show.StartAtUtc:dd/MM HH:mm} ({tempoLabel})", Icona = "fa-solid fa-clock", CreatedAtUtc = now };
+                var notif = new Notifica { UserId = userId.Value, Tipo = "promemoria", Titolo = "Promemoria spettacolo", Descrizione = $"{showDesc} ({tempoLabel})", Icona = "fa-solid fa-clock", CreatedAtUtc = now };
                 db.Notifiche.Add(notif);
                 await db.SaveChangesAsync(ct);
-                result.Add(new { id = "db_" + notif.Id, icon = "fa-solid fa-clock", title = "Promemoria spettacolo", desc = $"«{o.Show.Film?.Titolo}» — {o.Show.Cinema?.Nome} — {o.Show.StartAtUtc:dd/MM HH:mm} ({tempoLabel})", time = "ora", createdAt = now });
+                result.Add(new { id = "db_" + notif.Id, icon = "fa-solid fa-clock", title = "Promemoria spettacolo", desc = $"{showDesc} ({tempoLabel})", time = "ora", createdAt = now });
             }
 
             return Results.Ok(result.OrderByDescending(r => {

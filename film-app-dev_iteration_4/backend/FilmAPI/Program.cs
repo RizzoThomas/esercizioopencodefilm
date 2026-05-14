@@ -303,10 +303,18 @@ using (var scope = app.Services.CreateScope())
     var context = scope.ServiceProvider.GetRequiredService<FilmDbContext>();
     
     // Applica migration automaticamente
-    try { context.Database.Migrate(); } catch (Exception) { }
+    try { context.Database.Migrate(); } catch (Exception ex) { Console.WriteLine($"[STARTUP] Migration skipped: {ex.Message}"); }
     
-    var seeder = new DataSeeder(context);
-    await seeder.SeedAsync();
+    try
+    {
+        var seeder = new DataSeeder(context);
+        await seeder.SeedAsync();
+        Console.WriteLine("[STARTUP] Seeding completato.");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"[STARTUP] Seeding skipped (DB non raggiungibile?): {ex.Message}");
+    }
 }
 
 app.Run();

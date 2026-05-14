@@ -242,7 +242,7 @@ async function loadCredito() {
 
     if (movimenti.length > 0) {
       const recentMov = movimenti.slice(0, 5);
-      html += `<div class="border-t border-hairline pt-3 mt-3">
+      html += `<div class="pt-3 mt-3">
         <p class="text-xs font-semibold text-body uppercase tracking-wider mb-2">Ultimi movimenti</p>
         <div class="space-y-2">`;
 

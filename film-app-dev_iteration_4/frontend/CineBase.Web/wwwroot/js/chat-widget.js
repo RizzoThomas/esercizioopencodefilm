@@ -77,18 +77,29 @@
     iconWrap.innerHTML = '<i class="fa-solid fa-message"></i>';
     fab.appendChild(iconWrap);
 
-    // ── Drag Physics ─────────────────────────────
-    var fabOffsetX = 24, fabOffsetY = 24; // current offset from right/bottom edges
+    // ── Drag Physics (long-press to drag) ──────
+    var fabOffsetX = 24, fabOffsetY = 24; // offset from right/bottom
     var dragStartX = 0, dragStartY = 0;
     var dragStartOffsetX = 0, dragStartOffsetY = 0;
     var isDragging = false;
     var hasMoved = false;
     var velX = 0, velY = 0;
     var physicsId = null;
+    var holdTimer = null;
+    var dragEnabled = false;
+    var prevX = 0, prevY = 0; // for per-frame velocity
 
     function updateFabPosition() {
       fab.style.right = fabOffsetX + 'px';
       fab.style.bottom = fabOffsetY + 'px';
+    }
+
+    function fabToViewport() {
+      // Convert right/bottom offsets to viewport coordinates
+      return {
+        x: window.innerWidth - fabOffsetX - 56,
+        y: window.innerHeight - fabOffsetY - 56
+      };
     }
 
     function clampToViewport() {
@@ -100,9 +111,8 @@
 
     function startPhysics() {
       if (physicsId) cancelAnimationFrame(physicsId);
-      var friction = 0.92;
-      var edgeSnap = 4; // pixels from edge to snap
-      var snapSpeed = 0.15;
+      var friction = 0.88;
+      var snapSpeed = 0.18;
 
       function step() {
         velX *= friction;
@@ -111,33 +121,23 @@
         fabOffsetX -= velX;
         fabOffsetY -= velY;
 
-        // Bounce off edges
         var minX = 8, maxX = window.innerWidth - 56 - 8;
         var minY = 8, maxY = window.innerHeight - 56 - 8;
 
-        if (fabOffsetX < minX) { fabOffsetX = minX; velX *= -0.4; }
-        if (fabOffsetX > maxX) { fabOffsetX = maxX; velX *= -0.4; }
-        if (fabOffsetY < minY) { fabOffsetY = minY; velY *= -0.4; }
-        if (fabOffsetY > maxY) { fabOffsetY = maxY; velY *= -0.4; }
+        if (fabOffsetX < minX) { fabOffsetX = minX; velX *= -0.3; }
+        if (fabOffsetX > maxX) { fabOffsetX = maxX; velX *= -0.3; }
+        if (fabOffsetY < minY) { fabOffsetY = minY; velY *= -0.3; }
+        if (fabOffsetY > maxY) { fabOffsetY = maxY; velY *= -0.3; }
 
-        // Snap to nearest edge when slow
-        if (Math.abs(velX) < 0.3 && Math.abs(velY) < 0.3) {
-          // Snap to nearest horizontal edge
-          if (fabOffsetX < (maxX - minX) / 2) {
-            fabOffsetX += (minX - fabOffsetX) * snapSpeed;
-          } else {
-            fabOffsetX += (maxX - fabOffsetX) * snapSpeed;
-          }
-          // Mild vertical snap too
-          if (fabOffsetY < (maxY - minY) / 2) {
-            fabOffsetY += (minY - fabOffsetY) * snapSpeed * 0.5;
-          } else {
-            fabOffsetY += (maxY - fabOffsetY) * snapSpeed * 0.5;
-          }
+        // Snap to nearest edge when velocity is low
+        if (Math.abs(velX) < 0.4 && Math.abs(velY) < 0.4) {
+          var targetX = fabOffsetX < (maxX - minX) / 2 ? minX : maxX;
+          fabOffsetX += (targetX - fabOffsetX) * snapSpeed;
+          fabOffsetY += ((fabOffsetY < (maxY - minY) / 2 ? minY : maxY) - fabOffsetY) * snapSpeed * 0.6;
 
-          if (Math.abs(velX) < 0.01 && Math.abs(velY) < 0.01 &&
-              Math.abs(fabOffsetX - minX) < 0.5 || Math.abs(fabOffsetX - maxX) < 0.5) {
-            fabOffsetX = fabOffsetX < (maxX - minX) / 2 ? minX : maxX;
+          if (Math.abs(velX) < 0.02 && Math.abs(velY) < 0.02) {
+            fabOffsetX = Math.round(fabOffsetX < (maxX - minX) / 2 ? minX : maxX);
+            fabOffsetY = Math.round(fabOffsetY);
             velX = 0; velY = 0;
             updateFabPosition();
             physicsId = null;
@@ -151,18 +151,77 @@
       physicsId = requestAnimationFrame(step);
     }
 
+    function positionPanel() {
+      var vp = fabToViewport();
+      var ww = window.innerWidth;
+      var wh = window.innerHeight;
+      var isLeft = vp.x < ww / 2;
+      var isTop = vp.y < wh / 2;
+      var isMob = ww < 640;
+
+      // Reset all position properties first
+      panel.style.left = ''; panel.style.right = '';
+      panel.style.top = ''; panel.style.bottom = '';
+      panel.style.width = isMob ? 'auto' : '370px';
+      panel.style.maxWidth = 'calc(100vw - 24px)';
+      panel.style.maxHeight = 'calc(100vh - 130px)';
+      panel.style.height = isMob ? '420px' : '440px';
+
+      var gap = 10; // gap between FAB and panel
+
+      if (isMob) {
+        // Full-width on mobile, position above or below FAB
+        panel.style.left = '12px';
+        panel.style.right = '12px';
+        if (isTop) {
+          panel.style.top = (vp.y + 56 + gap) + 'px';
+          panel.style.bottom = 'auto';
+        } else {
+          panel.style.bottom = (wh - vp.y + gap) + 'px';
+          panel.style.top = 'auto';
+        }
+      } else {
+        // Desktop: panel to the side opposite to FAB's horizontal position
+        if (isLeft) {
+          panel.style.left = (vp.x + 56 + gap) + 'px';
+          panel.style.right = 'auto';
+        } else {
+          panel.style.right = (ww - vp.x + gap) + 'px';
+          panel.style.left = 'auto';
+        }
+        if (isTop) {
+          panel.style.top = Math.max(8, vp.y) + 'px';
+          panel.style.bottom = 'auto';
+        } else {
+          panel.style.bottom = Math.max(8, wh - vp.y - 56) + 'px';
+          panel.style.top = 'auto';
+        }
+      }
+    }
+
+    // ── Pointer Events ────────────────────────
     fab.addEventListener('pointerdown', function(e) {
       fab.setPointerCapture(e.pointerId);
       dragStartX = e.clientX;
       dragStartY = e.clientY;
+      prevX = e.clientX;
+      prevY = e.clientY;
       dragStartOffsetX = fabOffsetX;
       dragStartOffsetY = fabOffsetY;
       isDragging = true;
       hasMoved = false;
+      dragEnabled = false;
       velX = 0; velY = 0;
       if (physicsId) { cancelAnimationFrame(physicsId); physicsId = null; }
-      fab.style.cursor = 'grabbing';
-      fab.style.transition = 'none';
+
+      // Long-press to enable drag (400ms hold)
+      clearTimeout(holdTimer);
+      holdTimer = setTimeout(function() {
+        dragEnabled = true;
+        fab.style.cursor = 'grabbing';
+        fab.style.transition = 'none';
+      }, 400);
+
       e.preventDefault();
     });
 
@@ -170,35 +229,52 @@
       if (!isDragging) return;
       var dx = dragStartX - e.clientX;
       var dy = dragStartY - e.clientY;
-      if (Math.abs(dx) > 3 || Math.abs(dy) > 3) hasMoved = true;
+      var dragThreshold = ('ontouchstart' in window || navigator.maxTouchPoints > 0) ? 12 : 5;
+      if (Math.abs(dx) > dragThreshold || Math.abs(dy) > dragThreshold) hasMoved = true;
       if (!hasMoved) return;
+      if (!dragEnabled) return;
 
-      // Calculate velocity (smoothed)
-      velX = velX * 0.5 + dx * 0.5;
-      velY = velY * 0.5 + dy * 0.5;
+      // Per-frame velocity from instantaneous movement
+      velX = (prevX - e.clientX) * 0.7 + velX * 0.3;
+      velY = (prevY - e.clientY) * 0.7 + velY * 0.3;
+      prevX = e.clientX;
+      prevY = e.clientY;
 
       fabOffsetX = dragStartOffsetX + dx;
       fabOffsetY = dragStartOffsetY + dy;
       clampToViewport();
       updateFabPosition();
+
+      // Close panel while dragging
+      if (open) {
+        open = false;
+        panel.style.opacity = '0';
+        panel.style.visibility = 'hidden';
+        panel.style.pointerEvents = 'none';
+        panel.style.transform = 'translateY(12px) scale(0.95)';
+        iconWrap.innerHTML = '<i class="fa-solid fa-message"></i>';
+      }
     });
 
     fab.addEventListener('pointerup', function(e) {
+      clearTimeout(holdTimer);
       isDragging = false;
       fab.style.cursor = 'grab';
-      if (!hasMoved) {
-        // It was a click
+      fab.style.transition = '';
+
+      if (!hasMoved || !dragEnabled) {
+        // It was a click (or not enough hold time)
         fabOffsetX = dragStartOffsetX;
         fabOffsetY = dragStartOffsetY;
         updateFabPosition();
-        // Trigger click handler
         open = !open;
         if (open) {
+          positionPanel();
           panel.style.opacity = '1';
           panel.style.visibility = 'visible';
           panel.style.pointerEvents = 'all';
           panel.style.transform = 'translateY(0) scale(1)';
-          fab.innerHTML = '<span style="position:relative;z-index:10;pointer-events:none"><i class="fa-solid fa-times"></i></span>';
+          iconWrap.innerHTML = '<i class="fa-solid fa-times"></i>';
           inp.focus();
           qrWrap.style.display = 'flex';
           showQrBtn.style.display = 'none';
@@ -206,29 +282,35 @@
           panel.style.opacity = '0';
           panel.style.visibility = 'hidden';
           panel.style.pointerEvents = 'none';
-          panel.style.transform = 'translateY(20px) scale(0.95)';
-          fab.innerHTML = '<span style="position:relative;z-index:10;pointer-events:none"><i class="fa-solid fa-message"></i></span>';
+          panel.style.transform = 'translateY(12px) scale(0.95)';
+          iconWrap.innerHTML = '<i class="fa-solid fa-message"></i>';
         }
         return;
       }
-      // Start physics
+
+      // Apply velocity cap
+      var maxVel = 40;
+      velX = Math.max(-maxVel, Math.min(maxVel, velX));
+      velY = Math.max(-maxVel, Math.min(maxVel, velY));
       startPhysics();
     });
 
     fab.addEventListener('pointercancel', function() {
+      clearTimeout(holdTimer);
       isDragging = false;
+      dragEnabled = false;
       fab.style.cursor = 'grab';
+      fab.style.transition = '';
       if (hasMoved) startPhysics();
     });
 
     // Chat panel
     const panel = document.createElement('div');
     panel.setAttribute('style',
-      'position:fixed!important;bottom:88px!important;right:24px!important;z-index:2147483646!important;' +
-      'width:370px;max-width:calc(100vw - 48px);height:440px;max-height:calc(100vh - 130px);' +
-      'background:var(--ferrari-canvas,#181818);border:1px solid var(--ferrari-hairline,#303030);' +
-      'display:flex;flex-direction:column;' +
-      'transform:translateY(20px) scale(0.95);opacity:0;visibility:hidden;pointer-events:none;' +
+      'position:fixed!important;z-index:2147483646!important;' +
+      'background:var(--ferrari-canvas,#181818);border:1px solid var(--ferrari-hairline,#303030);border-radius:16px;' +
+      'display:flex;flex-direction:column;overflow:hidden;' +
+      'transform:translateY(12px) scale(0.95);opacity:0;visibility:hidden;pointer-events:none;' +
       'transition:transform 0.25s,opacity 0.2s,visibility 0.2s;' +
       "font-family:'Geist','Inter',sans-serif");
 
@@ -346,27 +428,6 @@
     document.documentElement.appendChild(panel);
 
     // ── Events ──────────────────────────────────────
-    fab.onclick = () => {
-      open = !open;
-      if (open) {
-        panel.style.opacity = '1';
-        panel.style.visibility = 'visible';
-        panel.style.pointerEvents = 'all';
-        panel.style.transform = 'translateY(0) scale(1)';
-        fab.innerHTML = '<i class="fa-solid fa-times"></i>';
-        inp.focus();
-        // Reset chips visibility
-        qrWrap.style.display = 'flex';
-        showQrBtn.style.display = 'none';
-      } else {
-        panel.style.opacity = '0';
-        panel.style.visibility = 'hidden';
-        panel.style.pointerEvents = 'none';
-        panel.style.transform = 'translateY(20px) scale(0.95)';
-        fab.innerHTML = '<i class="fa-solid fa-message"></i>';
-      }
-    };
-
     function scroll() { setTimeout(() => { msgs.scrollTop = msgs.scrollHeight; }, 50); }
     function addMsg(text, cls) {
       const d = document.createElement('div');
