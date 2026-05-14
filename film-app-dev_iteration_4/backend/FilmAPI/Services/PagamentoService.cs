@@ -506,13 +506,16 @@ public class PagamentoService : IPagamentoService
 
         // Create notification for the user
         var titoloFilm = ordine.Show?.Film?.Titolo ?? "film";
+        var cinemaNome = ordine.Show?.Cinema?.Nome ?? "";
+        var dataOra = ordine.Show?.StartAtUtc;
+        var dataLabel = dataOra?.ToString("ddd d MMM", new System.Globalization.CultureInfo("it-IT")) + $" alle {dataOra:HH:mm}" ?? "";
         var notifica = new Notifica
         {
             UserId = ordine.UserId,
             Tipo = "biglietto",
-            Titolo = "Biglietto acquistato",
-            Descrizione = $"Acquisto confermato per {titoloFilm} — {ordine.NumeroBiglietti} biglietto/i. Codice: {ordine.CodiceOrdine}",
-            Icona = "fa-solid fa-ticket",
+            Titolo = "Acquisto completato!",
+            Descrizione = $"I tuoi biglietti sono pronti · {titoloFilm} · {cinemaNome} · {dataLabel} · {ordine.NumeroBiglietti} biglietto/i · {ordine.TotaleLordo:F2} € · {ordine.CodiceOrdine}",
+            Icona = "fa-solid fa-circle-check",
             CreatedAtUtc = now
         };
         _db.Notifiche.Add(notifica);
