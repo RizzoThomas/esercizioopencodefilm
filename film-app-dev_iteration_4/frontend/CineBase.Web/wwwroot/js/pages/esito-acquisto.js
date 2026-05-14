@@ -78,6 +78,8 @@ function renderHeader() {
 
   if (stato === 'Paid') {
     successHeader.classList.remove('hidden');
+    // Force notification reload so badge updates immediately
+    document.dispatchEvent(new CustomEvent('components:loaded'));
   } else if (stato === 'Pending' || stato === 'CheckoutInProgress') {
     pendingHeader.classList.remove('hidden');
 
@@ -110,6 +112,8 @@ function renderHeader() {
         } else if (updatedOrdine && updatedOrdine.stato === 'Paid' && ordine.stato === 'Paid') {
           ordine = updatedOrdine;
           renderEsito();
+          // Reload notifications on each polling tick while Paid (badge may need updating)
+          document.dispatchEvent(new CustomEvent('components:loaded'));
         }
       } catch {
       }
