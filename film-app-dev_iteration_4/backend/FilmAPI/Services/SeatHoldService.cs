@@ -329,7 +329,8 @@ public class SeatHoldService : ISeatHoldService
     }
 
     // ========================================================================
-    // CLEANUP — Rimuove hold scaduti (chiamato prima di ogni operazione)
+    // CLEANUP (privato) — Rimuove hold scaduti per uno show specifico
+    // Chiamato automaticamente prima di GetSeatMap e CreateHold
     // ========================================================================
     private async Task CleanupExpiredHoldsForShowAsync(int showId)
     {
@@ -345,5 +346,26 @@ public class SeatHoldService : ISeatHoldService
             _db.ShowPostiStato.RemoveRange(expired);
             await _db.SaveChangesAsync();
         }
+    }
+
+    // ========================================================================
+    // CLEANUP (pubblico) — Rimuove TUTTI gli hold scaduti a livello globale
+    // Chiamato dal hosted service ExpiredHoldCleanupService ogni 5 minuti
+    // Restituisce il numero di record puliti
+    // ========================================================================
+    public async Task<int> CleanupExpiredHoldsAsync()
+    {
+        var now = DateTime.UtcNow;
+        var expired = await _db.ShowPostiStato
+            .Where(sps => sps.Stato == ShowPostoState.Hold
+                   && sps.ScadeAtUtc <= now)
+            .ToListAsync();
+
+        if (expired.Count > 0)
+        {
+            _db.ShowPostiStato.RemoveRange(expired);
+            await _db.SaveChangesAsync();
+        }
+        return expired.Count;
     }
 }
