@@ -19,8 +19,10 @@
 </head>
 
 <body class="bg-canvas text-ink font-sans cinematic-enter-page">
+  <!-- Contenitore dinamico: navbar-container viene popolato o mostrato da JavaScript. -->
   <div id="navbar-container"></div>
 
+  <!-- Contenuto principale: area centrale che ospita il flusso della pagina. -->
   <main class="acquista-page max-w-7xl mx-auto px-3 sm:px-4 lg:px-5 py-3 lg:py-4 pt-20">
     <!-- Loading State -->
     <div id="loading-state" class="py-16">
@@ -137,6 +139,7 @@
             <h3 class="text-sm lg:text-base font-bold text-ink mb-2.5">
               <i class="fa-solid fa-ticket text-ferrari-primary mr-2"></i>Riepilogo
             </h3>
+  <!-- Contenitore dinamico: selected-seats-list viene popolato o mostrato da JavaScript. -->
             <div id="selected-seats-list" class="space-y-1.5 mb-4 max-h-52 overflow-y-auto pr-1">
               <p class="text-sm text-body text-center py-4">
                 Seleziona almeno un posto dalla piantina
@@ -177,8 +180,10 @@
     </div>
   </main>
 
+  <!-- Contenitore dinamico: footer-container viene popolato o mostrato da JavaScript. -->
   <div id="footer-container"></div>
 
+  <!-- Contenitore dinamico: toast-container viene popolato o mostrato da JavaScript. -->
   <div id="toast-container" class="fixed bottom-4 right-4 z-50"></div>
 
   <script src="/js/utils.js"></script>

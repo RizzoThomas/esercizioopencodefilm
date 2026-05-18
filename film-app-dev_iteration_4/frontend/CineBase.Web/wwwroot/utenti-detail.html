@@ -17,6 +17,7 @@
 </head>
 
 <body class="bg-canvas text-ink font-sans">
+  <!-- Contenuto principale: area centrale che ospita il flusso della pagina. -->
   <main>
     <!-- Header: torna a utenti -->
     <a href="/utenti.html" class="inline-flex items-center gap-2 text-body hover:text-ink mb-6 transition-colors">
@@ -65,6 +66,7 @@
     <div id="tab-profilo" class="tab-content">
       <div class="card-ferrari p-6">
         <h2 class="text-lg font-bold text-ink mb-4">Modifica Dati</h2>
+  <!-- Modulo: raccoglie i dati dell'utente e li invia tramite JavaScript al backend. -->
         <form id="profilo-form" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label class="block text-sm font-medium text-ink mb-1">Ruolo</label>
@@ -89,6 +91,7 @@
     <div id="tab-credito" class="tab-content hidden">
       <div class="card-ferrari p-6">
         <h2 class="text-lg font-bold text-ink mb-4">Movimenti Credito</h2>
+  <!-- Contenitore dinamico: movimenti-list viene popolato o mostrato da JavaScript. -->
         <div id="movimenti-list" class="space-y-3">
           <p class="text-body text-center py-4">Caricamento...</p>
         </div>
@@ -99,6 +102,7 @@
     <div id="tab-biglietti" class="tab-content hidden">
       <div class="card-ferrari p-6">
         <h2 class="text-lg font-bold text-ink mb-4">Biglietti dell'utente</h2>
+  <!-- Contenitore dinamico: biglietti-list viene popolato o mostrato da JavaScript. -->
         <div id="biglietti-list" class="space-y-3">
           <p class="text-body text-center py-4">Caricamento...</p>
         </div>
@@ -109,6 +113,7 @@
     <div id="tab-ordini" class="tab-content hidden">
       <div class="card-ferrari p-6">
         <h2 class="text-lg font-bold text-ink mb-4">Ordini dell'utente</h2>
+  <!-- Contenitore dinamico: ordini-list viene popolato o mostrato da JavaScript. -->
         <div id="ordini-list" class="space-y-3">
           <p class="text-body text-center py-4">Caricamento...</p>
         </div>
@@ -145,6 +150,7 @@
     </div>
   </div>
 
+  <!-- Contenitore dinamico: toast-container viene popolato o mostrato da JavaScript. -->
   <div id="toast-container" class="fixed bottom-4 left-4 z-50"></div>
 
   <script src="/js/utils.js"></script>

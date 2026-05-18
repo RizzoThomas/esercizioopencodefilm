@@ -6,7 +6,9 @@
   'use strict';
   if (document.getElementById('cb-chat-root')) return;
 
+  // Variabile API_BASE: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const API_BASE = window.API_BASE_URL || 'http://localhost:5000';
+  // Variabile failed: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   let failed = 0, open = false;
 
   // ── Stock FAQ ─────────────────────────────────────
@@ -33,6 +35,7 @@
     }
   ];
 
+  // Funzione init: inizializza stato, timer o interfaccia della pagina. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
   function init() {
     if (!document.body) { setTimeout(init, 30); return; }
 
@@ -79,21 +82,32 @@
 
     // ── Drag Physics (long-press to drag) ──────
     var fabOffsetX = 24, fabOffsetY = 24; // offset from right/bottom
+    // Variabile dragStartX: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     var dragStartX = 0, dragStartY = 0;
+    // Variabile dragStartOffsetX: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     var dragStartOffsetX = 0, dragStartOffsetY = 0;
+    // Variabile isDragging: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     var isDragging = false;
+    // Variabile hasMoved: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     var hasMoved = false;
+    // Variabile velX: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     var velX = 0, velY = 0;
+    // Variabile physicsId: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     var physicsId = null;
+    // Variabile holdTimer: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     var holdTimer = null;
+    // Variabile dragEnabled: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     var dragEnabled = false;
+    // Variabile prevX: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     var prevX = 0, prevY = 0; // for per-frame velocity
 
+    // Funzione updateFabPosition: aggiorna lo stato o il DOM in base ai dati correnti. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
     function updateFabPosition() {
       fab.style.right = fabOffsetX + 'px';
       fab.style.bottom = fabOffsetY + 'px';
     }
 
+    // Funzione fabToViewport: gestisce la logica prevista e restituisce il risultato atteso. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
     function fabToViewport() {
       // Convert right/bottom offsets to viewport coordinates
       return {
@@ -102,18 +116,25 @@
       };
     }
 
+    // Funzione clampToViewport: gestisce la logica prevista e restituisce il risultato atteso. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
     function clampToViewport() {
+      // Variabile maxX: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
       var maxX = window.innerWidth - 56 - 8;
+      // Variabile maxY: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
       var maxY = window.innerHeight - 56 - 8;
       fabOffsetX = Math.max(8, Math.min(maxX, fabOffsetX));
       fabOffsetY = Math.max(8, Math.min(maxY, fabOffsetY));
     }
 
+    // Funzione startPhysics: gestisce la logica prevista e restituisce il risultato atteso. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
     function startPhysics() {
       if (physicsId) cancelAnimationFrame(physicsId);
+      // Variabile friction: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
       var friction = 0.88;
+      // Variabile snapSpeed: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
       var snapSpeed = 0.18;
 
+      // Funzione step: gestisce la logica prevista e restituisce il risultato atteso. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
       function step() {
         velX *= friction;
         velY *= friction;
@@ -121,7 +142,9 @@
         fabOffsetX -= velX;
         fabOffsetY -= velY;
 
+        // Variabile minX: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
         var minX = 8, maxX = window.innerWidth - 56 - 8;
+        // Variabile minY: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
         var minY = 8, maxY = window.innerHeight - 56 - 8;
 
         if (fabOffsetX < minX) { fabOffsetX = minX; velX *= -0.3; }
@@ -131,6 +154,7 @@
 
         // Snap to nearest edge when velocity is low
         if (Math.abs(velX) < 0.4 && Math.abs(velY) < 0.4) {
+          // Variabile targetX: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
           var targetX = fabOffsetX < (maxX - minX) / 2 ? minX : maxX;
           fabOffsetX += (targetX - fabOffsetX) * snapSpeed;
           fabOffsetY += ((fabOffsetY < (maxY - minY) / 2 ? minY : maxY) - fabOffsetY) * snapSpeed * 0.6;
@@ -151,12 +175,19 @@
       physicsId = requestAnimationFrame(step);
     }
 
+    // Funzione positionPanel: gestisce la logica prevista e restituisce il risultato atteso. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
     function positionPanel() {
+      // Variabile vp: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
       var vp = fabToViewport();
+      // Variabile ww: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
       var ww = window.innerWidth;
+      // Variabile wh: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
       var wh = window.innerHeight;
+      // Variabile isLeft: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
       var isLeft = vp.x < ww / 2;
+      // Variabile isTop: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
       var isTop = vp.y < wh / 2;
+      // Variabile isMob: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
       var isMob = ww < 640;
 
       // Reset all position properties first
@@ -167,6 +198,7 @@
       panel.style.maxHeight = 'calc(100vh - 130px)';
       panel.style.height = isMob ? '420px' : '440px';
 
+      // Variabile gap: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
       var gap = 10; // gap between FAB and panel
 
       if (isMob) {
@@ -225,10 +257,14 @@
       e.preventDefault();
     });
 
+    // Listener evento: si attiva quando scatta l'evento sulla pagina e aggiorna la UI o lo stato.
     fab.addEventListener('pointermove', function(e) {
       if (!isDragging) return;
+      // Variabile dx: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
       var dx = dragStartX - e.clientX;
+      // Variabile dy: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
       var dy = dragStartY - e.clientY;
+      // Variabile dragThreshold: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
       var dragThreshold = ('ontouchstart' in window || navigator.maxTouchPoints > 0) ? 12 : 5;
       if (Math.abs(dx) > dragThreshold || Math.abs(dy) > dragThreshold) hasMoved = true;
       if (!hasMoved) return;
@@ -256,6 +292,7 @@
       }
     });
 
+    // Listener evento: si attiva quando scatta l'evento sulla pagina e aggiorna la UI o lo stato.
     fab.addEventListener('pointerup', function(e) {
       clearTimeout(holdTimer);
       isDragging = false;
@@ -295,6 +332,7 @@
       startPhysics();
     });
 
+    // Listener evento: si attiva quando scatta l'evento sulla pagina e aggiorna la UI o lo stato.
     fab.addEventListener('pointercancel', function() {
       clearTimeout(holdTimer);
       isDragging = false;
@@ -340,6 +378,7 @@
       maxHeight:'112px', overflowY:'auto'
     });
     STOCK_QA.forEach(item => {
+      // Variabile chip: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
       const chip = document.createElement('button');
       Object.assign(chip.style, {
         padding:'5px 10px', border:'1px solid var(--ferrari-hairline,#303030)',
@@ -388,6 +427,7 @@
     Object.assign(row.style, {
       display:'flex', borderTop:'1px solid var(--ferrari-hairline, #303030)'
     });
+    // Variabile inp: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const inp = document.createElement('input');
     Object.assign(inp.style, {
       flex:'1', padding:'10px 14px', border:'none', outline:'none',
@@ -395,6 +435,7 @@
       color:'var(--ferrari-ink,#fff)', fontSize:'13px'
     });
     inp.placeholder = 'Scrivi un messaggio...';
+    // Variabile send: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const send = document.createElement('button');
     Object.assign(send.style, {
       padding:'10px 16px', border:'none', cursor:'pointer',
@@ -408,12 +449,15 @@
     // Ticket form (hidden)
     const tf = document.createElement('div');
     Object.assign(tf.style, { display:'none', flexDirection:'column', gap:'6px', padding:'10px 14px', borderTop:'1px solid var(--ferrari-hairline,#303030)' });
+    // Variabile tSub: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const tSub = document.createElement('input');
     Object.assign(tSub.style, { padding:'7px 10px', background:'var(--ferrari-canvas-elevated,#303030)', color:'var(--ferrari-ink,#fff)', border:'1px solid var(--ferrari-hairline,#303030)', fontSize:'12px', outline:'none' });
     tSub.placeholder = 'Oggetto (opzionale)';
+    // Variabile tMsg: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const tMsg = document.createElement('textarea');
     Object.assign(tMsg.style, { padding:'7px 10px', background:'var(--ferrari-canvas-elevated,#303030)', color:'var(--ferrari-ink,#fff)', border:'1px solid var(--ferrari-hairline,#303030)', fontSize:'12px', outline:'none', resize:'none', fontFamily:'inherit', height:'50px' });
     tMsg.placeholder = 'Descrivi il problema...';
+    // Variabile tBtn: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const tBtn = document.createElement('button');
     Object.assign(tBtn.style, { padding:'8px', border:'none', cursor:'pointer', background:'#da291c', color:'#fff', fontSize:'12px', fontWeight:'600', textTransform:'uppercase' });
     tBtn.textContent = 'Invia Ticket';
@@ -429,6 +473,7 @@
 
     // ── Events ──────────────────────────────────────
     function scroll() { setTimeout(() => { msgs.scrollTop = msgs.scrollHeight; }, 50); }
+    // Funzione addMsg: gestisce la logica prevista e restituisce il risultato atteso. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
     function addMsg(text, cls) {
       const d = document.createElement('div');
       d.style.cssText = cls === 'user'
@@ -439,6 +484,7 @@
       scroll();
     }
 
+    // Funzione handleStockClick: gestisce un evento o una risposta utente. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
     function handleStockClick(item) {
       addMsg(item.q, 'user');
       addMsg(item.a, 'bot');
@@ -447,6 +493,7 @@
     }
 
     send.onclick = async () => {
+      // Variabile txt: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
       const txt = inp.value.trim();
       if (!txt) return;
       addMsg(txt, 'user');
@@ -456,6 +503,7 @@
       // Show "domande frequenti" button
       showQrBtn.style.display = 'inline-block';
       try {
+        // Chiamata API: contatta il backend con i dati previsti e usa la risposta per aggiornare l'interfaccia.
         const r = await fetch(API_BASE + '/api/chat', {
           method:'POST', headers:{'Content-Type':'application/json'},
           body: JSON.stringify({ message: txt, failedAttempts: failed })
@@ -476,6 +524,7 @@
       if (!m) { addMsg('⚠️ Descrivi il problema prima di inviare.', 'bot'); return; }
       tBtn.disabled = true; tBtn.textContent = 'Invio...';
       try {
+        // Chiamata API: contatta il backend con i dati previsti e usa la risposta per aggiornare l'interfaccia.
         const r = await fetch(API_BASE + '/api/tickets', {
           method:'POST', headers:{'Content-Type':'application/json'},
           body: JSON.stringify({ oggetto: tSub.value.trim(), messaggio: m, emailContatto: '' })
@@ -487,6 +536,7 @@
     };
   }
 
+  // Listener evento: si attiva quando scatta l'evento sulla pagina e aggiorna la UI o lo stato.
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
   else init();
 })();

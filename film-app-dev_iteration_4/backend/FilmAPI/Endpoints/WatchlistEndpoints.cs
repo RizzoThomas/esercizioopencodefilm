@@ -6,8 +6,18 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FilmAPI.Endpoints;
 
+/// <summary>
+/// Raggruppa gli endpoint autenticati per la gestione della watchlist dell'utente.
+/// </summary>
 public static class WatchlistEndpoints
 {
+    /// <summary>
+    /// Mappa il gruppo <c>/watchlist</c> per consultare, verificare e rimuovere i film salvati dall'utente.
+    /// Richiede autenticazione tramite il gruppo protetto dell'applicazione.
+    /// Esegue letture e aggiornamenti sulla watchlist con effetti sul database.
+    /// </summary>
+    /// <param name="app">Applicazione web su cui registrare gli endpoint.</param>
+    /// <returns>Non restituisce valori.</returns>
     public static void MapWatchlistEndpoints(this WebApplication app)
     {
         var group = app.MapGroup("/watchlist").RequireAuthorization();
@@ -125,6 +135,9 @@ public static class WatchlistEndpoints
     }
 }
 
+/// <summary>
+/// Rappresenta un film salvato nella watchlist dell'utente.
+/// </summary>
 public class WatchlistFilmDTO
 {
     public int Id { get; set; }

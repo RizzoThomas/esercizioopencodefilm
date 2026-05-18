@@ -1,137 +1,131 @@
-// ============================================================================
-// Ordine.cs — ENTITÀ ORDINE (CENTRALE NEL FLUSSO DI ACQUISTO)
-// ============================================================================
-// Rappresenta un ordine di acquisto biglietti.
-// Passa attraverso diversi stati (OrdineState):
-//   Pending → CheckoutInProgress → Paid
-//   Pending → Cancelled / Expired
-//   CheckoutInProgress → Cancelled / Expired
-//
-// L'ordine contiene TUTTA l'informazione necessaria:
-// - Cosa è stato acquistato (film, cinema, sala, show)
-// - Quanto è costato (totale, credito, carta)
-// - Come è stato pagato (StripeSessionId)
-// - Tracciamento email (TicketEmailSentAt)
-// ============================================================================
-
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace FilmAPI.Model;
 
+/// <summary>
+/// Ordine di acquisto della piattaforma CineBase.
+/// È usato dai servizi checkout, ticketing, pagamento e rimborso e mappa la tabella ordini nel database.
+/// </summary>
 public class Ordine
 {
+    /// <summary>Identificativo univoco dell'ordine.</summary>
     [Key]
     public int Id { get; set; }
 
-    // ─── CODICE ORDINE (leggibile dall'utente) ────────────────────────────
-    // Esempio: "CB-A1B2C3D4"
-    // Indice univoco su questa colonna
+    /// <summary>Codice leggibile dell'ordine; massimo 50 caratteri.</summary>
     [Required]
     [MaxLength(50)]
     public string CodiceOrdine { get; set; } = string.Empty;
 
-    // ─── FOREIGN KEYS ─────────────────────────────────────────────────────
-    // L'ordine è collegato a TUTTE le entità coinvolte nell'acquisto:
-    // User: chi ha acquistato
-    // Show: quale spettacolo
-    // Cinema/Sala/Film: snapshot dell'acquisto (anche se i dati cambiano dopo)
+    /// <summary>Utente che ha creato l'ordine; chiave esterna obbligatoria.</summary>
     [Required]
     public int UserId { get; set; }
 
+    /// <summary>Relazione con l'utente che ha effettuato l'acquisto.</summary>
     [ForeignKey(nameof(UserId))]
     public User? User { get; set; }
 
+    /// <summary>Show acquistato; chiave esterna obbligatoria.</summary>
     [Required]
     public int ShowId { get; set; }
 
+    /// <summary>Relazione con la proiezione acquistata.</summary>
     [ForeignKey(nameof(ShowId))]
     public Show? Show { get; set; }
 
+    /// <summary>Cinema della proiezione; chiave esterna obbligatoria.</summary>
     [Required]
     public int CinemaId { get; set; }
 
+    /// <summary>Relazione con il cinema associato all'ordine.</summary>
     [ForeignKey(nameof(CinemaId))]
     public Cinema? Cinema { get; set; }
 
+    /// <summary>Sala della proiezione; chiave esterna obbligatoria.</summary>
     [Required]
     public int SalaId { get; set; }
 
+    /// <summary>Relazione con la sala associata all'ordine.</summary>
     [ForeignKey(nameof(SalaId))]
     public Sala? Sala { get; set; }
 
+    /// <summary>Film acquistato; chiave esterna obbligatoria.</summary>
     [Required]
     public int FilmId { get; set; }
 
+    /// <summary>Relazione con il film associato all'ordine.</summary>
     [ForeignKey(nameof(FilmId))]
     public Film? Film { get; set; }
 
-    // ─── HOLD TOKEN ───────────────────────────────────────────────────────
-    // Token dell'hold posti da cui è stato creato questo ordine
+    /// <summary>Token di hold dei posti che ha generato l'ordine; massimo 120 caratteri.</summary>
     [Required]
     [MaxLength(120)]
     public string HoldToken { get; set; } = string.Empty;
 
-    // ─── DATI ECONOMICI ───────────────────────────────────────────────────
+    /// <summary>Numero di biglietti inclusi nell'ordine.</summary>
     [Required]
-    public int NumeroBiglietti { get; set; }               // Quanti biglietti
+    public int NumeroBiglietti { get; set; }
 
-    [Required]
-    [Column(TypeName = "decimal(10,2)")]
-    public decimal TotaleLordo { get; set; }               // Totale complessivo
-
+    /// <summary>Totale lordo dell'ordine prima di crediti o altri sconti.</summary>
     [Required]
     [Column(TypeName = "decimal(10,2)")]
-    public decimal ImportoCredito { get; set; }             // Quanto pagato con credito
+    public decimal TotaleLordo { get; set; }
 
+    /// <summary>Importo coperto da credito utente; valore monetario a due decimali.</summary>
     [Required]
     [Column(TypeName = "decimal(10,2)")]
-    public decimal ImportoCarta { get; set; }               // Quanto pagato con carta
+    public decimal ImportoCredito { get; set; }
 
-    // ─── INTEGRAZIONE STRIPE ──────────────────────────────────────────────
+    /// <summary>Importo coperto da pagamento con carta; valore monetario a due decimali.</summary>
+    [Required]
+    [Column(TypeName = "decimal(10,2)")]
+    public decimal ImportoCarta { get; set; }
+
+    /// <summary>PaymentIntent Stripe associato, se presente; massimo 120 caratteri.</summary>
     [MaxLength(120)]
-    public string? StripePaymentIntentId { get; set; }     // Payment Intent (Stripe Elements legacy)
+    public string? StripePaymentIntentId { get; set; }
 
+    /// <summary>Checkout Session Stripe associata, se presente; massimo 120 caratteri.</summary>
     [MaxLength(120)]
-    public string? StripeCheckoutSessionId { get; set; }   // Checkout Session (Stripe Checkout hosted)
+    public string? StripeCheckoutSessionId { get; set; }
 
-    // ─── IDEMPOTENZA ──────────────────────────────────────────────────────
-    // Chiave generata dal client per evitare doppi pagamenti
-    // Se stessa IdempotencyKey arriva due volte, il backend restituisce
-    // lo stesso risultato senza processare un nuovo pagamento
+    /// <summary>Chiave di idempotenza per evitare doppie elaborazioni; massimo 120 caratteri.</summary>
     [MaxLength(120)]
     public string? IdempotencyKey { get; set; }
 
-    // ─── STATO ORDINE ────────────────────────────────────────────────────
-    // Enum OrdineState: Pending, Paid, Failed, Cancelled, Expired, CheckoutInProgress
+    /// <summary>Stato corrente dell'ordine nel ciclo di vita di acquisto.</summary>
     [Required]
     public OrdineState Stato { get; set; }
 
-    // ─── TIMESTAMP ────────────────────────────────────────────────────────
+    /// <summary>Data/ora UTC di creazione dell'ordine.</summary>
     [Required]
-    public DateTime CreatedAtUtc { get; set; }              // Data creazione
+    public DateTime CreatedAtUtc { get; set; }
 
-    public DateTime? PaidAtUtc { get; set; }                // Data pagamento
+    /// <summary>Data/ora UTC di pagamento dell'ordine; nulla se non pagato.</summary>
+    public DateTime? PaidAtUtc { get; set; }
 
-    // Campi Stripe Checkout
-    public DateTime? CheckoutExpiresAtUtc { get; set; }     // Scadenza sessione Stripe
-    public DateTime? CheckoutCompletedAtUtc { get; set; }   // Completamento sessione
+    /// <summary>Data/ora UTC di scadenza del checkout; nulla se non applicabile.</summary>
+    public DateTime? CheckoutExpiresAtUtc { get; set; }
 
-    // Tracciamento email biglietti
-    public DateTime? TicketEmailSentAtUtc { get; set; }     // Email inviata con successo
+    /// <summary>Data/ora UTC di completamento del checkout; nulla se non concluso.</summary>
+    public DateTime? CheckoutCompletedAtUtc { get; set; }
+
+    /// <summary>Data/ora UTC di invio dell'email biglietti; nulla se non inviata.</summary>
+    public DateTime? TicketEmailSentAtUtc { get; set; }
+
+    /// <summary>Ultimo errore di invio email biglietti; massimo 1000 caratteri.</summary>
     [MaxLength(1000)]
-    public string? TicketEmailLastError { get; set; }       // Errore invio email (se fallito)
+    public string? TicketEmailLastError { get; set; }
 
+    /// <summary>Ultimo errore di pagamento registrato; massimo 1000 caratteri.</summary>
     [MaxLength(1000)]
-    public string? LastPaymentError { get; set; }           // Ultimo errore di pagamento
+    public string? LastPaymentError { get; set; }
 
-    // ─── CREDITO RISERVATO (pagamento misto) ──────────────────────────────
-    // In un pagamento misto, il credito viene riservato al momento della
-    // creazione della sessione Stripe e addebitato solo a pagamento confermato
+    /// <summary>Credito riservato per pagamenti misti; importo a due decimali.</summary>
     [Column(TypeName = "decimal(10,2)")]
     public decimal CreditoRiservato { get; set; }
 
-    // ─── BIGLIETTI ASSOCIATI ──────────────────────────────────────────────
-    // Un ordine contiene N biglietti (uno per posto acquistato)
+    /// <summary>Biglietti associati all'ordine.</summary>
     public ICollection<Biglietto> Biglietti { get; set; } = new List<Biglietto>();
 }

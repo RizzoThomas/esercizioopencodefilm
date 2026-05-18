@@ -1,14 +1,20 @@
 // Home Page JavaScript
 let featuredInterval;
+// Variabile currentFeaturedIndex: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
 let currentFeaturedIndex = 0;
+// Variabile featuredEntries: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
 let featuredEntries = [];
 
+// Listener evento: si attiva quando scatta l'evento sulla pagina e aggiorna la UI o lo stato.
 document.addEventListener("DOMContentLoaded", async () => {
+  // Variabile params: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const params = new URLSearchParams(window.location.search);
   if (params.get("forbidden") === "true") {
     showToast("Non hai i permessi per accedere all'area admin", "warning");
     params.delete("forbidden");
+    // Variabile newQuery: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const newQuery = params.toString();
+    // Variabile newUrl: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const newUrl = `${window.location.pathname}${newQuery ? `?${newQuery}` : ""}`;
     window.history.replaceState({}, "", newUrl);
   }
@@ -16,7 +22,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   await loadFeaturedFilms();
 });
 
+// Funzione loadFeaturedFilms: carica i dati iniziali o aggiorna il contenuto visibile della pagina. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 async function loadFeaturedFilms() {
+  // Variabile featuredGrid: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const featuredGrid = document.getElementById("featured-grid");
   if (!featuredGrid) return;
 
@@ -26,6 +34,7 @@ async function loadFeaturedFilms() {
       API.getProiezioni()
     ]);
 
+    // Variabile films: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const films = Array.isArray(filmsResponse)
       ? filmsResponse
       : Array.isArray(filmsResponse?.items)
@@ -34,6 +43,7 @@ async function loadFeaturedFilms() {
           ? filmsResponse.$values
           : [];
 
+    // Variabile proiezioni: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const proiezioni = Array.isArray(proiezioniResponse)
       ? proiezioniResponse
       : Array.isArray(proiezioniResponse?.items)
@@ -42,6 +52,7 @@ async function loadFeaturedFilms() {
           ? proiezioniResponse.$values
           : [];
 
+    // Variabile featured: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const featured = buildFeaturedSelection(films, proiezioni);
     initFeaturedFilms(featured);
   } catch (error) {
@@ -51,21 +62,28 @@ async function loadFeaturedFilms() {
   }
 }
 
+// Funzione buildFeaturedSelection: costruisce una struttura dati o una selezione ordinata per la UI. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 function buildFeaturedSelection(films, proiezioni) {
+  // Variabile next7Days: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const next7Days = new Date();
   next7Days.setDate(next7Days.getDate() + 7);
 
+  // Variabile upcoming: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const upcoming = proiezioni.filter((p) => {
+    // Variabile date: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const date = new Date(p.data || p.ora);
     return Number.isFinite(date.getTime()) && date >= new Date() && date <= next7Days;
   });
 
+  // Variabile countByFilm: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const countByFilm = new Map();
   upcoming.forEach((p) => {
+    // Variabile filmId: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const filmId = Number(p.filmId);
     countByFilm.set(filmId, (countByFilm.get(filmId) || 0) + 1);
   });
 
+  // Variabile filmsWithScore: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const filmsWithScore = films
     .map((film) => ({
       film,
@@ -84,13 +102,16 @@ function buildFeaturedSelection(films, proiezioni) {
 }
 
 
+// Funzione getDirectorName: recupera un valore derivato e lo restituisce al chiamante. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 function getDirectorName(film) {
+  // Variabile flatName: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const flatName = [film?.registaNome, film?.registaCognome]
     .filter(Boolean)
     .join(" ")
     .trim();
   if (flatName) return flatName;
 
+  // Variabile nestedName: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const nestedName = [film?.regista?.nome, film?.regista?.cognome]
     .filter(Boolean)
     .join(" ")
@@ -98,11 +119,13 @@ function getDirectorName(film) {
   return nestedName || "Regista sconosciuto";
 }
 
+// Funzione initFeaturedFilms: inizializza stato, timer o interfaccia della pagina. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 function initFeaturedFilms(entries) {
   featuredEntries = entries;
 
   // Hide skeleton, show grid
   const skeleton = document.getElementById('featured-skeleton');
+  // Variabile grid: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const grid = document.getElementById('featured-grid');
   if (skeleton) skeleton.classList.add('hidden');
   if (grid) grid.classList.remove('hidden');
@@ -138,16 +161,21 @@ window.setActiveFeatured = function (index) {
   }
 };
 
+// Listener evento: si attiva quando scatta l'evento sulla pagina e aggiorna la UI o lo stato.
 window.addEventListener("resize", () => {
   if (!featuredEntries.length) return;
   updateFeaturedDisplay(currentFeaturedIndex);
 });
 
+// Funzione updateFeaturedDisplay: aggiorna lo stato o il DOM in base ai dati correnti. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 function updateFeaturedDisplay(activeIndex) {
+  // Variabile featuredGrid: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const featuredGrid = document.getElementById("featured-grid");
   if (!featuredGrid) return;
 
+  // Variabile heroEntry: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const heroEntry = featuredEntries[activeIndex];
+  // Variabile sideEntries: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const sideEntries = featuredEntries.filter((_, idx) => idx !== activeIndex);
   featuredGrid.innerHTML = `
     ${renderHeroCard(heroEntry.film, heroEntry.score)}
@@ -161,15 +189,22 @@ function updateFeaturedDisplay(activeIndex) {
   `;
 }
 
+// Funzione renderHeroCard: costruisce markup o componenti UI a partire dai dati in ingresso. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 function renderHeroCard(film, score) {
+  // Variabile badge: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const badge = score > 0 ? "Top della Settimana" : "Nuovo Arrivo";
+  // Variabile subBadge: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const subBadge = score > 0 ? `${score} proiezioni` : "";
+  // Variabile categorie: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const categorie = film.categorie || [];
+  // Variabile badgeHtml: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const badgeHtml = categorie.length
     ? categorie.map(c => `<span class="bg-canvas/80 backdrop-blur-sm text-ink text-xs px-2 py-0.5 rounded">${c.nome}</span>`).join('')
     : `<span class="bg-ferrari-primary text-xs font-bold px-2 py-1 rounded">${film.genere || "Film"}</span>`;
   
+  // Variabile isLoggedIn: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const isLoggedIn = typeof Auth !== 'undefined' && Auth?.isLoggedIn?.() || false;
+  // Variabile cta: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const cta = isLoggedIn
     ? `<a href="/programmazione.html" class="btn-primary text-sm">Vai alla Programmazione</a>`
     : `<a href="/programmazione.html" class="btn-outline text-sm">Scopri Orari</a>`;
@@ -206,7 +241,9 @@ function renderHeroCard(film, score) {
   `;
 }
 
+// Funzione renderCompactCard: costruisce markup o componenti UI a partire dai dati in ingresso. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 function renderCompactCard(film, score, originalIndex) {
+  // Variabile badge: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const badge = score > 0 ? "In Programmazione" : "Novità";
   
   return `
@@ -236,6 +273,7 @@ window.handlePrenotaFilm = function(filmId) {
 async function loadRecommendations() {
   // Wait for auth
   var tries = 0;
+  // Variabile auth: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   var auth = null;
   while (tries < 20) {
     auth = getAuthSafe();
@@ -246,27 +284,34 @@ async function loadRecommendations() {
 
   if (!auth || !auth.isLoggedIn()) return;
 
+  // Variabile section: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const section = document.getElementById('recommendations-section');
   if (!section) return;
 
   section.classList.remove('hidden');
 
   try {
+    // Variabile token: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     var token = auth.getAccessToken();
     if (!token) { section.classList.add('hidden'); return; }
 
+    // Chiamata API: contatta il backend con i dati previsti e usa la risposta per aggiornare l'interfaccia.
     const response = await fetch((window.API_BASE_URL || 'http://localhost:5000') + '/recommendations', {
       headers: { 'Authorization': 'Bearer ' + token }
     });
     if (!response.ok) throw new Error('Not available');
 
+    // Variabile data: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const data = await response.json();
+    // Variabile items: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const items = data.items || [];
+    // Variabile subtitle: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const subtitle = document.getElementById('recommendations-subtitle');
     if (subtitle && data.source === 'personalized') {
       subtitle.textContent = 'Suggerimenti basati sui tuoi gusti cinematografici';
     }
 
+    // Variabile grid: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const grid = document.getElementById('recommendations-grid');
     if (items.length === 0) {
       grid.innerHTML = '<p class="text-body text-sm col-span-full text-center py-4">Nessun suggerimento al momento. Guarda qualche film per ricevere consigli personalizzati!</p>';

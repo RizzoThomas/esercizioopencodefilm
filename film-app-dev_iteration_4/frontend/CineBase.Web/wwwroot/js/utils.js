@@ -35,6 +35,7 @@ function truncateText(text, maxLength = 50) {
 function handleApiError(error) {
   console.error('API Error:', error);
   
+  // Variabile message: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   let message = 'Si è verificato un errore';
 
   if (error.status === 0) {
@@ -67,9 +68,11 @@ function handleApiError(error) {
 
 // Toast notification (Tailwind version)
 function showToast(message, type = 'success') {
+  // Variabile toastContainer: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const toastContainer = document.getElementById('toast-container');
   if (!toastContainer) return;
   
+  // Variabile colors: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const colors = {
     success: 'bg-emerald-500',
     danger: 'bg-red-500',
@@ -77,7 +80,9 @@ function showToast(message, type = 'success') {
     info: 'bg-blue-500'
   };
   
+  // Variabile toastId: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const toastId = 'toast-' + Date.now();
+  // Variabile toastHtml: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const toastHtml = `
     <div id="${toastId}" class="${colors[type]} text-white px-6 py-3 shadow-lg flex items-center gap-3 animate-fade-in">
       <span>${message}</span>
@@ -91,6 +96,7 @@ function showToast(message, type = 'success') {
   
   // Auto-remove after 3 seconds
   setTimeout(() => {
+    // Variabile toast: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const toast = document.getElementById(toastId);
     if (toast) toast.remove();
   }, 3000);
@@ -98,12 +104,14 @@ function showToast(message, type = 'success') {
 
 // Conferma eliminazione
 function confirmDelete(itemName, callback) {
+  // Variabile confirmed: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const confirmed = confirm(`Sei sicuro di voler eliminare "${itemName}"?`);
   if (confirmed) callback();
 }
 
 // Formatta importo in EUR
 function formatCurrency(amount) {
+  // Variabile val: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   var val = parseFloat(amount);
   if (isNaN(val)) return '0,00 \u20AC';
   return new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR' }).format(val);
@@ -126,14 +134,21 @@ function getCoverImage(copertinaPath) {
 
 // Counter animation — anima un numero da 0 al target (21st.dev style)
 function animateCounter(el, target, duration = 1200) {
+  // Variabile start: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const start = 0;
+  // Variabile startTime: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const startTime = performance.now();
+  // Variabile isInt: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const isInt = Number.isInteger(target);
+  // Funzione update: aggiorna lo stato o il DOM in base ai dati correnti. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
   function update(now) {
+    // Variabile elapsed: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const elapsed = now - startTime;
+    // Variabile progress: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const progress = Math.min(elapsed / duration, 1);
     // Easing out cubic
     const eased = 1 - Math.pow(1 - progress, 3);
+    // Variabile current: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const current = start + (target - start) * eased;
     el.textContent = isInt ? Math.round(current).toLocaleString('it-IT') : current.toLocaleString('it-IT', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     el.classList.add('counted');

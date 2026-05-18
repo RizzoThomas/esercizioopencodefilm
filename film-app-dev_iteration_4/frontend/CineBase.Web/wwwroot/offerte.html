@@ -17,8 +17,10 @@
 </head>
 
 <body class="bg-canvas text-ink font-sans cinematic-enter-page">
+  <!-- Contenitore dinamico: navbar-container viene popolato o mostrato da JavaScript. -->
   <div id="navbar-container"></div>
 
+  <!-- Contenuto principale: area centrale che ospita il flusso della pagina. -->
   <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 pt-24">
     <div class="flex items-end justify-between gap-4 mb-10">
       <div>
@@ -54,8 +56,10 @@
       <button id="retry-button" class="btn-primary">Riprova</button>
     </div>
 
+  <!-- Contenitore dinamico: offers-grid viene popolato o mostrato da JavaScript. -->
     <div id="offers-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 hidden"></div>
 
+  <!-- Sezione principale: blocco UI dedicato a un contenuto funzionale della pagina. -->
     <section class="mt-16 orb-bg">
       <div class="orb-overlay" aria-hidden="true"></div>
       <div class="flex items-end justify-between gap-4 mb-8">
@@ -68,11 +72,14 @@
         <i class="fa-solid fa-spinner fa-spin text-3xl mb-3 text-ferrari-primary"></i>
         <p class="text-body">Caricamento abbonamenti...</p>
       </div>
+  <!-- Contenitore dinamico: subscriptions-grid viene popolato o mostrato da JavaScript. -->
       <div id="subscriptions-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 hidden"></div>
     </section>
   </main>
 
+  <!-- Contenitore dinamico: footer-container viene popolato o mostrato da JavaScript. -->
   <div id="footer-container"></div>
+  <!-- Contenitore dinamico: toast-container viene popolato o mostrato da JavaScript. -->
   <div id="toast-container" class="fixed bottom-4 right-4 z-50"></div>
 
   <script src="/js/utils.js?v=2"></script>

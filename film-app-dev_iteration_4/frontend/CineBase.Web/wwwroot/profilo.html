@@ -19,8 +19,10 @@
 </head>
 
 <body class="bg-canvas text-ink font-sans cinematic-enter-page">
+  <!-- Contenitore dinamico: navbar-container viene popolato o mostrato da JavaScript. -->
   <div id="navbar-container"></div>
 
+  <!-- Contenuto principale: area centrale che ospita il flusso della pagina. -->
   <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-8">
     <div class="mb-10">
       <p class="page-header-eyebrow mb-3">Account</p>
@@ -34,6 +36,7 @@
         <h2 class="text-xl font-bold text-ink mb-6">
           <i class="fa-solid fa-user text-ferrari-primary mr-2"></i>Dati Personali
         </h2>
+  <!-- Modulo: raccoglie i dati dell'utente e li invia tramite JavaScript al backend. -->
         <form id="profilo-form" class="space-y-4">
           <div>
             <label for="profilo-email" class="block text-sm font-medium text-ink mb-1">Email</label>
@@ -72,6 +75,7 @@
           <h2 class="text-xl font-bold text-ink mb-4">
             <i class="fa-solid fa-location-dot text-ferrari-primary mr-2"></i>Cinema Preferito
           </h2>
+  <!-- Contenitore dinamico: cinema-preferito-content viene popolato o mostrato da JavaScript. -->
           <div id="cinema-preferito-content">
             <div class="text-center py-4 text-body">
               <i class="fa-solid fa-spinner fa-spin text-xl mb-2"></i>
@@ -85,6 +89,7 @@
           <h2 class="text-xl font-bold text-ink mb-4">
             <i class="fa-solid fa-wallet text-ferrari-primary mr-2"></i>Credito Piattaforma
           </h2>
+  <!-- Contenitore dinamico: credito-content viene popolato o mostrato da JavaScript. -->
           <div id="credito-content">
             <div class="text-center py-4 text-body">
               <i class="fa-solid fa-spinner fa-spin text-xl mb-2"></i>
@@ -102,6 +107,7 @@
           <i class="fa-solid fa-receipt text-ferrari-primary mr-2"></i>I Miei Ordini
         </h2>
       </div>
+  <!-- Contenitore dinamico: ordini-list viene popolato o mostrato da JavaScript. -->
       <div id="ordini-list">
         <div class="text-center py-8 text-body">
           <i class="fa-solid fa-spinner fa-spin text-3xl mb-3"></i>
@@ -117,6 +123,7 @@
           <i class="fa-solid fa-ticket text-ferrari-primary mr-2"></i>I Miei Biglietti
         </h2>
       </div>
+  <!-- Contenitore dinamico: biglietti-list viene popolato o mostrato da JavaScript. -->
       <div id="biglietti-list">
         <div class="text-center py-8 text-body">
           <i class="fa-solid fa-spinner fa-spin text-3xl mb-3"></i>
@@ -132,6 +139,7 @@
           <i class="fa-solid fa-clock-rotate-left text-body mr-2"></i>Prenotazioni (legacy)
         </h2>
       </div>
+  <!-- Contenitore dinamico: prenotazioni-list viene popolato o mostrato da JavaScript. -->
       <div id="prenotazioni-list">
         <div class="text-center py-4 text-body">
           <i class="fa-solid fa-spinner fa-spin text-xl mb-2"></i>
@@ -147,6 +155,7 @@
           <i class="fa-solid fa-lock text-ferrari-primary mr-2"></i>Sicurezza Account
         </h2>
       </div>
+  <!-- Contenitore dinamico: account-security-content viene popolato o mostrato da JavaScript. -->
       <div id="account-security-content">
         <div class="text-center py-4 text-body">
           <i class="fa-solid fa-spinner fa-spin text-xl mb-2"></i>
@@ -174,17 +183,21 @@
       </div>
     </div>
 
+  <!-- Sezione principale: blocco UI dedicato a un contenuto funzionale della pagina. -->
     <section id="subscription-section" class="hidden card-ferrari p-6 mb-6 mt-8">
       <h2 class="text-lg font-bold text-ink mb-4">
         <i class="fa-solid fa-crown text-ferrari-primary mr-2"></i>Il mio Abbonamento
       </h2>
+  <!-- Contenitore dinamico: subscription-content viene popolato o mostrato da JavaScript. -->
       <div id="subscription-content" class="text-body">Nessun abbonamento attivo</div>
     </section>
 
+  <!-- Sezione principale: blocco UI dedicato a un contenuto funzionale della pagina. -->
     <section id="vouchers-section" class="hidden card-ferrari p-6 mb-6 mt-8">
       <h2 class="text-lg font-bold text-ink mb-4">
         <i class="fa-solid fa-ticket text-ferrari-primary mr-2"></i>I miei Voucher
       </h2>
+  <!-- Contenitore dinamico: vouchers-content viene popolato o mostrato da JavaScript. -->
       <div id="vouchers-content" class="grid grid-cols-1 md:grid-cols-2 gap-4 text-body">Nessun voucher</div>
     </section>
   </main>
@@ -220,6 +233,7 @@
     </div>
   </div>
 
+<!-- Contenitore dinamico: footer-container viene popolato o mostrato da JavaScript. -->
 <div id="footer-container"></div>
 
   <!-- Biglietto Detail Modal -->
@@ -236,12 +250,14 @@
               <i class="fa-solid fa-xmark text-lg"></i>
             </button>
           </div>
+  <!-- Contenitore dinamico: biglietto-modal-content viene popolato o mostrato da JavaScript. -->
           <div id="biglietto-modal-content"></div>
         </div>
       </div>
     </div>
   </div>
 
+  <!-- Contenitore dinamico: toast-container viene popolato o mostrato da JavaScript. -->
   <div id="toast-container" class="fixed bottom-4 right-4 z-50"></div>
 
   <script src="/js/utils.js"></script>

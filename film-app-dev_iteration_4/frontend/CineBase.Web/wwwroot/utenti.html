@@ -18,6 +18,7 @@
 </head>
 
 <body class="bg-canvas text-ink font-sans">
+  <!-- Contenuto principale: area centrale che ospita il flusso della pagina. -->
   <main>
     <div class="flex items-center justify-between gap-4 mb-6">
       <p class="text-sm text-body">Gestisci gli utenti della piattaforma</p>
@@ -65,6 +66,7 @@
             </h3>
             <button onclick="closeUtenteModal()" class="text-body hover:text-ink"><i class="fa-solid fa-xmark text-xl"></i></button>
           </div>
+  <!-- Modulo: raccoglie i dati dell'utente e li invia tramite JavaScript al backend. -->
           <form id="utenti-edit-form" class="space-y-4">
             <input type="hidden" id="edit-user-id">
             <div>
@@ -101,6 +103,7 @@
     </div>
   </div>
 
+  <!-- Contenitore dinamico: toast-container viene popolato o mostrato da JavaScript. -->
   <div id="toast-container" class="fixed bottom-4 right-4 z-50"></div>
 
   <script src="/js/utils.js"></script>

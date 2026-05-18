@@ -5,8 +5,18 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FilmAPI.Endpoints;
 
+/// <summary>
+/// Raggruppa gli endpoint pubblici e amministrativi per la gestione dei cinema.
+/// </summary>
 public static class CinemasEndpoints
 {
+    /// <summary>
+    /// Mappa le rotte del gruppo <c>/cinemas</c> per elenco, dettaglio, creazione, aggiornamento ed eliminazione dei cinema.
+    /// Le rotte di lettura sono pubbliche con <c>AllowAnonymous</c>, mentre le modifiche richiedono <c>RequireAuthorization("AdminOnly")</c>.
+    /// Esegue operazioni CRUD sui cinema con effetti sul database e restituisce i dati creati o aggiornati.
+    /// </summary>
+    /// <param name="app">Applicazione web su cui registrare gli endpoint.</param>
+    /// <returns>Non restituisce valori.</returns>
     public static void MapCinemasEndpoints(this WebApplication app)
     {
         var group = app.MapGroup("/cinemas");

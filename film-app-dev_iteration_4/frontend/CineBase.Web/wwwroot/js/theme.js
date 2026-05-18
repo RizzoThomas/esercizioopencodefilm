@@ -7,17 +7,22 @@
  * - Exposes window.CineBaseTheme for external access
  */
 (function () {
+  // Variabile STORAGE_KEY: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const STORAGE_KEY = 'cinebase-theme';
 
+  // Funzione getSystemTheme: recupera un valore derivato e lo restituisce al chiamante. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
   function getSystemTheme() {
     return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
   }
 
+  // Funzione getSavedTheme: recupera un valore derivato e lo restituisce al chiamante. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
   function getSavedTheme() {
     return localStorage.getItem(STORAGE_KEY);
   }
 
+  // Funzione applyTheme: gestisce la logica prevista e restituisce il risultato atteso. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
   function applyTheme(theme) {
+    // Variabile root: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const root = document.documentElement;
     if (theme === 'light') {
       root.classList.add('light');
@@ -33,7 +38,9 @@
     updateHeroBackground(theme);
   }
 
+  // Funzione updateHeroBackground: aggiorna lo stato o il DOM in base ai dati correnti. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
   function updateHeroBackground(theme) {
+    // Variabile heroBg: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const heroBg = document.getElementById('hero-bg');
     if (!heroBg) return;
     if (theme === 'light') {
@@ -43,26 +50,34 @@
     }
   }
 
+  // Funzione updateToggleIcons: aggiorna lo stato o il DOM in base ai dati correnti. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
   function updateToggleIcons(theme) {
+    // Variabile iconClass: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     var iconClass = theme === 'dark' ? 'fa-solid fa-moon' : 'fa-solid fa-sun';
     document.querySelectorAll('#theme-toggle i, #admin-theme-toggle i').forEach(function(el) {
       el.className = iconClass;
     });
   }
 
+  // Funzione getCurrentTheme: recupera un valore derivato e lo restituisce al chiamante. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
   function getCurrentTheme() {
+    // Variabile saved: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const saved = getSavedTheme();
     if (saved) return saved;
     return getSystemTheme();
   }
 
+  // Funzione toggleTheme: commuta uno stato visivo o funzionale tra due modalità. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
   function toggleTheme() {
+    // Variabile current: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const current = getCurrentTheme();
+    // Variabile next: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const next = current === 'dark' ? 'light' : 'dark';
     localStorage.setItem(STORAGE_KEY, next);
     applyTheme(next);
   }
 
+  // Funzione setTheme: gestisce la logica prevista e restituisce il risultato atteso. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
   function setTheme(theme) {
     localStorage.setItem(STORAGE_KEY, theme);
     applyTheme(theme);

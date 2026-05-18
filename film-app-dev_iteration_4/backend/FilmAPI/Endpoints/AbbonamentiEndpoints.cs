@@ -7,8 +7,18 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FilmAPI.Endpoints;
 
+/// <summary>
+/// Raggruppa gli endpoint autenticati per la gestione degli abbonamenti.
+/// </summary>
 public static class AbbonamentiEndpoints
 {
+    /// <summary>
+    /// Mappa il gruppo <c>/abbonamenti</c> per consultare e gestire gli abbonamenti dell'utente autenticato.
+    /// Richiede <c>RequireAuthorization("Authenticated")</c>.
+    /// Esegue operazioni di lettura e modifica sugli abbonamenti con effetti sul database e sullo stato sottoscrizione.
+    /// </summary>
+    /// <param name="app">Applicazione web su cui registrare gli endpoint.</param>
+    /// <returns>Non restituisce valori.</returns>
     public static void MapAbbonamentiEndpoints(this WebApplication app)
     {
         var abbonamentiGroup = app.MapGroup("/abbonamenti");

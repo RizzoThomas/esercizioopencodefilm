@@ -1,14 +1,25 @@
+// Variabile orderId: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
 let orderId = null;
+// Variabile ordine: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
 let ordine = null;
+// Variabile creditoData: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
 let creditoData = null;
+// Variabile frontendConfig: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
 let frontendConfig = null;
+// Variabile urlParams: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
 const urlParams = new URLSearchParams(window.location.search);
+// Variabile offertaIdFromUrl: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
 const offertaIdFromUrl = urlParams.get('offertaId');
+// Variabile showIdFromUrl: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
 const showIdFromUrl = urlParams.get('showId');
+// Variabile abbonamentoIdFromUrl: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
 const abbonamentoIdFromUrl = urlParams.get('abbonamentoId');
+// Variabile stripeStatusFromUrl: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
 const stripeStatusFromUrl = urlParams.get('stripe');
+// Variabile paymentFlowMode: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
 let paymentFlowMode = 'order';
 
+// Listener evento: si attiva quando scatta l'evento sulla pagina e aggiorna la UI o lo stato.
 document.addEventListener('DOMContentLoaded', async () => {
   // Reset button state when page loads (fix for stuck "Elaborazione pagamento...")
   resetPayButton();
@@ -30,6 +41,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
+  // Variabile params: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const params = new URLSearchParams(window.location.search);
   orderId = parseInt(params.get('orderId'));
 
@@ -50,6 +62,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Se l'ordine è bloccato in CheckoutInProgress (checkout abbandonato), prova a cancellarlo
   if (ordine.stato === 'CheckoutInProgress') {
     try {
+      // Variabile checkoutStatus: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
       const checkoutStatus = await API.reconcileCheckoutSession(orderId);
       if (checkoutStatus?.ordine) ordine = checkoutStatus.ordine;
     } catch { /* ignore */ }
@@ -86,6 +99,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         try { await API.cancelOrdine(orderId); } catch {}
         showToast('Pagamento non completato. Ordine annullato.', 'warning');
         setTimeout(() => {
+          // Variabile backUrl: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
           const backUrl = new URL('/acquista.html', window.location.origin);
           if (ordine?.showId) backUrl.searchParams.set('showId', ordine.showId);
           if (offertaIdFromUrl) backUrl.searchParams.set('offertaId', offertaIdFromUrl);
@@ -96,6 +110,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 });
 
+// Funzione loadFrontendConfig: carica i dati iniziali o aggiorna il contenuto visibile della pagina. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 async function loadFrontendConfig() {
   try {
     frontendConfig = await API.getFrontendConfig();
@@ -104,6 +119,7 @@ async function loadFrontendConfig() {
   }
 }
 
+// Funzione loadOrdine: carica i dati iniziali o aggiorna il contenuto visibile della pagina. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 async function loadOrdine() {
   try {
     ordine = await API.getOrdine(orderId);
@@ -116,6 +132,7 @@ async function loadOrdine() {
   }
 }
 
+// Funzione loadCredito: carica i dati iniziali o aggiorna il contenuto visibile della pagina. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 async function loadCredito() {
   try {
     creditoData = await API.getCreditoMe();
@@ -124,6 +141,7 @@ async function loadCredito() {
   }
 }
 
+// Funzione normalizeCollection: normalizza il valore in ingresso per confronti stabili. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 function normalizeCollection(data) {
   if (Array.isArray(data)) return data;
   if (Array.isArray(data?.$values)) return data.$values;
@@ -131,6 +149,7 @@ function normalizeCollection(data) {
   return [];
 }
 
+// Funzione hideOrderOnlyControls: gestisce la logica prevista e restituisce il risultato atteso. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 function hideOrderOnlyControls() {
   document.getElementById('option-misto')?.classList.add('hidden');
   document.getElementById('option-ticket')?.classList.add('hidden');
@@ -139,9 +158,12 @@ function hideOrderOnlyControls() {
   document.getElementById('order-summary-card')?.classList.add('hidden');
 }
 
+// Funzione loadOffertaDiscount: carica i dati iniziali o aggiorna il contenuto visibile della pagina. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 async function loadOffertaDiscount(offertaId) {
   try {
+    // Variabile offers: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const offers = normalizeCollection(await API.getOfferte());
+    // Variabile offerta: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const offerta = offers.find((offer) => String(offer.id) === String(offertaId)) || null;
     if (!offerta) throw new Error('Offerta non trovata');
 
@@ -166,7 +188,9 @@ async function loadOffertaDiscount(offertaId) {
   }
 }
 
+// Funzione finalizeAbbonamentoAfterStripe: gestisce la logica prevista e restituisce il risultato atteso. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 async function finalizeAbbonamentoAfterStripe(abbonamentoId) {
+  // Variabile marker: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const marker = `abbonamento-finalized-${abbonamentoId}`;
   if (sessionStorage.getItem(marker)) {
     window.location.href = '/profilo.html';
@@ -174,6 +198,7 @@ async function finalizeAbbonamentoAfterStripe(abbonamentoId) {
   }
 
   try {
+    // Chiamata API: contatta il backend con i dati previsti e usa la risposta per aggiornare l'interfaccia.
     const res = await fetch((window.API_BASE_URL || 'http://localhost:5000') + '/abbonamenti/' + abbonamentoId + '/attiva', {
       method: 'POST',
       headers: {
@@ -184,6 +209,7 @@ async function finalizeAbbonamentoAfterStripe(abbonamentoId) {
     });
 
     if (!res.ok) {
+      // Variabile err: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
       const err = await res.json().catch(() => ({}));
       throw new Error(err.message || 'Attivazione abbonamento fallita');
     }
@@ -196,9 +222,12 @@ async function finalizeAbbonamentoAfterStripe(abbonamentoId) {
   }
 }
 
+// Funzione loadAbbonamentoPayment: carica i dati iniziali o aggiorna il contenuto visibile della pagina. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 async function loadAbbonamentoPayment(abbonamentoId) {
   try {
+    // Variabile abbonamenti: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const abbonamenti = normalizeCollection(await API.getAbbonamenti());
+    // Variabile abb: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const abb = abbonamenti.find((item) => String(item.id) === String(abbonamentoId)) || null;
     if (!abb) throw new Error('Abbonamento non trovato');
 
@@ -214,6 +243,7 @@ async function loadAbbonamentoPayment(abbonamentoId) {
     // Mostra il credito disponibile (non veniva mostrato nel flusso abbonamento)
     document.getElementById('credit-balance').textContent = formatCurrency(creditoData?.saldoAttuale || 0);
 
+    // Variabile prezzo: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const prezzo = abb.prezzoAnnuale || abb.prezzo || 0;
     document.getElementById('order-summary').innerHTML = `
       <div class="flex justify-between text-sm">
@@ -237,15 +267,20 @@ async function loadAbbonamentoPayment(abbonamentoId) {
   }
 }
 
+// Funzione renderOrderSummary: costruisce markup o componenti UI a partire dai dati in ingresso. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 function renderOrderSummary() {
   hideLoading();
   document.getElementById('main-content').classList.remove('hidden');
 
   document.getElementById('credit-balance').textContent = formatCurrency(creditoData?.saldoAttuale || 0);
 
+  // Variabile container: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const container = document.getElementById('order-summary');
+  // Variabile startDate: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const startDate = new Date(ordine.startAtUtc);
+  // Variabile dateOptions: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const dateOptions = { weekday: 'short', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' };
+  // Variabile dateStr: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const dateStr = startDate.toLocaleDateString('it-IT', dateOptions);
 
   container.innerHTML = `
@@ -276,6 +311,7 @@ function renderOrderSummary() {
   `;
 
   if (window._offertaData) {
+    // Variabile risparmio: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const risparmio = (window._offertaData.totaleOriginale || ordine.totaleOriginale || 0) - (window._offertaData.prezzo || 0);
     container.insertAdjacentHTML('beforeend', `
       <div class="border-t border-hairline pt-3 mt-3">
@@ -295,12 +331,18 @@ function renderOrderSummary() {
   updatePayButtonText();
 }
 
+// Funzione setupPaymentOptions: gestisce la logica prevista e restituisce il risultato atteso. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 function setupPaymentOptions() {
+  // Variabile saldo: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const saldo = creditoData?.saldoAttuale || 0;
+  // Variabile totale: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const totale = ordine?.totaleLordo || 0;
 
+  // Variabile optionCredito: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const optionCredito = document.getElementById('option-credito');
+  // Variabile optionMisto: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const optionMisto = document.getElementById('option-misto');
+  // Variabile creditOnlyDesc: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const creditOnlyDesc = document.getElementById('credit-only-desc');
 
   if (saldo < totale) {
@@ -314,26 +356,35 @@ function setupPaymentOptions() {
     optionMisto.classList.add('opacity-50', 'cursor-not-allowed');
   }
 
+  // Variabile slider: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const slider = document.getElementById('credit-slider');
   slider.max = Math.min(saldo, Math.max(0, totale - 0.01));
   slider.value = 0;
 
   document.querySelectorAll('input[name="payment-method"]').forEach(radio => {
+    // Listener evento: si attiva quando scatta l'evento sulla pagina e aggiorna la UI o lo stato.
     radio.addEventListener('change', () => {
       onPaymentMethodChange(radio.value);
     });
   });
 
+  // Listener evento: si attiva quando scatta l'evento sulla pagina e aggiorna la UI o lo stato.
   slider.addEventListener('input', () => {
     updateSplitDisplay();
   });
 }
 
+// Funzione onPaymentMethodChange: gestisce la logica prevista e restituisce il risultato atteso. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 function onPaymentMethodChange(method) {
+  // Variabile stripeInfoSection: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const stripeInfoSection = document.getElementById('stripe-info-section');
+  // Variabile sliderSection: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const sliderSection = document.getElementById('credit-slider-section');
+  // Variabile ticketCodeSection: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const ticketCodeSection = document.getElementById('ticket-code-section');
+  // Variabile saldo: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const saldo = creditoData?.saldoAttuale || 0;
+  // Variabile totale: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const totale = ordine?.totaleLordo || 0;
 
   sliderSection.classList.add('hidden');
@@ -349,6 +400,7 @@ function onPaymentMethodChange(method) {
     case 'misto':
       sliderSection.classList.remove('hidden');
       stripeInfoSection.classList.remove('hidden');
+      // Variabile slider: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
       const slider = document.getElementById('credit-slider');
       slider.max = Math.min(saldo, Math.max(0, totale - 0.01));
       slider.value = Math.min(saldo, Math.max(0, totale - 0.01));
@@ -362,10 +414,15 @@ function onPaymentMethodChange(method) {
   updatePayButtonText();
 }
 
+// Funzione updateSplitDisplay: aggiorna lo stato o il DOM in base ai dati correnti. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 function updateSplitDisplay() {
+  // Variabile slider: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const slider = document.getElementById('credit-slider');
+  // Variabile creditAmount: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const creditAmount = parseFloat(slider.value);
+  // Variabile totale: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const totale = ordine?.totaleLordo || 0;
+  // Variabile cardAmount: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const cardAmount = totale - creditAmount;
 
   document.getElementById('credit-amount-label').textContent = `Credito: ${formatCurrency(creditAmount)}`;
@@ -374,19 +431,26 @@ function updateSplitDisplay() {
   updatePayButtonText();
 }
 
+// Funzione updatePayButtonText: aggiorna lo stato o il DOM in base ai dati correnti. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 function updatePayButtonText() {
+  // Variabile method: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const method = document.querySelector('input[name="payment-method"]:checked')?.value || 'carta';
+  // Variabile totale: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const totale = ordine?.totaleLordo || 0;
+  // Variabile amount: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   let amount = totale;
 
   if (method === 'credito') {
     amount = totale;
   } else if (method === 'misto') {
+    // Variabile slider: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const slider = document.getElementById('credit-slider');
+    // Variabile creditUsed: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const creditUsed = parseFloat(slider?.value || 0);
     amount = totale - creditUsed;
   }
 
+  // Variabile btnText: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const btnText = document.getElementById('pay-button-text');
   if (method === 'credito') {
     btnText.textContent = `Paga ${formatCurrency(totale)} con credito`;
@@ -399,14 +463,19 @@ function updatePayButtonText() {
   }
 }
 
+// Funzione setupActions: gestisce la logica prevista e restituisce il risultato atteso. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 function setupActions() {
+  // Variabile btnPay: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const btnPay = document.getElementById('btn-pay');
+  // Variabile btnCancel: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const btnCancel = document.getElementById('btn-cancel');
 
+  // Listener evento: si attiva quando scatta l'evento sulla pagina e aggiorna la UI o lo stato.
   btnPay.addEventListener('click', async () => {
     await handlePayment();
   });
 
+  // Listener evento: si attiva quando scatta l'evento sulla pagina e aggiorna la UI o lo stato.
   btnCancel?.addEventListener('click', async () => {
     btnCancel.disabled = true;
     btnCancel.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>Annullamento...';
@@ -422,11 +491,14 @@ function setupActions() {
   });
 }
 
+// Funzione handlePayment: gestisce un evento o una risposta utente. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 async function handlePayment() {
+  // Variabile btnPay: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const btnPay = document.getElementById('btn-pay');
   btnPay.disabled = true;
   btnPay.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>Elaborazione pagamento...';
 
+  // Variabile method: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   let method = 'carta'; // hoisted for catch-block access
 
   try {
@@ -443,9 +515,11 @@ async function handlePayment() {
     }
 
     if (window._abbonamentoData) {
+      // Variabile method: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
       const method = document.querySelector('input[name="payment-method"]:checked')?.value || 'carta';
       if (method === 'credito') {
         try {
+          // Chiamata API: contatta il backend con i dati previsti e usa la risposta per aggiornare l'interfaccia.
           const res = await fetch((window.API_BASE_URL || 'http://localhost:5000') + '/abbonamenti/' + window._abbonamentoData.id + '/attiva', {
             method: 'POST',
             headers: {
@@ -461,6 +535,7 @@ async function handlePayment() {
             return;
           }
 
+          // Variabile err: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
           const err = await res.json().catch(() => ({}));
           showToast(res.status === 409 ? 'Hai già un abbonamento attivo. Controlla il tuo profilo.' : (err.message || err.title || 'Errore attivazione'), 'danger');
         } catch (e) {
@@ -472,7 +547,9 @@ async function handlePayment() {
         return;
       }
 
+      // Variabile idempotencyKey: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
       const idempotencyKey = `abbonamento-${window._abbonamentoData.id}-${Date.now()}`;
+      // Variabile session: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
       const session = await API.createAbbonamentoStripeCheckoutSession(window._abbonamentoData.id, idempotencyKey);
 
       if (session?.stripeCheckoutUrl) {
@@ -481,6 +558,7 @@ async function handlePayment() {
       }
 
       try {
+        // Chiamata API: contatta il backend con i dati previsti e usa la risposta per aggiornare l'interfaccia.
         const res = await fetch((window.API_BASE_URL || 'http://localhost:5000') + '/abbonamenti/' + window._abbonamentoData.id + '/attiva', {
           method: 'POST',
           headers: {
@@ -496,6 +574,7 @@ async function handlePayment() {
           return;
         }
 
+        // Variabile err: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
         const err = await res.json().catch(() => ({}));
         showToast(res.status === 409 ? 'Hai già un abbonamento attivo. Controlla il tuo profilo.' : (err.message || err.title || 'Errore attivazione'), 'danger');
       } catch (e) {
@@ -508,17 +587,21 @@ async function handlePayment() {
     }
 
     method = document.querySelector('input[name="payment-method"]:checked')?.value || 'carta';
+    // Variabile importoCreditoRichiesto: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     let importoCreditoRichiesto = null;
+    // Variabile offertaId: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const offertaId = window._offertaData?.id || null;
 
     if (method === 'credito') {
       importoCreditoRichiesto = ordine.totaleLordo;
     } else if (method === 'misto') {
+      // Variabile slider: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
       const slider = document.getElementById('credit-slider');
       importoCreditoRichiesto = parseFloat(slider.value);
     }
 
     if (method === 'credito') {
+      // Variabile saldo: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
       const saldo = creditoData?.saldoAttuale || 0;
       if (saldo < ordine.totaleLordo) {
         showToast('Credito insufficiente. Hai ' + formatCurrency(saldo) + ', servono ' + formatCurrency(ordine.totaleLordo) + '.', 'danger');
@@ -527,9 +610,12 @@ async function handlePayment() {
         return;
       }
 
+      // Variabile metodoPagamento: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
       const metodoPagamento = 'Credito';
+      // Variabile idempotencyKey: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
       const idempotencyKey = 'pay-' + orderId + '-' + Date.now();
       console.log('[PAGAMENTO] Paying with credit, orderId=' + orderId);
+      // Variabile result: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
       const result = await API.payOrdine(orderId, metodoPagamento, importoCreditoRichiesto, idempotencyKey, null, offertaId);
       console.log('[PAGAMENTO] Credit payment result:', result);
       window.location.replace('/esito-acquisto.html?orderId=' + orderId + '&success=true');
@@ -537,6 +623,7 @@ async function handlePayment() {
     }
 
     if (method === 'ticket') {
+      // Variabile codiceVoucher: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
       const codiceVoucher = document.getElementById('ticket-code-input')?.value?.trim();
       if (!codiceVoucher) {
         showToast('Inserisci il codice del voucher.', 'warning');
@@ -544,9 +631,12 @@ async function handlePayment() {
         btnPay.innerHTML = '<i class="fa-solid fa-lock mr-2"></i><span id="pay-button-text">Paga</span>';
         return;
       }
+      // Variabile metodoPagamento: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
       const metodoPagamento = 'Ticket';
+      // Variabile idempotencyKey: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
       const idempotencyKey = 'pay-' + orderId + '-' + Date.now();
       console.log('[PAGAMENTO] Paying with ticket, orderId=' + orderId + ' code=' + codiceVoucher);
+      // Variabile result: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
       const result = await API.payOrdine(orderId, metodoPagamento, null, idempotencyKey, codiceVoucher, offertaId);
       console.log('[PAGAMENTO] Ticket payment result:', result);
       window.location.replace('/esito-acquisto.html?orderId=' + orderId + '&success=true');
@@ -554,7 +644,9 @@ async function handlePayment() {
     }
 
     if (method === 'misto' && importoCreditoRichiesto > 0 && (creditoData?.saldoAttuale || 0) >= importoCreditoRichiesto) {
+      // Variabile idempotencyKey: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
       const idempotencyKey = `checkout-${orderId}-${Date.now()}`;
+      // Variabile session: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
       const session = await API.createStripeCheckoutSession(orderId, {
         metodoPagamento: 'Misto',
         importoCreditoRichiesto,
@@ -572,7 +664,9 @@ async function handlePayment() {
       return;
     }
 
+    // Variabile idempotencyKey: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const idempotencyKey = `checkout-${orderId}-${Date.now()}`;
+    // Variabile session: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const session = await API.createStripeCheckoutSession(orderId, {
       metodoPagamento: 'Carta',
       offertaId: offertaId || undefined
@@ -590,6 +684,7 @@ async function handlePayment() {
     // Poll order status before redirecting anywhere.
     if (method === 'credito' && error?.status === 409) {
       showToast('Verifica stato pagamento...', 'warning');
+      // Variabile paid: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
       const paid = await pollOrderPaid(orderId, 4, 1500);
       if (paid) {
         window.location.href = `/esito-acquisto.html?orderId=${orderId}&success=true`;
@@ -602,6 +697,7 @@ async function handlePayment() {
       }
       setTimeout(function() {
         if (paymentFlowMode === 'abbonamento') return;
+        // Variabile backUrl: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
         const backUrl = new URL('/acquista.html', window.location.origin);
         if (ordine?.showId) backUrl.searchParams.set('showId', ordine.showId);
         if (offertaIdFromUrl) backUrl.searchParams.set('offertaId', offertaIdFromUrl);
@@ -619,6 +715,7 @@ async function handlePayment() {
       }
       setTimeout(function() {
         if (paymentFlowMode === 'abbonamento') return;
+        // Variabile backUrl: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
         const backUrl = new URL('/acquista.html', window.location.origin);
         if (ordine?.showId) backUrl.searchParams.set('showId', ordine.showId);
         if (offertaIdFromUrl) backUrl.searchParams.set('offertaId', offertaIdFromUrl);
@@ -630,6 +727,7 @@ async function handlePayment() {
     // Network/server error: payment might have succeeded on backend
     // (MySQL connection errors can cause this). Poll order status.
     btnPay.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>Verifica pagamento...';
+    // Variabile paid: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const paid = await pollOrderPaid(orderId, 4, 1500);
     if (paid) {
       window.location.href = `/esito-acquisto.html?orderId=${orderId}&success=true`;
@@ -643,10 +741,12 @@ async function handlePayment() {
   }
 }
 
+// Funzione pollOrderPaid: gestisce la logica prevista e restituisce il risultato atteso. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 async function pollOrderPaid(orderId, attempts, delayMs) {
   for (let i = 0; i < attempts; i++) {
     await new Promise(r => setTimeout(r, delayMs));
     try {
+      // Variabile ordine: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
       const ordine = await API.getOrdine(orderId);
       if (ordine?.stato === 'Paid') return true;
     } catch { /* keep polling */ }
@@ -654,20 +754,25 @@ async function pollOrderPaid(orderId, attempts, delayMs) {
   return false;
 }
 
+// Funzione getStripePublishableKey: recupera un valore derivato e lo restituisce al chiamante. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 function getStripePublishableKey() {
+  // Variabile configKey: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const configKey = frontendConfig?.stripePublishableKey;
   if (configKey) return configKey;
   return '';
 }
 
+// Funzione hideLoading: gestisce la logica prevista e restituisce il risultato atteso. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 function hideLoading() {
   document.getElementById('loading-state').classList.add('hidden');
 }
 
+// Funzione showError: gestisce la logica prevista e restituisce il risultato atteso. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 function showError(message) {
   document.getElementById('loading-state').classList.add('hidden');
   document.getElementById('error-state').classList.remove('hidden');
   document.getElementById('main-content').classList.add('hidden');
+  // Variabile msgEl: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const msgEl = document.getElementById('error-message');
   if (msgEl) msgEl.textContent = message;
 }
@@ -691,7 +796,9 @@ window.addEventListener('pageshow', (event) => {
   }
 });
 
+// Funzione resetPayButton: gestisce la logica prevista e restituisce il risultato atteso. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 function resetPayButton() {
+  // Variabile btn: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const btn = document.getElementById('btn-pay');
   if (btn) {
     btn.disabled = false;

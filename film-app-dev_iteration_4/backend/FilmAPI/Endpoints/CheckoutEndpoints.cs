@@ -21,8 +21,18 @@ using System.Security.Claims;
 
 namespace FilmAPI.Endpoints;
 
+/// <summary>
+/// Raggruppa gli endpoint autenticati del checkout per hold, ordini, biglietti e pagamenti.
+/// </summary>
 public static class CheckoutEndpoints
 {
+    /// <summary>
+    /// Mappa le rotte del gruppo <c>/checkout</c> per mappa posti, hold, ordini, PDF dei biglietti, pagamento, annullamento, storico biglietti, sessioni Stripe e riconciliazione checkout.
+    /// Tutte le rotte richiedono <c>RequireAuthorization("Authenticated")</c>.
+    /// Esegue operazioni sui posti in hold, sugli ordini e sui pagamenti con effetti su database, stato prenotazioni e flussi di pagamento esterni.
+    /// </summary>
+    /// <param name="app">Applicazione web su cui registrare gli endpoint.</param>
+    /// <returns>Non restituisce valori.</returns>
     public static void MapCheckoutEndpoints(this WebApplication app)
     {
         // Raggruppa tutti gli endpoint sotto /checkout

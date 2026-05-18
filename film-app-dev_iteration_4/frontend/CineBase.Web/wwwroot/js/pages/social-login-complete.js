@@ -6,10 +6,12 @@
 (function () {
     'use strict';
 
+    // Variabile API_BASE: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     var API_BASE = (window.API && window.API.getBaseUrl) 
         ? window.API.getBaseUrl() 
         : (window.location.hostname === 'localhost' ? 'http://localhost:5000' : '');
 
+    // Funzione sanitizeRedirectPath: gestisce la logica prevista e restituisce il risultato atteso. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
     function sanitizeRedirectPath(path) {
         if (!path || typeof path !== 'string') return '/index.html';
         // Blocca URL esterni
@@ -21,10 +23,15 @@
         return path;
     }
 
+    // Funzione showError: gestisce la logica prevista e restituisce il risultato atteso. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
     function showError(message) {
+        // Variabile spinner: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
         var spinner = document.getElementById('spinner');
+        // Variabile statusText: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
         var statusText = document.getElementById('status-text');
+        // Variabile statusSub: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
         var statusSub = document.getElementById('status-sub');
+        // Variabile errorMsg: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
         var errorMsg = document.getElementById('error-msg');
 
         if (spinner) spinner.style.display = 'none';
@@ -36,10 +43,13 @@
         }
     }
 
+    // Funzione exchangeCode: gestisce la logica prevista e restituisce il risultato atteso. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
     async function exchangeCode(code) {
+        // Variabile statusSub: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
         var statusSub = document.getElementById('status-sub');
 
         try {
+            // Chiamata API: contatta il backend con i dati previsti e usa la risposta per aggiornare l'interfaccia.
             var response = await fetch(API_BASE + '/auth/external/exchange', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -47,10 +57,12 @@
             });
 
             if (!response.ok) {
+                // Variabile errData: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
                 var errData = await response.json().catch(function() { return {}; });
                 throw new Error(errData.error || 'Scambio codice fallito (HTTP ' + response.status + ')');
             }
 
+            // Variabile data: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
             var data = await response.json();
 
             // Salva token usando Auth (da auth.js)
@@ -74,6 +86,7 @@
 
             // Redirect
             var params = new URLSearchParams(window.location.search);
+            // Variabile redirect: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
             var redirect = sanitizeRedirectPath(params.get('redirect'));
             
             if (statusSub) statusSub.textContent = 'Accesso completato. Reindirizzamento...';
@@ -90,7 +103,9 @@
 
     // Avvia lo scambio
     document.addEventListener('DOMContentLoaded', function () {
+        // Variabile params: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
         var params = new URLSearchParams(window.location.search);
+        // Variabile code: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
         var code = params.get('code');
 
         if (!code) {

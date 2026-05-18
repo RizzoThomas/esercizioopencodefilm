@@ -7,8 +7,18 @@ using System.Security.Claims;
 
 namespace FilmAPI.Endpoints;
 
+/// <summary>
+/// Raggruppa gli endpoint per consultazione e gestione delle offerte.
+/// </summary>
 public static class OfferteEndpoints
 {
+    /// <summary>
+    /// Mappa il gruppo <c>/offerte</c> per consultare le offerte attive e acquistare un'offerta associata a uno spettacolo.
+    /// La consultazione è pubblica; l'acquisto richiede utente autenticato nel flusso applicativo.
+    /// Esegue letture sulle offerte e crea ordini/hold con effetti sul database e sui pagamenti.
+    /// </summary>
+    /// <param name="app">Applicazione web su cui registrare gli endpoint.</param>
+    /// <returns>Non restituisce valori.</returns>
     public static void MapOfferteEndpoints(this WebApplication app)
     {
         var offerteGroup = app.MapGroup("/offerte");

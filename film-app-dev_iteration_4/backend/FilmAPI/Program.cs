@@ -391,9 +391,13 @@ using (var scope = app.Services.CreateScope())
 // ─── AVVIO APPLICAZIONE ────────────────────────────────────────────────────
 app.Run();
 
-// Classe necessaria per i test di integrazione (xUnit)
+/// <summary>
+/// Classe parziale usata dai test di integrazione.
+/// </summary>
 public partial class Program;
 
-// Record per la configurazione runtime esposta al frontend
-// Attualmente contiene solo StripePublishableKey
+/// <summary>
+/// Configurazione runtime esposta al frontend.
+/// </summary>
+/// <param name="StripePublishableKey">Chiave pubblicabile Stripe esposta al frontend.</param>
 public sealed record FrontendRuntimeConfig(string StripePublishableKey);

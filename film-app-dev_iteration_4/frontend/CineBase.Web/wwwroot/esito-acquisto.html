@@ -19,8 +19,10 @@
 </head>
 
 <body class="bg-canvas text-ink font-sans cinematic-enter-page">
+  <!-- Contenitore dinamico: navbar-container viene popolato o mostrato da JavaScript. -->
   <div id="navbar-container"></div>
 
+  <!-- Contenuto principale: area centrale che ospita il flusso della pagina. -->
   <main class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-6 pt-24">
     <!-- Loading State -->
     <div id="loading-state" class="text-center py-16">
@@ -98,6 +100,7 @@
           </h2>
           <span id="tickets-count" class="text-sm text-body"></span>
         </div>
+  <!-- Contenitore dinamico: tickets-list viene popolato o mostrato da JavaScript. -->
         <div id="tickets-list" class="space-y-3"></div>
       </div>
 
@@ -127,8 +130,10 @@
     </div>
   </main>
 
+  <!-- Contenitore dinamico: footer-container viene popolato o mostrato da JavaScript. -->
   <div id="footer-container"></div>
 
+  <!-- Contenitore dinamico: toast-container viene popolato o mostrato da JavaScript. -->
   <div id="toast-container" class="fixed bottom-4 right-4 z-50"></div>
 
   <script src="/js/utils.js?v=2"></script>

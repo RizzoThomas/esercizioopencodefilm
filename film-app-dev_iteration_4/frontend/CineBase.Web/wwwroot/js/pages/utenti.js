@@ -1,12 +1,17 @@
+// Variabile utentiData: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
 let utentiData = [];
 
+// Listener evento: si attiva quando scatta l'evento sulla pagina e aggiorna la UI o lo stato.
 document.addEventListener('DOMContentLoaded', async () => {
   await loadUtenti();
 });
 
+// Funzione loadUtenti: carica i dati iniziali o aggiorna il contenuto visibile della pagina. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 async function loadUtenti() {
+  // Variabile tbody: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const tbody = document.getElementById('utenti-table-body');
   try {
+    // Variabile data: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const data = await API.getUtenti();
     utentiData = normalizeCollection(data);
     renderUtenti(utentiData);
@@ -15,7 +20,9 @@ async function loadUtenti() {
   }
 }
 
+// Funzione renderUtenti: costruisce markup o componenti UI a partire dai dati in ingresso. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 function renderUtenti(lista) {
+  // Variabile tbody: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const tbody = document.getElementById('utenti-table-body');
 
   if (!lista.length) {
@@ -24,8 +31,11 @@ function renderUtenti(lista) {
   }
 
   tbody.innerHTML = lista.map(u => {
+    // Variabile ruoloBadge: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const ruoloBadge = getRuoloBadge(u.ruolo);
+    // Variabile date: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const date = new Date(u.dataRegistrazione);
+    // Variabile dateStr: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const dateStr = date.toLocaleDateString('it-IT', { day: 'numeric', month: 'short', year: 'numeric' });
 
     return `
@@ -46,6 +56,7 @@ function renderUtenti(lista) {
   }).join('');
 }
 
+// Funzione getRuoloBadge: recupera un valore derivato e lo restituisce al chiamante. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 function getRuoloBadge(ruolo) {
   switch (ruolo) {
     case 'Admin':
@@ -59,12 +70,14 @@ function getRuoloBadge(ruolo) {
   }
 }
 
+// Funzione filterUtenti: gestisce la logica prevista e restituisce il risultato atteso. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 function filterUtenti() {
   const q = document.getElementById('utenti-search').value.toLowerCase().trim();
   if (!q) {
     renderUtenti(utentiData);
     return;
   }
+  // Variabile filtered: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const filtered = utentiData.filter(u =>
     (u.nome && u.nome.toLowerCase().includes(q)) ||
     (u.cognome && u.cognome.toLowerCase().includes(q)) ||
@@ -73,6 +86,7 @@ function filterUtenti() {
   renderUtenti(filtered);
 }
 
+// Funzione normalizeCollection: normalizza il valore in ingresso per confronti stabili. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 function normalizeCollection(data) {
   if (Array.isArray(data)) return data;
   if (Array.isArray(data?.$values)) return data.$values;

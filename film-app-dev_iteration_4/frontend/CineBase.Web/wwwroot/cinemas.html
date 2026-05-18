@@ -19,8 +19,10 @@
 </head>
 
 <body class="bg-canvas text-ink font-sans">
+  <!-- Contenitore dinamico: navbar-container viene popolato o mostrato da JavaScript. -->
   <div id="navbar-container"></div>
 
+  <!-- Contenuto principale: area centrale che ospita il flusso della pagina. -->
   <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <!-- Page Header -->
     <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
@@ -112,8 +114,10 @@
     </div>
   </main>
 
+  <!-- Contenitore dinamico: footer-container viene popolato o mostrato da JavaScript. -->
   <div id="footer-container"></div>
 
+  <!-- Contenitore dinamico: toast-container viene popolato o mostrato da JavaScript. -->
   <div id="toast-container" class="fixed bottom-4 right-4 z-50"></div>
 
   <!-- Modal -->
@@ -132,6 +136,7 @@
             </button>
           </div>
           <div class="bg-canvas-elevated-lowest px-6 pb-4">
+  <!-- Modulo: raccoglie i dati dell'utente e li invia tramite JavaScript al backend. -->
             <form id="cinema-form" class="space-y-4">
               <input type="hidden" name="id" value="">
               <div>

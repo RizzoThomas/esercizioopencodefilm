@@ -19,7 +19,9 @@
 </head>
 
 <body class="bg-canvas text-ink font-sans">
+  <!-- Contenitore dinamico: navbar-container viene popolato o mostrato da JavaScript. -->
   <div id="navbar-container"></div>
+  <!-- Contenuto principale: area centrale che ospita il flusso della pagina. -->
   <main>
     <div class="flex items-center justify-between gap-4 mb-8">
       <div></div>
@@ -96,6 +98,7 @@
               <i class="fa-solid fa-fire text-ferrari-primary"></i>
               <h2 class="text-sm font-semibold text-ink uppercase tracking-wider">Film più Prenotati</h2>
             </div>
+  <!-- Contenitore dinamico: top-films-list viene popolato o mostrato da JavaScript. -->
             <div id="top-films-list" class="divide-y divide-hairline">
               <div class="px-6 py-8 text-center text-body text-sm">Caricamento...</div>
             </div>
@@ -107,6 +110,7 @@
               <i class="fa-solid fa-crown text-ferrari-primary"></i>
               <h2 class="text-sm font-semibold text-ink uppercase tracking-wider">Offerte più Acquistate</h2>
             </div>
+  <!-- Contenitore dinamico: top-offerte-list viene popolato o mostrato da JavaScript. -->
             <div id="top-offerte-list" class="divide-y divide-hairline">
               <div class="px-6 py-8 text-center text-body text-sm">Caricamento...</div>
             </div>
@@ -219,6 +223,7 @@
               <h2 class="text-lg font-semibold text-ink"><i class="fa-solid fa-bug text-ferrari-primary mr-2"></i>Segnalazioni</h2>
               <span id="segnalazioni-count" class="text-xs text-body"></span>
             </div>
+  <!-- Contenitore dinamico: segnalazioni-list viene popolato o mostrato da JavaScript. -->
             <div id="segnalazioni-list" class="divide-y divide-hairline">
               <div class="px-6 py-8 text-center text-body">Caricamento segnalazioni...</div>
             </div>
@@ -232,6 +237,7 @@
               <h2 class="text-lg font-semibold text-ink"><i class="fa-solid fa-headset text-ferrari-primary mr-2"></i>Ticket Supporto</h2>
               <span id="tickets-count" class="text-xs text-body"></span>
             </div>
+  <!-- Contenitore dinamico: tickets-list viene popolato o mostrato da JavaScript. -->
             <div id="tickets-list" class="divide-y divide-hairline">
               <div class="px-6 py-8 text-center text-body">Caricamento ticket...</div>
             </div>
@@ -253,6 +259,7 @@
             </button>
           </div>
           <div class="bg-canvas-elevated px-6 pb-4">
+  <!-- Modulo: raccoglie i dati dell'utente e li invia tramite JavaScript al backend. -->
             <form id="proiezione-form" class="space-y-4">
               <input type="hidden" name="id" value="">
               <div>
@@ -293,6 +300,7 @@
     </div>
   </div>
 
+  <!-- Contenitore dinamico: toast-container viene popolato o mostrato da JavaScript. -->
   <div id="toast-container" class="fixed bottom-4 right-4 z-50"></div>
 
   <script src="/js/utils.js"></script>
@@ -676,6 +684,7 @@
       };
     }
   </script>
+  <!-- Contenitore dinamico: footer-container viene popolato o mostrato da JavaScript. -->
   <div id="footer-container"></div>
   <script src="/js/chat-widget.js?v=4"></script>
   <script src="/js/alert-dialog.js"></script>

@@ -84,10 +84,12 @@
       <i class="fa-solid fa-moon"></i>
     </button>
 
+  <!-- Contenitore dinamico: user-dropdown viene popolato o mostrato da JavaScript. -->
     <div id="user-dropdown" class="hidden relative">
       <button id="user-menu-toggle" class="text-ink hover:text-ferrari-primary transition-colors duration-300">
         <i class="fa-solid fa-user"></i>
       </button>
+  <!-- Contenitore dinamico: user-menu viene popolato o mostrato da JavaScript. -->
       <div id="user-menu" class="hidden absolute right-0 mt-3 w-48 bg-canvas-elevated border border-hairline z-[60]">
         <a href="/profilo.html" id="desktop-user-name-link" class="block px-4 py-2.5 text-sm text-ink hover:text-ferrari-primary hover:bg-white/5 transition-colors duration-200">
           <i class="fa-solid fa-user mr-2 w-4"></i><span id="desktop-user-name">Profilo</span>
@@ -132,6 +134,7 @@
     <a href="/login.html" class="btn-outline w-full text-center text-sm">Accedi</a>
     <a href="/registrazione.html" class="btn-primary w-full text-center text-sm ripple-container magnetic-btn">Registrati</a>
   </div>
+  <!-- Contenitore dinamico: mobile-user-menu viene popolato o mostrato da JavaScript. -->
   <div id="mobile-user-menu" class="hidden mt-8 flex flex-col gap-3">
     <p id="mobile-user-name" class="text-ferrari-primary uppercase tracking-wider text-center text-sm"></p>
     <button id="mobile-logout-btn" class="btn-outline w-full text-center text-sm text-ferrari-semantic-warning">Logout</button>

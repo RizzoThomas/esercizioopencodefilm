@@ -1,28 +1,44 @@
+// Listener evento: si attiva quando scatta l'evento sulla pagina e aggiorna la UI o lo stato.
 document.addEventListener('DOMContentLoaded', () => {
   if (!window.Auth) return;
 
+  // Variabile form: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const form = document.getElementById('login-form');
+  // Variabile emailInput: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const emailInput = document.getElementById('email');
+  // Variabile passwordInput: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const passwordInput = document.getElementById('password');
+  // Variabile submitBtn: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const submitBtn = document.getElementById('submit-btn');
+  // Variabile btnText: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const btnText = document.getElementById('btn-text');
+  // Variabile btnLoader: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const btnLoader = document.getElementById('btn-loader');
+  // Variabile errorAlert: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const errorAlert = document.getElementById('error-alert');
+  // Variabile errorMessage: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const errorMessage = document.getElementById('error-message');
+  // Variabile expiredAlert: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const expiredAlert = document.getElementById('expired-alert');
+  // Variabile togglePasswordBtn: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const togglePasswordBtn = document.getElementById('toggle-password');
 
   // Container 2FA (creato dinamicamente)
   let twoFaContainer = null;
 
+  // Variabile params: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const params = new URLSearchParams(window.location.search);
+  // Variabile expired: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const expired = params.get('expired');
+  // Variabile redirect: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const redirect = params.get('returnUrl') || params.get('redirect');
+  // Variabile socialError: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const socialError = params.get('error');
 
   // Errore social login
   if (socialError) {
     if (errorAlert && errorMessage) {
+      // Variabile errorMap: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
       var errorMap = {
         'no_email': 'Il provider non ha fornito un\'email. Riprova con un altro metodo.',
         'email_not_verified': 'L\'email Google non risulta verificata. Usa un account Google con email verificata.',
@@ -49,9 +65,12 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   if (togglePasswordBtn && passwordInput) {
+    // Listener evento: si attiva quando scatta l'evento sulla pagina e aggiorna la UI o lo stato.
     togglePasswordBtn.addEventListener('click', () => {
+      // Variabile type: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
       const type = passwordInput.type === 'password' ? 'text' : 'password';
       passwordInput.type = type;
+      // Variabile icon: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
       const icon = togglePasswordBtn.querySelector('i');
       if (icon) {
         icon.className = type === 'password' ? 'fa-solid fa-eye' : 'fa-solid fa-eye-slash';
@@ -59,6 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // Funzione showError: gestisce la logica prevista e restituisce il risultato atteso. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
   function showError(message) {
     if (errorAlert && errorMessage) {
       errorMessage.textContent = message;
@@ -66,10 +86,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  // Funzione hideError: gestisce la logica prevista e restituisce il risultato atteso. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
   function hideError() {
     if (errorAlert) errorAlert.classList.add('hidden');
   }
 
+  // Funzione setLoading: gestisce la logica prevista e restituisce il risultato atteso. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
   function setLoading(loading) {
     if (submitBtn) submitBtn.disabled = loading;
     if (btnText) btnText.classList.toggle('hidden', loading);
@@ -113,10 +135,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     form.parentElement.insertBefore(twoFaContainer, form.nextSibling);
 
+    // Variabile codeInput: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const codeInput = document.getElementById('twofa-code');
+    // Variabile trustCheckbox: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const trustCheckbox = document.getElementById('trust-device');
+    // Variabile twoFaSubmit: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const twoFaSubmit = document.getElementById('twofa-submit');
+    // Variabile twoFaBtnText: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const twoFaBtnText = document.getElementById('twofa-btn-text');
+    // Variabile twoFaBtnLoader: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const twoFaBtnLoader = document.getElementById('twofa-btn-loader');
 
     codeInput?.focus();
@@ -131,6 +158,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Submit 2FA
     twoFaSubmit?.addEventListener('click', async () => {
+      // Variabile code: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
       const code = codeInput?.value.trim();
       if (!code || code.length !== 6) {
         showError('Inserisci il codice a 6 cifre.');
@@ -165,11 +193,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (!form) return;
 
+  // Listener evento: si attiva quando scatta l'evento sulla pagina e aggiorna la UI o lo stato.
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     hideError();
 
+    // Variabile email: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const email = emailInput?.value.trim();
+    // Variabile password: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const password = passwordInput?.value;
 
     if (!email) { showError('Inserisci la tua email'); emailInput?.focus(); return; }
@@ -178,6 +209,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setLoading(true);
 
     try {
+      // Variabile result: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
       const result = await Auth.login(email, password);
 
       if (result.requiresTwoFactor) {

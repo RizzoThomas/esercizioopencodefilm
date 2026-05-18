@@ -5,8 +5,18 @@ using MailKit.Security;
 
 namespace FilmAPI.Endpoints;
 
+/// <summary>
+/// Raggruppa gli endpoint diagnostici amministrativi.
+/// </summary>
 public static class AdminDiagnosticEndpoints
 {
+    /// <summary>
+    /// Mappa il gruppo <c>/admin</c> per controlli diagnostici e test dell'infrastruttura email.
+    /// Richiede <c>RequireAuthorization("PowerUserOrAdmin")</c>.
+    /// Esegue sole letture e test di connessione senza modificare i dati applicativi.
+    /// </summary>
+    /// <param name="app">Applicazione web su cui registrare gli endpoint.</param>
+    /// <returns>Non restituisce valori.</returns>
     public static void MapDiagnosticEndpoints(this WebApplication app)
     {
         var adminGroup = app.MapGroup("/admin").RequireAuthorization("PowerUserOrAdmin");

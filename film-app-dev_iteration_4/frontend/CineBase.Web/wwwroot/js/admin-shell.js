@@ -1,26 +1,32 @@
 (() => {
+  // Variabile ADMIN_PATHS: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const ADMIN_PATHS = new Set([
     '/dashboard.html', '/films.html', '/registi.html', '/cinemas.html',
     '/proiezioni.html', '/categorie.html', '/utenti.html', '/utenti-detail.html', '/validazione.html'
   ]);
 
+  // Variabile PAGE_TITLES: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const PAGE_TITLES = {
     '/dashboard.html': 'Dashboard', '/films.html': 'Film', '/registi.html': 'Registi',
     '/cinemas.html': 'Cinema', '/proiezioni.html': 'Proiezioni', '/categorie.html': 'Categorie',
     '/utenti.html': 'Utenti', '/utenti-detail.html': 'Dettaglio Utente', '/validazione.html': 'Validazione'
   };
 
+  // Variabile PAGE_ICONS: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const PAGE_ICONS = {
     '/dashboard.html': 'fa-gauge-high', '/films.html': 'fa-film', '/registi.html': 'fa-user',
     '/cinemas.html': 'fa-building', '/proiezioni.html': 'fa-clock', '/categorie.html': 'fa-tags',
     '/utenti.html': 'fa-users', '/validazione.html': 'fa-ticket-check'
   };
 
+  // Funzione getUser: recupera un valore derivato e lo restituisce al chiamante. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
   function getUser() {
     return (typeof Auth !== 'undefined' && Auth?.getUser) ? Auth.getUser() : null;
   }
 
+  // Funzione getUserRole: recupera un valore derivato e lo restituisce al chiamante. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
   function getUserRole() {
+    // Variabile user: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const user = getUser();
     if (!user) return null;
     const r = String(user.ruolo || '').trim().toLowerCase();
@@ -29,10 +35,14 @@
     return 'user';
   }
 
+  // Funzione isAdmin: gestisce la logica prevista e restituisce il risultato atteso. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
   function isAdmin() { return getUserRole() === 'admin'; }
 
+  // Funzione toggleSidebar: commuta uno stato visivo o funzionale tra due modalità. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
   function toggleSidebar() {
+    // Variabile sb: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const sb = document.getElementById('admin-sidebar');
+    // Variabile bd: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const bd = document.getElementById('admin-sidebar-backdrop');
     if (!sb) return;
     sb.classList.toggle('-translate-x-full');
@@ -43,16 +53,22 @@
     });
   }
 
+  // Funzione setActiveLinks: gestisce la logica prevista e restituisce il risultato atteso. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
   function setActiveLinks() {
+    // Variabile cp: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const cp = window.location.pathname.toLowerCase();
     document.querySelectorAll('[data-admin-link]').forEach(el => {
       el.classList.toggle('active', (el.getAttribute('href') || '').toLowerCase() === cp);
     });
   }
 
+  // Funzione updateUserUI: aggiorna lo stato o il DOM in base ai dati correnti. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
   function updateUserUI() {
+    // Variabile user: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const user = getUser();
+    // Variabile elName: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const elName = document.getElementById('admin-user-name');
+    // Variabile elAvatar: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const elAvatar = document.getElementById('admin-user-avatar');
     if (elName) elName.textContent = user?.nome || user?.email || 'Admin';
     if (elAvatar) {
@@ -60,32 +76,46 @@
     }
   }
 
+  // Funzione bindActions: gestisce la logica prevista e restituisce il risultato atteso. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
   function bindActions() {
+    // Listener evento: si attiva quando scatta l'evento sulla pagina e aggiorna la UI o lo stato.
     document.getElementById('admin-sidebar-toggle')?.addEventListener('click', toggleSidebar);
+    // Listener evento: si attiva quando scatta l'evento sulla pagina e aggiorna la UI o lo stato.
     document.getElementById('admin-sidebar-backdrop')?.addEventListener('click', toggleSidebar);
+    // Listener evento: si attiva quando scatta l'evento sulla pagina e aggiorna la UI o lo stato.
     document.querySelectorAll('#admin-sidebar a[data-admin-link]').forEach(a => a.addEventListener('click', () => {
       if (window.innerWidth < 768) toggleSidebar();
     }));
 
+    // Variabile userToggle: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const userToggle = document.getElementById('admin-user-toggle');
+    // Variabile userMenu: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const userMenu = document.getElementById('admin-user-menu');
     if (userToggle && userMenu) {
+      // Listener evento: si attiva quando scatta l'evento sulla pagina e aggiorna la UI o lo stato.
       userToggle.addEventListener('click', () => userMenu.classList.toggle('hidden'));
+      // Listener evento: si attiva quando scatta l'evento sulla pagina e aggiorna la UI o lo stato.
       document.addEventListener('click', e => {
         if (!userToggle.contains(e.target) && !userMenu.contains(e.target)) userMenu.classList.add('hidden');
       });
     }
 
+    // Listener evento: si attiva quando scatta l'evento sulla pagina e aggiorna la UI o lo stato.
     document.getElementById('admin-logout-btn')?.addEventListener('click', () => {
       (Auth?.logout ? Auth.logout() : Promise.resolve()).finally(() => { window.location.href = '/index.html'; });
     });
   }
 
+  // Funzione renderShell: costruisce markup o componenti UI a partire dai dati in ingresso. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
   function renderShell(main) {
+    // Variabile cp: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const cp = window.location.pathname.toLowerCase();
+    // Variabile title: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const title = PAGE_TITLES[cp] || 'Admin';
+    // Variabile icon: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const icon = PAGE_ICONS[cp] || 'fa-gauge-high';
 
+    // Variabile shell: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const shell = document.createElement('div');
     shell.innerHTML = `
     <div id="admin-shell-root" class="flex h-screen overflow-hidden bg-[#f5f5f5]">
@@ -211,11 +241,16 @@
     }
   }
 
+  // Funzione initThemeToggle: inizializza stato, timer o interfaccia della pagina. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
   function initThemeToggle() {
+    // Variabile btn: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     var btn = document.getElementById('admin-theme-toggle');
     if (!btn) return;
+    // Listener evento: si attiva quando scatta l'evento sulla pagina e aggiorna la UI o lo stato.
     btn.addEventListener('click', function() {
+      // Variabile root: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
       var root = document.documentElement;
+      // Variabile isLight: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
       var isLight = root.classList.contains('light');
       if (isLight) {
         root.classList.remove('light');
@@ -237,10 +272,13 @@
     if (icon) icon.className = document.documentElement.classList.contains('light') ? 'fa-solid fa-sun text-sm' : 'fa-solid fa-moon text-sm';
   }
 
+  // Listener evento: si attiva quando scatta l'evento sulla pagina e aggiorna la UI o lo stato.
   document.addEventListener('DOMContentLoaded', () => {
+    // Variabile cp: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const cp = window.location.pathname.toLowerCase();
     if (!ADMIN_PATHS.has(cp)) return;
 
+    // Variabile main: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const main = document.querySelector('main');
     if (!main) return;
 

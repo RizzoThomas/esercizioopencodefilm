@@ -2,9 +2,11 @@
  * CineBase Alert Dialog — 21st.dev style confirm modal
  */
 window.CineBaseAlert = function({ title, description, confirmText, cancelText, icon, onConfirm }) {
+  // Variabile overlay: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const overlay = document.createElement('div');
   overlay.className = 'alert-overlay';
   
+  // Variabile iconHtml: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const iconHtml = icon ? `<i class="fa-solid ${icon} text-ferrari-primary"></i>` : '';
   
   overlay.innerHTML = `

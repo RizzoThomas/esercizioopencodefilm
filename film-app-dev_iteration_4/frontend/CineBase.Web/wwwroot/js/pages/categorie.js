@@ -1,11 +1,13 @@
 // Categorie Page JavaScript
 let allCategorie = [];
 
+// Listener evento: si attiva quando scatta l'evento sulla pagina e aggiorna la UI o lo stato.
 document.addEventListener('DOMContentLoaded', async () => {
   setupFormSubmit();
   await loadCategorie();
 });
 
+// Funzione normalizeCollection: normalizza il valore in ingresso per confronti stabili. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 function normalizeCollection(data) {
   if (Array.isArray(data)) return data;
   if (Array.isArray(data?.$values)) return data.$values;
@@ -13,7 +15,9 @@ function normalizeCollection(data) {
   return [];
 }
 
+// Funzione loadCategorie: carica i dati iniziali o aggiorna il contenuto visibile della pagina. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 async function loadCategorie() {
+  // Variabile tableBody: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const tableBody = document.getElementById('categorie-table-body');
   if (!tableBody) return;
 
@@ -26,7 +30,9 @@ async function loadCategorie() {
   }
 }
 
+// Funzione renderCategorie: costruisce markup o componenti UI a partire dai dati in ingresso. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 function renderCategorie(categorie) {
+  // Variabile tableBody: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const tableBody = document.getElementById('categorie-table-body');
   if (!tableBody) return;
 
@@ -51,21 +57,29 @@ function renderCategorie(categorie) {
   `).join('');
 }
 
+// Funzione escapeHtml: gestisce la logica prevista e restituisce il risultato atteso. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 function escapeHtml(text) {
+  // Variabile div: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const div = document.createElement('div');
   div.textContent = text;
   return div.innerHTML.replace(/'/g, "\\'").replace(/"/g, '\\"');
 }
 
+// Funzione setupFormSubmit: gestisce la logica prevista e restituisce il risultato atteso. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 function setupFormSubmit() {
+  // Variabile form: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const form = document.getElementById('categoria-form');
   if (!form) return;
 
+  // Listener evento: si attiva quando scatta l'evento sulla pagina e aggiorna la UI o lo stato.
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
 
+    // Variabile formData: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const formData = new FormData(form);
+    // Variabile nome: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const nome = formData.get('nome')?.toString().trim();
+    // Variabile editId: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const editId = form.dataset.editId;
 
     if (!nome) {
@@ -90,13 +104,16 @@ function setupFormSubmit() {
   });
 }
 
+// Funzione editCategoria: gestisce la logica prevista e restituisce il risultato atteso. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 async function editCategoria(id, nome) {
   openModal('categoria-modal', 'Modifica Categoria');
+  // Variabile form: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const form = document.getElementById('categoria-form');
   form.dataset.editId = id;
   form.querySelector('[name="nome"]').value = nome;
 }
 
+// Funzione deleteCategoria: gestisce la logica prevista e restituisce il risultato atteso. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 async function deleteCategoria(id, nome) {
   openDeleteModal(nome, async () => {
     try {
