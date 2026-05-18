@@ -2,175 +2,125 @@
 
 ## Panoramica
 
-L'area admin di CineBase offre una shell unificata per tutte le operazioni di gestione: CRUD di film, registi, sale, show, categorie, utenti e credito.
+L'area admin offre una shell unificata per tutte le operazioni di gestione: CRUD di film, registi, sale, show, categorie, utenti e credito, con paginazione server-side e ricerca testuale su tutte le liste.
 
 ---
 
-## Architettura Admin
+## Tabella delle Pagine Admin
+
+| Pagina | URL | File JS | Ruolo Minimo | CRUD | API Chiamate |
+|--------|-----|---------|-------------|------|--------------|
+| Dashboard | `dashboard.html` | — | PowerUser | Lettura | `getProiezioni` |
+| Film | `films.html` | `films.js` | PowerUser | C/U/D | `/films`, `/registi`, `/categorie`, `/tmdb/search` |
+| Registi | `registi.html` | `registi.js` | PowerUser | C/U/D | `/registi` |
+| Cinema | `cinemas.html` | `cinemas.js` | Admin (delete) | C/U/D | `/cinemas` |
+| Proiezioni | `proiezioni.html` | `proiezioni.js` | PowerUser | C/U/D | `/proiezioni`, `/shows` |
+| Categorie | `categorie.html` | `categorie.js` | PowerUser | C/U/D | `/categorie` |
+| Sale | (nuovo) | — | PowerUser | C/U/D | `/sale`, `/cinemas/{id}/sale` |
+| Show | (da proiezioni) | — | PowerUser | C/U/D | `/shows` |
+| Utenti | `utenti.html` | `utenti.js` | Admin | Lettura/Ruolo/Credito | `/admin/utenti` |
+| Utente Dettaglio | `utenti-detail.html` | `utenti-detail.js` | Admin | Lettura/Modifica | `/admin/utenti/{id}` |
+| Validazione | `validazione.html` | `validazione.js` | PowerUser | Validazione | `/admin/tickets/validate` |
+
+---
+
+## Shell Admin Unificata (admin-shell.js)
 
 ```mermaid
 graph TB
-    subgraph "Frontend Admin"
-        SHELL[admin-shell.js]
-        DASH[dashboard.html]
-        FILMS[films.html]
-        REGISTI[registi.html]
-        CINEMAS[cinemas.html]
-        PROIEZ[proiezioni.html]
-        CAT[categorie.html]
-        SALE[sale.html]  <!-- non ancora implementata -->
-        UTENTI[utenti.html]
-        UT_DET[utenti-detail.html]
+    subgraph "Shell Admin"
+        SIDEBAR[Sidebar laterale fissa]
+        TOPBAR[Topbar secondaria]
+        CONTENT[Area contenuto principale]
     end
 
-    subgraph "Backend"
-        FE[FilmsEndpoints]
-        RE[RegistiEndpoints]
-        CE[CinemasEndpoints]
-        PE[ProiezioniEndpoints]
-        CAE[CategorieEndpoints]
-        SE[ShowsEndpoints]
-        SAE[SaleEndpoints]
-        AUE[AdminUtentiEndpoints]
-        CRE[CreditoEndpoints]
+    subgraph "Voci Sidebar"
+        DASH[📊 Dashboard]
+        FILM[🎬 Film]
+        REG[🎭 Registi]
+        CIN[🏢 Cinema]
+        PRO[📅 Proiezioni]
+        CAT[🏷️ Categorie]
+        THEME[🌓 Cambia tema]
     end
 
-    subgraph "Servizi"
-        FS[FilmService]
-        RS[RegistaService]
-        CS[CinemaService]
-        PRS[ProiezioneService]
-        CAS[CategoriaService]
-        SHS[ShowService]
-        SAS[SalaService]
-        AUS[UserAdminService]
-        CRS[CreditoService]
+    subgraph "Topbar"
+        USER[👤 Menu utente]
+        LOGOUT[🚪 Logout]
     end
 
-    SHELL --> DASH
-    SHELL --> FILMS
-    SHELL --> REGISTI
-    SHELL --> CINEMAS
-    SHELL --> PROIEZ
-    SHELL --> CAT
-
-    FILMS --> FE --> FS
-    REGISTI --> RE --> RS
-    CINEMAS --> CE --> CS
-    PROIEZ --> PE --> PRS
-    CAT --> CAE --> CAS
-    SALE --> SAE --> SAS
-    PROIEZ --> SE --> SHS
-    UTENTI --> AUE --> AUS
+    SIDEBAR --> DASH
+    SIDEBAR --> FILM
+    SIDEBAR --> REG
+    SIDEBAR --> CIN
+    SIDEBAR --> PRO
+    SIDEBAR --> CAT
+    SIDEBAR --> THEME
+    TOPBAR --> USER
+    TOPBAR --> LOGOUT
+    CONTENT -->|Carica| PAGINA[Pagina corrente]
 ```
+
+| Componente | Descrizione |
+|------------|-------------|
+| Sidebar | Navigazione principale, link attivo evidenziato, toggle mobile |
+| Topbar | Menu utente, cambio tema (solo sidebar), logout |
+| Content | Area centrale dove viene caricata la pagina |
 
 ---
 
-## Shell Admin Unificata (`admin-shell.js`)
+## Matrice CRUD Admin
 
-La shell admin fornisce:
-- **Sidebar laterale** fissa con tutte le voci admin
-- **Topbar secondaria** con menu utente (profilo, logout)
-- **Gestione link attivo** (highlight della pagina corrente)
-- **Toggle sidebar mobile** (hamburger)
-- **Cambio tema** (light/dark) dalla sidebar
-
-```html
-<!-- Sidebar esempio -->
-<div class="admin-sidebar">
-  <nav>
-    <a href="/dashboard.html">📊 Dashboard</a>
-    <a href="/films.html">🎬 Film</a>
-    <a href="/registi.html">🎭 Registi</a>
-    <a href="/cinemas.html">🏢 Cinema</a>
-    <a href="/proiezioni.html">📅 Proiezioni</a>
-    <a href="/categorie.html">🏷️ Categorie</a>
-  </nav>
-  <div class="admin-sidebar-footer">
-    <button onclick="toggleTheme()">🌓 Cambia tema</button>
-  </div>
-</div>
-```
-
-Il `template-loader.js` esclude il caricamento della navbar/footer legacy sulle pagine che usano la shell admin.
+| Entità | Crea | Leggi | Aggiorna | Elimina | Note |
+|--------|------|-------|----------|---------|------|
+| Film | PowerUser+ | Pubblico | PowerUser+ | PowerUser+ | Con categorie many-to-many |
+| Regista | PowerUser+ | Pubblico | PowerUser+ | PowerUser+ | — |
+| Cinema | PowerUser+ | Pubblico | PowerUser+ | Admin Only | Blocco se esistono sale/show |
+| Sala | PowerUser+ | Pubblico | PowerUser+ | PowerUser+ | Blocco se show futuri o biglietti |
+| Show | PowerUser+ | Pubblico | PowerUser+ | PowerUser+ | Anti-overlap validato |
+| Categoria | PowerUser+ | Pubblico | PowerUser+ | PowerUser+ | — |
+| Proiezione (legacy) | PowerUser+ | Pubblico | PowerUser+ | PowerUser+ | Bridge verso Show |
+| Utente | Solo registro | Admin | Admin | — | Solo disabilita, non elimina |
+| Credito | Admin (ricarica) | User (proprio) | Admin | — | Con audit trail |
 
 ---
 
-## Pagine Admin e Loro Logica
-
-### Dashboard (`dashboard.html`)
-
-Riepilogo con stato delle proiezioni recenti usando badge `chip-status`:
-
-- Proiezioni "Passata" / "In programma"
-- Collegamenti rapidi a tutte le CRUD
-
-### Film (`films.html`) — `films.js`
+## Paginazione Server-Side
 
 ```mermaid
 flowchart TD
-    A[Carica pagina] --> B[GET /films con paginazione + search]
-    B --> C[Render tabella: ID, Titolo, Durata, Categorie, Regista, Azioni]
+    A[Frontend: richiede /registi?page=2&pageSize=10&search=test] --> B{Backend: page e pageSize presenti?}
+    B -->|Sì| C[RegistaService.GetPagedAsync]
+    C --> D[Query con Skip/Take + filtro search]
+    D --> E[DTO paginato: Items, TotalCount, HasNextPage]
+    E --> F[Frontend: render tabella + controlli pagina]
     
-    C --> D{Creazione/Modifica}
-    D --> E[Form: titolo, durata, regista, categorie, descrizione, copertina]
-    E --> F[POST/PUT /films]
-    F --> G[Refresh tabella]
+    B -->|No| G[Fallback legacy: GetAllAsync]
+    G --> H[Risposta array semplice]
 
-    C --> H{Elimina}
-    H --> I[DELETE /films/{id}]
-    I --> G
+    F --> I[Utente clicca "Avanti"]
+    I --> A
 ```
 
-- **Ricerca** per titolo con paginazione server-side
-- **Categorie**: gruppo checkbox con categorie dinamiche
-- **Regista**: dropdown con lista registi
-- **TMDB Search**: integrazione per importare dati film da TMDB
+### DTO Paginato
 
-### Registi (`registi.html`) — `registi.js`
+```csharp
+public class RegistaPagedResultDTO {
+    public List<RegistaDTO> Items { get; set; }    // Elementi della pagina
+    public int TotalCount { get; set; }             // Totale elementi (tutte le pagine)
+    public int Page { get; set; }                   // Pagina corrente
+    public int PageSize { get; set; }               // Elementi per pagina
+    public bool HasNextPage { get; set; }           // True se ci sono altre pagine
+}
+```
 
-CRUD completo con:
-- Tabella: Nome, Cognome, Azioni
-- Paginazione con controlli first/prev/next/last
-- Modal Bootstrap per creazione/modifica
+### Pagine con Paginazione
 
-### Cinema (`cinemas.html`) — `cinemas.js`
-
-Gestione cinema con:
-- Barra ricerca testuale + paginazione server-side
-- Card/Lista: Nome, Città, Indirizzo, Coordinate, Azioni
-- Form: Nome, Città, Indirizzo, Latitudine, Longitudine
-
-### Proiezioni/Schedule (`proiezioni.html`) — `proiezioni.js`
-
-Bridge legacy tra vecchio modello `Proiezione` e nuovo `Show`:
-- Tabella: Film, Cinema, Sala, Data, Ora, Stato
-- Stato calcolato: "Passata" / "In programma" (non più hardcoded)
-- Ricerca + paginazione server-side
-- Creazione show con validazione anti-overlap
-
-### Categorie (`categorie.html`) — `categorie.js`
-
-CRUD semplice per categorie film:
-- Lista badge categorie
-- Create, Update, Delete con feedback UI (toast)
-- Relazione many-to-many con Film
-
-### Utenti (`utenti.html`) — `utenti.js` + `utenti-detail.js`
-
-Solo Admin:
-- Lista utenti con ricerca
-- Dettaglio utente: profilo, ruolo, credito, stato
-- Ricarica credito admin
-- Disabilita/Abilita account
-- Reset password
-
-### Validazione Biglietti (`validazione.html`) — `validazione.js`
-
-Interfaccia per operatori cinema:
-- Input codice biglietto (o scansione QR)
-- Dettaglio biglietto: film, cinema, sala, data, posto
-- Pulsante "Valida" per conferma ingresso
+| Pagina | Endpoint | Parametri | Page Size Default |
+|--------|----------|-----------|-------------------|
+| Registi | `GET /registi` | `page, pageSize, search` | 10 |
+| Cinema | `GET /cinemas` | `page, pageSize, search` | 10 |
+| Proiezioni | `GET /proiezioni` | `page, pageSize, search` | 10 |
 
 ---
 
@@ -178,29 +128,32 @@ Interfaccia per operatori cinema:
 
 | Metodo | Endpoint | Auth | Descrizione |
 |--------|----------|------|-------------|
-| `GET` | `/films` | AllowAnonymous | Lista film (paginata, con search) |
-| `POST` | `/films` | PowerUserOrAdmin | Crea film |
-| `PUT` | `/films/{id}` | PowerUserOrAdmin | Aggiorna film |
-| `DELETE` | `/films/{id}` | PowerUserOrAdmin | Elimina film |
-| `GET` | `/registi` | AllowAnonymous | Lista registi (paginata) |
-| `POST` | `/registi` | PowerUserOrAdmin | Crea regista |
-| `GET` | `/cinemas` | AllowAnonymous | Lista cinema (paginata) |
-| `POST` | `/cinemas` | PowerUserOrAdmin | Crea cinema |
-| `DELETE` | `/cinemas/{id}` | AdminOnly | Elimina cinema |
-| `GET` | `/proiezioni` | AllowAnonymous | Lista proiezioni (paginata) |
-| `POST` | `/proiezioni` | PowerUserOrAdmin | Crea proiezione (bridge legacy → Show) |
-| `GET` | `/shows` | AllowAnonymous | Lista show |
-| `POST` | `/shows` | PowerUserOrAdmin | Crea show |
-| `PUT` | `/shows/{id}` | PowerUserOrAdmin | Aggiorna show |
-| `DELETE` | `/shows/{id}` | PowerUserOrAdmin | Elimina show |
-| `GET` | `/cinemas/{cinemaId}/sale` | AllowAnonymous | Lista sale per cinema |
-| `POST` | `/cinemas/{cinemaId}/sale` | PowerUserOrAdmin | Crea sala |
-| `PUT` | `/sale/{salaId}/posti` | PowerUserOrAdmin | Salva piantina posti |
-| `GET` | `/categorie` | AllowAnonymous | Lista categorie |
-| `POST` | `/categorie` | PowerUserOrAdmin | Crea categoria |
-| `GET` | `/admin/utenti` | AdminOnly | Lista utenti |
-| `PUT` | `/admin/utenti/{id}/ruolo` | AdminOnly | Cambia ruolo |
-| `POST` | `/admin/credito/ricarica` | AdminOnly | Ricarica credito |
+| GET | `/films` | AllowAnonymous | Lista film paginata con ricerca |
+| POST | `/films` | PowerUserOrAdmin | Crea film |
+| PUT | `/films/{id}` | PowerUserOrAdmin | Aggiorna film |
+| DELETE | `/films/{id}` | PowerUserOrAdmin | Elimina film |
+| GET | `/registi` | AllowAnonymous | Lista registi paginata |
+| POST | `/registi` | PowerUserOrAdmin | Crea regista |
+| PUT | `/registi/{id}` | PowerUserOrAdmin | Aggiorna regista |
+| DELETE | `/registi/{id}` | PowerUserOrAdmin | Elimina regista |
+| GET | `/cinemas` | AllowAnonymous | Lista cinema paginata |
+| POST | `/cinemas` | PowerUserOrAdmin | Crea cinema |
+| DELETE | `/cinemas/{id}` | AdminOnly | Elimina cinema |
+| GET | `/cinemas/{cinemaId}/sale` | AllowAnonymous | Lista sale per cinema |
+| POST | `/cinemas/{cinemaId}/sale` | PowerUserOrAdmin | Crea sala |
+| PUT | `/sale/{salaId}/posti` | PowerUserOrAdmin | Salva piantina posti |
+| GET | `/shows` | AllowAnonymous | Lista show con filtri |
+| POST | `/shows` | PowerUserOrAdmin | Crea show |
+| PUT | `/shows/{id}` | PowerUserOrAdmin | Aggiorna show |
+| DELETE | `/shows/{id}` | PowerUserOrAdmin | Elimina show |
+| GET | `/categorie` | AllowAnonymous | Lista categorie |
+| POST | `/categorie` | PowerUserOrAdmin | Crea categoria |
+| DELETE | `/categorie/{id}` | PowerUserOrAdmin | Elimina categoria |
+| GET | `/admin/utenti` | AdminOnly | Lista utenti |
+| PUT | `/admin/utenti/{id}/ruolo` | AdminOnly | Cambia ruolo utente |
+| PUT | `/admin/utenti/{id}` | AdminOnly | Modifica profilo utente |
+| POST | `/admin/credito/ricarica` | AdminOnly | Ricarica credito admin |
+| GET | `/admin/tickets/validate/{code}` | PowerUserOrAdmin | Ricerca biglietto |
 
 ---
 
@@ -209,38 +162,10 @@ Interfaccia per operatori cinema:
 | Servizio | Metodi Principali |
 |----------|-------------------|
 | `IFilmService` | `GetAllAsync`, `GetPagedAsync`, `GetByIdAsync`, `CreateAsync`, `UpdateAsync`, `DeleteAsync` |
-| `IRegistaService` | `GetAllAsync`, `GetPagedAsync`, `GetByIdAsync`, `CreateAsync`, `UpdateAsync`, `DeleteAsync` |
-| `ICinemaService` | `GetAllAsync`, `GetPagedAsync`, `GetByIdAsync`, `CreateAsync`, `UpdateAsync`, `DeleteAsync` |
-| `IProiezioneService` | Bridge legacy → Show |
+| `IRegistaService` | `GetAllAsync`, `GetPagedAsync`, `CreateAsync`, `UpdateAsync`, `DeleteAsync` |
+| `ICinemaService` | `GetAllAsync`, `GetPagedAsync`, `CreateAsync`, `UpdateAsync`, `DeleteAsync` |
 | `IShowService` | CRUD con validazione anti-overlap |
-| `ISalaService` | CRUD sale + gestione piantina posti |
+| `ISalaService` | CRUD sale + gestione piantina posti (replace-all) |
 | `ICategoriaService` | CRUD categorie |
-| `IUserAdminService` | Gestione utenti, ruoli, credito |
-
----
-
-## Paginazione Server-Side
-
-Tre endpoint supportano paginazione e ricerca:
-
-```csharp
-// Esempio: RegistiEndpoints
-app.MapGet("/registi", async (int? page, int? pageSize, string? search) => {
-    if (page.HasValue && pageSize.HasValue) {
-        return Results.Ok(await _service.GetPagedAsync(page.Value, pageSize.Value, search));
-    }
-    // Fallback legacy: lista completa (array)
-    return Results.Ok(await _service.GetAllAsync());
-});
-```
-
-DTO paginati:
-```csharp
-public class RegistaPagedResultDTO {
-    public List<RegistaDTO> Items { get; set; }
-    public int TotalCount { get; set; }
-    public int Page { get; set; }
-    public int PageSize { get; set; }
-    public bool HasNextPage { get; set; }
-}
-```
+| `IUserAdminService` | Lista utenti, cambio ruolo, disabilita |
+| `ICreditoService` | Saldo, movimenti, ricarica admin |

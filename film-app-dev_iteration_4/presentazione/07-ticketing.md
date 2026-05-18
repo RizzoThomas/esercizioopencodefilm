@@ -2,162 +2,113 @@
 
 ## Panoramica
 
-Il sistema di ticketing digitale copre l'intero ciclo di vita del biglietto: dall'emissione alla validazione, passando per PDF, email e QR code.
+Il sistema di ticketing digitale copre l'intero ciclo di vita del biglietto: emissione automatica al pagamento, generazione PDF multipagina con QR code, invio email e validazione all'ingresso.
 
 ---
 
-## Architettura del Ticketing
+## Ciclo di Vita del Biglietto
 
 ```mermaid
-graph TB
-    subgraph "Emissione"
-        PAY[Pagamento confermato]
-        BS[BigliettoService]
-        PS[PdfService]
-        ES[EmailService]
-    end
-
-    subgraph "Output"
-        PDF[PDF Multipagina]
-        QR[QR Code + Barcode]
-        EMAIL[Email SMTP]
-    end
-
-    subgraph "Validazione"
-        VS[ValidazioneBigliettoService]
-        VE[Endpoint Validazione]
-        SC[Scanner QR/Codice]
-    end
-
-    subgraph "Storage"
-        DB[(MySQL)]
-        TICK[Biglietto entity]
-        ORD[Ordine entity]
-    end
-
-    PAY --> BS
-    BS --> ORD
-    BS --> TICK
-    BS --> PS
-    BS --> ES
-    PS --> PDF
-    PS --> QR
-    ES --> EMAIL
-    PDF --> EMAIL
-
-    SC --> VE
-    VE --> VS
-    VS --> DB
-    VS --> TICK
-    VS --> ORD
+stateDiagram-v2
+    [*] --> Issued: Pagamento confermato
+    Issued --> Validated: Operatore valida all'ingresso
+    Issued --> Cancelled: Rimborso/annullamento
+    Validated --> [*]: Ingresso consentito
+    Cancelled --> [*]: Biglietto non valido
 ```
+
+### Tabella Stati Biglietto
+
+| Stato | Valore | Descrizione | Azioni Possibili |
+|-------|--------|-------------|------------------|
+| Issued | 0 | Emesso, in attesa di utilizzo | Validazione, download PDF |
+| Validated | 1 | Già utilizzato per l'ingresso | Solo visualizzazione |
+| Cancelled | 2 | Annullato o rimborsato | Nessuna |
 
 ---
 
-## Flusso di Emissione Biglietti
+## Flusso di Emissione Completo
 
 ```mermaid
 sequenceDiagram
     participant B as Backend
     participant DB as Database
     participant PDF as PdfService
-    participant EMAIL as EmailService
+    participant EM as EmailService
     participant U as Utente
 
-    Note over B: Pagamento confermato (stato=Paid)
-
-    B->>B: BigliettoService.EmittiBigliettiAsync()
-    B->>DB: Per ogni posto:
-    B->>DB: INSERT Biglietto (codice CB-XXXXXXXX)
-    B->>DB: UPDATE ShowPostoStato → Sold
-    B->>DB: Genera CodiceUnivoco, BarcodeValue
-
-    B->>PDF: GeneraPdfOrdineAsync(ordineId)
-    PDF->>PDF: Crea documento QuestPDF multipagina
-    PDF->>PDF: 1 biglietto per pagina
-    PDF->>PDF: QR Code + Barcode
-    PDF->>PDF: Dati: film, cinema, sala, data, posto, prezzo
-    PDF-->>B: byte[] PDF
-
-    B->>EMAIL: InviaTicketEmailAsync(ordine, pdfBytes)
-    EMAIL->>EMAIL: Costruisce HTML corpo email
-    EMAIL->>EMAIL: Allega PDF
-    EMAIL->>EMAIL: Invia via SMTP (MailKit)
-    alt Email inviata
-        EMAIL-->>B: Successo
-        B->>DB: Ordine.TicketEmailSentAtUtc = now
-    else Email fallita
-        EMAIL-->>B: Errore
-        B->>DB: Ordine.TicketEmailLastError = error
+    Note over B: Pagamento confermato (stato = Paid)
+    
+    B->>B: BigliettoService.EmittiBigliettiAsync(ordineId)
+    
+    loop Per ogni posto nell'ordine
+        B->>B: Genera codice univoco CB-XXXXXXXX
+        B->>B: Genera barcode value
+        B->>DB: INSERT Biglietto (Issued)
+        B->>DB: UPDATE ShowPostoStato → Sold
     end
 
+    B->>PDF: GeneraPdfOrdineAsync(ordineId)
+    PDF->>PDF: Crea documento QuestPDF
+    PDF->>PDF: 1 pagina per biglietto
+    PDF->>PDF: QR code dati biglietto
+    PDF->>PDF: Barcode grafico
+    PDF->>PDF: Dettagli: film, cinema, sala, data, posto
+    PDF-->>B: byte[] pdfBytes
+
+    B->>EM: InviaTicketEmailAsync(ordine, pdfBytes)
+    EM->>EM: Costruisce corpo HTML
+    EM->>EM: Allega PDF
+    EM->>EM: Invia via SMTP (MailKit)
+
+    Alt Email inviata con successo
+        B->>DB: Ordine.TicketEmailSentAtUtc = now
+    Else Email fallita
+        B->>DB: Ordine.TicketEmailLastError = errore
+        Note right of B: Nessun rollback dell'ordine pagato
+    End
+
     U->>B: GET /checkout/orders/{orderId}/pdf
-    B-->>U: PDF bytes
-    U->>U: Download / biglietti-{codice}.pdf
+    B-->>U: Scarica biglietti-{codice}.pdf
 ```
 
 ---
 
-## Generazione PDF (QuestPDF)
+## Struttura del PDF (QuestPDF)
 
-Il PDF viene generato con **QuestPDF** (libreria C# per PDF, licenza community).
+### Contenuto di Ogni Pagina
 
-### Struttura del PDF Multipagina
-
-```
-┌──────────────────────────────────────┐
-│          BIGLIETTO CINEMA            │
-│  ┌──────────────────────────────┐    │
-│  │         QR CODE              │    │
-│  │     ██ ▄▄▄ ██ ▄▄▄           │    │
-│  │     ▄▄█ █ ▄▄▄█▄▄            │    │
-│  └──────────────────────────────┘    │
-│                                      │
-│  CineBase - La Tua Rete Cinematogr.  │
-│                                      │
-│  Film:      Il Padrino               │
-│  Cinema:    Roma Moderno             │
-│  Sala:      Sala 3 - ISENSE          │
-│  Data:      mer 25/05/2026           │
-│  Orario:    21:00                    │
-│                                      │
-│  Posto:     PLATEA CENTRO - Fila 8   │
-│  Posto n:   12                       │
-│                                      │
-│  Codice:    CB-A1B2C3D4              │
-│  Prezzo:    14,50 €                  │
-│  ──────────────────────────────      │
-│  ▌▌▌▌▌▌ BARCODE ▌▌▌▌▌▌             │
-└──────────────────────────────────────┘
-        (una pagina per biglietto)
-```
-
-### Dipendenze
-
-```xml
-<PackageReference Include="QuestPDF" Version="2024.*" />
-<PackageReference Include="QRCoder" Version="1.*" />
-<PackageReference Include="ZXing.Net" Version="0.16.*" />
-```
+| Sezione | Contenuto | Tecnologia |
+|---------|-----------|------------|
+| Intestazione | Logo CineBase, titolo "Biglietto Cinema" | QuestPDF layout |
+| QR Code | Dati biglietto codificati | QRCoder |
+| Informazioni film | Titolo, durata, descrizione breve | QuestPDF text |
+| Informazioni cinema | Nome cinema, indirizzo, sala | QuestPDF text |
+| Data e ora | Data spettacolo formattata it-IT | QuestPDF text |
+| Posto | Settore, fila, numero | QuestPDF text |
+| Codice biglietto | CB-XXXXXXXX (font monospace) | QuestPDF text |
+| Prezzo | Formattato €X.XX | QuestPDF text |
+| Barcode | Barcode grafico 1D | ZXing.Net |
+| Piè di pagina | Condizioni di validità | QuestPDF text |
 
 ---
 
 ## Invio Email (MailKit)
 
-### Provider Supportati
+### Tabella Provider Supportati
 
-| Provider | Configurazione | Tipo |
-|----------|---------------|------|
-| **Google SMTP** | `smtp.gmail.com:587`, TLS, OAuth2/App Password | Baseline operativa |
-| **Twilio SendGrid** | `smtp.sendgrid.net:587`, TLS, API Key | Alternativa documentata |
+| Provider | Host | Porta | TLS | Autenticazione |
+|----------|------|-------|-----|----------------|
+| Google SMTP | smtp.gmail.com | 587 | Sì | OAuth2 / App Password |
+| Twilio SendGrid | smtp.sendgrid.net | 587 | Sì | API Key |
 
-### Configurazione `.env`
+### Configurazione .env
 
 ```env
 SMTP_HOST=smtp.gmail.com
 SMTP_PORT=587
-SMTP_USER=your-email@gmail.com
-SMTP_PASSWORD=your-app-password
+SMTP_USER=mittente@gmail.com
+SMTP_PASSWORD=password_app_16_caratteri
 SMTP_FROM_EMAIL=noreply@cinebase.it
 SMTP_FROM_NAME=CineBase
 ```
@@ -166,11 +117,17 @@ SMTP_FROM_NAME=CineBase
 
 ```csharp
 public interface IEmailService {
-    Task SendTicketEmailAsync(string to, string subject, string htmlBody, byte[] pdfAttachment, string pdfFileName);
+    Task SendTicketEmailAsync(
+        string to,              // Email destinatario
+        string subject,         // Oggetto email
+        string htmlBody,        // Corpo HTML
+        byte[] pdfAttachment,   // PDF allegato
+        string pdfFileName      // Nome file PDF
+    );
 }
 
-// Implementazione concreta: EmailService (MailKit)
-// Fake per test: sostituito in CustomWebApplicationFactory
+// Implementazione reale: EmailService (MailKit)
+// Fake per test: FakeEmailService (sostituito in DI)
 ```
 
 ---
@@ -184,46 +141,45 @@ sequenceDiagram
     participant B as Backend
     participant DB as Database
 
-    O->>F: Inserisce codice biglietto (o scannerizza QR)
-    F->>B: GET /admin/tickets/validate/{code}
-    B->>DB: Lookup Biglietto per CodiceBiglietto
-    B->>B: ValidazioneBigliettoService.ValidaBigliettoAsync
-
-    alt Biglietto trovato
+    O->>F: Inserisce/scansiona codice biglietto
+    F->>B: GET /admin/tickets/validate/{codice}
+    B->>DB: Cerca Biglietto per CodiceBiglietto
+    
+    Alt Biglietto non trovato
+        B-->>F: 404 Not Found
+        F-->>O: "Biglietto non trovato"
+    Else Biglietto valido
         B-->>F: { film, cinema, sala, data, posto, stato }
         F-->>O: Mostra dettagli biglietto
-    else Biglietto non trovato
-        B-->>F: 404
-        F-->>O: "Biglietto non trovato"
-    end
-
-    O->>F: Click "Valida" (conferma ingresso)
-    F->>B: POST /admin/tickets/validate { codice, cinemaId }
-    B->>B: ValidazioneBigliettoService.ValidaBigliettoAsync
-
-    alt Già validato
-        B-->>F: 409 Conflict
-        F-->>O: "Biglietto già validato il DD/MM/YYYY"
-    else Cinema errato
-        B-->>F: 400 BadRequest
-        F-->>O: "Questo biglietto non è per questo cinema"
-    else Successo
-        B->>DB: Biglietto.Stato = Validated
-        B->>DB: ValidatoAtUtc, ValidatoDaUserId, ValidatoCinemaId
-        B-->>F: { successo, timestamp }
-        F-->>O: "✅ Ingresso consentito"
-    end
+        
+        O->>F: Click "Valida"
+        F->>B: POST /admin/tickets/validate { codice, cinemaId }
+        B->>B: ValidazioneBigliettoService.ValidaBigliettoAsync
+        
+        Alt Già validato
+            B-->>F: 409 Conflict
+            F-->>O: "Biglietto già validato il DD/MM/YYYY"
+        Else Cinema errato
+            B-->>F: 400 Bad Request
+            F-->>O: "Questo biglietto non è per questo cinema"
+        Else Successo
+            B->>DB: Biglietto.Stato = Validated
+            B->>DB: ValidatoAtUtc, ValidatoDaUserId, ValidatoCinemaId
+            B-->>F: 200 OK { validato: true }
+            F-->>O: "Ingresso consentito"
+        End
+    End
 ```
 
 ### Regole di Validazione
 
-| Regola | Comportamento |
-|--------|---------------|
-| Biglietto non trovato | 404 Not Found |
-| Biglietto già validato | 409 Conflict + data validazione |
-| Cinema non corrispondente | 400 Bad Request |
-| Biglietto annullato | 400 Bad Request |
-| Biglietto emesso e valido | ✅ Validazione OK |
+| Condizione | Codice HTTP | Messaggio |
+|------------|-------------|-----------|
+| Codice inesistente | 404 | Biglietto non trovato |
+| Già validato | 409 | Biglietto già validato il [data] |
+| Cinema non corrispondente | 400 | Questo biglietto non è per questo cinema |
+| Biglietto annullato | 400 | Biglietto annullato |
+| Validazione riuscita | 200 | Ingresso consentito |
 
 ---
 
@@ -231,11 +187,13 @@ sequenceDiagram
 
 | Metodo | Endpoint | Auth | Descrizione |
 |--------|----------|------|-------------|
-| `GET` | `/checkout/orders/{orderId}/pdf` | Authenticated | Download PDF ordine |
-| `GET` | `/admin/tickets/validate/{code}` | PowerUserOrAdmin | Lookup biglietto per codice |
-| `POST` | `/admin/tickets/validate` | PowerUserOrAdmin | Valida biglietto (conferma ingresso) |
+| GET | `/checkout/orders/{orderId}/pdf` | Authenticated | Download PDF dell'ordine |
+| GET | `/admin/tickets/validate/{code}` | PowerUserOrAdmin | Ricerca biglietto per codice |
+| POST | `/admin/tickets/validate` | PowerUserOrAdmin | Convalida biglietto all'ingresso |
 
-### Servizi Backend
+---
+
+## Servizi Backend
 
 | Servizio | Metodi Principali |
 |----------|-------------------|
@@ -243,3 +201,15 @@ sequenceDiagram
 | `IPdfService` | `GeneraPdfOrdineAsync` |
 | `IEmailService` | `SendTicketEmailAsync` |
 | `IValidazioneBigliettoService` | `LookupBigliettoAsync`, `ValidaBigliettoAsync` |
+
+---
+
+## Librerie Utilizzate
+
+| Libreria | Versione | Utilizzo |
+|----------|----------|----------|
+| QuestPDF | 2024.x | Generazione PDF multipagina |
+| QRCoder | 1.x | Codici QR per ogni biglietto |
+| ZXing.Net | 0.16.x | Barcode grafico 1D |
+| MailKit | 4.x | Client SMTP per invio email |
+| PdfPig | — | Lettura PDF nei test di integrazione |

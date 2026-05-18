@@ -2,38 +2,18 @@
 
 ## Panoramica
 
-CineBase include un progetto console standalone (`FilmApiSeeder`) per popolare il database con dati reali e credibili, utilizzando l'API TMDB per film, copertine e cast.
+CineBase include un progetto console standalone chiamato `FilmApiSeeder` che popola il database con dati reali e credibili utilizzando l'API TMDB per film, copertine e cast, e generando proceduralmente cinema, sale e programmazione.
 
 ---
 
-## Progetto FilmApiSeeder
+## Struttura del Progetto
 
 ```
 backend/scripts/FilmApiSeeder/
-├── FilmApiSeeder.csproj    # Progetto console .NET
-├── Program.cs              # Orchestratore seed
-├── TmdbClient.cs           # Client API TMDB
-└── SeedCatalog.cs          # Catalogo dati seed
-```
-
-### Dipendenze
-- Riferisce `FilmAPI.csproj` per modelli e DbContext
-- Legge configurazione da `backend/.env`
-- Usa TMDB API v3 per dati film
-
----
-
-## Comandi Disponibili
-
-```bash
-# Seed completo (aggiunge senza cancellare)
-dotnet run --project backend/scripts/FilmApiSeeder
-
-# Reset e reseed della sola programmazione
-dotnet run --project backend/scripts/FilmApiSeeder -- --reset-shows --force
-
-# Reset completo e reseed (tutto)
-dotnet run --project backend/scripts/FilmApiSeeder -- --reset-all --force
+├── FilmApiSeeder.csproj    # Progetto console .NET 8
+├── Program.cs              # Orchestratore: reset, seed, opzioni CLI
+├── TmdbClient.cs           # Client HTTP per TMDB API v3
+└── SeedCatalog.cs          # Catalogo: film, cinema, categorie, sale
 ```
 
 ---
@@ -42,132 +22,138 @@ dotnet run --project backend/scripts/FilmApiSeeder -- --reset-all --force
 
 ```mermaid
 flowchart TD
-    START[Avvio FilmApiSeeder] --> CFG[Leggi backend/.env]
+    A[Esecuzione FilmApiSeeder] --> B[Legge backend/.env]
 
-    CFG --> CAT[Seed Categorie]
-    CAT --> REG[Seed Registi]
-    REG -->[+ TMDB] FILM[Seed Film da TMDB]
-    FILM -->[+ TMDB] UPD[Aggiorna dettagli: cast, copertine, voto]
+    B --> C{Flag --reset-shows o --reset-all?}
+    C -->|--reset-shows| D[Elimina solo: Shows, ShowPostiStato, Ordini, Biglietti]
+    C -->|--reset-all| E[Elimina TUTTI i dati seedati]
+    C -->|nessun flag| F[Aggiunge incrementalmente]
 
-    UPD --> CIN[Seed Cinema italiani]
-    CIN --> SAL[Seed Sale multi-tipologia]
-    SAL --> POSTI[Genera piantine posti per ogni sala]
-    POSTI --> SHOW[Genera programmazione show]
+    D --> G[Seed Categorie generiche]
+    E --> G
+    F --> G
 
-    SHOW --> VER{Verifica}
-    VER --> OK[Seed completato]
-    VER --> FAIL[Mostra errori]
+    G --> H[Seed Registi reali]
+    H --> I[Per ogni film del catalogo]
+    I --> I1[TMDB.SearchMovieAsync(titolo)]
+    I1 --> I2[TmdbClient.GetMovieDetailAsync(tmdbId)]
+    I2 --> I3[Salva: titolo, descrizione, cast, copertina, voti]
 
-    TMDB[TMDB API] -.->|Ricerca film| FILM
-    TMDB -.->|Dettagli + crediti| UPD
+    I3 --> J[Seed Cinema italiani]
+    J --> K[Per ogni cinema: crea 3-5 sale]
+    K --> L[Per ogni sala: genera piantina posti]
+
+    L --> M[Genera Shows per i prossimi 7-14 giorni]
+    M --> N[Verifica finale]
+    N --> O[Seed completato con successo]
 ```
+
+---
+
+## Tabella Dati Seedati
+
+| Entità | Quantità | Dettaglio |
+|--------|----------|-----------|
+| Film | 64 | Importati da TMDB con cast, copertine, voti |
+| Categorie | 12 | Azione, Commedia, Drammatico, Horror, Fantascienza, Thriller, Animazione, Documentario, Avventura, Romantico, Musicale, Western |
+| Registi | ~40 | Registi reali associati ai film |
+| Cinema | 20 | Cinema in città italiane con coordinate geografiche |
+| Sale | 83 | 3-5 sale per cinema, tipologie miste (2D, 3D, ISENSE, XL) |
+| Posti | ~10.000 | Generati proceduralmente per ogni sala |
+| Shows | ~500 | Programmazione distribuita su 7-14 giorni |
+
+---
+
+## Tabella Cinema Italiani Seedati
+
+| Cinema | Città | Sale | Tipologie |
+|--------|-------|------|-----------|
+| Roma Moderno | Roma | 5 | 2D, 3D, ISENSE, XL |
+| Milano Duomo | Milano | 5 | 2D, 3D, ISENSE, XL |
+| Napoli Centro | Napoli | 4 | 2D, 3D, ISENSE |
+| Torino Matrix | Torino | 4 | 2D, 3D, XL |
+| Firenze Aurora | Firenze | 4 | 2D, 3D, ISENSE |
+| Bologna | Bologna | 4 | 2D, 3D, XL |
+| ... (altri 14) | ... | ... | ... |
+
+---
+
+## Distribuzione Tipologie Sala
+
+```mermaid
+pie title Distribuzione Sale per Tipologia (83 totali)
+    "2D (standard)" : 45
+    "3D (stereoscopico)" : 25
+    "ISENSE (premium)" : 15
+    "XL (grande formato)" : 15
+```
+
+---
+
+## Piantina Posti Generata
+
+Ogni sala ha una piantina generata proceduralmente con:
+
+| Parametro | Valore | Descrizione |
+|-----------|--------|-------------|
+| Settori | Platea-Centro, Platea-SX, Platea-DX | Settori principali |
+| Settori aggiuntivi | Galleria, Accessibilità | Opzionale per sale grandi |
+| File per settore | 6-12 | Numero variabile per dimensione sala |
+| Posti per fila | 8-15 | Dipende dalla capienza |
+| Posti wheelchair | 1-3 per settore | Contrassegnati con IsWheelchair=true |
+| Coordinate | PosX, PosY | Per rendering sulla mappa |
+| Prezzo supplemento | 0-4 € | In base al tipo sala |
 
 ---
 
 ## Integrazione TMDB
 
-### `TmdbClient.cs`
+### Metodi del Client
 
-```csharp
-public class TmdbClient {
-    // Ricerca film per titolo
-    Task<List<TmdbMovie>> SearchMovieAsync(string query);
-    
-    // Dettaglio film con cast
-    Task<TmdbMovieDetail> GetMovieDetailAsync(int tmdbId);
-    
-    // URL copertine
-    string GetPosterUrl(string path, string size = "w500");
-    string GetBackdropUrl(string path, string size = "w1280");
-}
-```
+| Metodo | Descrizione |
+|--------|-------------|
+| `SearchMovieAsync(query)` | Ricerca film per titolo, restituisce risultati TMDB |
+| `GetMovieDetailAsync(tmdbId)` | Dettaglio completo: trama, cast, crew, voti |
+| `GetPosterUrl(path, size)` | URL poster nella dimensione specificata (w500) |
+| `GetBackdropUrl(path, size)` | URL backdrop nella dimensione specificata (w1280) |
 
-### Dati Importati da TMDB
+### Dati Importati per Ogni Film
 
-| Campo | Fonte TMDB |
-|-------|------------|
+| Campo Modello | Fonte TMDB |
+|---------------|------------|
 | `Titolo` | `original_title` |
 | `DescrizioneLunga` | `overview` |
-| `CastText` | `credits.cast[].name` |
+| `CastText` | `credits.cast[0..5].name` (concatenati) |
 | `DataRilascio` | `release_date` |
-| `CopertinaPath` | `poster_path` | 
+| `CopertinaPath` | `poster_path` |
 | `BackdropPath` | `backdrop_path` |
 | `VoteAverage` | `vote_average` |
 | `VoteCount` | `vote_count` |
-| `Popularity` | `popularity` |
+| `RegistaId` | `credits.crew[?].job=Director` |
 | `TmdbId` | `id` |
-| `ImdbId` | `imdb_id` |
-| `OriginalLanguage` | `original_language` |
-| `Regista` | `credits.crew[].job=Director` |
 
 ---
 
-## Dati Seedati
+## Comandi CLI
 
-### Categorie (generiche)
-```
-Azione, Commedia, Drammatico, Horror, Fantascienza, Thriller,
-Animazione, Documentario, Avventura, Romantico, Musicale, Western
-```
-
-### Film (64 film — esempio)
-
-| Titolo | TMDB | Categorie |
-|--------|------|-----------|
-| Il Padrino | tmdb | Drammatico |
-| Interstellar | tmdb | Fantascienza, Avventura |
-| Pulp Fiction | tmdb | Thriller |
-| ... (61 altri film) | ... | ... |
-
-### Cinema Italiani (20)
-
-| Cinema | Città | Coordinate |
-|--------|-------|------------|
-| Roma Moderno | Roma | 41.9028, 12.4964 |
-| Milano Duomo | Milano | 45.4642, 9.1900 |
-| Napoli Centro | Napoli | 40.8518, 14.2681 |
-| ... (17 altri cinema) | ... | ... |
-
-### Sale per Cinema (83 totali)
-
-Ogni cinema ha 3-5 sale di tipologie diverse:
-
-| Tipo Sala | Posti | Supplemento |
-|-----------|-------|-------------|
-| 2D | 80-150 | €0.00 |
-| 3D | 80-120 | €2.00 |
-| ISENSE | 60-100 | €4.00 |
-| XL | 100-200 | €3.00 |
-
-### Piantine Posti
-
-Ogni sala ha posti generati con:
-- **Settori**: Platea-Centro, Platea-SX, Platea-DX, Galleria (opzionale)
-- **File**: numerate da 1 a N
-- **Posti per fila**: da 6 a 15
-- **Posti wheelchair**: 1-3 per settore
-- **Coordinate**: PosX, PosY per rendering sulla mappa
-
-### Programmazione Show
-
-- Show generati per i prossimi 7-14 giorni
-- Prezzi: `DEFAULT_TICKET_PRICE` (default €8.50) + supplemento sala
-- Durata: snapshot dalla durata del film
-- Evitati overlap nella stessa sala
-- Film distribuiti uniformemente tra i cinema
+| Comando | Descrizione | Quando Usarlo |
+|---------|-------------|---------------|
+| `dotnet run` | Seed incrementale (aggiunge senza cancellare) | Prima esecuzione o dopo reset manuale |
+| `dotnet run -- --reset-shows --force` | Cancella solo la programmazione e riesegue il seed | Dopo modifiche alla struttura show |
+| `dotnet run -- --reset-all --force` | Cancella tutto e reseed da capo | Dopo modifiche allo schema DB |
 
 ---
 
-## Configurazione `.env`
+## Configurazione .env
 
 ```env
 # Database
-DB_CONNECTION_STRING=Server=localhost;Database=cinebase;...
+DB_CONNECTION_STRING=Server=localhost;Database=cinebase;User=root;Password=...;
 
-# TMDB (per seeder)
+# TMDB (obbligatorio per il seeder)
 TMDB_BEARER_TOKEN=eyJhbGciOiJIUzI1NiJ9...
 
-# Ticketing
+# Ticketing (usati anche dal backend)
 DEFAULT_TICKET_PRICE=8.50
 HOLD_TTL_MINUTES=10
 MAX_SEATS_PER_ORDER=10
@@ -175,4 +161,10 @@ MAX_SEATS_PER_ORDER=10
 # Stripe
 STRIPE_API_KEY=sk_test_...
 STRIPE_WEBHOOK_SECRET=whsec_...
+
+# SMTP
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=noreply@cinebase.it
+SMTP_PASSWORD=...
 ```

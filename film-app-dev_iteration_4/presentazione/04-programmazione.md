@@ -2,221 +2,193 @@
 
 ## Panoramica
 
-La sezione pubblica di CineBase permette agli utenti di esplorare la programmazione cinematografica in modo moderno, con ricerca, filtri, geolocalizzazione e selezione del cinema preferito.
+La sezione pubblica permette agli utenti di esplorare la programmazione cinematografica con ricerca avanzata, filtri per categoria, geolocalizzazione dei cinema e selezione persistente del cinema preferito.
 
 ---
 
-## Pagine Coinvolte
+## Tabella delle Pagine
 
-| Pagina | File HTML | File JS | Descrizione |
-|--------|-----------|---------|-------------|
-| Home | `index.html` | `home.js` | Hero cinematico + film in evidenza + raccomandazioni AI |
-| Programmazione | `programmazione.html` | `programmazione.js` | Catalogo film-centric con tabs, ricerca, filtri |
-| Scheda Film | `scheda-film.html` | `scheda-film.js` | Dettaglio film con rail date e orari show |
-| My Cinemas | `my-cinemas.html` | `my-cinemas.js` | Vista cinema-centric con programmazione giornaliera |
+| Pagina | URL | File JS | Accesso | API Chiamate |
+|--------|-----|---------|---------|--------------|
+| Home | `index.html` | `home.js` | Pubblico | `getFilms`, `getProiezioni`, `/recommendations` |
+| Programmazione | `programmazione.html` | `programmazione.js` | Pubblico | `getProgrammazioneFilms`, `getProgrammazioneCinemas`, `getCinemaPreferito` |
+| Scheda Film | `scheda-film.html` | `scheda-film.js` | Pubblico | `getFilmScheda` |
+| My Cinemas | `my-cinemas.html` | `my-cinemas.js` | Pubblico | `getMyCinemas`, `getCinemaSchedule` |
 
 ---
 
-## Flusso di Navigazione Pubblica
+## Flusso di Navigazione Completo
 
 ```mermaid
 flowchart TD
-    HOME[index.html<br/>Home Page] -->|Hero CTA| PROG
-    HOME -->|Card film| SCHED
+    HOME[index.html] -->|Hero CTA| PROG
+    HOME -->|Card film in evidenza| SCHED
     HOME -->|Raccomandazioni AI| SCHED
 
-    PROG[programmazione.html<br/>Catalogo Film] -->|Seleziona cinema| MODAL[Modale Scelta Cinema]
-    MODAL -->|Persistenza| LS[(localStorage / Backend)]
-    PROG -->|Tabs: Evidenza/Uscita/Tutti| FILMS[Griglia/Carosello Film]
-    PROG -->|Search + Categoria| FILTRATI[Film filtrati]
-    PROG -->|Click card| SCHED
+    PROG[programmazione.html] -->|Click cambio cinema| MODAL
+    PROG -->|Selezione tab| TABS{Tab attivo}
+    TABS -->|In Evidenza| CAR[Carosello orizzontale]
+    TABS -->|In Uscita| CAR
+    TABS -->|Tutti i Film| GRID[Grid 4 colonne]
+    PROG -->|Search input| FILT[Filtra per titolo]
+    PROG -->|Select categoria| FILT2[Filtra per categoria]
+    PROG -->|Click card film| SCHED
 
-    SCHED[scheda-film.html<br/>Dettaglio Film] -->|Rail date| DATE[Selezione data]
-    DATE -->|Show per tipo sala| ORARI[Bottoni orario]
-    ORARI -->|Autenticato| ACQ[acquista.html]
-    ORARI -->|Anonimo| LOGIN[login.html]
+    MODAL[Modale cinema] -->|Selezione| CIN{Autenticato?}
+    CIN -->|Sì| PUT[PUT /profilo/cinema-preferito]
+    CIN -->|No| LS[localStorage]
+    PUT --> PERSIST[Persistito]
+    LS --> PERSIST
 
-    MYC[my-cinemas.html<br/>Cinema-centric] -->|Lista cinema| CARD[Card cinema]
-    CARD -->|Click| DETT[Dettaglio cinema]
-    DETT -->|Rail date| PROG_DAY[Programmazione giornaliera]
+    SCHED[scheda-film.html] -->|Rail date| DATE[Selezione data]
+    DATE -->|Raggruppa per tipo sala| ORARI[Bottoni orario show]
+    ORARI -->|Autenticato| ACQ[acquista.html?showId=X]
+    ORARI -->|Anonimo| LOGIN[login.html → redirect]
+
+    MYC[my-cinemas.html] -->|Lista cinema| LISTA[Card con tipologie]
+    LISTA -->|Click cinema| DETT[Dettaglio programma]
+    DETT -->|Rail date| GIORNO[Film del giorno]
+    GIORNO -->|Click film| SCHED
 ```
 
 ---
 
-## Home Page (`index.html`)
+## Home Page (index.html)
 
-### Logica (`home.js`)
+### Logica di `home.js`
 
 ```mermaid
 flowchart TD
     A[DOMContentLoaded] --> B{URL ha forbidden=true?}
-    B -->|Sì| C[Mostra toast 'Non hai permessi']
-    B -->|No| D[Rimuovi param forbidden]
+    B -->|Sì| C[Mostra toast permessi insufficienti]
+    B -->|No| D[Rimuovi param dalla URL]
 
     D --> E[loadFeaturedFilms]
-    E --> F[API.getFilms + API.getProiezioni in parallelo]
-    F --> G[buildFeaturedSelection]
-    G --> H[Calcola prossimi 7 giorni]
-    H --> I[Conta proiezioni per film]
-    I --> J[Ordina: più proiezioni → più recenti]
-    J --> K[Prendi top 5 film]
+    E --> F[Parallel: API.getFilms + API.getProiezioni]
+    F --> G[Calcola prox 7 giorni]
+    G --> H[Conta proiezioni per film]
+    H --> I[Ordina per conteggio poi per data]
+    I --> J[Prendi top 5 film]
 
-    K --> L[initFeaturedFilms]
-    L --> M[Hero card grande + 4 card compatte]
-    M --> N[Avvia rotazione automatica ogni 6s]
+    J --> K[Rendering: hero card + 4 compact card]
+    K --> L[Avvia rotazione automatica 6s]
 
-    O[loadRecommendations] --> P{Auth.isLoggedIn?}
-    P -->|No| Q[Esci]
-    P -->|Sì| R[GET /recommendations]
-    R --> S[Raccomandazioni personalizzate]
-    S --> T[Card film con motivo]
+    M[loadRecommendations setTimeout 1s] --> N{Auth.isLoggedIn?}
+    N -->|No| O[Esci]
+    N -->|Sì| P[GET /recommendations]
+    P --> Q[Raccomandazioni personalizzate]
+    Q --> R[Mostra sezione con card]
 ```
 
 ### API Chiamate
-- `API.getFilms({ page: 1, pageSize: 100 })` — tutti i film
-- `API.getProiezioni()` — proiezioni per calcolo "In Evidenza"
-- `GET /recommendations` — raccomandazioni AI (solo autenticato)
+
+| Chiamata | Endpoint | Parametri |
+|----------|----------|-----------|
+| `API.getFilms()` | `GET /films` | `page=1, pageSize=100` |
+| `API.getProiezioni()` | `GET /proiezioni` | nessuno |
+| Raccomandazioni | `GET /recommendations` | Bearer token (auth) |
 
 ---
 
-## Programmazione (`programmazione.html`)
+## Programmazione (programmazione.html)
 
-### Logica (`programmazione.js`)
+### Logica di `programmazione.js`
+
+Il cuore della pagina è il `CinemaManager`, un modulo che gestisce la persistenza del cinema selezionato con sincronizzazione bidirezionale tra localStorage e backend.
 
 ```mermaid
 flowchart TD
-    A[DOMContentLoaded] --> B[Carica pendingOffertaId da URL/sessionStorage]
+    A[DOMContentLoaded] --> B[Carica pendingOffertaId]
     B --> C[CinemaManager.syncCinemaPreferito]
+    C --> D[Setup: tabs, search, filtri, modale, carosello]
+    
+    D --> E[Caricamento parallelo]
+    E --> F1[loadFilms]
+    E --> F2[loadCategorie → populateCategoriaFilter]
+    E --> F3[loadCinemas → renderCinemaHeader]
+    E --> F4[requestUserLocationInBackground]
+    E --> F5[loadPendingOfferBanner]
 
-    C --> D[Imposta selectedCinemaId]
-    D --> E[setupTabs, setupSearch, setupCategoriaFilter]
-    D --> F[setupCinemaModal, setupCarouselControls, setupLoadMore]
+    F1 --> G{selectedCinemaId == null?}
+    G -->|Sì| H[Mostra stato nessun cinema]
+    G -->|No| I[GET /programmazione/films con params]
 
-    F --> G[Load iniziale parallelo]
-    G --> H1[loadFilms]
-    G --> H2[loadCategorie → populateCategoriaFilter]
-    G --> H3[loadCinemas → renderCinemaHeader]
+    I --> J{currentTab?}
+    J -->|evidenza| K[Carosello, pageSize=8]
+    J -->|uscita| K
+    J -->|tutti| L[Grid, pageSize=20, Load More]
 
-    H1 --> I{selectedCinemaId == null?}
-    I -->|Sì| J[Mostra no-cinema-state]
-    I -->|No| K[Chiama GET /programmazione/films con params]
-
-    K --> L{currentTab?}
-    L -->|evidenza/uscita| M[Carosello orizzontale con scroll infinito]
-    L -->|tutti| N[Grid 4 colonne con Load More]
-
-    H3 --> O[Geolocalizzazione non bloccante]
-    O --> P[Calcolo distanza Haversine]
-    P --> Q[Ordina cinema per distanza]
-
-    R[CinemaManager.syncCinemaPreferito] --> S{Autenticato?}
-    S -->|Sì| T[GET /profilo/cinema-preferito]
-    S -->|No| U[Leggi da localStorage]
-    T --> V{Backend ha cinema?}
-    V -->|Sì| W[Aggiorna localStorage]
-    V -->|No| X{localStorage ha cinema?}
-    X -->|Sì| Y[PUT /profilo/cinema-preferito → sync]
+    F3 --> M[Geolocalizzazione non bloccante]
+    M --> N[Calcolo distanza Haversine]
+    N --> O[Riorganizza lista cinema per distanza]
 ```
 
-### CinemaManager
+### Tabella dei Tab
 
-Il `CinemaManager` gestisce la persistenza del cinema selezionato:
+| Tab | Descrizione | Layout | Page Size | Comportamento |
+|-----|-------------|--------|-----------|---------------|
+| In Evidenza | Film con proiezioni nei prossimi 7 giorni | Carosello orizzontale | 8 | Scroll infinito, caricamento automatico |
+| In Uscita | Film senza proiezioni ma con data rilascio futura | Carosello orizzontale | 8 | Scroll infinito, caricamento automatico |
+| Tutti i Film | Tutti i film presenti nel catalogo | Grid 4 colonne responsive | 20 | Pulsante "Carica altri" |
+
+### CinemaManager: Persistenza Bidirezionale
 
 ```javascript
 const CinemaManager = {
   STORAGE_KEY: 'cb_selected_cinema',
 
-  // Anonimo: localStorage
-  getLocalCinemaId() { ... },
-  setLocalCinemaId(cinemaId) { ... },
-
-  // Autenticato: backend come source of truth
-  async syncCinemaPreferito() {
-    const auth = getAuthSafe();
-    if (!auth || !auth.isLoggedIn()) return this.getLocalCinemaId();
+  syncCinemaPreferito() {
+    if (!auth?.isLoggedIn()) return this.getLocalCinemaId();
 
     const backendId = await API.getCinemaPreferito();
     const localId = this.getLocalCinemaId();
 
-    // Sincronizzazione bidirezionale
     if (backendId != null) {
-      this.setLocalCinemaId(backendId);
+      this.setLocalCinemaId(backendId);   // backend → localStorage
       return backendId;
     }
     if (localId != null) {
-      await API.setCinemaPreferito(localId);
+      await API.setCinemaPreferito(localId); // localStorage → backend
       return localId;
     }
     return null;
-  },
-
-  async setCinema(cinemaId) {
-    this.setLocalCinemaId(cinemaId);
-    if (auth?.isLoggedIn()) await API.setCinemaPreferito(cinemaId);
-    window.dispatchEvent(new CustomEvent('cinema:changed', { ... }));
   }
 };
 ```
 
-### Tabs e Caroselli
+---
 
-| Tab | Comportamento | Page Size |
-|-----|---------------|-----------|
-| **In Evidenza** | Film con show nei prossimi 7 giorni. Carosello orizzontale con scroll infinito | 8 film per page |
-| **In Uscita** | Film senza show attivi ma con data rilascio futura. Carosello orizzontale | 8 film per page |
-| **Tutti i Film** | Grid 4 colonne responsive con paginazione server-side "Carica altri" | 20 film per page |
+## Scheda Film (scheda-film.html)
 
-### API Chiamate
-- `API.getProgrammazioneFilms(params)` — `GET /programmazione/films?tab=&search=&categoriaId=&cinemaId=&page=&pageSize=`
-- `API.getProgrammazioneCinemas(params)` — `GET /programmazione/cinemas?lat=&lng=`
-- `API.getCinemaPreferito()` — `GET /profilo/cinema-preferito`
-- `API.setCinemaPreferito(id)` — `PUT /profilo/cinema-preferito/{id}`
+| Elemento | Descrizione |
+|----------|-------------|
+| Hero | Copertina full-width, titolo, durata, anno, categorie badge |
+| Metadati | Regista, cast, descrizione lunga, voto TMDB |
+| Rail Date | Componente `date-rail.js` con 7 giorni scorrevoli |
+| Show | Raggruppati per TipoSala (2D, 3D, ISENSE, XL) |
+| Bottoni | Auth-aware: autenticato → acquista, anonimo → login con redirect |
+
+### API
+
+| Chiamata | Endpoint |
+|----------|----------|
+| `API.getFilmScheda(id, cinemaId)` | `GET /films/{id}/scheda?cinemaId=` |
 
 ---
 
-## Scheda Film (`scheda-film.html`)
+## My Cinemas (my-cinemas.html)
 
-### Logica (`scheda-film.js`)
+| Vista | Contenuto |
+|-------|-----------|
+| Lista cinema | Card con nome, città, indirizzo, tipologie sala, distanza km |
+| Dettaglio cinema (`?IdCinema=X`) | Header cinema, rail date, film del giorno con orari show |
 
-1. Legge `id` e `cinema` dalla query string
-2. Carica scheda da `GET /films/{id}/scheda?cinemaId=`
-3. Renderizza:
-   - **Hero**: copertina, titolo, metadati, descrizione, cast, regista
-   - **Rail date orizzontale**: component `date-rail.js` con giorni dinamici
-   - **Show raggruppati per TipoSala**: 2D, 3D, ISENSE, XL
-   - **Bottoni orario** auth-aware: autenticato → acquista, anonimo → login con redirect
-   - **Modale cambio cinema** con sync cinema preferito
+### API
 
-```mermaid
-flowchart TD
-    A[Carica scheda film] --> B[GET /films/{id}/scheda?cinemaId=]
-    B --> C{Risposta OK?}
-    C -->|No| D[Mostra errore]
-    C -->|Sì| E[Render hero: copertina, titolo, cast]
-    E --> F[Init date-rail: oggi + 7 giorni]
-    F --> G[Seleziona data corrente]
-    G --> H[Render show raggruppati per tipo sala]
-    H --> I{Utente autenticato?}
-    I -->|Sì| J[Bottone → /acquista.html?showId=X]
-    I -->|No| K[Bottone → /login.html?redirect=/acquista.html]
-```
-
-### API Chiamate
-- `API.getFilmScheda(id, cinemaId)` — `GET /films/{id}/scheda?cinemaId=`
-
----
-
-## My Cinemas (`my-cinemas.html`)
-
-### Logica (`my-cinemas.js`)
-
-Due viste:
-1. **Lista cinema**: card con nome, città, indirizzo, tipologie sala, distanza
-2. **Dettaglio cinema** (`?IdCinema=X`): header info cinema, rail date, film del giorno con show
-
-### API Chiamate
-- `API.getMyCinemas()` — `GET /my-cinemas`
-- `API.getCinemaSchedule(cinemaId, date)` — `GET /my-cinemas/{cinemaId}/schedule?date=`
+| Chiamata | Endpoint |
+|----------|----------|
+| `API.getMyCinemas()` | `GET /my-cinemas` |
+| `API.getCinemaSchedule(cinemaId, date)` | `GET /my-cinemas/{cinemaId}/schedule?date=` |
 
 ---
 
@@ -224,32 +196,23 @@ Due viste:
 
 | Metodo | Endpoint | Auth | Descrizione |
 |--------|----------|------|-------------|
-| `GET` | `/programmazione/films` | AllowAnonymous | Listing film con tab, search, categoria, cinemaId, paginato |
-| `GET` | `/programmazione/cinemas` | AllowAnonymous | Elenco cinema con ordinamento per distanza (Haversine) |
-| `GET` | `/films/{id}/scheda` | AllowAnonymous | Scheda film completa con calendario show |
-| `GET` | `/my-cinemas` | AllowAnonymous | Elenco cinema per vista cinema-centric |
-| `GET` | `/my-cinemas/{cinemaId}/schedule` | AllowAnonymous | Programmazione giornaliera di un cinema |
-| `GET` | `/profilo/cinema-preferito` | Authenticated | Legge cinema preferito |
-| `PUT` | `/profilo/cinema-preferito/{cinemaId}` | Authenticated | Imposta cinema preferito |
-| `PUT` | `/profilo/cinema-preferito` | Authenticated | Cancella cinema preferito |
+| GET | `/programmazione/films` | AllowAnonymous | Listing paginato con tab, search, categoria, cinemaId |
+| GET | `/programmazione/cinemas` | AllowAnonymous | Elenco cinema con ordinamento per distanza |
+| GET | `/films/{id}/scheda` | AllowAnonymous | Scheda film con calendario show |
+| GET | `/my-cinemas` | AllowAnonymous | Elenco cinema per vista cinema-centric |
+| GET | `/my-cinemas/{cinemaId}/schedule` | AllowAnonymous | Programmazione giornaliera di un cinema |
+| GET | `/profilo/cinema-preferito` | Authenticated | Legge cinema preferito utente |
+| PUT | `/profilo/cinema-preferito/{cinemaId}` | Authenticated | Imposta cinema preferito |
 
-### Servizi Backend
+---
 
-| Servizio | Metodi Principali |
-|----------|-------------------|
-| `IProgrammazioneService` | `GetFilmsAsync`, `GetCinemasAsync`, `GetFilmSchedaAsync`, `GetMyCinemasAsync`, `GetCinemaScheduleAsync` |
-| `IProfiloService` | `GetCinemaPreferitoAsync`, `SetCinemaPreferitoAsync` |
-| `IFilmService` | CRUD completo film |
-| `ICinemaService` | CRUD completo cinema |
+## Calcolo Distanza Haversine
 
-### Calcolo Distanza (Haversine)
-
-Il backend calcola la distanza tra l'utente e i cinema usando la formula di Haversine:
+Il backend calcola la distanza tra utente e cinema usando la formula di Haversine:
 
 ```csharp
-// Semplificato
 double Distance(double lat1, double lon1, double lat2, double lon2) {
-    const double R = 6371; // Raggio Terra in km
+    const double R = 6371; // Raggio terrestre in km
     double dLat = ToRad(lat2 - lat1);
     double dLon = ToRad(lon2 - lon1);
     double a = Math.Sin(dLat/2) * Math.Sin(dLat/2) +

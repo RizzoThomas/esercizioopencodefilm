@@ -2,42 +2,73 @@
 
 ## Panoramica
 
-CineBase implementa un sistema di autenticazione completo e sicuro basato su **JWT (JSON Web Token)** con **refresh token rotanti** e **device identity**. Supporta autenticazione locale (email/password) e social login (Google, Microsoft, Facebook).
+CineBase implementa un sistema di autenticazione completo basato su JWT con refresh token rotanti e device identity. Supporta login locale (email/password con BCrypt) e social login tramite Google, Microsoft e Facebook.
+
+| Funzionalità | Implementazione | Stato |
+|-------------|----------------|-------|
+| Login/Register locale | JWT + BCrypt + DeviceId | Attivo |
+| Social login (Google/Microsoft/Facebook) | OAuth2 + PKCE + ExternalAuthState | Attivo |
+| Refresh token rotanti | Revoca su ogni refresh | Attivo |
+| Device-aware auth | Refresh token legato a UserId+DeviceId | Attivo |
+| 2FA (TOTP) | Google Authenticator, secret+verifica | Attivo |
+| Route guard frontend | IIFE self-contained nel head | Attivo |
+| RBAC (3 ruoli) | User, PowerUser, Admin | Attivo |
+| AuthVersion | Invalida token dopo cambio password | Attivo |
+| RefreshTokenCleanupService | Hosted service ogni 30 min | Attivo |
 
 ---
 
-## Architettura Auth
+## Architettura del Sistema Auth
 
 ```mermaid
 graph TB
     subgraph "Frontend"
-        AUTH_JS[auth.js]
+        AUTH[auth.js]
         RG[route-guard.js]
+        API[api.js]
         LS[(localStorage)]
     end
 
-    subgraph "Backend"
+    subgraph "Backend Auth"
         AE[AuthEndpoints]
         AS[AuthService]
         JWT[JWT Middleware]
-        DB[(MySQL Users/RefreshTokens)]
+        SES[SocialAuthEndpoints]
+        TOTP[2FA Endpoints]
     end
 
-    AUTH_JS -->|register/login| AE
-    AUTH_JS -->|refresh| AE
-    AUTH_JS -->|logout| AE
-    AUTH_JS <-->|token storage| LS
+    subgraph "Storage"
+        DB[(MySQL)]
+        USR[Users]
+        RT[RefreshTokens]
+        EAS[ExternalAuthState]
+        AAT[AccountActionToken]
+    end
+
+    subgraph "Provider Esterni"
+        GOOG[Google OAuth]
+        MSFT[Microsoft OAuth]
+        FB[Facebook OAuth]
+    end
+
+    AUTH -->|register/login/refresh| AE
+    AUTH -->|social login redirect| SES
     RG -->|check permissions| LS
+    API -->|Bearer token| JWT
 
     AE --> AS
-    AS -->|BCrypt hash| DB
-    AS -->|create/rotate| DB
-    JWT -->|validate token| AS
+    SES --> AS
+    AS -->|BCrypt verify| DB
+    AS -->|create/validate JWT| JWT
+    AS -->|rotate tokens| RT
+    SES -->|OAuth2 flow| GOOG
+    SES -->|OAuth2 flow| MSFT
+    SES -->|OAuth2 flow| FB
 ```
 
 ---
 
-## Flusso di Login
+## Flusso di Login Locale
 
 ```mermaid
 sequenceDiagram
@@ -50,208 +81,195 @@ sequenceDiagram
     F->>F: Auth.getOrCreateDeviceId()
     F->>B: POST /auth/login { email, password, deviceId }
     B->>B: AuthService.LoginAsync()
-    B->>DB: Find by NormalizedEmail
-    B->>B: Verify BCrypt password hash
-    B->>B: Check IsDisabled, MustChangePassword
-    B->>B: Revoke existing tokens for (UserId, DeviceId)
-    B->>B: Generate JWT (access_token, 15 min)
-    B->>B: Generate RefreshToken (7 days)
-    B->>DB: Save RefreshToken
-    B-->>F: { accessToken, refreshToken, user }
-    F->>F: saveTokens() → localStorage
-    F->>F: saveUser() → localStorage
-    F-->>U: Redirect to home/dashboard
+    B->>DB: Trova utente per NormalizedEmail
+    B->>B: Verifica BCrypt password hash
+    
+    Alt Utente disabilitato
+        B-->>F: 403 Account disabilitato
+    Else Password errata
+        B-->>F: 401 Credenziali non valide
+    Else Login OK
+        B->>B: Revoca token attivi per (UserId, DeviceId)
+        B->>B: Genera JWT (access_token, scadenza 15 min)
+        B->>B: Genera RefreshToken (scadenza 7 giorni)
+        B->>DB: Salva RefreshToken
+        B-->>F: { accessToken, refreshToken, user }
+        F->>F: saveTokens() in localStorage
+        F->>F: saveUser() in localStorage
+        F-->>U: Redirect a home/dashboard
+    End
 ```
 
 ---
 
-## JWT Claims
+## Struttura del JWT
 
-Il token JWT contiene i seguenti claim:
-
-| Claim | Descrizione |
-|-------|-------------|
-| `sub` | User ID |
-| `email` | Email utente |
-| `name` | Nome completo |
-| `role` | Ruolo (User/PowerUser/Admin) |
-| `auth_version` | Versione sicurezza (invalida token dopo cambio password) |
-| `iat` | Issued at |
-| `exp` | Expiration (15 minuti) |
-
-## Refresh Token Device-Aware
-
-```mermaid
-flowchart TD
-    A[Utente fa login] --> B{C'è un deviceId?}
-    B -->|No| C[Genera UUID deviceId]
-    B -->|Sì| D[Usa deviceId esistente]
-    C --> D
-    D --> E[Revoca token attivi per UserId+DeviceId]
-    E --> F[Crea nuovo Refresh Token con DeviceId]
-    F --> G[Salva su DB con scadenza 7 giorni]
-    G --> H[Restituisci al client]
-
-    I[Utente fa refresh] --> J{Refresh token valido?}
-    J -->|Sì| K{DeviceId match?}
-    K -->|Sì| L[Ruota token: revoca vecchio, crea nuovo]
-    K -->|No| M[Rifiuta: token non appartiene a questo device]
-    J -->|No| N[Richiedi nuovo login]
-```
+| Claim | Tipo | Descrizione |
+|-------|------|-------------|
+| `sub` | string | User ID (int) |
+| `email` | string | Email utente |
+| `name` | string | Nome e cognome |
+| `role` | string | Ruolo (User/PowerUser/Admin) |
+| `auth_version` | int | Versione sicurezza (cambio password = incremento) |
+| `iat` | int | Issued at (Unix timestamp) |
+| `exp` | int | Expiration (Unix timestamp, 15 min) |
 
 ---
 
-## RBAC — Matrice dei Permessi
+## Matrice di Controllo Accessi (RBAC)
 
-### Livelli di Ruolo
+### Pagine Frontend
 
-| Ruolo | Valore | Permessi |
-|-------|--------|----------|
-| `User` | 0 | Acquisto biglietti, profilo personale |
-| `PowerUser` | 1 | CRUD film, registi, categorie, sale, show |
-| `Admin` | 2 | Tutto + gestione utenti, ricariche credito, diagnostica |
+| Pagina | Anonimo | User | PowerUser | Admin |
+|--------|---------|------|-----------|-------|
+| `index.html` | ✅ | ✅ | ✅ | ✅ |
+| `programmazione.html` | ✅ | ✅ | ✅ | ✅ |
+| `scheda-film.html` | ✅ | ✅ | ✅ | ✅ |
+| `my-cinemas.html` | ✅ | ✅ | ✅ | ✅ |
+| `login.html` | ✅ (solo anonimo) | ❌ | ❌ | ❌ |
+| `registrazione.html` | ✅ (solo anonimo) | ❌ | ❌ | ❌ |
+| `acquista.html` | ❌ | ✅ | ✅ | ✅ |
+| `pagamento.html` | ❌ | ✅ | ✅ | ✅ |
+| `esito-acquisto.html` | ❌ | ✅ | ✅ | ✅ |
+| `profilo.html` | ❌ | ✅ | ✅ | ✅ |
+| `dashboard.html` | ❌ | ❌ | ✅ | ✅ |
+| `films.html` | ❌ | ❌ | ✅ | ✅ |
+| `registi.html` | ❌ | ❌ | ✅ | ✅ |
+| `cinemas.html` | ❌ | ❌ | ✅ | ✅ |
+| `proiezioni.html` | ❌ | ❌ | ✅ | ✅ |
+| `categorie.html` | ❌ | ❌ | ✅ | ✅ |
+| `utenti.html` | ❌ | ❌ | ❌ | ✅ |
+| `validazione.html` | ❌ | ❌ | ✅ | ✅ |
 
-### Mappa Pagine Frontend
+### Endpoint API
 
-```mermaid
-graph LR
-    subgraph "Pubbliche (Anonimo)"
-        INDEX[index.html]
-        PROG[programmazione.html]
-        SCHED[scheda-film.html]
-        MYCIN[my-cinemas.html]
-    end
-    subgraph "Anonimo-only (redirect se loggato)"
-        LOGIN[login.html]
-        REG[registrazione.html]
-    end
-    subgraph "Autenticato (User+)"
-        PROF[profilo.html]
-        ACQ[acquista.html]
-        PAG[esito-acquisto.html]
-    end
-    subgraph "PowerUser+Admin"
-        DASH[dashboard.html]
-        FILMS[films.html]
-        REGISTI[registi.html]
-        CINEMAS[cinemas.html]
-        PROIEZ[proiezioni.html]
-        CAT[categorie.html]
-    end
-    subgraph "Admin Only"
-        UTENTI[utenti.html]
-        UTENTI_D[utenti-detail.html]
-    end
-
-    INDEX --> PROG
-    PROG --> SCHED
-    PROG --> MYCIN
-    LOGIN --> PROF
-    REG --> PROF
-    PROF --> ACQ
-    ACQ --> PAG
-    DASH --> FILMS
-    DASH --> REGISTI
-    DASH --> CINEMAS
-    DASH --> PROIEZ
-    DASH --> CAT
-```
-
-### Endpoint API per Ruolo
-
-| Auth | Endpoint |
-|------|----------|
-| `AllowAnonymous` | `GET /films`, `GET /cinemas`, `GET /programmazione/*`, `GET /shows`, `GET /sale`, `POST /auth/login`, `POST /auth/register`, `POST /auth/refresh`, `GET /config/frontend` |
-| `Authenticated` | `GET/PUT /profilo`, `GET /checkout/*`, `POST /checkout/*`, `POST /auth/logout`, `GET /credito/me`, `GET /biglietti` |
-| `PowerUserOrAdmin` | `POST/PUT/DELETE /films`, `POST/PUT/DELETE /shows`, `POST/PUT/DELETE /sale`, `POST/PUT/DELETE /registi`, `POST/PUT/DELETE /categorie` |
-| `AdminOnly` | `GET/POST /admin/utenti`, `GET/POST /admin/credito`, `DELETE /cinemas` |
+| Auth Richiesto | Metodi | Esempi |
+|----------------|--------|--------|
+| `AllowAnonymous` | GET pubblici | `/films`, `/cinemas`, `/programmazione/*`, `/auth/login` |
+| `Authenticated` | Profilo e acquisti | `/profilo/*`, `/checkout/*`, `/credito/me` |
+| `PowerUserOrAdmin` | CRUD gestione | `POST/PUT/DELETE /films`, `/shows`, `/sale` |
+| `AdminOnly` | Utenti e diagnostica | `/admin/utenti/*`, `/admin/credito/*` |
 
 ---
 
 ## Route Guard Frontend
 
-Il `route-guard.js` è un **IIFE (Immediately Invoked Function Expression)** eseguito nell'`<head>` di ogni pagina HTML prima che qualsiasi contenuto venga renderizzato.
+Il `route-guard.js` è un IIFE eseguito nell'head della pagina prima del rendering del body, garantendo zero flash di pagine non autorizzate.
 
 ```javascript
-// Logica principale (semplificata)
 var RouteGuard = (function () {
-  var PAGE_PERMISSIONS = {
-    '/dashboard.html': { roles: ['poweruser', 'admin'], authRequired: true },
-    '/acquista.html':  { roles: ['user', 'poweruser', 'admin'], authRequired: true },
-    '/utenti.html':    { roles: ['admin'], authRequired: true },
-    '/login.html':     { roles: ['anonimo'], anonymousOnly: true },
-    // ... per ogni pagina
-  };
+  var PAGE_PERMISSIONS = { /* mappa percorsi -> ruoli */ };
 
   function check() {
     var path = window.location.pathname;
     var perm = PAGE_PERMISSIONS[path];
-    if (!perm) return;  // pagina non protetta
+    if (!perm) return;
 
     var token = localStorage.getItem('cb_access_token');
     var role = normalizeRole(parseJwt(token)?.role);
 
-    if (perm.anonymousOnly && role !== 'anonimo') {
-      window.location.replace('/index.html');  // replace, non href
-      return;
-    }
-
+    // Anonimo su pagina solo-autenticati → redirect a login
     if (perm.authRequired && role === 'anonimo') {
       window.location.replace('/login.html?redirect=' + encodeURIComponent(path));
       return;
     }
 
+    // Autenticato su pagina solo-anonimo → redirect a home
+    if (perm.anonymousOnly && role !== 'anonimo') {
+      window.location.replace('/index.html');
+      return;
+    }
+
+    // Ruolo non permesso → redirect con forbidden
     if (!perm.roles.includes(role)) {
       window.location.replace('/index.html?forbidden=true');
       return;
     }
   }
-
-  check();  // Esecuzione immediata
+  check(); // Esecuzione immediata
 })();
 ```
 
-### Caratteristiche chiave:
-- **Esecuzione sincrona** prima del rendering DOM — nessun flash di pagina non autorizzata
-- **`window.location.replace()`** invece di `href` — non lascia pagine bloccate nella history
-- **Self-contained**: legge e parsifica JWT direttamente da localStorage senza dipendere da `auth.js`
-- **Refresh proattivo**: se l'access token è scaduto, tenta refresh prima del redirect a login
+### Caratteristiche
+
+| Caratteristica | Dettaglio |
+|---------------|-----------|
+| Esecuzione | IIFE sincrono nel `<head>`, prima del `DOMContentLoaded` |
+| Redirect | `window.location.replace()` per non lasciare pagine bloccate nella history |
+| Dipendenza | Zero dipendenze da auth.js (legge JWT direttamente da localStorage) |
+| Refresh proattivo | Se token scaduto, tenta refresh prima del redirect |
+| Parsing JWT | Decodifica base64 inline, nessuna libreria esterna |
 
 ---
 
-## Social Login
+## Refresh Token Device-Aware
 
-Supporto per login tramite provider esterni:
-- **Google** / **Microsoft** / **Facebook**
+| Passo | Descrizione |
+|-------|-------------|
+| 1 | Al login, `auth.js` genera un UUID `deviceId` (o riusa `web-default` per legacy) |
+| 2 | Il deviceId viene inviato a `/auth/login` e salvato sul RefreshToken |
+| 3 | Al refresh, il backend verifica che il token appartenga allo stesso device |
+| 4 | I token precedenti per lo stesso `(UserId, DeviceId)` vengono revocati |
+| 5 | Il `RefreshTokenCleanupService` rimuove periodicamente token scaduti/revocati |
 
-Flusso:
-1. Utente clicca "Accedi con Google" → redirect a `GET /auth/external/login?provider=Google`
-2. Backend genera `ExternalAuthState` con PKCE e redirect
-3. Provider esterno autentica utente e redirect a callback
-4. Backend scambia codice per token, crea/collega utente
-5. Redirect frontend a `social-login-complete.html` con JWT
+---
+
+## Social Login Flow
+
+```mermaid
+sequenceDiagram
+    participant U as Utente
+    participant F as Frontend
+    participant B as Backend
+    participant P as Provider (Google/MS/FB)
+
+    U->>F: Clicca "Accedi con Google"
+    F->>B: GET /auth/external/login?provider=Google
+    B->>B: Genera ExternalAuthState + PKCE code_verifier
+    B-->>U: Redirect a accounts.google.com/o/oauth2/...
+    U->>P: Autenticazione + consenso
+    P-->>U: Redirect a /auth/external/callback?code=...&state=...
+    U->>B: GET /auth/external/callback
+    B->>B: Verifica state, scambia code per token
+    B->>P: GET userinfo (email, nome, avatar)
+    
+    Alt Nuovo utente
+        B->>DB: Crea User con provider collegato
+    Else Utente esistente (stessa email)
+        B->>DB: Collega nuovo provider
+    End
+    
+    B->>B: Genera JWT + RefreshToken
+    B-->>U: Redirect a social-login-complete.html con token
+```
 
 ---
 
 ## 2FA (Two-Factor Authentication)
 
-- Basato su **TOTP** (Time-based One-Time Password)
-- Generazione secret → scansiona QR code con Google Authenticator
-- Verifica codice OTP a 6 cifre
-- Attivabile/disattivabile dalla pagina profilo
+| Passo | Descrizione |
+|-------|-------------|
+| 1 | Utente abilita 2FA da profilo |
+| 2 | Backend genera secret TOTP (base32) |
+| 3 | Frontend mostra QR code (scansionabile con Google Authenticator) |
+| 4 | Utente inserisce codice a 6 cifre per verifica |
+| 5 | 2FA attivato, login successivi richiedono codice TOTP |
+
+---
 
 ## Security Features
 
 | Feature | Implementazione |
 |---------|----------------|
-| Password hashing | BCrypt |
-| JWT signing | HMAC-SHA256 con chiave segreta |
-| Auth version | Claim `auth_version` invalida token dopo cambio password |
-| Device-aware refresh | Refresh token legato a `UserId + DeviceId` |
-| Token cleanup | `RefreshTokenCleanupService` (hosted service, ogni 30 min) |
+| Password hashing | BCrypt con salt automatico |
+| JWT signing | HMAC-SHA256 con chiave segreta in .env |
+| Auth version | Claim `auth_version` invalida tutti i token dopo cambio password |
+| Device-aware refresh | Refresh token legato a UserId + DeviceId |
+| Token cleanup | Hosted service ogni 30 minuti |
+| Account disable | Admin può disabilitare, blocca ogni login |
+| Must change password | Flag forza cambio password al prossimo login |
 | Rate limiting | Middleware ASP.NET Core |
-| Input validation | Data Annotations + FluentValidation sui DTO |
+| Input validation | Data Annotations + validazione DTO |
 | CORS | Configurato per frontend su porta 5001 |
-| Password reset | Token temporaneo via email + AccountActionToken |
-| Account disable | Admin può disabilitare utenti (blocca login) |
-| Must change password | Forza cambio password al prossimo login |
+| Password reset | Token temporaneo via email con scadenza |
+| 2FA reset/disabilita | Verifica identità prima della disattivazione |

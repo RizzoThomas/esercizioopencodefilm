@@ -2,212 +2,177 @@
 
 ## Panoramica
 
-CineBase supporta tre modalità di pagamento:
-1. **Solo credito** — pagamento interno alla piattaforma (nessun addebito esterno)
-2. **Solo carta** — Stripe Checkout Session hosted
-3. **Misto (credito + carta)** — quota credito + residuo su Stripe
-
-L'architettura è evoluta da Stripe Elements (embedded) a **Stripe Checkout hosted** per maggiore sicurezza e minore complessità PCI.
+CineBase supporta tre modalità di pagamento: solo credito interno, solo carta tramite Stripe Checkout hosted, o pagamento misto che combina credito e carta.
 
 ---
 
-## Metodi di Pagamento
+## Tabella Comparativa Metodi di Pagamento
+
+| Caratteristica | Solo Credito | Solo Carta | Misto (Credito + Carta) |
+|----------------|-------------|------------|------------------------|
+| Richiede Stripe | No | Sì | Sì (solo per la parte carta) |
+| Redirect a Stripe | No | Sì | Sì |
+| Tempo di completamento | Immediato | 1-3 minuti | 1-3 minuti |
+| Commissioni Stripe | Nessuna | Sì | Solo sulla quota carta |
+| Addebito immediato | Sì | No (attesa webhook) | No (attesa webhook) |
+| Rischio doppio pagamento | Nessuno | Gestito da idempotenza | Gestito da idempotenza |
+| Rimborsabile | Sì (admin) | Sì (tramite Stripe) | Sì (credito + Stripe) |
+
+---
+
+## Architettura dei Pagamenti
 
 ```mermaid
-flowchart TD
-    PAG[pagamento.html] --> M{Metodo scelto}
-    
-    M -->|Solo Credito| CRED[Paga con credito]
-    CRED --> POST[POST /checkout/orders/{id}/pay]
-    POST --> VER{Saldo sufficiente?}
-    VER -->|Sì| OK[Ordine → Paid]
-    VER -->|No| ERR[Mostra errore]
-    OK --> ESITO[esito-acquisto.html]
+graph TB
+    subgraph "Frontend (pagamento.html)"
+        UI[Scelta metodo]
+        CRED[Pulsante: Paga con credito]
+        CARD[Pulsante: Paga con carta]
+        MIX[Slider credito + Paga resto]
+    end
 
-    M -->|Solo Carta| CARTA[POST /checkout/orders/{id}/stripe-checkout-session]
-    CARTA --> STS[Crea sessione Stripe Checkout]
-    STS --> RED[Redirect a checkout.stripe.com]
-    RED --> WEB{Webhook completed?}
-    WEB -->|Sì| FIN[Finalizza ordine]
-    WEB -->|No| POLL[Polling riconciliazione]
-    FIN --> ESITO2[esito-acquisto.html]
+    subgraph "Backend Pagamenti"
+        PS[PagamentoService]
+        SG[StripeGateway]
+        CS[CreditoService]
+        WH[Webhook Handler]
+    end
 
-    M -->|Misto| MISTO[Riserva credito + crea sessione Stripe]
-    MISTO --> RES[CreditoRiservato = importo]
-    RES --> STS2[Crea sessione Stripe per residuo]
-    STS2 --> RED2[Redirect a Stripe]
-    RED2 --> WEB2{Webhook completed?}
-    WEB2 -->|Sì| FIN2[Addebita credito riservato + finalizza]
-    WEB2 -->|No| POLL2[Polling + rilascio credito se scade]
+    subgraph "Stripe"
+        CHK[Checkout Session]
+        PI[Payment Intent]
+        WH_EVT[Webhook Events]
+    end
+
+    subgraph "Database"
+        ORD[Ordine]
+        CRD[CreditoResiduo]
+        MOV[MovimentoCredito]
+    end
+
+    UI --> CRED
+    UI --> CARD
+    UI --> MIX
+
+    CRED --> PS
+    PS --> CS
+    CS --> CRD
+    CS --> MOV
+    PS --> ORD
+
+    CARD --> SG
+    MIX --> CS
+    MIX --> SG
+    CS -->|Riserva credito| CRD
+    SG -->|Crea| CHK
+    CHK -->|Redirect| UI
+
+    WH -->|checkout.session.completed| PS
+    WH -->|checkout.session.expired| PS
+    PS -->|Finalizza| ORD
+    PS -->|Addebita credito| CS
+    PS -->|Emetti biglietti| ORD
 ```
 
 ---
 
-## Flusso Stripe Checkout Hosted
+## Flusso Pagamento Completo
 
 ```mermaid
 sequenceDiagram
     participant U as Utente
     participant F as Frontend
     participant B as Backend
-    participant STR as Stripe
+    participant S as Stripe
     participant DB as Database
 
-    U->>F: Seleziona "Paga con carta" o "Misto"
-    F->>B: GET /config/frontend (publishable key)
-    B-->>F: { stripePublishableKey }
+    U->>F: Apre pagamento.html?orderId=X
+    F->>B: GET /checkout/orders/{orderId}
+    F->>B: GET /credito/me
+    F->>B: GET /config/frontend
 
-    alt Misto
-        F->>B: POST /checkout/orders/{id}/stripe-checkout-session
-        B->>B: CreditoService.ReserveOrderCreditAsync
-        B->>DB: Ordine.CreditoRiservato = importoCredito
-        B->>DB: Ordine.Stato = CheckoutInProgress
-        B->>DB: Ordine.StripeCheckoutSessionId = sessionId
-        B->>B: StripeGateway.CreateCheckoutSessionAsync
-        B->>STR: Crea Checkout Session (importo = residuo)
-        STR-->>B: { sessionId, url }
-        B-->>F: { stripeCheckoutUrl, sessionId }
-    end
+    F->>F: Render riepilogo ordine
+    F->>F: Mostra opzioni pagamento
 
-    F->>U: Redirect a Stripe Checkout hosted
-    U->>STR: Inserisce dati carta
-    STR-->>U: Conferma pagamento
-
-    U->>F: Redirect a esito-acquisto.html?success=true
-    F->>B: POST /checkout/orders/{id}/reconcile-checkout-session
-    B->>STR: Sessione completata?
-    STR-->>B: Sì
-    B->>B: PagamentoService.ReconcileCheckoutSessionAsync
-    B->>DB: Ordine → Paid, addebita credito riservato
-    B->>DB: Emetti biglietti, invia email
-
-    STR->>B: Webhook: checkout.session.completed
-    B->>B: Idempotent handler
-    B->>DB: Finalizza se non già fatto
-
-    F->>B: Polling ogni 3s fino a stato Paid
-    B-->>F: Ordine → Paid
-    F->>U: Mostra successo + PDF biglietti
-```
-
----
-
-## Pagina Pagamento (`pagamento.html`) — `pagamento.js`
-
-### Logica
-
-```mermaid
-flowchart TD
-    A[DOMContentLoaded] --> B{Autenticato?}
-    B -->|No| C[Redirect login]
-    B -->|Sì| D[Carica ordine, credito, config in parallelo]
-
-    D --> E{Stato ordine?}
-    E -->|CheckoutInProgress| F[Tenta reconcile]
-    F --> G{Ancora CheckoutInProgress?}
-    G -->|Sì| H[Cancella ordine + redirect esito]
-    G -->|No| I[Riprova]
-
-    E -->|Pending| J[renderOrderSummary]
-    J --> K[setupPaymentOptions]
-    K --> L[Credito sufficiente? → abilita option-credito]
-    K --> M[Saldo > 0? → abilita option-misto]
-
-    L --> N[Attendi click Paga]
-    M --> N
-
-    N --> O{Metodo?}
-    O -->|Credito| P[POST /checkout/orders/{id}/pay]
-    O -->|Carta| Q[POST /checkout/orders/{id}/stripe-checkout-session]
-    O -->|Misto| R[POST con importoCreditoRichiesto]
-    Q --> S[Redirect a Stripe]
-    R --> S
-```
-
-### Scelta Metodo
-
-L'interfaccia mostra tre opzioni radio:
-
-```html
-<input type="radio" name="payment-method" value="carta">   <!-- Sempre attivo -->
-<input type="radio" name="payment-method" value="credito"> <!-- Solo se saldo >= totale -->
-<input type="radio" name="payment-method" value="misto">   <!-- Solo se saldo > 0 -->
-```
-
-Per il metodo **misto**, uno slider permette di scegliere quanto credito usare:
-
-```javascript
-const slider = document.getElementById('credit-slider');
-slider.max = Math.min(saldo, Math.max(0, totale - 0.01)); // Almeno 0.01 su carta
-slider.value = Math.min(saldo, Math.max(0, totale - 0.01)); // Default: massimo credito
-```
-
-### Gestione Back Button da Stripe
-
-```javascript
-window.addEventListener('pageshow', async (e) => {
-    if (e.persisted) {
-        // Utente tornato da Stripe con back button
-        if (ordine?.stato === 'CheckoutInProgress' || ordine?.stato === 'Pending') {
-            await API.cancelOrdine(orderId);
-            showToast('Pagamento non completato. Ordine annullato.', 'warning');
-            // Redirect a acquista.html
-        }
-    }
-});
-```
-
----
-
-## Webhook Stripe
-
-```mermaid
-sequenceDiagram
-    participant STR as Stripe
-    participant B as Backend
-    participant DB as Database
-
-    STR->>B: POST /payments/stripe/webhook
-    Note over STR,B: Con firma Stripe-Signature
-
-    B->>B: Verifica firma webhook
-    B->>B: Parsing evento
-
-    alt checkout.session.completed
-        B->>B: PagamentoService.HandleCheckoutCompletedAsync
-        B->>DB: Ordine → Paid
+    U->>F: Seleziona metodo
+    
+    Alt Metodo: Solo Credito
+        F->>B: POST /checkout/orders/{id}/pay (credito)
+        B->>B: Verifica saldo sufficiente
+        B->>DB: Addebita credito, stato→Paid
         B->>DB: Emetti biglietti
-        B->>DB: Invia email (best effort)
-        B-->>STR: 200 OK
+        B->>DB: Tenta invio email (best effort)
+        B-->>F: { success: true }
+        F->>U: Redirect a esito.html?success=true
 
-    else checkout.session.expired
-        B->>B: PagamentoService.HandleCheckoutExpiredAsync
-        B->>DB: Ordine → Expired
-        B->>DB: Rilascia posti (se ancora in hold)
-        B->>DB: Rilascia credito riservato
-        B-->>STR: 200 OK
+    Else Metodo: Solo Carta
+        F->>B: POST /checkout/orders/{id}/stripe-checkout-session
+        B->>DB: Ordine→CheckoutInProgress
+        B->>S: CheckoutSession.create(params)
+        S-->>B: { sessionId, url }
+        B-->>F: { stripeCheckoutUrl }
+        F->>U: Redirect a checkout.stripe.com
+        U->>S: Inserisce dati carta
+        S-->>U: Redirect a esito.html?success=true
+        S->>B: Webhook: checkout.session.completed
+        B->>B: Finalizza ordine, biglietti, email
+        B-->>S: 200 OK
 
-    else payment_intent.payment_failed
-        B->>B: Logga errore
-        B->>DB: Ordine.LastPaymentError = error
-        B-->>STR: 200 OK
+    Else Metodo: Misto (Credito + Carta)
+        F->>B: Slider: importoCreditoRichiesto
+        F->>B: POST /checkout/orders/{id}/stripe-checkout-session (con credito)
+        B->>DB: Riserva importoCreditoRichiesto
+        B->>S: CheckoutSession.create(importoResiduo)
+        S-->>B: { url }
+        B-->>F: { stripeCheckoutUrl }
+        F->>U: Redirect a Stripe
+        U->>S: Paga importo residuo con carta
+        S->>B: Webhook: checkout.session.completed
+        B->>DB: Addebita credito riservato + finalizza
+    End
 
-    else payment_intent.canceled
-        B->>B: Gestione cancellazione
-        B-->>STR: 200 OK
-    end
+    U->>F: esito-acquisto.html
+    F->>B: Polling ogni 3s fino a stato Paid
+    B-->>F: Stato → Paid
+    F->>U: Mostra conferma + download PDF
 ```
 
 ---
 
-## Servizi Backend Pagamento
+## Tabella Webhook Stripe Gestiti
 
-| Servizio | Metodi Principali |
-|----------|-------------------|
-| `IPagamentoService` | `PayCreditoAsync`, `CreateCheckoutSessionAsync`, `GetCheckoutStatusAsync`, `ReconcileCheckoutSessionAsync`, `HandleStripeWebhookAsync`, `CancelPendingOrdineAsync` |
-| `StripeGateway` | `CreateCheckoutSessionAsync`, `GetCheckoutSessionAsync`, `ConstructWebhookEvent`, `ParsePaymentIntent` |
-| `CreditoService` | `GetSaldoAsync`, `AddCreditoAsync` (admin), `ReserveOrderCreditAsync`, `ReleaseReservedOrderCreditAsync` |
-| `ICheckoutService` | `GetOrdineByIdAsync`, `MapToSummary` |
+| Evento Stripe | Azione Backend | Stato Ordine Finale |
+|---------------|----------------|---------------------|
+| `checkout.session.completed` | Finalizza ordine, addebita credito riservato, emetti biglietti, invia email | Paid |
+| `checkout.session.expired` | Rilascia posti, ripristina credito riservato | Expired |
+| `payment_intent.payment_failed` | Logga errore su LastPaymentError | CheckoutInProgress (se hosted) o Failed |
+| `payment_intent.canceled` | Logga cancellazione | CheckoutInProgress o Cancelled |
+
+---
+
+## Gestione Transizioni di Stato Ordine
+
+```mermaid
+stateDiagram-v2
+    [*] --> Pending: Ordine creato da hold
+    
+    Pending --> CheckoutInProgress: Sessione Stripe creata
+    Pending --> Paid: Pagamento solo credito
+    Pending --> Cancelled: Utente annulla
+    
+    CheckoutInProgress --> Paid: Webhook completed + riconciliazione
+    CheckoutInProgress --> Cancelled: Utente annulla
+    CheckoutInProgress --> Expired: Sessione Stripe scaduta
+    
+    Paid --> [*]: Biglietti emessi
+    
+    note right of CheckoutInProgress
+        Pulizia automatica:
+        - ExpiredHoldCleanupService
+        - Rilascio posti
+        - Ripristino credito riservato
+    end note
+```
 
 ---
 
@@ -215,26 +180,24 @@ sequenceDiagram
 
 | Metodo | Endpoint | Auth | Descrizione |
 |--------|----------|------|-------------|
-| `POST` | `/checkout/orders/{orderId}/pay` | Authenticated | Paga ordine (credito/ticket) |
-| `POST` | `/checkout/orders/{orderId}/stripe-checkout-session` | Authenticated | Crea sessione Stripe Checkout |
-| `GET` | `/checkout/orders/{orderId}/checkout-status` | Authenticated | Stato sessione Stripe |
-| `POST` | `/checkout/orders/{orderId}/reconcile-checkout-session` | Authenticated | Riconcilia ordine dopo Stripe |
-| `POST` | `/payments/stripe/webhook` | AllowAnonymous | Webhook Stripe (verificato) |
-| `GET` | `/credito/me` | Authenticated | Saldo e movimenti credito |
-| `POST` | `/admin/credito/ricarica` | AdminOnly | Ricarica credito admin |
-| `POST` | `/admin/credito/crea-ricarica-stripe` | Authenticated | Crea sessione Stripe per topup |
-| `GET` | `/config/frontend` | AllowAnonymous | Config pubblica (Stripe key) |
+| POST | `/checkout/orders/{orderId}/pay` | Authenticated | Paga ordine con credito |
+| POST | `/checkout/orders/{orderId}/stripe-checkout-session` | Authenticated | Crea sessione Stripe Checkout |
+| GET | `/checkout/orders/{orderId}/checkout-status` | Authenticated | Stato sessione Stripe |
+| POST | `/checkout/orders/{orderId}/reconcile-checkout-session` | Authenticated | Riconcilia ordine dopo Stripe |
+| POST | `/payments/stripe/webhook` | AllowAnonymous | Webhook Stripe (firmato) |
+| GET | `/credito/me` | Authenticated | Saldo e movimenti credito |
+| GET | `/config/frontend` | AllowAnonymous | Publishable key Stripe |
 
 ---
 
-## Sicurezza Pagamenti
+## Tabella Sicurezza Pagamenti
 
-| Aspetto | Implementazione |
-|---------|----------------|
-| **Idempotenza** | `IdempotencyKey` su tutta la pipeline pagamento |
-| **Source of Truth** | Backend, non il client. Il redirect di ritorno da Stripe non è considerato prova |
-| **Doppio addebito** | Prevenuto da stato `Paid` e idempotenza |
-| **Webhook** | Firmati con `STRIPE_WEBHOOK_SECRET`, elaborati in modo idempotente |
-| **Credito** | Riservato al momento della sessione Stripe, addebitato solo a pagamento confermato |
-| **Scadenza** | Ordini `CheckoutInProgress` scadono automaticamente, credito rilasciato |
-| **Concorrenza** | Lock d'ordine impedisce pagamenti concorrenti |
+| Rischio | Mitigazione |
+|---------|-------------|
+| Doppio pagamento | `IdempotencyKey` su tutta la pipeline, stato `Paid` bloccante |
+| Redirect di ritorno non affidabile | Backend come source of truth, webhook come conferma principale |
+| Sessione Stripe abbandonata | `ExpiredHoldCleanupService` pulisce ordini CheckoutInProgress scaduti |
+| Credito non addebitato | Riservato al momento della creazione sessione, addebitato solo a webhook completed |
+| Concorrenza pagamenti | Lock d'ordine impedisce pagamenti concorrenti |
+| Webhook duplicati | Idempotenza sull'evento Stripe (event ID) |
+| Back button da Stripe | Riconciliazione automatica, se ancora CheckoutInProgress → cancella ordine |
