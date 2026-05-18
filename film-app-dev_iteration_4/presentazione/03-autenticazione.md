@@ -21,43 +21,14 @@ CineBase implementa un sistema di autenticazione completo basato su JWT con refr
 ## Architettura del Sistema Auth
 
 ```mermaid
-graph TB
-    subgraph "Frontend"
-        AUTH[auth.js]
-        RG[route-guard.js]
-        API[api.js]
-        LS[(localStorage)]
-    end
-
-    subgraph "Backend Auth"
-        AE[AuthEndpoints]
-        AS[AuthService]
-        JWT[JWT Middleware]
-        SES[SocialAuthEndpoints]
-        TOTP[2FA Endpoints]
-    end
-
-    subgraph "Storage"
-        DB[(MySQL)]
-        USR[Users]
-        RT[RefreshTokens]
-        EAS[ExternalAuthState]
-        AAT[AccountActionToken]
-    end
-
-    subgraph "Provider Esterni"
-        GOOG[Google OAuth]
-        MSFT[Microsoft OAuth]
-        FB[Facebook OAuth]
-    end
-
-    AUTH -->|register/login/refresh| AE
-    AUTH -->|social login redirect| SES
-    RG -->|check permissions| LS
-    API -->|Bearer token| JWT
-
-    AE --> AS
-    SES --> AS
+graph LR
+    FRONT[Frontend<br/>auth.js + route-guard.js] -->|HTTP| END[AuthEndpoints]
+    END --> SVC[AuthService]
+    SVC --> DB[(MySQL<br/>Users + RefreshTokens)]
+    SVC --> JWT[JWT Middleware]
+    FRONT -->|Social Login| SOC[SocialAuthEndpoints]
+    SOC --> EXT[Google / Microsoft / Facebook]
+```
     AS -->|BCrypt verify| DB
     AS -->|create/validate JWT| JWT
     AS -->|rotate tokens| RT

@@ -29,154 +29,42 @@ Il database si basa su Entity Framework Core con MySQL. Il modello dati è suddi
 
 ---
 
-## Diagramma Entità-Relazioni Completo
+## Diagrammi Entità-Relazioni per Dominio
+
+### Dominio Cinema Multisala (Film, Regista, Categorie, Cinema, Sale, Posti, Show)
 
 ```mermaid
-classDiagram
-    class Film {
-        +int Id
-        +string Titolo
-        +int Durata
-        +string? CopertinaPath
-        +string? DescrizioneLunga
-        +string? CastText
-        +DateOnly? DataRilascio
-        +int? TmdbId
-        +double? VoteAverage
-        +int RegistaId
-    }
-    
-    class Regista {
-        +int Id
-        +string Nome
-        +string Cognome
-    }
-    
-    class Categoria {
-        +int Id
-        +string Nome
-    }
-    
-    class FilmCategoria {
-        +int FilmId
-        +int CategoriaId
-    }
-    
-    class Cinema {
-        +int Id
-        +string Nome
-        +string Citta
-        +string Indirizzo
-        +double? Latitudine
-        +double? Longitudine
-    }
-    
-    class Sala {
-        +int Id
-        +int CinemaId
-        +int NumeroProgressivo
-        +TipoSala TipoSala
-        +decimal Supplemento
-        +bool IsAttiva
-    }
-    
-    class SalaPosto {
-        +int Id
-        +int SalaId
-        +string Settore
-        +int Fila
-        +int Numero
-        +int? PosX, PosY
-        +bool IsWheelchair
-    }
-    
-    class Show {
-        +int Id
-        +int CinemaId
-        +int SalaId
-        +int FilmId
-        +DateTime StartAtUtc
-        +int DurataMinutiSnapshot
-        +decimal PrezzoBase
-        +decimal SupplementoSala
-    }
-    
-    class ShowPostoStato {
-        +int Id
-        +int ShowId
-        +int SalaPostoId
-        +int UserId
-        +ShowPostoState Stato
-        +string? HoldToken
-        +DateTime? ScadeAtUtc
-        +int? OrdineId
-    }
-    
-    class Ordine {
-        +int Id
-        +string CodiceOrdine
-        +int UserId
-        +int ShowId
-        +int NumeroBiglietti
-        +decimal TotaleLordo
-        +decimal ImportoCredito
-        +decimal ImportoCarta
-        +OrdineState Stato
-        +string? StripeCheckoutSessionId
-        +decimal CreditoRiservato
-    }
-    
-    class Biglietto {
-        +int Id
-        +int OrdineId
-        +int ShowId
-        +int SalaPostoId
-        +int UserId
-        +string CodiceBiglietto
-        +string BarcodeValue
-        +BigliettoState Stato
-        +DateTime? ValidatoAtUtc
-    }
-    
-    class User {
-        +int Id
-        +string Email
-        +string? PasswordHash
-        +string Nome, Cognome
-        +UserRole Ruolo
-        +decimal CreditoResiduo
-        +int? CinemaPreferitoId
-        +bool TwoFactorEnabled
-        +int AuthVersion
-        +bool IsDisabled
-    }
-    
-    class MovimentoCredito {
-        +int Id
-        +int UserId
-        +MovimentoCreditoTipo Tipo
-        +decimal Importo
-        +decimal SaldoPre, SaldoPost
-        +int? OrdineId
-    }
+graph LR
+    F[Film] -->|N:1| R[Regista]
+    F -->|N:M| C[Categoria]
+    F -->|1:N| S[Show]
+    CN[Cinema] -->|1:N| SA[Sala]
+    CN -->|1:N| S
+    SA -->|1:N| SP[SalaPosto]
+    SA -->|1:N| S
+```
 
-    Film "1" --> "many" FilmCategoria
-    Categoria "1" --> "many" FilmCategoria
-    Film "1" --> "many" Show
-    Film "many" --> "1" Regista
-    Cinema "1" --> "many" Sala
-    Cinema "1" --> "many" Show
-    Sala "1" --> "many" SalaPosto
-    Sala "1" --> "many" Show
-    Show "1" --> "many" ShowPostoStato
-    Show "1" --> "many" Biglietto
-    Show "1" --> "many" Ordine
-    Ordine "1" --> "many" Biglietto
-    User "1" --> "many" Ordine
-    User "1" --> "many" Biglietto
-    User "1" --> "many" MovimentoCredito
-    User "1" --> "many" RefreshToken
-    User "1" --> "0..1" Cinema : preferito
+### Dominio Ticketing (Ordini, Biglietti, ShowPostoStato)
+
+```mermaid
+graph LR
+    S[Show] -->|1:N| SP[ShowPostoStato]
+    S -->|1:N| O[Ordine]
+    S -->|1:N| B[Biglietto]
+    O -->|1:N| B
+    US[User] -->|1:N| O
+    US -->|1:N| B
+    SP -->|N:1| O
+```
+
+### Dominio Utenti e Pagamenti (User, Credito, Auth)
+
+```mermaid
+graph LR
+    U[User] -->|1:N| MC[MovimentoCredito]
+    U -->|1:N| RT[RefreshToken]
+    U -->|0..1| CN[Cinema Preferito]
+    MC -->|N:1| O[Ordine]
 ```
 
 ---
@@ -273,4 +161,136 @@ dotnet ef migrations add NomeMigration --project backend/FilmAPI
 
 # Applicare al database
 dotnet ef database update --project backend/FilmAPI
+```
+
+---
+
+## Blocchi di Codice Commentati
+
+### Modello Film (entità principale)
+
+```csharp
+// backend/FilmAPI/Model/Film.cs
+// Ogni entità EF Core ha: [Key] per la chiave primaria,
+// [Required] per campi obbligatori, [MaxLength] per stringhe,
+// [ForeignKey] per relazioni, [Column(TypeName)] per tipi decimali
+
+public class Film
+{
+    [Key]
+    public int Id { get; set; }                    // Chiave primaria auto-increment
+
+    [Required]
+    [MaxLength(200)]
+    public string Titolo { get; set; } = string.Empty;  // Titolo obbligatorio, max 200 char
+
+    [Required]
+    public int RegistaId { get; set; }              // FK verso Regista
+
+    [ForeignKey(nameof(RegistaId))]
+    public Regista? Regista { get; set; }           // Navigation property (nullable per lazy load)
+
+    [Required]
+    public int Durata { get; set; }                 // Durata in minuti
+
+    [MaxLength(2000)]
+    public string? DescrizioneLunga { get; set; }   // Trama del film (opzionale)
+
+    // Campi TMDB per dati reali dal seeder
+    public int? TmdbId { get; set; }                // ID su TMDB
+    public double? VoteAverage { get; set; }        // Voto medio TMDB
+
+    // Collection navigation properties (relazioni 1:N e N:M)
+    public ICollection<Show> Shows { get; set; } = new List<Show>();
+    public ICollection<FilmCategoria> FilmCategorie { get; set; } = new List<FilmCategoria>();
+}
+```
+
+### DbContext con configurazione relazioni e indici
+
+```csharp
+// backend/FilmAPI/Data/FilmDbContext.cs
+// Il DbContext è il ponte tra il codice C# e MySQL.
+// Ogni DbSet corrisponde a una tabella del database.
+
+public class FilmDbContext : DbContext
+{
+    // Ogni DbSet è una tabella nel DB
+    public DbSet<Film> Films => Set<Film>();
+    public DbSet<Cinema> Cinemas => Set<Cinema>();
+    public DbSet<Sala> Sale => Set<Sala>();
+    public DbSet<SalaPosto> SalaPosti => Set<SalaPosto>();
+    public DbSet<Show> Shows => Set<Show>();
+    public DbSet<ShowPostoStato> ShowPostiStato => Set<ShowPostoStato>();
+    public DbSet<Ordine> Ordini => Set<Ordine>();
+    public DbSet<Biglietto> Biglietti => Set<Biglietto>();
+    public DbSet<MovimentoCredito> MovimentiCredito => Set<MovimentoCredito>();
+    public DbSet<User> Users => Set<User>();
+    public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        // Esempio di indice unico composto:
+        // Impedisce due show nella stessa sala allo stesso orario
+        modelBuilder.Entity<Show>()
+            .HasIndex(s => new { s.CinemaId, s.SalaId, s.StartAtUtc })
+            .IsUnique();
+
+        // Esempio di delete behavior:
+        // Se elimino un Cinema, elimino anche le Sale collegate
+        modelBuilder.Entity<Sala>()
+            .HasOne(s => s.Cinema)
+            .WithMany(c => c.Sale)
+            .OnDelete(DeleteBehavior.Cascade);
+    }
+}
+```
+
+### Transazione atomica per hold posti (pattern importante)
+
+```csharp
+// backend/FilmAPI/Services/SeatHoldService.cs
+// Pattern: transazione atomica per operazioni multi-tabella
+
+public async Task<SeatHoldResponseDTO> CreateHoldAsync(int userId, SeatHoldRequestDTO request)
+{
+    // 1. Pulizia hold scaduti per questo show
+    await CleanupExpiredHoldsForShowAsync(request.ShowId);
+
+    // 2. Verifica conflitti: posti già tenuti da altri
+    var conflitti = await _db.ShowPostiStato
+        .Where(sps => sps.ShowId == request.ShowId
+            && request.SalaPostoIds.Contains(sps.SalaPostoId)
+            && sps.Stato != ShowPostoState.Sold)  // Sold escluso, Hold è conflitto
+        .ToListAsync();
+
+    if (conflitti.Any())
+        return new SeatHoldResponseDTO { Conflitti = conflitti };
+
+    // 3. Transazione atomica: tutto o niente
+    using var tx = await _db.Database.BeginTransactionAsync();
+    try
+    {
+        foreach (var postoId in request.SalaPostoIds)
+        {
+            _db.ShowPostiStato.Add(new ShowPostoStato
+            {
+                ShowId = request.ShowId,
+                SalaPostoId = postoId,
+                UserId = userId,
+                Stato = ShowPostoState.Hold,
+                HoldToken = holdToken,
+                ScadeAtUtc = DateTime.UtcNow.AddMinutes(_holdTtlMinutes),
+                UpdatedAtUtc = DateTime.UtcNow
+            });
+        }
+        await _db.SaveChangesAsync();
+        await tx.CommitAsync();  // Se arriva qui, TUTTO è salvato
+    }
+    catch
+    {
+        await tx.RollbackAsync();  // Se errore, NIENTE viene salvato
+        throw;
+    }
+}
 ```

@@ -31,45 +31,31 @@ stateDiagram-v2
 
 ```mermaid
 sequenceDiagram
-    participant B as Backend
-    participant DB as Database
+    participant API as Backend
     participant PDF as PdfService
     participant EM as EmailService
-    participant U as Utente
 
-    Note over B: Pagamento confermato (stato = Paid)
+    Note over API: Pagamento confermato (Paid)
     
-    B->>B: BigliettoService.EmittiBigliettiAsync(ordineId)
-    
-    loop Per ogni posto nell'ordine
-        B->>B: Genera codice univoco CB-XXXXXXXX
-        B->>B: Genera barcode value
-        B->>DB: INSERT Biglietto (Issued)
-        B->>DB: UPDATE ShowPostoStato → Sold
-    end
+    API->>API: Emetti biglietti per ogni posto
+    API->>API: Genera codice CB-XXXXXXXX
+    API->>API: ShowPostoStato -> Sold
 
-    B->>PDF: GeneraPdfOrdineAsync(ordineId)
-    PDF->>PDF: Crea documento QuestPDF
-    PDF->>PDF: 1 pagina per biglietto
-    PDF->>PDF: QR code dati biglietto
-    PDF->>PDF: Barcode grafico
-    PDF->>PDF: Dettagli: film, cinema, sala, data, posto
-    PDF-->>B: byte[] pdfBytes
+    API->>PDF: GeneraPdfOrdineAsync
+    PDF->>PDF: Crea QuestPDF (1 pagina per biglietto)
+    PDF->>PDF: QR code + Barcode + Dettagli
+    PDF-->>API: byte[] pdfBytes
 
-    B->>EM: InviaTicketEmailAsync(ordine, pdfBytes)
-    EM->>EM: Costruisce corpo HTML
-    EM->>EM: Allega PDF
-    EM->>EM: Invia via SMTP (MailKit)
+    API->>EM: InviaTicketEmailAsync
+    EM->>EM: Corpo HTML + allegato PDF
+    EM->>EM: SMTP (MailKit)
 
-    Alt Email inviata con successo
-        B->>DB: Ordine.TicketEmailSentAtUtc = now
-    Else Email fallita
-        B->>DB: Ordine.TicketEmailLastError = errore
-        Note right of B: Nessun rollback dell'ordine pagato
+    Alt Email OK
+        API->>API: TicketEmailSentAtUtc = now
+    Else Email KO
+        API->>API: TicketEmailLastError = errore
+        Note right of API: Nessun rollback ordine
     End
-
-    U->>B: GET /checkout/orders/{orderId}/pdf
-    B-->>U: Scarica biglietti-{codice}.pdf
 ```
 
 ---
@@ -136,38 +122,30 @@ public interface IEmailService {
 
 ```mermaid
 sequenceDiagram
-    participant O as Operatore
-    participant F as Frontend (validazione.html)
-    participant B as Backend
-    participant DB as Database
+    participant OP as Operatore
+    participant FE as Frontend
+    participant API as Backend
 
-    O->>F: Inserisce/scansiona codice biglietto
-    F->>B: GET /admin/tickets/validate/{codice}
-    B->>DB: Cerca Biglietto per CodiceBiglietto
+    OP->>FE: Inserisce codice biglietto
+    FE->>API: GET /admin/tickets/validate/{codice}
     
-    Alt Biglietto non trovato
-        B-->>F: 404 Not Found
-        F-->>O: "Biglietto non trovato"
-    Else Biglietto valido
-        B-->>F: { film, cinema, sala, data, posto, stato }
-        F-->>O: Mostra dettagli biglietto
-        
-        O->>F: Click "Valida"
-        F->>B: POST /admin/tickets/validate { codice, cinemaId }
-        B->>B: ValidazioneBigliettoService.ValidaBigliettoAsync
+    Alt Trovato
+        API-->>FE: Dettagli biglietto
+        FE->>OP: Mostra dati
+        OP->>FE: Click Valida
+        FE->>API: POST validate { codice, cinemaId }
         
         Alt Già validato
-            B-->>F: 409 Conflict
-            F-->>O: "Biglietto già validato il DD/MM/YYYY"
+            API-->>FE: 409 Conflict
         Else Cinema errato
-            B-->>F: 400 Bad Request
-            F-->>O: "Questo biglietto non è per questo cinema"
-        Else Successo
-            B->>DB: Biglietto.Stato = Validated
-            B->>DB: ValidatoAtUtc, ValidatoDaUserId, ValidatoCinemaId
-            B-->>F: 200 OK { validato: true }
-            F-->>O: "Ingresso consentito"
+            API-->>FE: 400 Bad Request
+        Else OK
+            API->>API: Stato = Validated
+            API-->>FE: 200 OK
         End
+        
+    Else Non trovato
+        API-->>FE: 404
     End
 ```
 
@@ -203,6 +181,104 @@ sequenceDiagram
 | `IValidazioneBigliettoService` | `LookupBigliettoAsync`, `ValidaBigliettoAsync` |
 
 ---
+
+## Blocchi di Codice Commentati
+
+### Servizio di Validazione Biglietti (pattern importante)
+
+```csharp
+// backend/FilmAPI/Services/ValidazioneBigliettoService.cs
+// Pattern: validazione con regole multiple e audit
+
+public async Task<ValidazioneResultDTO> ValidaBigliettoAsync(string codice, int cinemaId, int operatoreId)
+{
+    // 1. Cerca il biglietto per codice univoco
+    var biglietto = await _db.Biglietti
+        .Include(b => b.Show).ThenInclude(s => s.Cinema)
+        .Include(b => b.SalaPosto)
+        .FirstOrDefaultAsync(b => b.CodiceBiglietto == codice);
+
+    if (biglietto == null)
+        return new ValidazioneResultDTO
+        {
+            Esito = "KO",
+            Messaggio = "Biglietto non trovato",
+            CodiceHttp = 404
+        };
+
+    // 2. Controlla se già validato (doppia validazione bloccata)
+    if (biglietto.Stato == BigliettoState.Validated)
+        return new ValidazioneResultDTO
+        {
+            Esito = "KO",
+            Messaggio = $"Biglietto già validato il {biglietto.ValidatoAtUtc:dd/MM/yyyy HH:mm}",
+            CodiceHttp = 409
+        };
+
+    // 3. Controlla che il cinema corrisponda
+    if (biglietto.Show.CinemaId != cinemaId)
+        return new ValidazioneResultDTO
+        {
+            Esito = "KO",
+            Messaggio = "Questo biglietto non è per questo cinema",
+            CodiceHttp = 400
+        };
+
+    // 4. Se tutti i controlli passano, valida
+    biglietto.Stato = BigliettoState.Validated;
+    biglietto.ValidatoAtUtc = DateTime.UtcNow;
+    biglietto.ValidatoDaUserId = operatoreId;
+    biglietto.ValidatoCinemaId = cinemaId;
+
+    await _db.SaveChangesAsync();
+
+    return new ValidazioneResultDTO
+    {
+        Esito = "OK",
+        Messaggio = "Ingresso consentito",
+        CodiceHttp = 200,
+        Biglietto = MapToDTO(biglietto)
+    };
+}
+```
+
+### Pattern di Idempotenza (fondamentale per pagamenti)
+
+```csharp
+// backend/FilmAPI/Services/PagamentoService.cs
+// Pattern: idempotenza per evitare doppi pagamenti
+
+public async Task<OrdineSummaryDTO> PayCreditoAsync(int userId, int ordineId,
+    decimal importoCredito, string idempotencyKey)
+{
+    using var tx = await _db.Database.BeginTransactionAsync();
+
+    // 1. IDEMPOTENZA: se stessa chiave già usata, restituisci risultato esistente
+    var existing = await _db.Ordini
+        .FirstOrDefaultAsync(o => o.IdempotencyKey == idempotencyKey);
+    if (existing != null)
+        return MapToSummary(existing);
+
+    // 2. LEGACY CHECK: se ordine già pagato, non procedere
+    var ordine = await _db.Ordini.FindAsync(ordineId);
+    if (ordine.Stato == OrdineState.Paid)
+        throw new ConflictException("Ordine già pagato");
+
+    // 3. TRANSAZIONE: addebita e finalizza
+    ordine.Stato = OrdineState.Paid;
+    ordine.ImportoCredito = importoCredito;
+    ordine.IdempotencyKey = idempotencyKey;
+    ordine.PaidAtUtc = DateTime.UtcNow;
+
+    // 4. Emetti biglietti (operazione interna, senza rollback)
+    await _bigliettoService.EmittiBigliettiAsync(ordine.Id);
+
+    await _db.SaveChangesAsync();
+    await tx.CommitAsync();
+
+    return MapToSummary(ordine);
+}
+```
 
 ## Librerie Utilizzate
 

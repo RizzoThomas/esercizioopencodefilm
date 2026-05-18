@@ -21,58 +21,43 @@ Il flusso di acquisto si compone di tre pagine consecutive che guidano l'utente 
 ```mermaid
 sequenceDiagram
     participant U as Utente
-    participant ACQ as acquista.js
-    participant PAG as pagamento.js
-    participant ES as esito-acquisto.js
-    participant API as Backend API
-    participant DB as Database
+    participant FE as Frontend
+    participant API as Backend
+    participant STR as Stripe
 
-    U->>ACQ: Apre acquista.html?showId=X
-    ACQ->>API: GET /checkout/shows/{showId}/seat-map
-    API-->>ACQ: SeatMapDTO (posti, settori, prezzi)
+    U->>FE: Apre acquista.html?showId=X
+    FE->>API: GET seat-map
+    API-->>FE: Posti, settori, prezzi
 
     loop Selezione posti
-        U->>ACQ: Click posto disponibile
-        ACQ->>API: POST /checkout/holds
-        API->>DB: Transazione atomica: cleanup + insert
-        API-->>ACQ: SeatHoldResponseDTO (holdToken, scadeAt)
-        ACQ->>ACQ: Avvia countdown, keep-alive, polling
+        U->>FE: Click posto
+        FE->>API: POST createHold
+        API-->>FE: holdToken + scadeAt
     end
 
-    U->>ACQ: Click "Continua al pagamento"
-    ACQ->>API: POST /checkout/orders
-    API-->>ACQ: Ordine Pending
-    ACQ->>U: Redirect a pagamento.html?orderId=X
+    U->>FE: Continua al pagamento
+    FE->>API: POST createOrdine
+    API-->>FE: Ordine Pending
+    FE->>U: Redirect a pagamento
 
-    U->>PAG: Sceglie metodo di pagamento
-    
+    U->>FE: Sceglie metodo
+
     Alt Solo credito
-        PAG->>API: POST /checkout/orders/{id}/pay (credito)
-        API->>DB: Addebita credito, stato→Paid
-        API-->>PAG: OK
-        PAG->>U: Redirect a esito.html?success=true
-    Else Carta / Misto
-        PAG->>API: POST /checkout/orders/{id}/stripe-checkout-session
-        API-->>PAG: { stripeCheckoutUrl }
-        PAG->>U: Redirect a Stripe Checkout
-        U->>STR: Inserisce dati carta
-        STR->>U: Redirect a esito.html?success=true
+        FE->>API: POST pay (credito)
+        API-->>FE: OK
+        FE->>U: Redirect a esito
+    Else Carta o Misto
+        FE->>API: POST createCheckoutSession
+        API-->>FE: URL Stripe
+        FE->>U: Redirect a Stripe
+        U->>STR: Inserisce carta
+        STR->>U: Redirect a esito
     End
 
-    U->>ES: esito-acquisto.html
-    ES->>API: POST reconcile (se da Stripe)
-    ES->>API: GET /checkout/orders/{id}
-    
-    Alt Stato Paid
-        ES->>ES: Mostra successo, biglietti, PDF
-    Else Stato Pending/CheckoutInProgress
-        ES->>ES: Polling ogni 3s fino a Paid
-    End
-    
-    U->>ES: Click "Scarica PDF"
-    ES->>API: GET /checkout/orders/{id}/pdf
-    API-->>ES: PDF bytes
-    ES->>U: Download biglietti.pdf
+    U->>FE: esito-acquisto.html
+    FE->>API: reconcile + polling 3s
+    API-->>FE: Stato Paid
+    FE->>U: Mostra biglietti + PDF
 ```
 
 ---

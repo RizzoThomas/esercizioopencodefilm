@@ -1,3 +1,16 @@
+// ============================================================================
+// AuthService.cs — SERVIZIO DI AUTENTICAZIONE
+// ============================================================================
+// Questo servizio gestisce: registrazione, login, refresh token, logout,
+// password reset, 2FA e social login.
+//
+// ARCHITETTURA JWT:
+//   - Access Token: JWT con scadenza breve (60 min), firmato HMAC-SHA256
+//   - Refresh Token: stringa random 64 byte, conservato nel DB, legato al device
+//   - Device Identity: ogni dispositivo ha un UUID, il refresh è vincolato al device
+//   - AuthVersion: se cambia, tutti i JWT emessi in precedenza diventano invalidi
+// ============================================================================
+
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -12,17 +25,22 @@ namespace FilmAPI.Services;
 
 public class AuthService : IAuthService
 {
-    private readonly FilmDbContext _context;
-    private readonly IEmailService _emailService;
-    private readonly IAccountTokenService _accountTokenService;
-    private readonly IAccountEmailService _accountEmailService;
-    private readonly IUserSecurityAuditService _auditService;
+    // ─── DEPENDENCY INJECTION ─────────────────────────────────────────────
+    // Tutti i servizi vengono iniettati nel costruttore
+    private readonly FilmDbContext _context;              // Database
+    private readonly IEmailService _emailService;          // Invio email
+    private readonly IAccountTokenService _accountTokenService;  // Token account
+    private readonly IAccountEmailService _accountEmailService;  // Email account
+    private readonly IUserSecurityAuditService _auditService;    // Log sicurezza
     private readonly ILogger<AuthService> _logger;
+
+    // Parametri JWT letti da .env
     private readonly string _jwtSecret;
     private readonly string _jwtIssuer;
     private readonly string _jwtAudience;
     private readonly int _accessTokenExpiryMinutes;
     private readonly int _refreshTokenExpiryDays;
+
     private const string DefaultDeviceId = "web-default";
     private const int TwoFactorTempTokenExpiryMinutes = 5;
     private const int TrustedDeviceExpiryDays = 3;
@@ -36,6 +54,7 @@ public class AuthService : IAuthService
         _accountEmailService = accountEmailService;
         _auditService = auditService;
         _logger = logger;
+        // Legge la configurazione JWT dal .env con fallback per sviluppo
         _jwtSecret = Environment.GetEnvironmentVariable("JWT_SECRET") ?? "SuperSecretKeyForCineBaseJWTAuth2026!";
         _jwtIssuer = Environment.GetEnvironmentVariable("JWT_ISSUER") ?? "CineBaseAPI";
         _jwtAudience = Environment.GetEnvironmentVariable("JWT_AUDIENCE") ?? "CineBaseWeb";
@@ -43,14 +62,23 @@ public class AuthService : IAuthService
         _refreshTokenExpiryDays = int.Parse(Environment.GetEnvironmentVariable("JWT_REFRESH_TOKEN_EXPIRY_DAYS") ?? "7");
     }
 
+    // ========================================================================
+    // REGISTRAZIONE
+    // ========================================================================
+    // 1. Verifica che l'email non sia già registrata
+    // 2. Crea User con PasswordHash = BCrypt(password)
+    // 3. Genera AccessToken JWT
+    // 4. Genera RefreshToken (con DeviceId)
+    // ========================================================================
     public async Task<AuthResponseDTO> RegisterAsync(RegisterRequestDTO dto)
     {
+        // Controllo email duplicata
         var exists = await _context.Users.AnyAsync(u => u.Email == dto.Email);
         if (exists)
-        {
             throw new InvalidOperationException("Email gia registrata");
-        }
 
+        // Crea nuovo utente con password hashata (BCrypt)
+        // BCrypt è un algoritmo di hashing lento (resistente a brute force)
         var user = new User
         {
             Email = dto.Email,
@@ -60,13 +88,14 @@ public class AuthService : IAuthService
             Nome = dto.Nome,
             Cognome = dto.Cognome,
             Telefono = dto.Telefono,
-            Ruolo = UserRole.User,
+            Ruolo = UserRole.User,              // Default: utente base
             DataRegistrazione = DateTime.UtcNow
         };
 
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
 
+        // Genera JWT access token + refresh token
         var accessToken = GenerateAccessToken(user);
         var refreshToken = await GenerateRefreshTokenAsync(user.Id, dto.DeviceId);
         await _context.SaveChangesAsync();
@@ -80,20 +109,30 @@ public class AuthService : IAuthService
         };
     }
 
+    // ========================================================================
+    // LOGIN
+    // ========================================================================
+    // 1. Cerca utente per email
+    // 2. Verifica password con BCrypt.Verify()
+    // 3. Controlla se account è disabilitato
+    // 4. Se 2FA abilitato, richiede secondo fattore
+    // 5. Genera JWT access token + refresh token
+    // ========================================================================
     public async Task<AuthResponseDTO> LoginAsync(LoginRequestDTO dto, HttpContext? httpContext = null)
     {
+        // Cerca utente per email (esatta, non normalizzata)
         var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == dto.Email);
+
+        // Verifica password con BCrypt
+        // BCrypt.Verify confronta la password in chiaro con l'hash salvato
         if (user is null || user.PasswordHash is null || !BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash))
-        {
             throw new UnauthorizedAccessException("Credenziali non valide");
-        }
 
+        // Account disabilitato? (admin può disabilitare)
         if (user.IsDisabled)
-        {
             throw new UnauthorizedAccessException("Account disabilitato");
-        }
 
-        // Aggiorna ultimo login
+        // Aggiorna timestamp ultimo login
         user.LastLoginAtUtc = DateTime.UtcNow;
         user.LastLoginProvider = "Local";
 
@@ -104,11 +143,9 @@ public class AuthService : IAuthService
             var isTrusted = (!string.IsNullOrEmpty(trustedDeviceToken) && ValidateTrustedDeviceToken(trustedDeviceToken, user.Id))
                          || IsTrustedDevice(httpContext, user.Id);
             
-            _logger.LogWarning("LoginAsync: utente {Email} ha 2FA abilitato. TrustedDevice={IsTrusted}",
-                user.Email, isTrusted);
-                
             if (!isTrusted)
             {
+                // Richiede secondo fattore: restituisce temp token
                 var tempToken = GenerateTwoFactorTempToken(user.Id);
                 return new AuthResponseDTO
                 {
@@ -122,6 +159,9 @@ public class AuthService : IAuthService
         return await GenerateAuthResponse(user, dto.DeviceId);
     }
 
+    // ========================================================================
+    // GENERAZIONE RISPOSTA AUTH (privato, chiamato da login/register)
+    // ========================================================================
     private async Task<AuthResponseDTO> GenerateAuthResponse(User user, string? deviceId)
     {
         var accessToken = GenerateAccessToken(user);
@@ -137,6 +177,15 @@ public class AuthService : IAuthService
         };
     }
 
+    // ========================================================================
+    // REFRESH TOKEN
+    // ========================================================================
+    // 1. Cerca refresh token nel DB
+    // 2. Verifica che sia attivo (non scaduto, non revocato)
+    // 3. Verifica che il DeviceId corrisponda (device-aware)
+    // 4. Revoca il vecchio token (ROTAZIONE)
+    // 5. Genera NUOVO access token + NUOVO refresh token
+    // ========================================================================
     public async Task<AuthResponseDTO> RefreshAsync(string refreshToken, string? deviceId)
     {
         var storedToken = await _context.RefreshTokens
@@ -144,18 +193,17 @@ public class AuthService : IAuthService
             .FirstOrDefaultAsync(rt => rt.Token == refreshToken);
 
         if (storedToken is null || !storedToken.IsActive)
-        {
             throw new UnauthorizedAccessException("Refresh token non valido o scaduto");
-        }
 
+        // Device-aware: il token appartiene a questo dispositivo?
         var normalizedDeviceId = NormalizeDeviceId(deviceId);
         if (!string.Equals(storedToken.DeviceId, normalizedDeviceId, StringComparison.Ordinal))
-        {
             throw new UnauthorizedAccessException("Refresh token non valido per questo device");
-        }
 
+        // ROTAZIONE: revoca il vecchio token
         storedToken.RevokedAt = DateTime.UtcNow;
 
+        // Genera NUOVO token (rotation = più sicuro)
         var newRefreshToken = await GenerateRefreshTokenAsync(storedToken.UserId, normalizedDeviceId);
         var accessToken = GenerateAccessToken(storedToken.User!);
 
@@ -170,6 +218,11 @@ public class AuthService : IAuthService
         };
     }
 
+    // ========================================================================
+    // LOGOUT
+    // ========================================================================
+    // Revoca il refresh token (non lo elimina, lo marca come revocato)
+    // ========================================================================
     public async Task<bool> LogoutAsync(string refreshToken, string? deviceId)
     {
         var normalizedDeviceId = NormalizeDeviceId(deviceId);
@@ -186,49 +239,66 @@ public class AuthService : IAuthService
     public async Task<UserInfoDTO?> GetUserByIdAsync(int id)
     {
         var user = await _context.Users.FindAsync(id);
-        if (user is null) return null;
-
-        return MapUserInfo(user);
+        return user is null ? null : MapUserInfo(user);
     }
 
+    // ========================================================================
+    // GENERAZIONE ACCESS TOKEN (JWT)
+    // ========================================================================
+    // Crea un JWT firmato con HMAC-SHA256 contenente:
+    //   - sub: User ID
+    //   - email: Email utente
+    //   - role: Ruolo (User/PowerUser/Admin) per RBAC
+    //   - auth_version: per invalidare token dopo cambio password
+    // ========================================================================
     private string GenerateAccessToken(User user)
     {
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSecret));
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
+        // Claims = informazioni sull'utente dentro il JWT
         var claims = new[]
         {
-            new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
-            new Claim(JwtRegisteredClaimNames.Email, user.Email),
-            new Claim("role", user.Ruolo.ToString()),
-            new Claim("nome", user.Nome),
-            new Claim("auth_version", user.AuthVersion.ToString())
+            new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),     // User ID
+            new Claim(JwtRegisteredClaimNames.Email, user.Email),            // Email
+            new Claim("role", user.Ruolo.ToString()),                        // Ruolo RBAC
+            new Claim("nome", user.Nome),                                    // Nome
+            new Claim("auth_version", user.AuthVersion.ToString())           // Versione sicurezza
         };
 
         var token = new JwtSecurityToken(
             issuer: _jwtIssuer,
             audience: _jwtAudience,
             claims: claims,
-            expires: DateTime.UtcNow.AddMinutes(_accessTokenExpiryMinutes),
+            expires: DateTime.UtcNow.AddMinutes(_accessTokenExpiryMinutes),  // Scadenza
             signingCredentials: credentials
         );
 
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
+    // ========================================================================
+    // GENERAZIONE REFRESH TOKEN (con rotazione)
+    // ========================================================================
+    // 1. Normalizza DeviceId (default: "web-default")
+    // 2. Revoca tutti i token attivi per questo (UserId, DeviceId)
+    // 3. Crea nuovo token con stringa random 64 byte
+    // ========================================================================
     private async Task<RefreshToken> GenerateRefreshTokenAsync(int userId, string? deviceId)
     {
         var normalizedDeviceId = NormalizeDeviceId(deviceId);
 
+        // Revoca token attivi esistenti per questo device
+        // Così ogni dispositivo ha UN SOLO refresh token attivo alla volta
         var activeTokensForDevice = await _context.RefreshTokens
-            .Where(rt => rt.UserId == userId && rt.DeviceId == normalizedDeviceId && rt.RevokedAt == null && rt.ExpiresAt > DateTime.UtcNow)
+            .Where(rt => rt.UserId == userId && rt.DeviceId == normalizedDeviceId
+                   && rt.RevokedAt == null && rt.ExpiresAt > DateTime.UtcNow)
             .ToListAsync();
 
         foreach (var token in activeTokensForDevice)
-        {
             token.RevokedAt = DateTime.UtcNow;
-        }
 
+        // Genera nuovo refresh token (64 byte random = 512 bit)
         var refreshToken = new RefreshToken
         {
             Token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64)),
@@ -243,11 +313,7 @@ public class AuthService : IAuthService
     }
 
     private static string NormalizeDeviceId(string? deviceId)
-    {
-        return string.IsNullOrWhiteSpace(deviceId)
-            ? DefaultDeviceId
-            : deviceId.Trim();
-    }
+        => string.IsNullOrWhiteSpace(deviceId) ? DefaultDeviceId : deviceId.Trim();
 
     private static UserInfoDTO MapUserInfo(User user)
     {

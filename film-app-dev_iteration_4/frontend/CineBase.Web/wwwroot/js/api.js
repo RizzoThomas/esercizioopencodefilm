@@ -1,6 +1,22 @@
-// Configurazione base
+// ============================================================================
+// api.js — CLIENT HTTP PER COMUNICAZIONE CON IL BACKEND
+// ============================================================================
+// Questo file gestisce TUTTE le chiamate API al backend.
+// Caratteristiche principali:
+//   - Aggiunge automaticamente il Bearer token JWT alle richieste
+//   - Gestisce il refresh automatico del token su 401
+//   - Fornisce metodi tipizzati per ogni endpoint del backend
+//   - Normalizza le risposte (gestisce $values per serializzazione EF)
+//   - Coda di richieste in attesa durante il refresh (evita race condition)
+// ============================================================================
+
+// URL base del backend (configurabile, default localhost:5000)
 var API_BASE_URL = window.API_BASE_URL || 'http://localhost:5000';
 
+// ─── GESTIONE REFRESH TOKEN ──────────────────────────────────────────────
+// Quando una richiesta riceve 401, apiFetch tenta automaticamente il refresh.
+// isRefreshing impedisce refresh concorrenti.
+// refreshSubscribers gestisce la coda di richieste in attesa.
 let isRefreshing = false;
 let refreshSubscribers = [];
 
@@ -17,6 +33,7 @@ function getAuthSafe() {
   return typeof window !== 'undefined' && window.Auth ? window.Auth : null;
 }
 
+// Normalizza il ruolo (accetta sia stringhe che numeri dal backend)
 function normalizeRole(role) {
   if (role == null) return '';
   const value = String(role).trim().toLowerCase();
@@ -26,50 +43,50 @@ function normalizeRole(role) {
   return value;
 }
 
+// Controlla se il path corrente è un'area admin
 function isAdminAreaPath(pathname) {
   const adminPaths = new Set([
-    '/dashboard.html',
-    '/films.html',
-    '/registi.html',
-    '/cinemas.html',
-    '/proiezioni.html',
-    '/categorie.html'
+    '/dashboard.html', '/films.html', '/registi.html',
+    '/cinemas.html', '/proiezioni.html', '/categorie.html'
   ]);
   return adminPaths.has((pathname || '').toLowerCase());
 }
 
+// Blocca l'accesso alle pagine admin per utenti non autorizzati
 function enforceAdminAreaAccess() {
   const auth = getAuthSafe();
   if (!auth) return true;
   if (!isAdminAreaPath(window.location.pathname)) return true;
 
   if (!auth.isLoggedIn()) {
-    const redirectUrl = window.location.pathname + window.location.search;
-    auth.redirectToLogin(redirectUrl);
+    auth.redirectToLogin(window.location.pathname + window.location.search);
     return false;
   }
 
   const role = normalizeRole(auth.getUserRole?.());
-  if (role === 'admin' || role === 'poweruser') {
-    return true;
-  }
+  if (role === 'admin' || role === 'poweruser') return true;
 
   window.location.href = '/index.html?forbidden=true';
   return false;
 }
 
+// Parsing della risposta HTTP (JSON o testo)
 async function parseSuccessfulResponse(response) {
   if (response.status === 204) return null;
-
   const contentType = response.headers.get('content-type') || '';
-  if (contentType.includes('application/json')) {
-    return response.json();
-  }
-
+  if (contentType.includes('application/json')) return response.json();
   return response.text();
 }
 
-// Helper function per fetch con error handling e retry su 401
+// ====================================================================
+// apiFetch — FUNZIONE PRINCIPALE PER CHIAMATE HTTP
+// ====================================================================
+// Pattern:
+//   1. Aggiunge header Authorization: Bearer <token>
+//   2. Invia richiesta al backend
+//   3. Se 401 → tenta refresh token → riprova richiesta
+//   4. Se errore → throw con status code
+// ====================================================================
 async function apiFetch(endpoint, options = {}) {
   if (!enforceAdminAreaAccess()) {
     throw { status: 403, message: 'Non autorizzato ad accedere a questa pagina' };

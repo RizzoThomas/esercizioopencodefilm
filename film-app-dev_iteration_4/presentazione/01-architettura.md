@@ -181,6 +181,87 @@ film-app-dev_iteration_4/
 
 ---
 
+## Blocchi di Codice Commentati
+
+### Pattern: Endpoint REST con ASP.NET Core Minimal API
+
+```csharp
+// backend/FilmAPI/Endpoints/CheckoutEndpoints.cs
+// Pattern: Minimal API con dependency injection e auth
+
+public static void MapCheckoutEndpoints(this WebApplication app)
+{
+    // Raggruppo tutti gli endpoint checkout sotto /checkout
+    var checkout = app.MapGroup("/checkout");
+
+    // Endpoint protetto: richiede autenticazione
+    // Il middleware JWT estrae user ID dal token automaticamente
+    checkout.MapGet("/orders", async (HttpContext ctx, ICheckoutService svc) =>
+    {
+        // Legge UserId dal claim "sub" del JWT
+        var userId = int.Parse(ctx.User.FindFirst("sub")!.Value);
+
+        // Chiama il service che fa la query al DB
+        var ordini = await svc.GetOrdiniByUserAsync(userId);
+
+        // Restituisce JSON automaticamente
+        return Results.Ok(ordini);
+    })
+    .RequireAuthorization("Authenticated");  // GATE: solo utenti loggati
+}
+```
+
+### Pattern: Middleware Pipeline ASP.NET Core
+
+```csharp
+// backend/FilmAPI/Program.cs
+// Pattern: pipeline middleware con configurazione
+
+var builder = WebApplication.CreateBuilder(args);
+
+// 1. REGISTRAZIONE SERVIZI (Dependency Injection)
+builder.Services.AddDbContext<FilmDbContext>(options =>
+    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+
+builder.Services.AddScoped<IFilmService, FilmService>();      // Nuova istanza per richiesta
+builder.Services.AddScoped<ICheckoutService, CheckoutService>();
+builder.Services.AddHostedService<ExpiredHoldCleanupService>(); // Background service
+
+// 2. AUTENTICAZIONE JWT
+builder.Services.AddAuthentication().AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(secretKey),
+        ValidateLifetime = true,           // Scadenza token
+        ClockSkew = TimeSpan.Zero          // Nessun margine
+    };
+});
+
+// 3. AUTORIZZAZIONE RBAC
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("Authenticated", p => p.RequireAuthenticatedUser());
+    options.AddPolicy("AdminOnly", p => p.RequireRole("Admin"));
+    options.AddPolicy("PowerUserOrAdmin", p => p.RequireRole("PowerUser", "Admin"));
+});
+
+var app = builder.Build();
+
+// 4. MIDDLEWARE PIPELINE (ordine IMPORTANTE)
+app.UseCors();              // 1. Permetti richieste cross-origin
+app.UseAuthentication();    // 2. Chi sei? (legge JWT)
+app.UseAuthorization();     // 3. Cosa puoi fare? (RBAC)
+
+// 4. MAPPATURA ENDPOINT
+app.MapAuthEndpoints();
+app.MapCheckoutEndpoints();
+app.MapProgrammazioneEndpoints();
+
+app.Run();
+```
+
 ## Design System Ferrari-inspired
 
 ### Palette Colori

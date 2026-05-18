@@ -1,3 +1,16 @@
+// ============================================================================
+// PROGRAM.CS — PUNTO DI INGRESSO DELL'APPLICAZIONE
+// ============================================================================
+// Questo file è il cuore dell'applicazione ASP.NET Core.
+// Qui avviene:
+//   1. Caricamento configurazione (file .env)
+//   2. Registrazione di tutti i servizi (Dependency Injection)
+//   3. Configurazione autenticazione JWT e autorizzazione RBAC
+//   4. Configurazione CORS, Swagger, Middleware
+//   5. Mappatura di tutti gli endpoint REST
+//   6. Avvio dell'applicazione
+// ============================================================================
+
 using DotNetEnv;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore;
@@ -9,8 +22,13 @@ using FilmAPI.Data;
 using FilmAPI.Endpoints;
 using FilmAPI.Services;
 
+// ─── CONFIGURAZIONE INIZIALE ────────────────────────────────────────────────
+// Imposta la licenza Community per QuestPDF (libreria per generazione PDF)
 QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
 
+// ─── CARICAMENTO FILE .ENV ──────────────────────────────────────────────────
+// Cerca il file .env in diverse posizioni possibili dell'albero del progetto
+// (dalla cartella backend/, dalla radice, o dalla current directory)
 var envCandidates = new[]
 {
     Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", ".env")),
@@ -21,20 +39,27 @@ var envCandidates = new[]
 var backendEnvPath = envCandidates.FirstOrDefault(File.Exists);
 if (!string.IsNullOrWhiteSpace(backendEnvPath))
 {
-    Env.Load(backendEnvPath);
+    Env.Load(backendEnvPath);                       // Carica il .env trovato
 }
 else
 {
-    Env.Load();
+    Env.Load();                                     // Fallback: cerca .env nella directory corrente
 }
 
+// ─── BUILDER: INIZIO CONFIGURAZIONE ─────────────────────────────────────────
 var builder = WebApplication.CreateBuilder(args);
 
+// === SERVIZI DI CONFIGURAZIONE RUNTIME ===
+// FrontendRuntimeConfig è un record che espone la Stripe publishable key
+// al frontend tramite GET /config/frontend
 builder.Services.AddSingleton(new FrontendRuntimeConfig(
     Environment.GetEnvironmentVariable("STRIPE_PUBLISHABLE_API_KEY")
     ?? Environment.GetEnvironmentVariable("STRIPE_PUBLISHABLE_KEY")
     ?? string.Empty));
 
+// === CONFIGURAZIONE DATABASE MySQL ===
+// Legge i parametri di connessione da variabili d'ambiente
+// (caricate dal file .env) con valori di default per sviluppo locale
 var dbHost = Environment.GetEnvironmentVariable("DB_HOST") ?? "localhost";
 var dbPort = Environment.GetEnvironmentVariable("DB_PORT") ?? "3306";
 var dbName = Environment.GetEnvironmentVariable("DB_NAME") ?? "film-api-db";
@@ -44,11 +69,14 @@ var dbUseAutoDetect = (Environment.GetEnvironmentVariable("DB_USE_AUTODETECT") ?
     .Equals("true", StringComparison.OrdinalIgnoreCase);
 var dbServerVersion = Environment.GetEnvironmentVariable("DB_SERVER_VERSION") ?? "10.11.0-mariadb";
 
+// Costruisce la connection string per MySQL
 var connectionString = $"Server={dbHost};Port={dbPort};Database={dbName};User Id={dbUser};Password={dbPassword};";
 var serverVersion = dbUseAutoDetect
-    ? ServerVersion.AutoDetect(connectionString)
-    : ServerVersion.Parse(dbServerVersion);
+    ? ServerVersion.AutoDetect(connectionString)    // Rileva automaticamente versione MySQL
+    : ServerVersion.Parse(dbServerVersion);          // Usa versione specificata
 
+// Registra il DbContext nel container DI
+// FilmDbContext è la classe che mappa le entità C# alle tabelle MySQL
 builder.Services.AddDbContext<FilmDbContext>(
     dbContextOptions => dbContextOptions
         .UseMySql(connectionString, serverVersion)
@@ -57,6 +85,11 @@ builder.Services.AddDbContext<FilmDbContext>(
         .EnableDetailedErrors()
 );
 
+// === REGISTRAZIONE SERVIZI (Dependency Injection) ===
+// AddScoped = una nuova istanza per ogni richiesta HTTP
+// AddSingleton = una sola istanza per tutta l'applicazione
+// AddHostedService = servizio in background (esecuzione periodica)
+// AddHttpClient = client HTTP per chiamate a servizi esterni (TMDB)
 builder.Services.AddScoped<IAccountTokenService, AccountTokenService>();
 builder.Services.AddScoped<IAccountEmailService, AccountEmailService>();
 builder.Services.AddScoped<IUserSecurityAuditService, UserSecurityAuditService>();
@@ -83,12 +116,15 @@ builder.Services.AddScoped<IValidazioneBigliettoService, ValidazioneBigliettoSer
 builder.Services.AddScoped<IStripePaymentGateway, StripePaymentGateway>();
 builder.Services.AddScoped<IPagamentoService, PagamentoService>();
 builder.Services.AddHttpClient<ITmdbService, TmdbService>();
-builder.Services.AddHostedService<RefreshTokenCleanupService>();
-builder.Services.AddHostedService<ExpiredHoldCleanupService>();
+builder.Services.AddHostedService<RefreshTokenCleanupService>();     // Pulisce i refresh token scaduti
+builder.Services.AddHostedService<ExpiredHoldCleanupService>();      // Pulisce gli hold posti scaduti
 
+// === SWAGGER / OPENAPI ===
 builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
 
+// === CORS (Cross-Origin Resource Sharing) ===
+// Permette al frontend (porta 5001) di chiamare il backend (porta 5000)
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowCineBaseFrontend", policy =>
@@ -101,6 +137,11 @@ builder.Services.AddCors(options =>
     });
 });
 
+// === AUTORIZZAZIONE RBAC (Role-Based Access Control) ===
+// Definisce 3 policy basate sul claim "role" del JWT:
+// - AdminOnly: solo utenti con ruolo Admin
+// - PowerUserOrAdmin: PowerUser e Admin
+// - Authenticated: qualsiasi utente loggato
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("AdminOnly", policy =>
@@ -120,17 +161,24 @@ builder.Services.AddOpenApiDocument(config =>
     config.Version = "v1";
 });
 
+// === CONFIGURAZIONE JWT (JSON Web Token) ===
+// Legge la chiave segreta e i parametri del token dal .env
 var jwtSecret = Environment.GetEnvironmentVariable("JWT_SECRET") ?? "SuperSecretKeyForCineBaseJWTAuth2026!";
 var jwtIssuer = Environment.GetEnvironmentVariable("JWT_ISSUER") ?? "CineBaseAPI";
 var jwtAudience = Environment.GetEnvironmentVariable("JWT_AUDIENCE") ?? "CineBaseWeb";
 
 builder.Services.AddAuthentication(options =>
 {
+    // Imposta JWT Bearer come schema di autenticazione predefinito
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 })
 .AddJwtBearer(options =>
 {
+    // Parametri di validazione del token:
+    // - Verifica che il token sia firmato con la chiave segreta
+    // - Verifica che issuer e audience corrispondano
+    // - Verifica che il token non sia scaduto (ValidateLifetime)
     options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuer = true,
@@ -142,6 +190,8 @@ builder.Services.AddAuthentication(options =>
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecret)),
         RoleClaimType = "role"
     };
+    // Evento: quando il token viene validato, copia il claim "role"
+    // nel formato standard ClaimTypes.Role per l'autorizzazione
     options.Events = new JwtBearerEvents
     {
         OnTokenValidated = context =>
@@ -160,9 +210,12 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-// ─── OAuth Social Login ──────────────────────────────────────────────
+// ─── SOCIAL LOGIN (OAUTH) ───────────────────────────────────────────────────
+// Configura i provider OAuth esterni se le credenziali sono presenti nel .env
+// Supporta: Google, Facebook, Microsoft
 var frontendBaseUrl = Environment.GetEnvironmentVariable("FRONTEND_BASE_URL") ?? "http://localhost:5001";
 
+// Google OAuth
 var googleClientId = Environment.GetEnvironmentVariable("GOOGLE_CLIENT_ID");
 var googleClientSecret = Environment.GetEnvironmentVariable("GOOGLE_CLIENT_SECRET");
 if (!string.IsNullOrEmpty(googleClientId))
@@ -185,6 +238,7 @@ if (!string.IsNullOrEmpty(googleClientId))
         };
     });
 
+// Facebook OAuth
 var fbAppId = Environment.GetEnvironmentVariable("FACEBOOK_APP_ID");
 var fbAppSecret = Environment.GetEnvironmentVariable("FACEBOOK_APP_SECRET");
 if (!string.IsNullOrEmpty(fbAppId))
@@ -207,6 +261,7 @@ if (!string.IsNullOrEmpty(fbAppId))
         };
     });
 
+// Microsoft OAuth (con supporto tenant specifico per Azure AD)
 var msClientId = Environment.GetEnvironmentVariable("MICROSOFT_CLIENT_ID");
 var msClientSecret = Environment.GetEnvironmentVariable("MICROSOFT_CLIENT_SECRET");
 var msTenantId = Environment.GetEnvironmentVariable("MICROSOFT_TENANT_ID") ?? "organizations";
@@ -243,14 +298,23 @@ if (!string.IsNullOrEmpty(msClientId))
 else
     Console.WriteLine("[STARTUP] Microsoft Auth: DISABLED (no MICROSOFT_CLIENT_ID)");
 
+// === COSTRUZIONE APPLICAZIONE ===
 var app = builder.Build();
 
+// ─── MIDDLEWARE PIPELINE (ORDINE IMPORTANTE!) ───────────────────────────────
+// L'ordine dei middleware è fondamentale:
+// 1. CORS        → permette richieste cross-origin
+// 2. RateLimiter → limita il numero di richieste (antiflood)
+// 3. Authentication → legge il JWT e identifica l'utente
+// 4. Authorization  → controlla i permessi (RBAC)
+// 5. StaticFiles    → serve i file statici (frontend)
 app.UseCors("AllowCineBaseFrontend");
 app.UseMiddleware<FilmAPI.Middleware.RateLimiterMiddleware>();
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseStaticFiles();
 
+// === SWAGGER (solo in sviluppo) ===
 if (app.Environment.IsDevelopment())
 {
     app.UseOpenApi();
@@ -263,6 +327,9 @@ if (app.Environment.IsDevelopment())
     });
 }
 
+// ─── MAPPATURA ENDPOINT ─────────────────────────────────────────────────────
+// Ogni gruppo di endpoint viene mappato a un percorso specifico
+// Esempio: app.MapAuthEndpoints() mappa /auth/register, /auth/login, etc.
 app.MapRegistiEndpoints();
 app.MapFilmsEndpoints();
 app.MapCinemasEndpoints();
@@ -293,18 +360,22 @@ app.MapWatchlistEndpoints();
 app.MapRecommendationsEndpoints();
 app.MapNotificheEndpoints();
 
+// Endpoint pubblico: espone la publishable key di Stripe al frontend
+// (necessario per inizializzare Stripe.js senza hardcodare la chiave)
 app.MapGet("/config/frontend", (FrontendRuntimeConfig config) => Results.Ok(new
 {
     stripePublishableKey = config.StripePublishableKey
 })).AllowAnonymous();
 
+// ─── MIGRATION E SEED ALL'AVVIO ─────────────────────────────────────────────
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<FilmDbContext>();
     
-    // Applica migration automaticamente
+    // Applica migration automaticamente all'avvio (sviluppo)
     try { context.Database.Migrate(); } catch (Exception ex) { Console.WriteLine($"[STARTUP] Migration skipped: {ex.Message}"); }
     
+    // Esegue il seed dei dati di sviluppo
     try
     {
         var seeder = new DataSeeder(context);
@@ -317,8 +388,12 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
+// ─── AVVIO APPLICAZIONE ────────────────────────────────────────────────────
 app.Run();
 
+// Classe necessaria per i test di integrazione (xUnit)
 public partial class Program;
 
+// Record per la configurazione runtime esposta al frontend
+// Attualmente contiene solo StripePublishableKey
 public sealed record FrontendRuntimeConfig(string StripePublishableKey);

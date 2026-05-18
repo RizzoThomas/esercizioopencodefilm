@@ -81,60 +81,47 @@ graph TB
 ```mermaid
 sequenceDiagram
     participant U as Utente
-    participant F as Frontend
-    participant B as Backend
-    participant S as Stripe
-    participant DB as Database
+    participant FE as Frontend
+    participant API as Backend
+    participant STR as Stripe
 
-    U->>F: Apre pagamento.html?orderId=X
-    F->>B: GET /checkout/orders/{orderId}
-    F->>B: GET /credito/me
-    F->>B: GET /config/frontend
+    U->>FE: Apre pagamento.html?orderId=X
+    FE->>API: GET ordine + credito + config
+    API-->>FE: Dati riepilogo
+    FE->>U: Mostra opzioni pagamento
 
-    F->>F: Render riepilogo ordine
-    F->>F: Mostra opzioni pagamento
+    U->>FE: Seleziona metodo
 
-    U->>F: Seleziona metodo
-    
-    Alt Metodo: Solo Credito
-        F->>B: POST /checkout/orders/{id}/pay (credito)
-        B->>B: Verifica saldo sufficiente
-        B->>DB: Addebita credito, stato→Paid
-        B->>DB: Emetti biglietti
-        B->>DB: Tenta invio email (best effort)
-        B-->>F: { success: true }
-        F->>U: Redirect a esito.html?success=true
+    Alt Solo credito
+        FE->>API: POST pay (credito)
+        API->>API: Verifica saldo
+        API-->>FE: OK
+        FE->>U: Redirect a esito
 
-    Else Metodo: Solo Carta
-        F->>B: POST /checkout/orders/{id}/stripe-checkout-session
-        B->>DB: Ordine→CheckoutInProgress
-        B->>S: CheckoutSession.create(params)
-        S-->>B: { sessionId, url }
-        B-->>F: { stripeCheckoutUrl }
-        F->>U: Redirect a checkout.stripe.com
-        U->>S: Inserisce dati carta
-        S-->>U: Redirect a esito.html?success=true
-        S->>B: Webhook: checkout.session.completed
-        B->>B: Finalizza ordine, biglietti, email
-        B-->>S: 200 OK
+    Else Carta
+        FE->>API: POST createCheckoutSession
+        API->>STR: Crea sessione Stripe
+        STR-->>API: URL checkout
+        API-->>FE: URL redirect
+        FE->>U: Redirect a Stripe
+        U->>STR: Inserisce carta
+        STR->>U: Redirect a esito
+        STR->>API: Webhook completed
+        API->>API: Finalizza ordine
 
-    Else Metodo: Misto (Credito + Carta)
-        F->>B: Slider: importoCreditoRichiesto
-        F->>B: POST /checkout/orders/{id}/stripe-checkout-session (con credito)
-        B->>DB: Riserva importoCreditoRichiesto
-        B->>S: CheckoutSession.create(importoResiduo)
-        S-->>B: { url }
-        B-->>F: { stripeCheckoutUrl }
-        F->>U: Redirect a Stripe
-        U->>S: Paga importo residuo con carta
-        S->>B: Webhook: checkout.session.completed
-        B->>DB: Addebita credito riservato + finalizza
+    Else Misto
+        FE->>API: Slider: importo credito
+        FE->>API: POST createCheckoutSession
+        API->>API: Riserva credito
+        API->>STR: Crea sessione (importo residuo)
+        STR-->>API: URL
+        API-->>FE: URL redirect
+        FE->>U: Redirect a Stripe
+        U->>STR: Paga residuo
+        STR->>U: Redirect a esito
+        STR->>API: Webhook completed
+        API->>API: Addebita credito + finalizza
     End
-
-    U->>F: esito-acquisto.html
-    F->>B: Polling ogni 3s fino a stato Paid
-    B-->>F: Stato → Paid
-    F->>U: Mostra conferma + download PDF
 ```
 
 ---
@@ -201,3 +188,96 @@ stateDiagram-v2
 | Concorrenza pagamenti | Lock d'ordine impedisce pagamenti concorrenti |
 | Webhook duplicati | Idempotenza sull'evento Stripe (event ID) |
 | Back button da Stripe | Riconciliazione automatica, se ancora CheckoutInProgress → cancella ordine |
+
+---
+
+## Blocchi di Codice Commentati
+
+### Gestione Webhook Stripe (idempotenza)
+
+```csharp
+// backend/FilmAPI/Services/PagamentoService.cs
+// Pattern: gestione webhook con idempotenza
+// Stripe invia lo stesso evento più volte; il codice deve gestirlo in modo sicuro.
+
+public async Task HandleStripeWebhookAsync(string jsonBody, string stripeSignature)
+{
+    // 1. Verifica che il webhook sia autentico (firmato da Stripe)
+    var stripeEvent = _stripeGateway.ConstructWebhookEvent(jsonBody, stripeSignature);
+
+    // 2. Route per tipo evento
+    switch (stripeEvent.Type)
+    {
+        case EventTypes.CheckoutSessionCompleted:
+            // Pagamento riuscito: finalizza ordine
+            var session = stripeEvent.Data.Object as Session;
+            await HandleCheckoutCompletedAsync(session.Id);
+            break;
+
+        case EventTypes.CheckoutSessionExpired:
+            // Sessione scaduta: rilascia posti e credito
+            var expiredSession = stripeEvent.Data.Object as Session;
+            await HandleCheckoutExpiredAsync(expiredSession.Id);
+            break;
+    }
+}
+
+private async Task HandleCheckoutCompletedAsync(string sessionId)
+{
+    // Cerca ordine per StripeCheckoutSessionId
+    var ordine = await _db.Ordini.FirstOrDefaultAsync(o =>
+        o.StripeCheckoutSessionId == sessionId);
+
+    if (ordine == null) return;  // Evento non nostro, ignora
+
+    // IDEMPOTENZA: se già Paid, non fare nulla
+    if (ordine.Stato == OrdineState.Paid) return;
+
+    // Addebita credito riservato (se pagamento misto)
+    if (ordine.CreditoRiservato > 0)
+        await _creditoService.DebitaCreditoAsync(ordine.UserId,
+            ordine.CreditoRiservato, ordine.Id);
+
+    // Finalizza: stato Paid, biglietti, email
+    ordine.Stato = OrdineState.Paid;
+    ordine.PaidAtUtc = DateTime.UtcNow;
+    await _bigliettoService.EmittiBigliettiAsync(ordine.Id);
+    await _emailService.InviaTicketEmailAsync(ordine); // best-effort
+
+    await _db.SaveChangesAsync();
+}
+```
+
+### Servizio Credito con Audit Trail
+
+```csharp
+// backend/FilmAPI/Services/CreditoService.cs
+// Pattern: ogni movimento di credito viene tracciato con audit
+
+public async Task<decimal> ReserveOrderCreditAsync(int userId, decimal importo, int ordineId)
+{
+    var user = await _db.Users.FindAsync(userId);
+
+    if (user.CreditoResiduo < importo)
+        throw new BadRequestException("Credito insufficiente");
+
+    // Riserva: scaliamo subito il credito
+    user.CreditoResiduo -= importo;
+
+    // Audit: registriamo il movimento
+    _db.MovimentiCredito.Add(new MovimentoCredito
+    {
+        UserId = userId,
+        Tipo = MovimentoCreditoTipo.DebitOrder,
+        Importo = importo,
+        SaldoPre = user.CreditoResiduo + importo,  // saldo prima
+        SaldoPost = user.CreditoResiduo,             // saldo dopo
+        OrdineId = ordineId,
+        CreatedAtUtc = DateTime.UtcNow,
+        Note = $"Riservato per ordine #{ordineId}"
+    });
+
+    await _db.SaveChangesAsync();
+    return user.CreditoResiduo;
+}
+```

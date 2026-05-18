@@ -1,23 +1,52 @@
+// ============================================================================
+// auth.js — GESTIONE AUTENTICAZIONE LATO FRONTEND
+// ============================================================================
+// Oggetto globale Auth che gestisce:
+//   - Salvataggio/caricamento token JWT in localStorage
+//   - Generazione e gestione DeviceId (per refresh token device-aware)
+//   - Decodifica JWT (parseJwt) per leggere ruolo e scadenza
+//   - Login/Register/Refresh/Logout API calls
+//   - Parsing del ruolo per RBAC frontend
+//
+// I token JWT sono salvati in localStorage con chiavi cb_access_token
+// e cb_refresh_token. Il DeviceId è in cb_device_id.
+// ============================================================================
+
 const Auth = {
+  // Chiavi localStorage per persistenza dei token
   STORAGE_KEYS: {
-    ACCESS_TOKEN: 'cb_access_token',
-    REFRESH_TOKEN: 'cb_refresh_token',
-    USER: 'cb_user',
-    DEVICE_ID: 'cb_device_id'
+    ACCESS_TOKEN: 'cb_access_token',     // JWT access token
+    REFRESH_TOKEN: 'cb_refresh_token',   // Refresh token (long-lived)
+    USER: 'cb_user',                      // Info utente (JSON)
+    DEVICE_ID: 'cb_device_id'            // Identificatore univoco dispositivo
   },
 
+  // Legge l'access token dal localStorage
   getAccessToken() {
     return localStorage.getItem(this.STORAGE_KEYS.ACCESS_TOKEN);
   },
 
+  // Legge il refresh token dal localStorage
   getRefreshToken() {
     return localStorage.getItem(this.STORAGE_KEYS.REFRESH_TOKEN);
   },
 
+  // ====================================================================
+  // getOrCreateDeviceId
+  // Genera o recupera un identificatore univoco per il dispositivo.
+  // Questo ID viene inviato al backend durante login/refresh/logout
+  // per vincolare il refresh token al dispositivo (device-aware auth).
+  //
+  // Strategia:
+  //   1. Se già esiste in localStorage → lo riusa
+  //   2. Se c'è un refresh token legacy → usa 'web-default'
+  //   3. Altrimenti → genera UUID con crypto.randomUUID()
+  // ====================================================================
   getOrCreateDeviceId() {
     let deviceId = localStorage.getItem(this.STORAGE_KEYS.DEVICE_ID);
     if (deviceId) return deviceId;
 
+    // Compatibilità legacy: utenti già registrati prima del device-aware auth
     const hasLegacyRefreshToken = !!this.getRefreshToken();
     if (hasLegacyRefreshToken) {
       deviceId = 'web-default';
@@ -25,6 +54,7 @@ const Auth = {
       return deviceId;
     }
 
+    // Genera UUID v4 usando l'API nativa del browser (fallback manuale)
     if (window.crypto?.randomUUID) {
       deviceId = window.crypto.randomUUID();
     } else {
@@ -35,47 +65,53 @@ const Auth = {
     return deviceId;
   },
 
+  // Salva access token e refresh token in localStorage
   saveTokens(accessToken, refreshToken) {
     localStorage.setItem(this.STORAGE_KEYS.ACCESS_TOKEN, accessToken);
     localStorage.setItem(this.STORAGE_KEYS.REFRESH_TOKEN, refreshToken);
   },
 
+  // Salva i dati dell'utente (nome, cognome, ruolo, etc.)
   saveUser(user) {
     localStorage.setItem(this.STORAGE_KEYS.USER, JSON.stringify(user));
   },
 
+  // Pulisce TUTTI i dati di autenticazione (logout)
   clearAuth() {
     localStorage.removeItem(this.STORAGE_KEYS.ACCESS_TOKEN);
     localStorage.removeItem(this.STORAGE_KEYS.REFRESH_TOKEN);
     localStorage.removeItem(this.STORAGE_KEYS.USER);
   },
 
+  // Recupera i dati utente salvati
   getUser() {
     const userStr = localStorage.getItem(this.STORAGE_KEYS.USER);
     if (!userStr) return null;
-    try {
-      return JSON.parse(userStr);
-    } catch {
-      return null;
-    }
+    try { return JSON.parse(userStr); } catch { return null; }
   },
 
+  // ====================================================================
+  // isLoggedIn
+  // Verifica se l'utente è autenticato controllando:
+  //   1. Che esista un access token
+  //   2. Che il JWT sia decodificabile
+  //   3. Che NON sia scaduto (exp > now)
+  // NOTA: non verifica la firma (quella la fa il backend)
+  // ====================================================================
   isLoggedIn() {
     const token = this.getAccessToken();
-    if (!token) { console.log('[auth] isLoggedIn: nessun token'); return false; }
+    if (!token) return false;
     try {
       const payload = this.parseJwt(token);
-      if (!payload) { console.log('[auth] isLoggedIn: parseJwt fallito'); return false; }
+      if (!payload) return false;
       const now = Math.ceil(Date.now() / 1000);
-      const valid = payload.exp > now;
-      console.log('[auth] isLoggedIn: exp=' + payload.exp + ' now=' + now + ' valid=' + valid + ' sub=' + payload.sub);
-      return valid;
+      return payload.exp > now;  // Confronta timestamp UNIX
     } catch (e) {
-      console.log('[auth] isLoggedIn: errore parse', e);
       return false;
     }
   },
 
+  // Legge il ruolo dell'utente dal JWT o dai dati salvati
   getUserRole() {
     const user = this.getUser();
     if (user?.ruolo != null) return user.ruolo;
@@ -85,9 +121,15 @@ const Auth = {
     return payload?.role || null;
   },
 
+  // ====================================================================
+  // parseJwt
+  // Decodifica un JWT senza verificare la firma (lato client).
+  // Estrae il payload (seconda parte del JWT, tra i due punti).
+  // Usato per leggere: exp, role, sub, email dal token.
+  // ====================================================================
   parseJwt(token) {
     try {
-      const base64Url = token.split('.')[1];
+      const base64Url = token.split('.')[1];  // Il payload è la seconda parte
       if (!base64Url) return null;
       const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
       const jsonPayload = decodeURIComponent(
