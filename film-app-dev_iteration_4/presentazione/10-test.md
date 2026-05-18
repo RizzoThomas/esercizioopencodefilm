@@ -179,18 +179,3 @@ public async Task H7_Pagamento_Misto_Credito_Riservato_E_Carta_Stripe() {
 | `dotnet test ... -v n` | Output dettagliato |
 | `dotnet test ... --filter "CH16"` | Esegue test specifico |
 | `dotnet test ... -p:CollectCoverage=true` | Con copertura codice |
-
-Output atteso:
-
-```
-Test run for FilmAPI.Tests.dll (.NETCoreApp,Version=v8.0)
-Starting test execution, please wait...
-A total of 231 test files matched the specified pattern.
-[x] PASS  ApiIntegrationTests.R10 ...
-[x] PASS  CheckoutIntegrationTests.CH16 ...
-...
-Test Run Successful.
-Total tests: 231
-     Passed: 231
- Total time: 45.2s
-```
