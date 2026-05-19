@@ -745,6 +745,7 @@ function goToSchedaFilm(filmId) {
 
 
 // Cinema Modal
+// Funzione setupCinemaModal: descrive l'azione eseguita, i parametri in ingresso e il valore restituito.
 function setupCinemaModal() {
   // Variabile modal: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const modal = document.getElementById('cinema-modal');
@@ -968,6 +969,7 @@ window.goToSchedaFilm = goToSchedaFilm;
 window.selectCinema = selectCinema;
 
 // Update navbar when cinema changes
+// Listener evento: si attiva quando scatta l'evento e aggiorna UI o stato.
 window.addEventListener('cinema:changed', (e) => {
   selectedCinemaId = e.detail?.cinemaId ?? selectedCinemaId;
   renderCinemaHeader();

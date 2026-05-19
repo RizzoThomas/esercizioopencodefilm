@@ -1,5 +1,6 @@
 // My Cinemas Page JavaScript
 
+// Funzione getAuthSafe: descrive l'azione eseguita, i parametri in ingresso e il valore restituito.
 function getAuthSafe() {
   return typeof window !== 'undefined' && window.Auth ? window.Auth : null;
 }
@@ -62,6 +63,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 // Cinema List View
+// Funzione loadCinemaList: descrive l'azione eseguita, i parametri in ingresso e il valore restituito.
 async function loadCinemaList() {
   showLoading();
 
@@ -142,6 +144,7 @@ function goToCinemaDetail(id) {
 }
 
 // Cinema Detail View
+// Funzione loadCinemaDetail: descrive l'azione eseguita, i parametri in ingresso e il valore restituito.
 async function loadCinemaDetail() {
   showLoading();
 
@@ -478,6 +481,7 @@ function getTipoSalaClass(tipoSala) {
 }
 
 // Utilities
+// Funzione showLoading: descrive l'azione eseguita, i parametri in ingresso e il valore restituito.
 function showLoading() {
   // Variabile loading: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const loading = document.getElementById('loading-state');
@@ -597,6 +601,7 @@ function openCinemaMap(cinemaId) {
           mapLng = parseFloat(data[0].lon);
         } else {
           // Try just the city
+// Chiamata API: contatta l'endpoint indicato, invia i dati richiesti e legge la risposta.
           const resp2 = await fetch(
             `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(cinemaCitta + ', Italia')}&limit=1`
           );
@@ -714,6 +719,7 @@ function toggleAccessibilityFilter(type) {
 }
 
 // Show accessibility filters when schedule is loaded
+// Funzione showAccessibilityFilters: descrive l'azione eseguita, i parametri in ingresso e il valore restituito.
 function showAccessibilityFilters() {
   // Variabile filterBar: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const filterBar = document.getElementById('accessibility-filters');

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 
@@ -6,10 +6,17 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace FilmAPI.Migrations
 {
-    /// <inheritdoc />
+    /// <summary>
+    ///     Aggiunge le tabelle per ExternalLogin (Google/Microsoft auth) e UserSecurityAuditLog. Include gli indici per ricerca efficiente per userId e provider.
+    /// </summary>
+    /// <summary>
+    /// Migrazione che rafforza la sicurezza account: aggiunge campi di stato e audit, crea le tabelle per token, login esterni e log, e aggiorna i dati esistenti.
+    /// </summary>
     public partial class AddAccountSecurityAndExternalLogins : Migration
     {
-        /// <inheritdoc />
+        /// <summary>
+    ///     Aggiunge le tabelle per ExternalLogin (Google/Microsoft auth) e UserSecurityAuditLog. Include gli indici per ricerca efficiente per userId e provider.
+    /// </summary>
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AlterColumn<string>(
@@ -339,7 +346,9 @@ namespace FilmAPI.Migrations
                 columns: new[] { "UserId", "CreatedAtUtc" });
         }
 
-        /// <inheritdoc />
+        /// <summary>
+    ///     Aggiunge le tabelle per ExternalLogin (Google/Microsoft auth) e UserSecurityAuditLog. Include gli indici per ricerca efficiente per userId e provider.
+    /// </summary>
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(

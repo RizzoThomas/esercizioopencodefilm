@@ -138,6 +138,9 @@ public static class WatchlistEndpoints
 /// <summary>
 /// Rappresenta un film salvato nella watchlist dell'utente.
 /// </summary>
+/// <summary>
+/// Rappresenta un film salvato nella watchlist dell'utente.
+/// </summary>
 public class WatchlistFilmDTO
 {
     public int Id { get; set; }

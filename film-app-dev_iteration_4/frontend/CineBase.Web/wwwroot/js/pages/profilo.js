@@ -729,6 +729,7 @@ function getStatoBadge(stato) {
 }
 
 // --- Top-up (ricarica credito) ---
+// Funzione reconcileTopup: descrive l'azione eseguita, i parametri in ingresso e il valore restituito.
 async function reconcileTopup(sessionId) {
   try {
     await API.reconcileTopup(sessionId);
@@ -872,6 +873,7 @@ window.submitSetPasswordRequest = submitSetPasswordRequest;
 
 // ─── Account Security (Iteration 5) ────────────────────────────────
 
+// Funzione loadAccountSecurity: descrive l'azione eseguita, i parametri in ingresso e il valore restituito.
 async function loadAccountSecurity() {
   // Variabile container: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   var container = document.getElementById('account-security-content');

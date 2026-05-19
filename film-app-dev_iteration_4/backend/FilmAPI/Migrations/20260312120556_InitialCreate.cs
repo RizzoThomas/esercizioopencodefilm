@@ -7,6 +7,9 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace FilmAPI.Migrations
 {
     /// <inheritdoc />
+    /// <summary>
+    /// Migrazione iniziale che crea le tabelle base del catalogo, delle sale, dei film e delle proiezioni, con i relativi indici e vincoli.
+    /// </summary>
     public partial class InitialCreate : Migration
     {
         /// <inheritdoc />

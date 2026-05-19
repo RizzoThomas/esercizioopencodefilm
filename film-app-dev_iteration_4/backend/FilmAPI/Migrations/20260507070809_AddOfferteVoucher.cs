@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 
@@ -6,10 +6,17 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace FilmAPI.Migrations
 {
-    /// <inheritdoc />
+    /// <summary>
+    ///     Aggiunge le tabelle Offerte e Vouchers per la gestione di promozioni e sconti. Le offerte possono essere legate a cinema, film o periodi specifici.
+    /// </summary>
+    /// <summary>
+    /// Migrazione che introduce le tabelle Offerte e Vouchers con i relativi indici di unicità e ricerca.
+    /// </summary>
     public partial class AddOfferteVoucher : Migration
     {
-        /// <inheritdoc />
+        /// <summary>
+    ///     Aggiunge le tabelle Offerte e Vouchers per la gestione di promozioni e sconti. Le offerte possono essere legate a cinema, film o periodi specifici.
+    /// </summary>
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
@@ -75,7 +82,9 @@ namespace FilmAPI.Migrations
                 column: "UserId");
         }
 
-        /// <inheritdoc />
+        /// <summary>
+    ///     Aggiunge le tabelle Offerte e Vouchers per la gestione di promozioni e sconti. Le offerte possono essere legate a cinema, film o periodi specifici.
+    /// </summary>
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(

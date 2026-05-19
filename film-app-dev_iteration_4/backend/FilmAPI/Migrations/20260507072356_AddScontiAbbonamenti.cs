@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 
@@ -6,10 +6,17 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace FilmAPI.Migrations
 {
-    /// <inheritdoc />
+    /// <summary>
+    ///     Aggiunge la tabella ScontiAbbonamenti per gestire scontistiche specifiche sugli abbonamenti. Include percentuali, date validità e tipologia abbonamento.
+    /// </summary>
+    /// <summary>
+    /// Migrazione che aggiunge campi promozionali alle offerte e crea la tabella Abbonamenti con i relativi dati di supporto.
+    /// </summary>
     public partial class AddScontiAbbonamenti : Migration
     {
-        /// <inheritdoc />
+        /// <summary>
+    ///     Aggiunge la tabella ScontiAbbonamenti per gestire scontistiche specifiche sugli abbonamenti. Include percentuali, date validità e tipologia abbonamento.
+    /// </summary>
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<bool>(
@@ -59,7 +66,9 @@ namespace FilmAPI.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
         }
 
-        /// <inheritdoc />
+        /// <summary>
+    ///     Aggiunge la tabella ScontiAbbonamenti per gestire scontistiche specifiche sugli abbonamenti. Include percentuali, date validità e tipologia abbonamento.
+    /// </summary>
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(

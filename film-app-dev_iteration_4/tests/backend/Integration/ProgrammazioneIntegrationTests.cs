@@ -5,6 +5,7 @@ using FilmAPI.Model;
 
 namespace FilmAPI.Tests.Integration;
 
+/// <summary>Suite di test per ProgrammazioneIntegrationTests.</summary>
 public class ProgrammazioneIntegrationTests : IClassFixture<CustomWebApplicationFactory>
 {
     private readonly CustomWebApplicationFactory _factory;
@@ -14,6 +15,7 @@ public class ProgrammazioneIntegrationTests : IClassFixture<CustomWebApplication
         _factory = factory;
     }
 
+    /// <summary>Verifica lo scenario di PG1_GetProgrammazioneFilms_ReturnsEmptyList: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task PG1_GetProgrammazioneFilms_ReturnsEmptyList()
     {
@@ -28,6 +30,7 @@ public class ProgrammazioneIntegrationTests : IClassFixture<CustomWebApplication
         Assert.Empty(payload.Items);
     }
 
+    /// <summary>Verifica lo scenario di PG2_GetProgrammazioneFilms_TabEvidenza_ReturnsFilmsWithShows: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task PG2_GetProgrammazioneFilms_TabEvidenza_ReturnsFilmsWithShows()
     {
@@ -43,6 +46,7 @@ public class ProgrammazioneIntegrationTests : IClassFixture<CustomWebApplication
         Assert.All(payload.Items, f => Assert.True(f.ShowCountNext7Days > 0));
     }
 
+    /// <summary>Verifica lo scenario di PG3_GetProgrammazioneFilms_TabUscita_ReturnsUpcomingFilms: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task PG3_GetProgrammazioneFilms_TabUscita_ReturnsUpcomingFilms()
     {
@@ -59,6 +63,7 @@ public class ProgrammazioneIntegrationTests : IClassFixture<CustomWebApplication
         Assert.All(payload.Items, f => Assert.True(f.InUscita));
     }
 
+    /// <summary>Verifica lo scenario di PG3B_GetProgrammazioneFilms_TabUscita_ExcludesFilmsWithShowsToday: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task PG3B_GetProgrammazioneFilms_TabUscita_ExcludesFilmsWithShowsToday()
     {
@@ -73,6 +78,7 @@ public class ProgrammazioneIntegrationTests : IClassFixture<CustomWebApplication
         Assert.Empty(payload.Items);
     }
 
+    /// <summary>Verifica lo scenario di PG3C_GetProgrammazioneFilms_TabUscita_WithCinemaId_ExcludesFilmsAlreadyAvailableInSelectedCinema: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task PG3C_GetProgrammazioneFilms_TabUscita_WithCinemaId_ExcludesFilmsAlreadyAvailableInSelectedCinema()
     {
@@ -87,6 +93,7 @@ public class ProgrammazioneIntegrationTests : IClassFixture<CustomWebApplication
         Assert.Empty(payload.Items);
     }
 
+    /// <summary>Verifica lo scenario di PG4_GetProgrammazioneFilms_TabTutti_ReturnsAllRelevantFilms: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task PG4_GetProgrammazioneFilms_TabTutti_ReturnsAllRelevantFilms()
     {
@@ -101,6 +108,7 @@ public class ProgrammazioneIntegrationTests : IClassFixture<CustomWebApplication
         Assert.NotEmpty(payload.Items);
     }
 
+    /// <summary>Verifica lo scenario di PG5_GetProgrammazioneFilms_SearchByTitle_ReturnsMatchingFilms: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task PG5_GetProgrammazioneFilms_SearchByTitle_ReturnsMatchingFilms()
     {
@@ -115,6 +123,7 @@ public class ProgrammazioneIntegrationTests : IClassFixture<CustomWebApplication
         Assert.All(payload.Items, f => Assert.Contains("Avatar", f.Titolo, StringComparison.OrdinalIgnoreCase));
     }
 
+    /// <summary>Verifica lo scenario di PG6_GetProgrammazioneFilms_FilterByCategoria_ReturnsMatchingFilms: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task PG6_GetProgrammazioneFilms_FilterByCategoria_ReturnsMatchingFilms()
     {
@@ -129,6 +138,7 @@ public class ProgrammazioneIntegrationTests : IClassFixture<CustomWebApplication
         Assert.All(payload.Items, f => Assert.Contains(f.Categorie, c => c.Id == SeedDataCategoriaId));
     }
 
+    /// <summary>Verifica lo scenario di PG7_GetProgrammazioneCinemas_WithoutCoords_ReturnsSortedByName: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task PG7_GetProgrammazioneCinemas_WithoutCoords_ReturnsSortedByName()
     {
@@ -144,6 +154,7 @@ public class ProgrammazioneIntegrationTests : IClassFixture<CustomWebApplication
         Assert.Equal("Alpha Cinema", payload[0].Nome);
     }
 
+    /// <summary>Verifica lo scenario di PG8_GetProgrammazioneCinemas_WithCoords_ReturnsSortedByDistance: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task PG8_GetProgrammazioneCinemas_WithCoords_ReturnsSortedByDistance()
     {
@@ -161,6 +172,7 @@ public class ProgrammazioneIntegrationTests : IClassFixture<CustomWebApplication
         Assert.True(payload[1].DistanzaKm <= payload[2].DistanzaKm);
     }
 
+    /// <summary>Verifica lo scenario di PG9_GetFilmScheda_ReturnsFilmWithShowCalendar: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task PG9_GetFilmScheda_ReturnsFilmWithShowCalendar()
     {
@@ -177,6 +189,7 @@ public class ProgrammazioneIntegrationTests : IClassFixture<CustomWebApplication
         Assert.NotEmpty(payload.ShowCalendar);
     }
 
+    /// <summary>Verifica lo scenario di PG10_GetFilmScheda_WithCinemaId_FiltersShowsByCinema: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task PG10_GetFilmScheda_WithCinemaId_FiltersShowsByCinema()
     {
@@ -192,6 +205,7 @@ public class ProgrammazioneIntegrationTests : IClassFixture<CustomWebApplication
         Assert.Equal(1, payload.CinemaSelezionato.Id);
     }
 
+    /// <summary>Verifica lo scenario di PG11_GetFilmScheda_ReturnsNotFound_WhenFilmMissing: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task PG11_GetFilmScheda_ReturnsNotFound_WhenFilmMissing()
     {
@@ -203,6 +217,7 @@ public class ProgrammazioneIntegrationTests : IClassFixture<CustomWebApplication
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
 
+    /// <summary>Verifica lo scenario di PG12_GetMyCinemas_ReturnsAllCinemas: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task PG12_GetMyCinemas_ReturnsAllCinemas()
     {
@@ -218,6 +233,7 @@ public class ProgrammazioneIntegrationTests : IClassFixture<CustomWebApplication
         Assert.NotEmpty(payload[0].TipologieSalePresenti);
     }
 
+    /// <summary>Verifica lo scenario di PG13_GetCinemaSchedule_ReturnsScheduleForDate: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task PG13_GetCinemaSchedule_ReturnsScheduleForDate()
     {
@@ -234,6 +250,7 @@ public class ProgrammazioneIntegrationTests : IClassFixture<CustomWebApplication
         Assert.Equal(today, payload.Data);
     }
 
+    /// <summary>Verifica lo scenario di PG14_GetCinemaSchedule_ReturnsNotFound_WhenCinemaMissing: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task PG14_GetCinemaSchedule_ReturnsNotFound_WhenCinemaMissing()
     {
@@ -245,6 +262,7 @@ public class ProgrammazioneIntegrationTests : IClassFixture<CustomWebApplication
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
 
+    /// <summary>Verifica lo scenario di PG15_GetCinemaPreferito_ReturnsNull_WhenNotSet: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task PG15_GetCinemaPreferito_ReturnsNull_WhenNotSet()
     {
@@ -260,6 +278,7 @@ public class ProgrammazioneIntegrationTests : IClassFixture<CustomWebApplication
         Assert.Null(payload.Cinema);
     }
 
+    /// <summary>Verifica lo scenario di PG16_PutCinemaPreferito_SetsCinema: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task PG16_PutCinemaPreferito_SetsCinema()
     {
@@ -276,6 +295,7 @@ public class ProgrammazioneIntegrationTests : IClassFixture<CustomWebApplication
         Assert.Equal("Cinema Test", payload.Cinema.Nome);
     }
 
+    /// <summary>Verifica lo scenario di PG17_PutCinemaPreferito_ClearsCinema: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task PG17_PutCinemaPreferito_ClearsCinema()
     {
@@ -290,6 +310,7 @@ public class ProgrammazioneIntegrationTests : IClassFixture<CustomWebApplication
         Assert.Null(payload.CinemaId);
     }
 
+    /// <summary>Verifica lo scenario di PG18_PutCinemaPreferito_ReturnsBadRequest_WhenCinemaNotFound: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task PG18_PutCinemaPreferito_ReturnsBadRequest_WhenCinemaNotFound()
     {
@@ -301,6 +322,7 @@ public class ProgrammazioneIntegrationTests : IClassFixture<CustomWebApplication
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
 
+    /// <summary>Verifica lo scenario di PG19_GetProgrammazioneFilms_WithCinemaId_ShowsAvailability: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task PG19_GetProgrammazioneFilms_WithCinemaId_ShowsAvailability()
     {
@@ -317,6 +339,7 @@ public class ProgrammazioneIntegrationTests : IClassFixture<CustomWebApplication
         Assert.True(filmUno.DisponibileNelCinemaSelezionato);
     }
 
+    /// <summary>Verifica lo scenario di PG20_GetProgrammazioneFilms_OrderByShowCount_Evidenza: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task PG20_GetProgrammazioneFilms_OrderByShowCount_Evidenza()
     {
@@ -331,6 +354,7 @@ public class ProgrammazioneIntegrationTests : IClassFixture<CustomWebApplication
         Assert.True(payload.Items[0].ShowCountNext7Days >= payload.Items[payload.Items.Count - 1].ShowCountNext7Days);
     }
 
+    /// <summary>Verifica lo scenario di PG21_GetProgrammazioneFilms_WithPagination_ReturnsPagedResult: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task PG21_GetProgrammazioneFilms_WithPagination_ReturnsPagedResult()
     {

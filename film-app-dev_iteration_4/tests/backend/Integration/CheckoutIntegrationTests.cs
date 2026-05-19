@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FilmAPI.Tests.Integration;
 
+/// <summary>Suite di test per CheckoutIntegrationTests.</summary>
 public class CheckoutIntegrationTests : IClassFixture<CustomWebApplicationFactory>
 {
     private readonly CustomWebApplicationFactory _factory;
@@ -15,6 +16,7 @@ public class CheckoutIntegrationTests : IClassFixture<CustomWebApplicationFactor
         _factory = factory;
     }
 
+    /// <summary>Verifica lo scenario di CH1_GetSeatMap_ReturnsSeatMapWithAvailableSeats: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task CH1_GetSeatMap_ReturnsSeatMapWithAvailableSeats()
     {
@@ -34,6 +36,7 @@ public class CheckoutIntegrationTests : IClassFixture<CustomWebApplicationFactor
         Assert.All(payload.Posti, p => Assert.Equal(SeatStatus.Available, p.Stato));
     }
 
+    /// <summary>Verifica lo scenario di CH2_GetSeatMap_ShowNotFound_ReturnsNotFound: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task CH2_GetSeatMap_ShowNotFound_ReturnsNotFound()
     {
@@ -45,6 +48,7 @@ public class CheckoutIntegrationTests : IClassFixture<CustomWebApplicationFactor
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
 
+    /// <summary>Verifica lo scenario di CH3_CreateHold_ReturnsHoldToken: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task CH3_CreateHold_ReturnsHoldToken()
     {
@@ -67,6 +71,7 @@ public class CheckoutIntegrationTests : IClassFixture<CustomWebApplicationFactor
         Assert.Empty(payload.Conflitti);
     }
 
+    /// <summary>Verifica lo scenario di CH4_CreateHold_ExceedsMaxSeats_ReturnsBadRequest: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task CH4_CreateHold_ExceedsMaxSeats_ReturnsBadRequest()
     {
@@ -84,6 +89,7 @@ public class CheckoutIntegrationTests : IClassFixture<CustomWebApplicationFactor
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
 
+    /// <summary>Verifica lo scenario di CH5_CreateHold_ConflictOnAlreadyHeldByOther_ReturnsConflict: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task CH5_CreateHold_ConflictOnAlreadyHeldByOther_ReturnsConflict()
     {
@@ -114,6 +120,7 @@ public class CheckoutIntegrationTests : IClassFixture<CustomWebApplicationFactor
         Assert.NotEmpty(payload.Conflitti);
     }
 
+    /// <summary>Verifica lo scenario di CH6_CreateHold_SameUserCanExtendHold: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task CH6_CreateHold_SameUserCanExtendHold()
     {
@@ -143,6 +150,7 @@ public class CheckoutIntegrationTests : IClassFixture<CustomWebApplicationFactor
         Assert.Equal(2, payload.SalaPostoIds.Count);
     }
 
+    /// <summary>Verifica lo scenario di CH7_RefreshHold_ExtendsExpiration: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task CH7_RefreshHold_ExtendsExpiration()
     {
@@ -169,6 +177,7 @@ public class CheckoutIntegrationTests : IClassFixture<CustomWebApplicationFactor
         Assert.True(payload.ScadeAtUtc > holdPayload.ScadeAtUtc);
     }
 
+    /// <summary>Verifica lo scenario di CH8_ReleaseHold_RemovesHold: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task CH8_ReleaseHold_RemovesHold()
     {
@@ -198,6 +207,7 @@ public class CheckoutIntegrationTests : IClassFixture<CustomWebApplicationFactor
         Assert.Equal(SeatStatus.Available, posto1.Stato);
     }
 
+    /// <summary>Verifica lo scenario di CH9_CreateOrdine_FromValidHold_CreatesPendingOrder: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task CH9_CreateOrdine_FromValidHold_CreatesPendingOrder()
     {
@@ -230,6 +240,7 @@ public class CheckoutIntegrationTests : IClassFixture<CustomWebApplicationFactor
         Assert.Equal(20m, payload.TotaleLordo);
     }
 
+    /// <summary>Verifica lo scenario di CH10_CreateOrderIdempotent_SameHoldToken_ReturnsExistingOrder: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task CH10_CreateOrderIdempotent_SameHoldToken_ReturnsExistingOrder()
     {
@@ -265,6 +276,7 @@ public class CheckoutIntegrationTests : IClassFixture<CustomWebApplicationFactor
         Assert.Equal(payload1.Id, payload2.Id);
     }
 
+    /// <summary>Verifica lo scenario di CH11_GetOrdiniByUser_ReturnsUserOrders: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task CH11_GetOrdiniByUser_ReturnsUserOrders()
     {
@@ -297,6 +309,7 @@ public class CheckoutIntegrationTests : IClassFixture<CustomWebApplicationFactor
         Assert.Single(payload);
     }
 
+    /// <summary>Verifica lo scenario di CH12_GetOrdineById_WithOwnershipCheck_ReturnsOrder: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task CH12_GetOrdineById_WithOwnershipCheck_ReturnsOrder()
     {
@@ -332,6 +345,7 @@ public class CheckoutIntegrationTests : IClassFixture<CustomWebApplicationFactor
         Assert.Equal(ordinePayload.Id, payload.Id);
     }
 
+    /// <summary>Verifica lo scenario di CH13_GetOrdineById_OtherUser_ReturnsNotFound: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task CH13_GetOrdineById_OtherUser_ReturnsNotFound()
     {
@@ -365,6 +379,7 @@ public class CheckoutIntegrationTests : IClassFixture<CustomWebApplicationFactor
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
 
+    /// <summary>Verifica lo scenario di CH14_SeatMap_ShowsHeldByMe_AfterHold: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task CH14_SeatMap_ShowsHeldByMe_AfterHold()
     {
@@ -388,6 +403,7 @@ public class CheckoutIntegrationTests : IClassFixture<CustomWebApplicationFactor
         Assert.NotNull(payload.ScadeAtUtc);
     }
 
+    /// <summary>Verifica lo scenario di CH15_SeatMap_ShowsHeldByOther_AfterOtherUserHold: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task CH15_SeatMap_ShowsHeldByOther_AfterOtherUserHold()
     {
@@ -411,6 +427,7 @@ public class CheckoutIntegrationTests : IClassFixture<CustomWebApplicationFactor
         Assert.Equal(SeatStatus.HeldByOther, posto1.Stato);
     }
 
+    /// <summary>Verifica lo scenario di CH16_ConcurrentHoldOnSameSeat_OnlyOneSucceeds: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task CH16_ConcurrentHoldOnSameSeat_OnlyOneSucceeds()
     {
@@ -436,6 +453,7 @@ public class CheckoutIntegrationTests : IClassFixture<CustomWebApplicationFactor
         Assert.Equal(1, successCount);
     }
 
+    /// <summary>Verifica lo scenario di CH17_ConcurrentHoldOnMultipleSeats_PartialConflictHandled: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task CH17_ConcurrentHoldOnMultipleSeats_PartialConflictHandled()
     {
@@ -481,6 +499,7 @@ public class CheckoutIntegrationTests : IClassFixture<CustomWebApplicationFactor
         }
     }
 
+    /// <summary>Verifica lo scenario di CH18_CreateOrdineWithIdempotencyKey_PreventsDuplicate: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task CH18_CreateOrdineWithIdempotencyKey_PreventsDuplicate()
     {
@@ -518,6 +537,7 @@ public class CheckoutIntegrationTests : IClassFixture<CustomWebApplicationFactor
         Assert.Equal(payload1.Id, payload2.Id);
     }
 
+    /// <summary>Verifica lo scenario di CH19_CreateOrdine_EmptyHoldToken_ReturnsBadRequest: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task CH19_CreateOrdine_EmptyHoldToken_ReturnsBadRequest()
     {
@@ -534,6 +554,7 @@ public class CheckoutIntegrationTests : IClassFixture<CustomWebApplicationFactor
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
 
+    /// <summary>Verifica lo scenario di CH20_CreateOrdine_InvalidHoldToken_ReturnsConflict: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task CH20_CreateOrdine_InvalidHoldToken_ReturnsConflict()
     {

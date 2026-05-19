@@ -5,15 +5,37 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FilmAPI.Services;
 
+/// <summary>
+/// Fornisce il servizio  per le operazioni di dominio esposte da questo modulo.
+/// </summary>
+/// <remarks>
+/// Usato dai controller o endpoint che gestiscono le funzioni di . Dipendenze iniettate nel costruttore: nessuna dichiarata esplicitamente.
+/// </remarks>
 public class SalaService : ISalaService
 {
     private readonly FilmDbContext _context;
 
+    /// <summary>
+    /// Esegue l''operazione SalaService del servizio.
+    /// </summary>
+    /// <param name="context">Parametro necessario per l'operazione: context.</param>
+    /// <returns>Restituisce il risultato dell'operazione quando questa ha esito positivo; altrimenti il chiamante riceve un'eccezione o un risultato nullo/booleano secondo il contratto del metodo.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database. può effettuare chiamate a servizi esterni o API HTTP.
+    /// </remarks>
     public SalaService(FilmDbContext context)
     {
         _context = context;
     }
 
+    /// <summary>
+    /// Recupera o legge i dati tramite l''operazione GetByCinemaAsync del servizio.
+    /// </summary>
+    /// <param name="cinemaId">Identificativo necessario per individuare l'entità o il contesto di lavoro: cinemaId.</param>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database. può effettuare chiamate a servizi esterni o API HTTP.
+    /// </remarks>
     public async Task<List<SalaDTO>> GetByCinemaAsync(int cinemaId)
     {
         var sale = await _context.Sale
@@ -25,6 +47,14 @@ public class SalaService : ISalaService
         return sale.Select(MapToDTO).ToList();
     }
 
+    /// <summary>
+    /// Recupera o legge i dati tramite l''operazione GetByIdAsync del servizio.
+    /// </summary>
+    /// <param name="id">Identificativo necessario per individuare l'entità o il contesto di lavoro: id.</param>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database. può effettuare chiamate a servizi esterni o API HTTP.
+    /// </remarks>
     public async Task<SalaDTO?> GetByIdAsync(int id)
     {
         var sala = await _context.Sale
@@ -36,6 +66,14 @@ public class SalaService : ISalaService
         return MapToDTO(sala);
     }
 
+    /// <summary>
+    /// Esegue l''operazione di business CreateAsync del servizio.
+    /// </summary>
+    /// <param name="dto">Oggetto DTO di input necessario per eseguire l'operazione.</param>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database. può effettuare chiamate a servizi esterni o API HTTP.
+    /// </remarks>
     public async Task<SalaDTO> CreateAsync(SalaCreateDTO dto)
     {
         var cinemaExists = await _context.Cinemas.AnyAsync(c => c.Id == dto.CinemaId);
@@ -68,6 +106,15 @@ public class SalaService : ISalaService
         return await GetByIdAsync(sala.Id) ?? throw new InvalidOperationException("Errore imprevisto dopo la creazione della sala.");
     }
 
+    /// <summary>
+    /// Esegue l''operazione di business UpdateAsync del servizio.
+    /// </summary>
+    /// <param name="id">Identificativo necessario per individuare l'entità o il contesto di lavoro: id.</param>
+    /// <param name="dto">Oggetto DTO di input necessario per eseguire l'operazione.</param>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database. può effettuare chiamate a servizi esterni o API HTTP.
+    /// </remarks>
     public async Task<SalaDTO?> UpdateAsync(int id, SalaUpdateDTO dto)
     {
         var sala = await _context.Sale.FindAsync(id);
@@ -87,6 +134,14 @@ public class SalaService : ISalaService
         return await GetByIdAsync(sala.Id);
     }
 
+    /// <summary>
+    /// Esegue l''operazione di business DeleteAsync del servizio.
+    /// </summary>
+    /// <param name="id">Identificativo necessario per individuare l'entità o il contesto di lavoro: id.</param>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database. può effettuare chiamate a servizi esterni o API HTTP.
+    /// </remarks>
     public async Task<bool> DeleteAsync(int id)
     {
         var sala = await _context.Sale
@@ -113,6 +168,14 @@ public class SalaService : ISalaService
         return true;
     }
 
+    /// <summary>
+    /// Recupera o legge i dati tramite l''operazione GetPostiAsync del servizio.
+    /// </summary>
+    /// <param name="salaId">Identificativo necessario per individuare l'entità o il contesto di lavoro: salaId.</param>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database.
+    /// </remarks>
     public async Task<List<SalaPostoDTO>> GetPostiAsync(int salaId)
     {
         var salaExists = await _context.Sale.AnyAsync(s => s.Id == salaId);
@@ -129,6 +192,15 @@ public class SalaService : ISalaService
         return posti.Select(MapPostoToDTO).ToList();
     }
 
+    /// <summary>
+    /// Esegue l''operazione di business SavePostiAsync del servizio.
+    /// </summary>
+    /// <param name="salaId">Identificativo necessario per individuare l'entità o il contesto di lavoro: salaId.</param>
+    /// <param name="dto">Oggetto DTO di input necessario per eseguire l'operazione.</param>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database.
+    /// </remarks>
     public async Task<List<SalaPostoDTO>> SavePostiAsync(int salaId, SalaLayoutSaveDTO dto)
     {
         var sala = await _context.Sale.FindAsync(salaId);

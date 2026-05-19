@@ -65,6 +65,7 @@ var RouteGuard = (function () {
   var REFRESH_TOKEN_KEY = 'cb_refresh_token';
 
   // Normalizza il ruolo da vari formati (numero, stringa) a stringa
+// Funzione normalizeRole: descrive l'azione eseguita, i parametri in ingresso e il valore restituito.
   function normalizeRole(role) {
     if (role == null) return 'anonimo';
     // Variabile value: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
@@ -76,6 +77,7 @@ var RouteGuard = (function () {
   }
 
   // Previene redirect a URL esterni (sicurezza)
+// Funzione sanitizeRedirectPath: descrive l'azione eseguita, i parametri in ingresso e il valore restituito.
   function sanitizeRedirectPath(path) {
     if (!path || typeof path !== 'string') return '/index.html';
     if (path.indexOf('://') !== -1 || path.indexOf('//') === 0) return '/index.html';
@@ -85,6 +87,7 @@ var RouteGuard = (function () {
   }
 
   // Decodifica JWT senza verificare la firma (solo per leggere ruolo e scadenza)
+// Funzione parseJwt: descrive l'azione eseguita, i parametri in ingresso e il valore restituito.
   function parseJwt(token) {
     try {
       // Variabile parts: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.

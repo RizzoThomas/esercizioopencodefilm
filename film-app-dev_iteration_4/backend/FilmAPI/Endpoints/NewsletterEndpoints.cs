@@ -188,6 +188,9 @@ public static class NewsletterEndpoints
 /// <summary>
 /// Rappresenta il payload usato per inviare una notifica promozionale newsletter.
 /// </summary>
+/// <summary>
+/// Rappresenta il payload usato per inviare una notifica promozionale newsletter.
+/// </summary>
 public class OfferNotificationDTO
 {
     public string? Subject { get; set; }

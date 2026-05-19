@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace FilmAPI.Tests.Unit;
 
+/// <summary>Suite di test per FilmServiceTests.</summary>
 public class FilmServiceTests : IAsyncLifetime
 {
     private readonly IServiceProvider _serviceProvider;
@@ -43,6 +44,7 @@ public class FilmServiceTests : IAsyncLifetime
         await _context.DisposeAsync();
     }
 
+    /// <summary>Verifica lo scenario di U_F1_GetAllAsync_WhenNoFilmsExist_ReturnsEmptyList: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task U_F1_GetAllAsync_WhenNoFilmsExist_ReturnsEmptyList()
     {
@@ -50,6 +52,7 @@ public class FilmServiceTests : IAsyncLifetime
         result.Should().BeEmpty();
     }
 
+    /// <summary>Verifica lo scenario di U_F2_GetAllAsync_WhenFilmsExist_ReturnsAllFilms: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task U_F2_GetAllAsync_WhenFilmsExist_ReturnsAllFilms()
     {
@@ -61,6 +64,7 @@ public class FilmServiceTests : IAsyncLifetime
         result.Should().HaveCount(2);
     }
 
+    /// <summary>Verifica lo scenario di U_F3_GetByIdAsync_WhenFilmExists_ReturnsFilm: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task U_F3_GetByIdAsync_WhenFilmExists_ReturnsFilm()
     {
@@ -72,6 +76,7 @@ public class FilmServiceTests : IAsyncLifetime
         result!.Titolo.Should().Be("Inception");
     }
 
+    /// <summary>Verifica lo scenario di U_F4_GetByIdAsync_WhenFilmNotExists_ReturnsNull: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task U_F4_GetByIdAsync_WhenFilmNotExists_ReturnsNull()
     {
@@ -80,6 +85,7 @@ public class FilmServiceTests : IAsyncLifetime
         result.Should().BeNull();
     }
 
+    /// <summary>Verifica lo scenario di U_F5_CreateAsync_WithValidData_CreatesFilm: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task U_F5_CreateAsync_WithValidData_CreatesFilm()
     {
@@ -91,6 +97,7 @@ public class FilmServiceTests : IAsyncLifetime
         result.Titolo.Should().Be("Inception");
     }
 
+    /// <summary>Verifica lo scenario di U_F6_CreateAsync_WhenRegistaNotExists_ThrowsArgumentException: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task U_F6_CreateAsync_WhenRegistaNotExists_ThrowsArgumentException()
     {
@@ -101,6 +108,7 @@ public class FilmServiceTests : IAsyncLifetime
         await act.Should().ThrowAsync<ArgumentException>();
     }
 
+    /// <summary>Verifica lo scenario di U_F7_UpdateAsync_WithValidData_UpdatesFilm: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task U_F7_UpdateAsync_WithValidData_UpdatesFilm()
     {
@@ -113,6 +121,7 @@ public class FilmServiceTests : IAsyncLifetime
         result!.Titolo.Should().Be("Inception 2");
     }
 
+    /// <summary>Verifica lo scenario di U_F8_UpdateAsync_WhenRegistaNotExists_ThrowsArgumentException: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task U_F8_UpdateAsync_WhenRegistaNotExists_ThrowsArgumentException()
     {
@@ -124,6 +133,7 @@ public class FilmServiceTests : IAsyncLifetime
         await act.Should().ThrowAsync<ArgumentException>();
     }
 
+    /// <summary>Verifica lo scenario di U_F10_DeleteAsync_WhenFilmExists_DeletesFilm: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task U_F10_DeleteAsync_WhenFilmExists_DeletesFilm()
     {

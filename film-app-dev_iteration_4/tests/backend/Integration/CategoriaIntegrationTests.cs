@@ -4,6 +4,7 @@ using FilmAPI.DTO;
 
 namespace FilmAPI.Tests.Integration;
 
+/// <summary>Suite di test per CategoriaIntegrationTests.</summary>
 public class CategoriaIntegrationTests : IClassFixture<CustomWebApplicationFactory>
 {
     private readonly CustomWebApplicationFactory _factory;
@@ -13,6 +14,7 @@ public class CategoriaIntegrationTests : IClassFixture<CustomWebApplicationFacto
         _factory = factory;
     }
 
+    /// <summary>Verifica lo scenario di CAT1_GetCategorie_ReturnsAllCategories: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task CAT1_GetCategorie_ReturnsAllCategories()
     {
@@ -26,6 +28,7 @@ public class CategoriaIntegrationTests : IClassFixture<CustomWebApplicationFacto
         Assert.NotNull(payload);
     }
 
+    /// <summary>Verifica lo scenario di CAT2_CreateCategoria_ReturnsCreated_WithValidData: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task CAT2_CreateCategoria_ReturnsCreated_WithValidData()
     {
@@ -43,6 +46,7 @@ public class CategoriaIntegrationTests : IClassFixture<CustomWebApplicationFacto
         Assert.Equal("Azione", payload.Nome);
     }
 
+    /// <summary>Verifica lo scenario di CAT3_CreateCategoria_ReturnsConflict_WhenDuplicateName: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task CAT3_CreateCategoria_ReturnsConflict_WhenDuplicateName()
     {
@@ -57,6 +61,7 @@ public class CategoriaIntegrationTests : IClassFixture<CustomWebApplicationFacto
         Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
     }
 
+    /// <summary>Verifica lo scenario di CAT4_UpdateCategoria_UpdatesName_WhenExists: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task CAT4_UpdateCategoria_UpdatesName_WhenExists()
     {
@@ -76,6 +81,7 @@ public class CategoriaIntegrationTests : IClassFixture<CustomWebApplicationFacto
         Assert.Equal("Thriller Avventuroso", payload.Nome);
     }
 
+    /// <summary>Verifica lo scenario di CAT5_DeleteCategoria_DeletesEntity_WhenExists: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task CAT5_DeleteCategoria_DeletesEntity_WhenExists()
     {

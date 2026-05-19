@@ -100,6 +100,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // ─── Crea UI 2FA ────────────────────────────────────────────────
 
+// Funzione showTwoFactorUI: descrive l'azione eseguita, i parametri in ingresso e il valore restituito.
   function showTwoFactorUI(tempToken) {
     // Nascondi form credenziali
     form.style.display = 'none';

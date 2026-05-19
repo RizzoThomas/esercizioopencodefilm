@@ -5,15 +5,37 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FilmAPI.Services;
 
+/// <summary>
+/// Fornisce il servizio  per le operazioni di dominio esposte da questo modulo.
+/// </summary>
+/// <remarks>
+/// Usato dai controller o endpoint che gestiscono le funzioni di . Dipendenze iniettate nel costruttore: nessuna dichiarata esplicitamente.
+/// </remarks>
 public class ProfiloService : IProfiloService
 {
     private readonly FilmDbContext _context;
 
+    /// <summary>
+    /// Esegue l''operazione ProfiloService del servizio.
+    /// </summary>
+    /// <param name="context">Parametro necessario per l'operazione: context.</param>
+    /// <returns>Restituisce il risultato dell'operazione quando questa ha esito positivo; altrimenti il chiamante riceve un'eccezione o un risultato nullo/booleano secondo il contratto del metodo.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database.
+    /// </remarks>
     public ProfiloService(FilmDbContext context)
     {
         _context = context;
     }
 
+    /// <summary>
+    /// Recupera o legge i dati tramite l''operazione GetProfiloAsync del servizio.
+    /// </summary>
+    /// <param name="userId">Identificativo necessario per individuare l'entità o il contesto di lavoro: userId.</param>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database.
+    /// </remarks>
     public async Task<UserInfoDTO?> GetProfiloAsync(int userId)
     {
         var user = await _context.Users.FindAsync(userId);
@@ -22,6 +44,15 @@ public class ProfiloService : IProfiloService
         return MapToUserInfoDTO(user);
     }
 
+    /// <summary>
+    /// Esegue l''operazione di business UpdateProfiloAsync del servizio.
+    /// </summary>
+    /// <param name="userId">Identificativo necessario per individuare l'entità o il contesto di lavoro: userId.</param>
+    /// <param name="dto">Oggetto DTO di input necessario per eseguire l'operazione.</param>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database.
+    /// </remarks>
     public async Task<UserInfoDTO?> UpdateProfiloAsync(int userId, ProfiloUpdateDTO dto)
     {
         var user = await _context.Users.FindAsync(userId);
@@ -36,6 +67,14 @@ public class ProfiloService : IProfiloService
         return MapToUserInfoDTO(user);
     }
 
+    /// <summary>
+    /// Recupera o legge i dati tramite l''operazione GetCinemaPreferitoAsync del servizio.
+    /// </summary>
+    /// <param name="userId">Identificativo necessario per individuare l'entità o il contesto di lavoro: userId.</param>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database. può inviare email di notifica.
+    /// </remarks>
     public async Task<CinemaPreferitoDTO?> GetCinemaPreferitoAsync(int userId)
     {
         var user = await _context.Users
@@ -64,6 +103,15 @@ public class ProfiloService : IProfiloService
         };
     }
 
+    /// <summary>
+    /// Esegue l''operazione SetCinemaPreferitoAsync del servizio.
+    /// </summary>
+    /// <param name="userId">Identificativo necessario per individuare l'entità o il contesto di lavoro: userId.</param>
+    /// <param name="cinemaId">Identificativo necessario per individuare l'entità o il contesto di lavoro: cinemaId.</param>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database. può inviare email di notifica.
+    /// </remarks>
     public async Task<CinemaPreferitoDTO> SetCinemaPreferitoAsync(int userId, int? cinemaId)
     {
         var user = await _context.Users.FindAsync(userId);
@@ -81,6 +129,14 @@ public class ProfiloService : IProfiloService
         return await GetCinemaPreferitoAsync(userId) ?? new CinemaPreferitoDTO { CinemaId = null, Cinema = null };
     }
 
+    /// <summary>
+    /// Recupera o legge i dati tramite l''operazione GetUserSubscriptionAsync del servizio.
+    /// </summary>
+    /// <param name="userId">Identificativo necessario per individuare l'entità o il contesto di lavoro: userId.</param>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database. può inviare email di notifica.
+    /// </remarks>
     public async Task<UserSubscriptionDTO?> GetUserSubscriptionAsync(int userId)
     {
         var sub = await _context.UserSubscriptions
@@ -105,6 +161,14 @@ public class ProfiloService : IProfiloService
         };
     }
 
+    /// <summary>
+    /// Recupera o legge i dati tramite l''operazione GetUserVouchersAsync del servizio.
+    /// </summary>
+    /// <param name="userId">Identificativo necessario per individuare l'entità o il contesto di lavoro: userId.</param>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database. può inviare email di notifica.
+    /// </remarks>
     public async Task<List<UserVoucherDTO>> GetUserVouchersAsync(int userId)
     {
         return await _context.Vouchers
@@ -121,6 +185,14 @@ public class ProfiloService : IProfiloService
             .ToListAsync();
     }
 
+    /// <summary>
+    /// Esegue l''operazione di business CancelUserSubscriptionAsync del servizio.
+    /// </summary>
+    /// <param name="userId">Identificativo necessario per individuare l'entità o il contesto di lavoro: userId.</param>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database. può inviare email di notifica.
+    /// </remarks>
     public async Task<UserSubscriptionDTO?> CancelUserSubscriptionAsync(int userId)
     {
         var sub = await _context.UserSubscriptions
@@ -136,6 +208,15 @@ public class ProfiloService : IProfiloService
         return await GetUserSubscriptionAsync(userId);
     }
 
+    /// <summary>
+    /// Esegue l''operazione ToggleAutoRenewAsync del servizio.
+    /// </summary>
+    /// <param name="userId">Identificativo necessario per individuare l'entità o il contesto di lavoro: userId.</param>
+    /// <param name="autoRinnovo">Parametro necessario per l'operazione: autoRinnovo.</param>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database. può inviare email di notifica.
+    /// </remarks>
     public async Task<UserSubscriptionDTO?> ToggleAutoRenewAsync(int userId, bool autoRinnovo)
     {
         var sub = await _context.UserSubscriptions

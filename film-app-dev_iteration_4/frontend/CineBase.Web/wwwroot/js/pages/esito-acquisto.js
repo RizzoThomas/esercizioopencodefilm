@@ -340,6 +340,7 @@ function showError(message) {
 }
 
 // Cleanup intervals on page unload
+// Listener evento: si attiva quando scatta l'evento e aggiorna UI o stato.
 window.addEventListener('beforeunload', () => {
   if (pollingInterval) clearInterval(pollingInterval);
 });

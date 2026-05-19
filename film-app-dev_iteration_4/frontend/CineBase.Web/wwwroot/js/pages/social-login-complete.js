@@ -102,6 +102,7 @@
     }
 
     // Avvia lo scambio
+// Listener evento: si attiva quando scatta l'evento e aggiorna UI o stato.
     document.addEventListener('DOMContentLoaded', function () {
         // Variabile params: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
         var params = new URLSearchParams(window.location.search);

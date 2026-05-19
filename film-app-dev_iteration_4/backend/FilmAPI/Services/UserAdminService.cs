@@ -6,6 +6,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FilmAPI.Services;
 
+/// <summary>
+/// Fornisce il servizio  per le operazioni di dominio esposte da questo modulo.
+/// </summary>
+/// <remarks>
+/// Usato dai controller o endpoint che gestiscono le funzioni di . Dipendenze iniettate nel costruttore: nessuna dichiarata esplicitamente.
+/// </remarks>
 public class UserAdminService : IUserAdminService
 {
     private readonly FilmDbContext _context;
@@ -25,6 +31,13 @@ public class UserAdminService : IUserAdminService
         _userSecurityAuditService = userSecurityAuditService;
     }
 
+    /// <summary>
+    /// Recupera o legge i dati tramite l''operazione GetAllUsersAsync del servizio.
+    /// </summary>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database. può inviare email di notifica.
+    /// </remarks>
     public async Task<List<UserAdminDTO>> GetAllUsersAsync()
     {
         return await _context.Users
@@ -42,6 +55,17 @@ public class UserAdminService : IUserAdminService
             .ToListAsync();
     }
 
+    /// <summary>
+    /// Recupera o legge i dati tramite l''operazione GetUsersPagedAsync del servizio.
+    /// </summary>
+    /// <param name="page">Parametro necessario per l'operazione: page.</param>
+    /// <param name="pageSize">Parametro necessario per l'operazione: pageSize.</param>
+    /// <param name="search">Parametro necessario per l'operazione: search.</param>
+    /// <param name="role">Parametro necessario per l'operazione: role.</param>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database. può inviare email di notifica.
+    /// </remarks>
     public async Task<AdminUserPagedResultDTO> GetUsersPagedAsync(int page, int pageSize, string? search, string? role)
     {
         var query = _context.Users
@@ -93,6 +117,15 @@ public class UserAdminService : IUserAdminService
         };
     }
 
+    /// <summary>
+    /// Esegue l''operazione di business CreateInviteAsync del servizio.
+    /// </summary>
+    /// <param name="dto">Oggetto DTO di input necessario per eseguire l'operazione.</param>
+    /// <param name="adminUserId">Identificativo necessario per individuare l'entità o il contesto di lavoro: adminUserId.</param>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database. può inviare email di notifica.
+    /// </remarks>
     public async Task<AdminUserListItemDTO?> CreateInviteAsync(CreateAdminUserInviteDTO dto, int adminUserId)
     {
         var normalizedEmail = dto.Email.Trim().ToLowerInvariant();
@@ -146,6 +179,15 @@ public class UserAdminService : IUserAdminService
         return MapToListItem(user);
     }
 
+    /// <summary>
+    /// Esegue l''operazione di business SendPasswordSetupAsync del servizio.
+    /// </summary>
+    /// <param name="userId">Identificativo necessario per individuare l'entità o il contesto di lavoro: userId.</param>
+    /// <param name="adminUserId">Identificativo necessario per individuare l'entità o il contesto di lavoro: adminUserId.</param>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database. può inviare email di notifica.
+    /// </remarks>
     public async Task<bool> SendPasswordSetupAsync(int userId, int adminUserId)
     {
         var user = await _context.Users.FindAsync(userId);
@@ -166,6 +208,16 @@ public class UserAdminService : IUserAdminService
         return true;
     }
 
+    /// <summary>
+    /// Esegue l''operazione di business UpdateUserRoleAsync del servizio.
+    /// </summary>
+    /// <param name="userId">Identificativo necessario per individuare l'entità o il contesto di lavoro: userId.</param>
+    /// <param name="dto">Oggetto DTO di input necessario per eseguire l'operazione.</param>
+    /// <param name="requestingUserId">Identificativo necessario per individuare l'entità o il contesto di lavoro: requestingUserId.</param>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database. può inviare email di notifica.
+    /// </remarks>
     public async Task<UserAdminDTO?> UpdateUserRoleAsync(int userId, UpdateRuoloDTO dto, int requestingUserId)
     {
         var user = await _context.Users.FindAsync(userId);
@@ -215,6 +267,15 @@ public class UserAdminService : IUserAdminService
         return MapToDTO(user);
     }
 
+    /// <summary>
+    /// Esegue l''operazione di business UpdateUserCreditoAsync del servizio.
+    /// </summary>
+    /// <param name="userId">Identificativo necessario per individuare l'entità o il contesto di lavoro: userId.</param>
+    /// <param name="dto">Oggetto DTO di input necessario per eseguire l'operazione.</param>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database. può inviare email di notifica.
+    /// </remarks>
     public async Task<UserAdminDTO?> UpdateUserCreditoAsync(int userId, UpdateCreditoDTO dto)
     {
         if (dto.NuovoCredito < 0)
@@ -229,6 +290,14 @@ public class UserAdminService : IUserAdminService
         return MapToDTO(user);
     }
 
+    /// <summary>
+    /// Recupera o legge i dati tramite l''operazione GetUserSecurityAsync del servizio.
+    /// </summary>
+    /// <param name="userId">Identificativo necessario per individuare l'entità o il contesto di lavoro: userId.</param>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: può inviare email di notifica.
+    /// </remarks>
     public async Task<AdminUserSecurityDTO?> GetUserSecurityAsync(int userId)
     {
         var user = await _context.Users

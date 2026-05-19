@@ -1,4 +1,5 @@
 // Popola select da dati API
+// Funzione populateSelect: descrive l'azione eseguita, i parametri in ingresso e il valore restituito.
 function populateSelect(selectId, data, valueField = 'id', labelFields = ['nome'], placeholder = 'Seleziona...') {
   // Variabile select: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const select = document.getElementById(selectId);
@@ -15,6 +16,7 @@ function populateSelect(selectId, data, valueField = 'id', labelFields = ['nome'
 }
 
 // Prepara form per creazione
+// Funzione setupCreateForm: descrive l'azione eseguita, i parametri in ingresso e il valore restituito.
 function setupCreateForm(modalId, formId, fields) {
   // Variabile form: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const form = document.getElementById(formId);
@@ -23,6 +25,7 @@ function setupCreateForm(modalId, formId, fields) {
 }
 
 // Prepara form per modifica
+// Funzione setupEditForm: descrive l'azione eseguita, i parametri in ingresso e il valore restituito.
 function setupEditForm(modalId, formId, data, fields) {
   // Variabile form: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const form = document.getElementById(formId);
@@ -38,6 +41,7 @@ function setupEditForm(modalId, formId, data, fields) {
 }
 
 // Serializza form in oggetto
+// Funzione serializeForm: descrive l'azione eseguita, i parametri in ingresso e il valore restituito.
 function serializeForm(formId) {
   // Variabile form: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const form = document.getElementById(formId);
@@ -54,6 +58,7 @@ function serializeForm(formId) {
 }
 
 // Setup submit handler
+// Funzione setupFormSubmit: descrive l'azione eseguita, i parametri in ingresso e il valore restituito.
 function setupFormSubmit(formId, apiCreate, apiUpdate, onSuccess) {
   // Variabile form: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const form = document.getElementById(formId);

@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- Pagina CineBase: struttura principale con sezioni statiche e contenuti dinamici gestiti da JavaScript. -->
 <html lang="it-IT">
 
 <head>
@@ -20,9 +21,11 @@
 
 <body class="bg-canvas text-ink font-sans cinematic-enter-page">
   <!-- Contenitore dinamico: navbar-container viene popolato o mostrato da JavaScript. -->
+<!-- Contenitore dinamico: quest'area viene popolata o mostrata da JavaScript. -->
   <div id="navbar-container"></div>
 
   <!-- Contenuto principale: area centrale che ospita il flusso della pagina. -->
+<!-- Contenuto principale: area centrale dove la pagina mostra il flusso operativo. -->
   <main class="acquista-page max-w-7xl mx-auto px-3 sm:px-4 lg:px-5 py-3 lg:py-4 pt-20">
     <!-- Loading State -->
     <div id="loading-state" class="py-16">
@@ -56,6 +59,7 @@
     </div>
 
     <!-- Main Content -->
+<!-- Contenitore dinamico: quest'area viene popolata o mostrata da JavaScript. -->
     <div id="main-content" class="hidden">
       <div class="acquista-layout flex flex-col lg:flex-row gap-4 lg:gap-5">
         <!-- Seat Map Section -->
@@ -103,6 +107,7 @@
             </div>
 
             <!-- Seat Map Container -->
+<!-- Contenitore dinamico: quest'area viene popolata o mostrata da JavaScript. -->
             <div id="seat-map-container" class="seat-map-wrapper">
               <div class="seat-map-toolbar hidden lg:flex" aria-label="Controlli zoom piantina">
                 <button id="seat-zoom-out" type="button" class="seat-zoom-btn" title="Riduci zoom" aria-label="Riduci zoom">
@@ -140,6 +145,7 @@
               <i class="fa-solid fa-ticket text-ferrari-primary mr-2"></i>Riepilogo
             </h3>
   <!-- Contenitore dinamico: selected-seats-list viene popolato o mostrato da JavaScript. -->
+<!-- Contenitore dinamico: quest'area viene popolata o mostrata da JavaScript. -->
             <div id="selected-seats-list" class="space-y-1.5 mb-4 max-h-52 overflow-y-auto pr-1">
               <p class="text-sm text-body text-center py-4">
                 Seleziona almeno un posto dalla piantina
@@ -181,9 +187,11 @@
   </main>
 
   <!-- Contenitore dinamico: footer-container viene popolato o mostrato da JavaScript. -->
+<!-- Contenitore dinamico: quest'area viene popolata o mostrata da JavaScript. -->
   <div id="footer-container"></div>
 
   <!-- Contenitore dinamico: toast-container viene popolato o mostrato da JavaScript. -->
+<!-- Contenitore dinamico: quest'area viene popolata o mostrata da JavaScript. -->
   <div id="toast-container" class="fixed bottom-4 right-4 z-50"></div>
 
   <script src="/js/utils.js"></script>

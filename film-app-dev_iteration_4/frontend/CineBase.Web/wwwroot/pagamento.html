@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- Pagina CineBase: struttura principale con sezioni statiche e contenuti dinamici gestiti da JavaScript. -->
 <html lang="it-IT">
 
 <head>
@@ -20,9 +21,11 @@
 
 <body class="bg-canvas text-ink font-sans cinematic-enter-page">
   <!-- Contenitore dinamico: navbar-container viene popolato o mostrato da JavaScript. -->
+<!-- Contenitore dinamico: quest'area viene popolata o mostrata da JavaScript. -->
   <div id="navbar-container"></div>
 
   <!-- Contenuto principale: area centrale che ospita il flusso della pagina. -->
+<!-- Contenuto principale: area centrale dove la pagina mostra il flusso operativo. -->
   <main class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-6 pt-24">
     <!-- Loading State -->
     <div id="loading-state" class="text-center py-16">
@@ -41,6 +44,7 @@
     </div>
 
     <!-- Main Content -->
+<!-- Contenitore dinamico: quest'area viene popolata o mostrata da JavaScript. -->
     <div id="main-content" class="hidden">
       <h1 class="ferrari-display-lg text-ink mb-6">
         <i class="fa-solid fa-credit-card text-ferrari-primary mr-2"></i>Pagamento
@@ -168,9 +172,11 @@
   </main>
 
   <!-- Contenitore dinamico: footer-container viene popolato o mostrato da JavaScript. -->
+<!-- Contenitore dinamico: quest'area viene popolata o mostrata da JavaScript. -->
   <div id="footer-container"></div>
 
   <!-- Contenitore dinamico: toast-container viene popolato o mostrato da JavaScript. -->
+<!-- Contenitore dinamico: quest'area viene popolata o mostrata da JavaScript. -->
   <div id="toast-container" class="fixed bottom-4 right-4 z-50"></div>
 
   <script src="/js/utils.js?v=2"></script>

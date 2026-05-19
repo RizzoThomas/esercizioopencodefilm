@@ -5,22 +5,54 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FilmAPI.Services;
 
+/// <summary>
+/// Fornisce il servizio  per le operazioni di dominio esposte da questo modulo.
+/// </summary>
+/// <remarks>
+/// Usato dai controller o endpoint che gestiscono le funzioni di . Dipendenze iniettate nel costruttore: nessuna dichiarata esplicitamente.
+/// </remarks>
 public class ValidazioneBigliettoService : IValidazioneBigliettoService
 {
     private readonly FilmDbContext _db;
     private readonly IBigliettoService _bigliettoService;
 
+    /// <summary>
+    /// Esegue l''operazione ValidazioneBigliettoService del servizio.
+    /// </summary>
+    /// <param name="db">Parametro necessario per l'operazione: db.</param>
+    /// <param name="bigliettoService">Parametro necessario per l'operazione: bigliettoService.</param>
+    /// <returns>Restituisce il risultato dell'operazione quando questa ha esito positivo; altrimenti il chiamante riceve un'eccezione o un risultato nullo/booleano secondo il contratto del metodo.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database.
+    /// </remarks>
     public ValidazioneBigliettoService(FilmDbContext db, IBigliettoService bigliettoService)
     {
         _db = db;
         _bigliettoService = bigliettoService;
     }
 
+    /// <summary>
+    /// Recupera o legge i dati tramite l''operazione GetTicketByCodeAsync del servizio.
+    /// </summary>
+    /// <param name="code">Parametro necessario per l'operazione: code.</param>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database.
+    /// </remarks>
     public Task<TicketValidationLookupDTO?> GetTicketByCodeAsync(string code)
     {
         return _bigliettoService.GetTicketValidationLookupAsync(code);
     }
 
+    /// <summary>
+    /// Esegue l''operazione di business ValidateAsync del servizio.
+    /// </summary>
+    /// <param name="operatorUserId">Identificativo necessario per individuare l'entità o il contesto di lavoro: operatorUserId.</param>
+    /// <param name="request">Parametro necessario per l'operazione: request.</param>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database.
+    /// </remarks>
     public async Task<TicketValidationResultDTO> ValidateAsync(int operatorUserId, TicketValidationRequestDTO request)
     {
         if (operatorUserId <= 0)

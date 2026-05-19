@@ -11,6 +11,9 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace FilmAPI.Migrations
 {
+    /// <summary>
+    /// Classe generata da EF Core per la migrazione AddRefreshTokenDeviceId.
+    /// </summary>
     [DbContext(typeof(FilmDbContext))]
     [Migration("20260413200358_AddRefreshTokenDeviceId")]
     partial class AddRefreshTokenDeviceId

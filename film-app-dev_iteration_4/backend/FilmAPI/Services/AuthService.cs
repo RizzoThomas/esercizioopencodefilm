@@ -23,6 +23,12 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace FilmAPI.Services;
 
+/// <summary>
+/// Fornisce il servizio  per le operazioni di dominio esposte da questo modulo.
+/// </summary>
+/// <remarks>
+/// Usato dai controller o endpoint che gestiscono le funzioni di . Dipendenze iniettate nel costruttore: nessuna dichiarata esplicitamente.
+/// </remarks>
 public class AuthService : IAuthService
 {
     // ─── DEPENDENCY INJECTION ─────────────────────────────────────────────
@@ -46,6 +52,19 @@ public class AuthService : IAuthService
     private const int TrustedDeviceExpiryDays = 3;
     private static readonly byte[] _tempTokenKey = RandomNumberGenerator.GetBytes(32);
 
+    /// <summary>
+    /// Esegue l''operazione AuthService del servizio.
+    /// </summary>
+    /// <param name="context">Parametro necessario per l'operazione: context.</param>
+    /// <param name="emailService">Parametro necessario per l'operazione: emailService.</param>
+    /// <param name="accountTokenService">Parametro necessario per l'operazione: accountTokenService.</param>
+    /// <param name="accountEmailService">Parametro necessario per l'operazione: accountEmailService.</param>
+    /// <param name="auditService">Parametro necessario per l'operazione: auditService.</param>
+    /// <param name="logger">Parametro necessario per l'operazione: logger.</param>
+    /// <returns>Restituisce il risultato dell'operazione quando questa ha esito positivo; altrimenti il chiamante riceve un'eccezione o un risultato nullo/booleano secondo il contratto del metodo.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database. può inviare email di notifica.
+    /// </remarks>
     public AuthService(FilmDbContext context, IEmailService emailService, IAccountTokenService accountTokenService, IAccountEmailService accountEmailService, IUserSecurityAuditService auditService, ILogger<AuthService> logger)
     {
         _context = context;
@@ -70,6 +89,14 @@ public class AuthService : IAuthService
     // 3. Genera AccessToken JWT
     // 4. Genera RefreshToken (con DeviceId)
     // ========================================================================
+    /// <summary>
+    /// Esegue l''operazione di business RegisterAsync del servizio.
+    /// </summary>
+    /// <param name="dto">Oggetto DTO di input necessario per eseguire l'operazione.</param>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database. può inviare email di notifica.
+    /// </remarks>
     public async Task<AuthResponseDTO> RegisterAsync(RegisterRequestDTO dto)
     {
         // Controllo email duplicata
@@ -118,6 +145,15 @@ public class AuthService : IAuthService
     // 4. Se 2FA abilitato, richiede secondo fattore
     // 5. Genera JWT access token + refresh token
     // ========================================================================
+    /// <summary>
+    /// Esegue l''operazione di business LoginAsync del servizio.
+    /// </summary>
+    /// <param name="dto">Oggetto DTO di input necessario per eseguire l'operazione.</param>
+    /// <param name="httpContext">Parametro necessario per l'operazione: httpContext.</param>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database. può inviare email di notifica.
+    /// </remarks>
     public async Task<AuthResponseDTO> LoginAsync(LoginRequestDTO dto, HttpContext? httpContext = null)
     {
         // Cerca utente per email (esatta, non normalizzata)
@@ -186,6 +222,15 @@ public class AuthService : IAuthService
     // 4. Revoca il vecchio token (ROTAZIONE)
     // 5. Genera NUOVO access token + NUOVO refresh token
     // ========================================================================
+    /// <summary>
+    /// Esegue l''operazione di business RefreshAsync del servizio.
+    /// </summary>
+    /// <param name="refreshToken">Token necessario per validare, rinnovare o revocare l'operazione richiesta.</param>
+    /// <param name="deviceId">Identificativo necessario per individuare l'entità o il contesto di lavoro: deviceId.</param>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database. può inviare email di notifica.
+    /// </remarks>
     public async Task<AuthResponseDTO> RefreshAsync(string refreshToken, string? deviceId)
     {
         var storedToken = await _context.RefreshTokens
@@ -223,6 +268,15 @@ public class AuthService : IAuthService
     // ========================================================================
     // Revoca il refresh token (non lo elimina, lo marca come revocato)
     // ========================================================================
+    /// <summary>
+    /// Esegue l''operazione di business LogoutAsync del servizio.
+    /// </summary>
+    /// <param name="refreshToken">Token necessario per validare, rinnovare o revocare l'operazione richiesta.</param>
+    /// <param name="deviceId">Identificativo necessario per individuare l'entità o il contesto di lavoro: deviceId.</param>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database. può inviare email di notifica.
+    /// </remarks>
     public async Task<bool> LogoutAsync(string refreshToken, string? deviceId)
     {
         var normalizedDeviceId = NormalizeDeviceId(deviceId);
@@ -236,6 +290,14 @@ public class AuthService : IAuthService
         return true;
     }
 
+    /// <summary>
+    /// Recupera o legge i dati tramite l''operazione GetUserByIdAsync del servizio.
+    /// </summary>
+    /// <param name="id">Identificativo necessario per individuare l'entità o il contesto di lavoro: id.</param>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database. può inviare email di notifica.
+    /// </remarks>
     public async Task<UserInfoDTO?> GetUserByIdAsync(int id)
     {
         var user = await _context.Users.FindAsync(id);
@@ -332,6 +394,14 @@ public class AuthService : IAuthService
 
     // ═══════════════════ Password Reset ═══════════════════════════════
 
+    /// <summary>
+    /// Esegue l''operazione ForgotPasswordAsync del servizio.
+    /// </summary>
+    /// <param name="email">Indirizzo email usato per autenticazione, notifica o identificazione dell'utente.</param>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database. può inviare email di notifica.
+    /// </remarks>
     public async Task<bool> ForgotPasswordAsync(string email)
     {
         var normalizedEmail = email.Trim().ToUpperInvariant();
@@ -350,6 +420,15 @@ public class AuthService : IAuthService
         return true;
     }
 
+    /// <summary>
+    /// Esegue l''operazione ResetPasswordAsync del servizio.
+    /// </summary>
+    /// <param name="token">Token necessario per validare, rinnovare o revocare l'operazione richiesta.</param>
+    /// <param name="newPassword">Nuova password da impostare dopo i controlli di sicurezza.</param>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database. può inviare email di notifica.
+    /// </remarks>
     public async Task<bool> ResetPasswordAsync(string token, string newPassword)
     {
         var (valid, actionToken) = await _accountTokenService.ValidateTokenAsync(token, AccountActionTokenPurpose.PasswordReset);
@@ -375,6 +454,16 @@ public class AuthService : IAuthService
 
     // ═══════════════════ Change Password ══════════════════════════════
 
+    /// <summary>
+    /// Esegue l''operazione di business ChangePasswordAsync del servizio.
+    /// </summary>
+    /// <param name="userId">Identificativo necessario per individuare l'entità o il contesto di lavoro: userId.</param>
+    /// <param name="currentPassword">Password attuale necessaria per verificare che la richiesta provenga dal titolare dell'account.</param>
+    /// <param name="newPassword">Nuova password da impostare dopo i controlli di sicurezza.</param>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database. può inviare email di notifica.
+    /// </remarks>
     public async Task<bool> ChangePasswordAsync(int userId, string currentPassword, string newPassword)
     {
         var user = await _context.Users.FindAsync(userId);
@@ -402,6 +491,14 @@ public class AuthService : IAuthService
 
     // ═══════════════════ Set Password (social-only → locale) ═════════
 
+    /// <summary>
+    /// Esegue l''operazione RequestSetPasswordAsync del servizio.
+    /// </summary>
+    /// <param name="userId">Identificativo necessario per individuare l'entità o il contesto di lavoro: userId.</param>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database. può inviare email di notifica.
+    /// </remarks>
     public async Task<bool> RequestSetPasswordAsync(int userId)
     {
         var user = await _context.Users.FindAsync(userId);
@@ -421,6 +518,14 @@ public class AuthService : IAuthService
 
     // ═══════════════════ Account Security ═════════════════════════════
 
+    /// <summary>
+    /// Recupera o legge i dati tramite l''operazione GetAccountSecurityAsync del servizio.
+    /// </summary>
+    /// <param name="userId">Identificativo necessario per individuare l'entità o il contesto di lavoro: userId.</param>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database. può inviare email di notifica.
+    /// </remarks>
     public async Task<AccountSecurityDTO?> GetAccountSecurityAsync(int userId)
     {
         var user = await _context.Users.FindAsync(userId);
@@ -458,6 +563,14 @@ public class AuthService : IAuthService
 
     // ═══════════════════ 2FA ══════════════════════════════════════════
 
+    /// <summary>
+    /// Esegue l''operazione di business GenerateTwoFactorSetupAsync del servizio.
+    /// </summary>
+    /// <param name="userId">Identificativo necessario per individuare l'entità o il contesto di lavoro: userId.</param>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database. può inviare email di notifica.
+    /// </remarks>
     public async Task<TwoFactorSetupResponseDTO> GenerateTwoFactorSetupAsync(int userId)
     {
         var user = await _context.Users.FindAsync(userId)
@@ -489,6 +602,15 @@ public class AuthService : IAuthService
         };
     }
 
+    /// <summary>
+    /// Esegue l''operazione EnableTwoFactorAsync del servizio.
+    /// </summary>
+    /// <param name="userId">Identificativo necessario per individuare l'entità o il contesto di lavoro: userId.</param>
+    /// <param name="code">Parametro necessario per l'operazione: code.</param>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database.
+    /// </remarks>
     public async Task<bool> EnableTwoFactorAsync(int userId, string code)
     {
         var user = await _context.Users.FindAsync(userId)
@@ -506,6 +628,14 @@ public class AuthService : IAuthService
         return true;
     }
 
+    /// <summary>
+    /// Esegue l''operazione DisableTwoFactorAsync del servizio.
+    /// </summary>
+    /// <param name="userId">Identificativo necessario per individuare l'entità o il contesto di lavoro: userId.</param>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database.
+    /// </remarks>
     public async Task<bool> DisableTwoFactorAsync(int userId)
     {
         var user = await _context.Users.FindAsync(userId)
@@ -517,6 +647,15 @@ public class AuthService : IAuthService
         return true;
     }
 
+    /// <summary>
+    /// Esegue l''operazione VerifyTwoFactorCodeAsync del servizio.
+    /// </summary>
+    /// <param name="userId">Identificativo necessario per individuare l'entità o il contesto di lavoro: userId.</param>
+    /// <param name="code">Parametro necessario per l'operazione: code.</param>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: non introduce effetti collaterali esterni evidenti oltre alla logica di lettura o validazione.
+    /// </remarks>
     public async Task<bool> VerifyTwoFactorCodeAsync(int userId, string code)
     {
         var user = await _context.Users.FindAsync(userId)
@@ -529,6 +668,18 @@ public class AuthService : IAuthService
         return TotpUtility.VerifyCode(secret, code);
     }
 
+    /// <summary>
+    /// Esegue l''operazione di business LoginWith2FaAsync del servizio.
+    /// </summary>
+    /// <param name="tempToken">Token necessario per validare, rinnovare o revocare l'operazione richiesta.</param>
+    /// <param name="code">Parametro necessario per l'operazione: code.</param>
+    /// <param name="trustDevice">Parametro necessario per l'operazione: trustDevice.</param>
+    /// <param name="deviceId">Identificativo necessario per individuare l'entità o il contesto di lavoro: deviceId.</param>
+    /// <param name="httpContext">Parametro necessario per l'operazione: httpContext.</param>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: non introduce effetti collaterali esterni evidenti oltre alla logica di lettura o validazione.
+    /// </remarks>
     public async Task<AuthResponseDTO> LoginWith2FaAsync(string tempToken, string code, bool trustDevice, string? deviceId, HttpContext? httpContext = null)
     {
         // Decodifica temp token
@@ -678,7 +829,19 @@ public class AuthService : IAuthService
 
     private class TempTokenPayload
     {
+        /// <summary>
+        /// Rappresenta la dipendenza o il dato esposto tramite la proprietà UserId.
+        /// </summary>
+        /// <remarks>
+        /// Serve al servizio per completare le sue operazioni di lettura, validazione, persistenza o integrazione esterna.
+        /// </remarks>
         public int UserId { get; set; }
+        /// <summary>
+        /// Rappresenta la dipendenza o il dato esposto tramite la proprietà Exp.
+        /// </summary>
+        /// <remarks>
+        /// Serve al servizio per completare le sue operazioni di lettura, validazione, persistenza o integrazione esterna.
+        /// </remarks>
         public long Exp { get; set; }
     }
 
@@ -686,6 +849,15 @@ public class AuthService : IAuthService
 
     // ─── Social Login ────────────────────────────────────────────────
 
+    /// <summary>
+    /// Esegue l''operazione SocialLoginAsync del servizio.
+    /// </summary>
+    /// <param name="user">Parametro necessario per l'operazione: user.</param>
+    /// <param name="deviceId">Identificativo necessario per individuare l'entità o il contesto di lavoro: deviceId.</param>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database.
+    /// </remarks>
     public async Task<AuthResponseDTO> SocialLoginAsync(User user, string? deviceId = null)
     {
         return await GenerateAuthResponse(user, deviceId);

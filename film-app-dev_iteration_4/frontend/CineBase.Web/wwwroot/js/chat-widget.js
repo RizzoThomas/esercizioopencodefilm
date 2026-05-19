@@ -472,6 +472,7 @@
     document.documentElement.appendChild(panel);
 
     // ── Events ──────────────────────────────────────
+// Funzione scroll: descrive l'azione eseguita, i parametri in ingresso e il valore restituito.
     function scroll() { setTimeout(() => { msgs.scrollTop = msgs.scrollHeight; }, 50); }
     // Funzione addMsg: gestisce la logica prevista e restituisce il risultato atteso. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
     function addMsg(text, cls) {

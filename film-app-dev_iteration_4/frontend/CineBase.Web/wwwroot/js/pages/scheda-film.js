@@ -504,6 +504,7 @@ function getTipoSalaClass(tipoSala) {
 }
 
 // Cinema Modal
+// Funzione setupCinemaModal: descrive l'azione eseguita, i parametri in ingresso e il valore restituito.
 function setupCinemaModal() {
   // Variabile modal: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const modal = document.getElementById('cinema-modal');
@@ -677,6 +678,7 @@ function selectCinema(cinemaId) {
 }
 
 // Utilities
+// Funzione showLoading: descrive l'azione eseguita, i parametri in ingresso e il valore restituito.
 function showLoading() {
   // Variabile loading: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const loading = document.getElementById('loading-state');

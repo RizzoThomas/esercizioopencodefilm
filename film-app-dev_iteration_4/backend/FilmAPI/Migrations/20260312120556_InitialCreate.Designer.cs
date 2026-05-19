@@ -11,6 +11,9 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace FilmAPI.Migrations
 {
+    /// <summary>
+    /// Classe generata da EF Core per la migrazione iniziale.
+    /// </summary>
     [DbContext(typeof(FilmDbContext))]
     [Migration("20260312120556_InitialCreate")]
     partial class InitialCreate

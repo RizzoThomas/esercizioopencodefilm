@@ -1,4 +1,5 @@
 <!-- Sticky Navbar — full-width, follows scroll -->
+<!-- Navbar: navigazione principale della pagina. -->
 <nav id="main-nav" class="navbar-fluid-island">
   <!-- Left: Hamburger (3 morphing lines) -->
   <button id="mobile-menu-toggle" class="flex flex-col gap-[5px] p-2 -ml-2" aria-label="Menu">
@@ -24,11 +25,13 @@
     </a>
 
     <!-- Notification Bell + Dropdown -->
+<!-- Contenitore dinamico: area popolata da JavaScript. -->
     <div id="notif-container" class="relative">
       <button id="notif-toggle" class="text-ink hover:text-ferrari-primary transition-colors duration-300 relative" title="Notifiche" aria-label="Notifiche">
         <i class="fa-solid fa-bell"></i>
         <span id="notif-badge" class="absolute -top-1.5 -right-2 bg-ferrari-primary text-white text-[9px] font-bold w-4 h-4 flex items-center justify-center rounded-full hidden">0</span>
       </button>
+<!-- Contenitore dinamico: area popolata da JavaScript. -->
       <div id="notif-popover" class="notif-popover hidden absolute right-0 top-full mt-3 w-80 z-[70]">
         <div class="notif-popover-inner">
           <!-- Header -->
@@ -45,6 +48,7 @@
           </div>
 
           <!-- Carousel View -->
+<!-- Contenitore dinamico: area popolata da JavaScript. -->
           <div id="notif-carousel" class="relative flex items-center py-3">
             <button id="notif-prev" class="absolute left-1 z-10 text-body hover:text-ink p-1.5 rounded-full hover:bg-white/5 transition-colors">
               <i class="fa-solid fa-chevron-left text-[10px]"></i>
@@ -69,9 +73,11 @@
           </div>
 
           <!-- List View (hidden by default) -->
+<!-- Contenitore dinamico: area popolata da JavaScript. -->
           <div id="notif-list" class="hidden max-h-80 overflow-y-auto divide-y divide-hairline"></div>
 
           <!-- Empty state -->
+<!-- Contenitore dinamico: area popolata da JavaScript. -->
           <div id="notif-empty" class="hidden p-6 text-sm text-body text-center">
             Nessuna notifica
           </div>
@@ -117,9 +123,11 @@
 </nav>
 
 <!-- Mobile Menu Backdrop (click to close) -->
+<!-- Contenitore dinamico: area popolata da JavaScript. -->
 <div id="mobile-menu-backdrop" class="mobile-menu-backdrop"></div>
 
 <!-- Mobile Menu — Sidebar slide-in -->
+<!-- Contenitore dinamico: area popolata da JavaScript. -->
 <div id="mobile-menu" class="mobile-menu-overlay">
   <div class="flex flex-col gap-1">
     <a href="/index.html" class="mobile-menu-link">Home</a>

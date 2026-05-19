@@ -11,6 +11,9 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace FilmAPI.Migrations
 {
+    /// <summary>
+    /// Classe generata da EF Core per la migrazione AddCategorieAndAuth.
+    /// </summary>
     [DbContext(typeof(FilmDbContext))]
     [Migration("20260406071504_AddCategorieAndAuth")]
     partial class AddCategorieAndAuth

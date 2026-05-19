@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace FilmAPI.Tests.Integration;
 
+/// <summary>Suite di test per PrenotazioneIntegrationTests.</summary>
 public class PrenotazioneIntegrationTests : IClassFixture<CustomWebApplicationFactory>
 {
     private readonly CustomWebApplicationFactory _factory;
@@ -17,6 +18,7 @@ public class PrenotazioneIntegrationTests : IClassFixture<CustomWebApplicationFa
         _factory = factory;
     }
 
+    /// <summary>Verifica lo scenario di PR1_CreatePrenotazione_ReturnsCreated_WithValidData: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task PR1_CreatePrenotazione_ReturnsCreated_WithValidData()
     {
@@ -70,6 +72,7 @@ public class PrenotazioneIntegrationTests : IClassFixture<CustomWebApplicationFa
         Assert.Equal("Test prenotazione", payload.Note);
     }
 
+    /// <summary>Verifica lo scenario di PR2_User_SeesOnlyOwnPrenotazioni: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task PR2_User_SeesOnlyOwnPrenotazioni()
     {
@@ -114,6 +117,7 @@ public class PrenotazioneIntegrationTests : IClassFixture<CustomWebApplicationFa
         Assert.Single(payload2);
     }
 
+    /// <summary>Verifica lo scenario di PR3_User_CannotDeleteAnotherUsersPrenotazione: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task PR3_User_CannotDeleteAnotherUsersPrenotazione()
     {
@@ -150,6 +154,7 @@ public class PrenotazioneIntegrationTests : IClassFixture<CustomWebApplicationFa
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
 
+    /// <summary>Verifica lo scenario di PR4_Admin_SeesAllPrenotazioni: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task PR4_Admin_SeesAllPrenotazioni()
     {
@@ -190,6 +195,7 @@ public class PrenotazioneIntegrationTests : IClassFixture<CustomWebApplicationFa
         Assert.Equal(2, payload.Count);
     }
 
+    /// <summary>Verifica lo scenario di PR5_DeletePrenotazione_ReturnsNotFound_WhenNonExistent: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task PR5_DeletePrenotazione_ReturnsNotFound_WhenNonExistent()
     {

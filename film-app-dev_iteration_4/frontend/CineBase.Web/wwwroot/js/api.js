@@ -38,6 +38,7 @@ function getAuthSafe() {
 }
 
 // Normalizza il ruolo (accetta sia stringhe che numeri dal backend)
+// Funzione normalizeRole: descrive l'azione eseguita, i parametri in ingresso e il valore restituito.
 function normalizeRole(role) {
   if (role == null) return '';
   // Variabile value: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
@@ -49,6 +50,7 @@ function normalizeRole(role) {
 }
 
 // Controlla se il path corrente è un'area admin
+// Funzione isAdminAreaPath: descrive l'azione eseguita, i parametri in ingresso e il valore restituito.
 function isAdminAreaPath(pathname) {
   // Variabile adminPaths: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const adminPaths = new Set([
@@ -59,6 +61,7 @@ function isAdminAreaPath(pathname) {
 }
 
 // Blocca l'accesso alle pagine admin per utenti non autorizzati
+// Funzione enforceAdminAreaAccess: descrive l'azione eseguita, i parametri in ingresso e il valore restituito.
 function enforceAdminAreaAccess() {
   // Variabile auth: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const auth = getAuthSafe();
@@ -79,6 +82,7 @@ function enforceAdminAreaAccess() {
 }
 
 // Parsing della risposta HTTP (JSON o testo)
+// Funzione parseSuccessfulResponse: descrive l'azione eseguita, i parametri in ingresso e il valore restituito.
 async function parseSuccessfulResponse(response) {
   if (response.status === 204) return null;
   // Variabile contentType: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
@@ -96,6 +100,7 @@ async function parseSuccessfulResponse(response) {
 //   3. Se 401 → tenta refresh token → riprova richiesta
 //   4. Se errore → throw con status code
 // ====================================================================
+// Funzione apiFetch: descrive l'azione eseguita, i parametri in ingresso e il valore restituito.
 async function apiFetch(endpoint, options = {}) {
   if (!enforceAdminAreaAccess()) {
     throw { status: 403, message: 'Non autorizzato ad accedere a questa pagina' };

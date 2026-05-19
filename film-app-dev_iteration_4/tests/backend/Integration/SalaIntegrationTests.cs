@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FilmAPI.Tests.Integration;
 
+/// <summary>Suite di test per SalaIntegrationTests.</summary>
 public class SalaIntegrationTests : IClassFixture<CustomWebApplicationFactory>
 {
     private readonly CustomWebApplicationFactory _factory;
@@ -15,6 +16,7 @@ public class SalaIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         _factory = factory;
     }
 
+    /// <summary>Verifica lo scenario di S1_GetSaleByCinema_ReturnsEmptyList: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task S1_GetSaleByCinema_ReturnsEmptyList()
     {
@@ -29,6 +31,7 @@ public class SalaIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Empty(payload);
     }
 
+    /// <summary>Verifica lo scenario di S2_GetSaleByCinema_ReturnsSaleForCinema: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task S2_GetSaleByCinema_ReturnsSaleForCinema()
     {
@@ -45,6 +48,7 @@ public class SalaIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Equal(TipoSala.DueD, payload[0].TipoSala);
     }
 
+    /// <summary>Verifica lo scenario di S3_GetSalaById_ReturnsSala: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task S3_GetSalaById_ReturnsSala()
     {
@@ -61,6 +65,7 @@ public class SalaIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Equal(1, payload.NumeroProgressivo);
     }
 
+    /// <summary>Verifica lo scenario di S4_GetSalaById_NotFound: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task S4_GetSalaById_NotFound()
     {
@@ -72,6 +77,7 @@ public class SalaIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
 
+    /// <summary>Verifica lo scenario di S5_CreateSala_ReturnsCreated: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task S5_CreateSala_ReturnsCreated()
     {
@@ -96,6 +102,7 @@ public class SalaIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Equal("Sala 1", payload.Nome);
     }
 
+    /// <summary>Verifica lo scenario di S6_CreateSala_ConflictOnDuplicateNumero: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task S6_CreateSala_ConflictOnDuplicateNumero()
     {
@@ -115,6 +122,7 @@ public class SalaIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
     }
 
+    /// <summary>Verifica lo scenario di S7_CreateSala_BadRequestOnInvalidCinema: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task S7_CreateSala_BadRequestOnInvalidCinema()
     {
@@ -134,6 +142,7 @@ public class SalaIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
 
+    /// <summary>Verifica lo scenario di S8_CreateSala_ForbiddenForUser: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task S8_CreateSala_ForbiddenForUser()
     {
@@ -153,6 +162,7 @@ public class SalaIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
     }
 
+    /// <summary>Verifica lo scenario di S9_UpdateSala_UpdatesFields: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task S9_UpdateSala_UpdatesFields()
     {
@@ -177,6 +187,7 @@ public class SalaIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Equal(3.50m, payload.Supplemento);
     }
 
+    /// <summary>Verifica lo scenario di S10_UpdateSala_NotFound: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task S10_UpdateSala_NotFound()
     {
@@ -195,6 +206,7 @@ public class SalaIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
 
+    /// <summary>Verifica lo scenario di S11_DeleteSala_DeletesEntity: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task S11_DeleteSala_DeletesEntity()
     {
@@ -209,6 +221,7 @@ public class SalaIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Equal(HttpStatusCode.NotFound, getResponse.StatusCode);
     }
 
+    /// <summary>Verifica lo scenario di S12_DeleteSala_NotFound: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task S12_DeleteSala_NotFound()
     {
@@ -220,6 +233,7 @@ public class SalaIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
 
+    /// <summary>Verifica lo scenario di S13_DeleteSala_BlockedByFutureShows: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task S13_DeleteSala_BlockedByFutureShows()
     {
@@ -231,6 +245,7 @@ public class SalaIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
     }
 
+    /// <summary>Verifica lo scenario di S14_GetPosti_ReturnsEmptyList: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task S14_GetPosti_ReturnsEmptyList()
     {
@@ -245,6 +260,7 @@ public class SalaIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Empty(payload);
     }
 
+    /// <summary>Verifica lo scenario di S15_GetPosti_NotFound: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task S15_GetPosti_NotFound()
     {
@@ -256,6 +272,7 @@ public class SalaIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
 
+    /// <summary>Verifica lo scenario di S16_SavePosti_CreatesLayout: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task S16_SavePosti_CreatesLayout()
     {
@@ -283,6 +300,7 @@ public class SalaIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Equal(1, payload[0].Numero);
     }
 
+    /// <summary>Verifica lo scenario di S17_SavePosti_ReplacesExistingLayout: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task S17_SavePosti_ReplacesExistingLayout()
     {
@@ -306,6 +324,7 @@ public class SalaIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Equal("BALCONE", payload[0].Settore);
     }
 
+    /// <summary>Verifica lo scenario di S18_SavePosti_NotFound: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task S18_SavePosti_NotFound()
     {
@@ -319,6 +338,7 @@ public class SalaIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
 
+    /// <summary>Verifica lo scenario di S19_SavePosti_ForbiddenForUser: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task S19_SavePosti_ForbiddenForUser()
     {
@@ -332,6 +352,7 @@ public class SalaIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
     }
 
+    /// <summary>Verifica lo scenario di S20_DeleteSala_BlockedByIssuedTickets: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task S20_DeleteSala_BlockedByIssuedTickets()
     {

@@ -11,6 +11,7 @@ using UglyToad.PdfPig.DocumentLayoutAnalysis.TextExtractor;
 
 namespace FilmAPI.Tests.Integration;
 
+/// <summary>Suite di test per TicketIntegrationTests.</summary>
 public class TicketIntegrationTests : IClassFixture<CustomWebApplicationFactory>
 {
     private readonly CustomWebApplicationFactory _factory;
@@ -20,6 +21,7 @@ public class TicketIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         _factory = factory;
     }
 
+    /// <summary>Verifica lo scenario di TK1_PayOrder_WithCredit_EmitsTicketsAndSendsEmailWithPdfAttachment: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task TK1_PayOrder_WithCredit_EmitsTicketsAndSendsEmailWithPdfAttachment()
     {
@@ -59,6 +61,7 @@ public class TicketIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Null(dbOrder.TicketEmailLastError);
     }
 
+    /// <summary>Verifica lo scenario di TK2_DownloadOrderPdf_ReturnsMultipagePdfContainingRequiredData: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task TK2_DownloadOrderPdf_ReturnsMultipagePdfContainingRequiredData()
     {
@@ -95,6 +98,7 @@ public class TicketIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Contains("URL validazione:", fullText);
     }
 
+    /// <summary>Verifica lo scenario di TK3_DownloadOrderPdf_OtherUser_ReturnsNotFound: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task TK3_DownloadOrderPdf_OtherUser_ReturnsNotFound()
     {

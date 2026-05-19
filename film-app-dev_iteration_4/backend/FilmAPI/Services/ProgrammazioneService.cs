@@ -5,17 +5,44 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FilmAPI.Services;
 
+/// <summary>
+/// Fornisce il servizio  per le operazioni di dominio esposte da questo modulo.
+/// </summary>
+/// <remarks>
+/// Usato dai controller o endpoint che gestiscono le funzioni di . Dipendenze iniettate nel costruttore: nessuna dichiarata esplicitamente.
+/// </remarks>
 public class ProgrammazioneService : IProgrammazioneService
 {
     private readonly FilmDbContext _context;
     private readonly string _defaultCoverPath;
 
+    /// <summary>
+    /// Esegue l''operazione ProgrammazioneService del servizio.
+    /// </summary>
+    /// <param name="context">Parametro necessario per l'operazione: context.</param>
+    /// <returns>Restituisce il risultato dell'operazione quando questa ha esito positivo; altrimenti il chiamante riceve un'eccezione o un risultato nullo/booleano secondo il contratto del metodo.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database.
+    /// </remarks>
     public ProgrammazioneService(FilmDbContext context)
     {
         _context = context;
         _defaultCoverPath = Environment.GetEnvironmentVariable("DEFAULT_COVER_IMAGE_PATH") ?? "/media/defaults/cover-default.jpg";
     }
 
+    /// <summary>
+    /// Recupera o legge i dati tramite l''operazione GetFilmsAsync del servizio.
+    /// </summary>
+    /// <param name="tab">Parametro necessario per l'operazione: tab.</param>
+    /// <param name="search">Parametro necessario per l'operazione: search.</param>
+    /// <param name="categoriaId">Identificativo necessario per individuare l'entità o il contesto di lavoro: categoriaId.</param>
+    /// <param name="cinemaId">Identificativo necessario per individuare l'entità o il contesto di lavoro: cinemaId.</param>
+    /// <param name="page">Parametro necessario per l'operazione: page.</param>
+    /// <param name="pageSize">Parametro necessario per l'operazione: pageSize.</param>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database.
+    /// </remarks>
     public async Task<ProgrammazioneFilmPagedResultDTO> GetFilmsAsync(string? tab, string? search, int? categoriaId, int? cinemaId, int page = 1, int pageSize = 20)
     {
         page = Math.Max(1, page);
@@ -162,6 +189,15 @@ public class ProgrammazioneService : IProgrammazioneService
         };
     }
 
+    /// <summary>
+    /// Recupera o legge i dati tramite l''operazione GetCinemasAsync del servizio.
+    /// </summary>
+    /// <param name="lat">Parametro necessario per l'operazione: lat.</param>
+    /// <param name="lng">Parametro necessario per l'operazione: lng.</param>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: non introduce effetti collaterali esterni evidenti oltre alla logica di lettura o validazione.
+    /// </remarks>
     public async Task<List<CinemaCardDTO>> GetCinemasAsync(double? lat, double? lng)
     {
         var cinemas = await _context.Cinemas
@@ -210,6 +246,15 @@ public class ProgrammazioneService : IProgrammazioneService
         return results;
     }
 
+    /// <summary>
+    /// Recupera o legge i dati tramite l''operazione GetFilmSchedaAsync del servizio.
+    /// </summary>
+    /// <param name="filmId">Identificativo necessario per individuare l'entità o il contesto di lavoro: filmId.</param>
+    /// <param name="cinemaId">Identificativo necessario per individuare l'entità o il contesto di lavoro: cinemaId.</param>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database.
+    /// </remarks>
     public async Task<FilmSchedaDTO?> GetFilmSchedaAsync(int filmId, int? cinemaId)
     {
         var film = await _context.Films
@@ -323,6 +368,13 @@ public class ProgrammazioneService : IProgrammazioneService
         return dto;
     }
 
+    /// <summary>
+    /// Recupera o legge i dati tramite l''operazione GetMyCinemasAsync del servizio.
+    /// </summary>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database.
+    /// </remarks>
     public async Task<List<CinemaCardDTO>> GetMyCinemasAsync()
     {
         var cinemas = await _context.Cinemas
@@ -351,6 +403,15 @@ public class ProgrammazioneService : IProgrammazioneService
         }).ToList();
     }
 
+    /// <summary>
+    /// Recupera o legge i dati tramite l''operazione GetCinemaScheduleAsync del servizio.
+    /// </summary>
+    /// <param name="cinemaId">Identificativo necessario per individuare l'entità o il contesto di lavoro: cinemaId.</param>
+    /// <param name="date">Parametro necessario per l'operazione: date.</param>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database.
+    /// </remarks>
     public async Task<CinemaScheduleDayDTO?> GetCinemaScheduleAsync(int cinemaId, DateOnly? date)
     {
         var cinema = await _context.Cinemas.FindAsync(cinemaId);
@@ -438,6 +499,14 @@ public class ProgrammazioneService : IProgrammazioneService
         };
     }
 
+    /// <summary>
+    /// Recupera o legge i dati tramite l''operazione GetCinemaPreferitoAsync del servizio.
+    /// </summary>
+    /// <param name="userId">Identificativo necessario per individuare l'entità o il contesto di lavoro: userId.</param>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database.
+    /// </remarks>
     public async Task<CinemaPreferitoDTO?> GetCinemaPreferitoAsync(int userId)
     {
         var user = await _context.Users
@@ -466,6 +535,15 @@ public class ProgrammazioneService : IProgrammazioneService
         };
     }
 
+    /// <summary>
+    /// Esegue l''operazione SetCinemaPreferitoAsync del servizio.
+    /// </summary>
+    /// <param name="userId">Identificativo necessario per individuare l'entità o il contesto di lavoro: userId.</param>
+    /// <param name="cinemaId">Identificativo necessario per individuare l'entità o il contesto di lavoro: cinemaId.</param>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database.
+    /// </remarks>
     public async Task<CinemaPreferitoDTO> SetCinemaPreferitoAsync(int userId, int? cinemaId)
     {
         var user = await _context.Users.FindAsync(userId);

@@ -52,6 +52,9 @@ public static class SegnalazioniEndpoints
 /// <summary>
 /// Rappresenta il payload per aggiornare lo stato di una segnalazione.
 /// </summary>
+/// <summary>
+/// Rappresenta il payload per aggiornare lo stato di una segnalazione.
+/// </summary>
 public class UpdateStatoDTO
 {
     public string Stato { get; set; } = string.Empty;

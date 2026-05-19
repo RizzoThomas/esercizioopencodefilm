@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace FilmAPI.Tests.Unit;
 
+/// <summary>Suite di test per ProiezioneServiceTests.</summary>
 public class ProiezioneServiceTests : IAsyncLifetime
 {
     private readonly IServiceProvider _serviceProvider;
@@ -64,6 +65,7 @@ public class ProiezioneServiceTests : IAsyncLifetime
         await _context.DisposeAsync();
     }
 
+    /// <summary>Verifica lo scenario di U_P1_GetAllAsync_WhenNoProiezioniExist_ReturnsEmptyList: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task U_P1_GetAllAsync_WhenNoProiezioniExist_ReturnsEmptyList()
     {
@@ -71,6 +73,7 @@ public class ProiezioneServiceTests : IAsyncLifetime
         result.Should().BeEmpty();
     }
 
+    /// <summary>Verifica lo scenario di U_P2_CreateAsync_WithValidData_CreatesProiezione: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task U_P2_CreateAsync_WithValidData_CreatesProiezione()
     {
@@ -88,6 +91,7 @@ public class ProiezioneServiceTests : IAsyncLifetime
         result.CinemaId.Should().Be(1);
     }
 
+    /// <summary>Verifica lo scenario di U_P3_CreateAsync_WhenCinemaNotExists_ThrowsArgumentException: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task U_P3_CreateAsync_WhenCinemaNotExists_ThrowsArgumentException()
     {
@@ -104,6 +108,7 @@ public class ProiezioneServiceTests : IAsyncLifetime
         await act.Should().ThrowAsync<ArgumentException>();
     }
 
+    /// <summary>Verifica lo scenario di U_P4_CreateAsync_WhenFilmNotExists_ThrowsArgumentException: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task U_P4_CreateAsync_WhenFilmNotExists_ThrowsArgumentException()
     {
@@ -120,6 +125,7 @@ public class ProiezioneServiceTests : IAsyncLifetime
         await act.Should().ThrowAsync<ArgumentException>();
     }
 
+    /// <summary>Verifica lo scenario di U_P5_CreateAsync_WhenDuplicateUnique_ThrowsInvalidOperationException: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task U_P5_CreateAsync_WhenDuplicateUnique_ThrowsInvalidOperationException()
     {
@@ -138,6 +144,7 @@ public class ProiezioneServiceTests : IAsyncLifetime
         await act.Should().ThrowAsync<InvalidOperationException>();
     }
 
+    /// <summary>Verifica lo scenario di U_P6_UpdateAsync_WithValidData_UpdatesProiezione: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task U_P6_UpdateAsync_WithValidData_UpdatesProiezione()
     {
@@ -163,6 +170,7 @@ public class ProiezioneServiceTests : IAsyncLifetime
         result!.Data.Date.Should().Be(new DateTime(2024, 12, 26));
     }
 
+    /// <summary>Verifica lo scenario di U_P7_DeleteAsync_WhenProiezioneExists_DeletesProiezione: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task U_P7_DeleteAsync_WhenProiezioneExists_DeletesProiezione()
     {

@@ -7,6 +7,9 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace FilmAPI.Migrations
 {
     /// <inheritdoc />
+    /// <summary>
+    /// Migrazione che introduce categorie, utenti, collegamenti film-categorie, prenotazioni e refresh token, con indici di supporto.
+    /// </summary>
     public partial class AddCategorieAndAuth : Migration
     {
         /// <inheritdoc />

@@ -1,6 +1,7 @@
 // API_BASE_URL declared in api.js — global reference
 
 // Formattazione data ISO -> DD/MM/YYYY
+// Funzione formatDate: descrive l'azione eseguita, i parametri in ingresso e il valore restituito.
 function formatDate(isoDate) {
   if (!isoDate) return '-';
   // Estrai solo la parte data dall'ISO per evitare problemi timezone
@@ -10,12 +11,14 @@ function formatDate(isoDate) {
 }
 
 // Formattazione data per input date (YYYY-MM-DD)
+// Funzione formatDateForInput: descrive l'azione eseguita, i parametri in ingresso e il valore restituito.
 function formatDateForInput(isoDate) {
   if (!isoDate) return '';
   return isoDate.split('T')[0];
 }
 
 // Formattazione ora (HH:MM)
+// Funzione formatTime: descrive l'azione eseguita, i parametri in ingresso e il valore restituito.
 function formatTime(timeString) {
   if (!timeString || timeString === '00:00:00') return '';
   // Se contiene 'T', estrai l'ora dalla parte dopo la T
@@ -26,12 +29,14 @@ function formatTime(timeString) {
 }
 
 // Troncamento testo
+// Funzione truncateText: descrive l'azione eseguita, i parametri in ingresso e il valore restituito.
 function truncateText(text, maxLength = 50) {
   if (!text) return '';
   return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
 }
 
 // Gestione errori API
+// Funzione handleApiError: descrive l'azione eseguita, i parametri in ingresso e il valore restituito.
 function handleApiError(error) {
   console.error('API Error:', error);
   
@@ -67,6 +72,7 @@ function handleApiError(error) {
 }
 
 // Toast notification (Tailwind version)
+// Funzione showToast: descrive l'azione eseguita, i parametri in ingresso e il valore restituito.
 function showToast(message, type = 'success') {
   // Variabile toastContainer: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const toastContainer = document.getElementById('toast-container');
@@ -103,6 +109,7 @@ function showToast(message, type = 'success') {
 }
 
 // Conferma eliminazione
+// Funzione confirmDelete: descrive l'azione eseguita, i parametri in ingresso e il valore restituito.
 function confirmDelete(itemName, callback) {
   // Variabile confirmed: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const confirmed = confirm(`Sei sicuro di voler eliminare "${itemName}"?`);
@@ -110,6 +117,7 @@ function confirmDelete(itemName, callback) {
 }
 
 // Formatta importo in EUR
+// Funzione formatCurrency: descrive l'azione eseguita, i parametri in ingresso e il valore restituito.
 function formatCurrency(amount) {
   // Variabile val: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   var val = parseFloat(amount);
@@ -118,6 +126,7 @@ function formatCurrency(amount) {
 }
 
 // Ottiene URL copertina film con fallback
+// Funzione getCoverImage: descrive l'azione eseguita, i parametri in ingresso e il valore restituito.
 function getCoverImage(copertinaPath) {
   if (!copertinaPath) return '/assets/images/defaults/cover-default.svg';
   if (copertinaPath.startsWith('/media/')) {
@@ -133,6 +142,7 @@ function getCoverImage(copertinaPath) {
 }
 
 // Counter animation — anima un numero da 0 al target (21st.dev style)
+// Funzione animateCounter: descrive l'azione eseguita, i parametri in ingresso e il valore restituito.
 function animateCounter(el, target, duration = 1200) {
   // Variabile start: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const start = 0;

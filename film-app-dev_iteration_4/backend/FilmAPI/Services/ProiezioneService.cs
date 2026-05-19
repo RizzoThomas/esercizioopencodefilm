@@ -5,17 +5,36 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FilmAPI.Services;
 
+/// <summary>
+///     Servizio per la gestione delle proiezioni (versione alternativa/semplificata
+///     degli show). Recupera e gestisce le proiezioni con dettagli su film,
+///     cinema e sala. Usato principalmente per la visualizzazione pubblica
+///     della programmazione.
+/// </summary>
 public class ProiezioneService : IProiezioneService
 {
+    /// <summary>DbContext per accesso a show, film, cinema, sale.</summary>
     private readonly FilmDbContext _context;
+
+    /// <summary>Servizio show sottostante per operazioni di base.</summary>
     private readonly IShowService _showService;
 
+    /// <summary>
+    ///     Inizializza il servizio con le dipendenze necessarie.
+    /// </summary>
     public ProiezioneService(FilmDbContext context, IShowService showService)
     {
         _context = context;
         _showService = showService;
     }
 
+    /// <summary>
+    /// Recupera o legge i dati tramite l''operazione GetAllAsync del servizio.
+    /// </summary>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: non introduce effetti collaterali esterni evidenti oltre alla logica di lettura o validazione.
+    /// </remarks>
     public async Task<List<ProiezioneDTO>> GetAllAsync()
     {
         return await _context.Shows
@@ -34,6 +53,16 @@ public class ProiezioneService : IProiezioneService
             .ToListAsync();
     }
 
+    /// <summary>
+    /// Recupera o legge i dati tramite l''operazione GetPagedAsync del servizio.
+    /// </summary>
+    /// <param name="page">Parametro necessario per l'operazione: page.</param>
+    /// <param name="pageSize">Parametro necessario per l'operazione: pageSize.</param>
+    /// <param name="search">Parametro necessario per l'operazione: search.</param>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database. può effettuare chiamate a servizi esterni o API HTTP.
+    /// </remarks>
     public async Task<ProiezionePagedResultDTO> GetPagedAsync(int page, int pageSize, string? search)
     {
         var normalizedPage = page < 1 ? 1 : page;
@@ -90,6 +119,14 @@ public class ProiezioneService : IProiezioneService
         };
     }
 
+    /// <summary>
+    /// Recupera o legge i dati tramite l''operazione GetByIdAsync del servizio.
+    /// </summary>
+    /// <param name="id">Identificativo necessario per individuare l'entità o il contesto di lavoro: id.</param>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database. può effettuare chiamate a servizi esterni o API HTTP.
+    /// </remarks>
     public async Task<ProiezioneDTO?> GetByIdAsync(int id)
     {
         var show = await _context.Shows.FindAsync(id);
@@ -98,6 +135,14 @@ public class ProiezioneService : IProiezioneService
         return MapToShowDTO(show);
     }
 
+    /// <summary>
+    /// Esegue l''operazione di business CreateAsync del servizio.
+    /// </summary>
+    /// <param name="dto">Oggetto DTO di input necessario per eseguire l'operazione.</param>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database. può effettuare chiamate a servizi esterni o API HTTP.
+    /// </remarks>
     public async Task<ProiezioneDTO> CreateAsync(ProiezioneCreateDTO dto)
     {
         var showDto = new ShowCreateDTO
@@ -112,6 +157,15 @@ public class ProiezioneService : IProiezioneService
         return MapToProiezioneDTO(createdShow);
     }
 
+    /// <summary>
+    /// Esegue l''operazione di business UpdateAsync del servizio.
+    /// </summary>
+    /// <param name="id">Identificativo necessario per individuare l'entità o il contesto di lavoro: id.</param>
+    /// <param name="dto">Oggetto DTO di input necessario per eseguire l'operazione.</param>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database. può effettuare chiamate a servizi esterni o API HTTP.
+    /// </remarks>
     public async Task<ProiezioneDTO?> UpdateAsync(int id, ProiezioneUpdateDTO dto)
     {
         var show = await _context.Shows.FindAsync(id);
@@ -137,6 +191,14 @@ public class ProiezioneService : IProiezioneService
         return updatedShow is null ? null : MapToProiezioneDTO(updatedShow);
     }
 
+    /// <summary>
+    /// Esegue l''operazione di business DeleteAsync del servizio.
+    /// </summary>
+    /// <param name="id">Identificativo necessario per individuare l'entità o il contesto di lavoro: id.</param>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database. può effettuare chiamate a servizi esterni o API HTTP.
+    /// </remarks>
     public async Task<bool> DeleteAsync(int id)
     {
         return await _showService.DeleteAsync(id);

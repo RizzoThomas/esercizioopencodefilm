@@ -270,6 +270,7 @@ window.handlePrenotaFilm = function(filmId) {
 };
 
 // ─── AI Recommendations ──────────────────────────────────
+// Funzione loadRecommendations: descrive l'azione eseguita, i parametri in ingresso e il valore restituito.
 async function loadRecommendations() {
   // Wait for auth
   var tries = 0;

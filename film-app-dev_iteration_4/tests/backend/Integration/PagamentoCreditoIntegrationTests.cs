@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace FilmAPI.Tests.Integration;
 
+/// <summary>Suite di test per PagamentoCreditoIntegrationTests.</summary>
 public class PagamentoCreditoIntegrationTests : IClassFixture<CustomWebApplicationFactory>
 {
     private readonly CustomWebApplicationFactory _factory;
@@ -18,6 +19,7 @@ public class PagamentoCreditoIntegrationTests : IClassFixture<CustomWebApplicati
         _factory = factory;
     }
 
+    /// <summary>Verifica lo scenario di PG1_PayOrder_WithCard_CompletesSynchronouslyAfterPaymentIntentSucceeded: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task PG1_PayOrder_WithCard_CompletesSynchronouslyAfterPaymentIntentSucceeded()
     {
@@ -63,6 +65,7 @@ public class PagamentoCreditoIntegrationTests : IClassFixture<CustomWebApplicati
         Assert.Equal(2, tickets.Count);
     }
 
+    /// <summary>Verifica lo scenario di PG2_PayOrder_WithCredit_DebitsBalanceAndCreatesAuditMovement: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task PG2_PayOrder_WithCredit_DebitsBalanceAndCreatesAuditMovement()
     {
@@ -97,6 +100,7 @@ public class PagamentoCreditoIntegrationTests : IClassFixture<CustomWebApplicati
         Assert.Equal(20m, movement.SaldoPost);
     }
 
+    /// <summary>Verifica lo scenario di PG3_PayOrder_WithMixedPayment_SplitsCreditAndCardAndFinalizesOrder: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task PG3_PayOrder_WithMixedPayment_SplitsCreditAndCardAndFinalizesOrder()
     {
@@ -140,6 +144,7 @@ public class PagamentoCreditoIntegrationTests : IClassFixture<CustomWebApplicati
         Assert.Equal(0m, user.CreditoResiduo);
     }
 
+    /// <summary>Verifica lo scenario di PG4_PayOrder_WithInsufficientCredit_ReturnsConflict: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task PG4_PayOrder_WithInsufficientCredit_ReturnsConflict()
     {
@@ -163,6 +168,7 @@ public class PagamentoCreditoIntegrationTests : IClassFixture<CustomWebApplicati
         Assert.Empty(payload.Biglietti);
     }
 
+    /// <summary>Verifica lo scenario di PG5_StripeWebhook_ReplaySafe_DoesNotDuplicateTicketsOrMovements: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task PG5_StripeWebhook_ReplaySafe_DoesNotDuplicateTicketsOrMovements()
     {
@@ -209,6 +215,7 @@ public class PagamentoCreditoIntegrationTests : IClassFixture<CustomWebApplicati
         Assert.Empty(await db.MovimentiCredito.Where(m => m.OrdineId == order.Id).ToListAsync());
     }
 
+    /// <summary>Verifica lo scenario di PG6_AdminTopUp_UpdatesBalanceAndCreditoMeHistory: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task PG6_AdminTopUp_UpdatesBalanceAndCreditoMeHistory()
     {
@@ -246,6 +253,7 @@ public class PagamentoCreditoIntegrationTests : IClassFixture<CustomWebApplicati
         Assert.Equal("TopUp", historyPayload.Movimenti[0].Tipo);
     }
 
+    /// <summary>Verifica lo scenario di PG7_CancelPendingOrder_ReleasesHeldSeatsAndCancelsOrder: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task PG7_CancelPendingOrder_ReleasesHeldSeatsAndCancelsOrder()
     {

@@ -11,6 +11,9 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace FilmAPI.Migrations
 {
+    /// <summary>
+    /// Classe generata da EF Core per la migrazione AddWatchlist.
+    /// </summary>
     [DbContext(typeof(FilmDbContext))]
     [Migration("20260513073256_AddWatchlist")]
     partial class AddWatchlist

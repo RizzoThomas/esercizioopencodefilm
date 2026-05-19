@@ -87,6 +87,7 @@
   applyTheme(getCurrentTheme());
 
   // Re-apply icon states when navbar components load
+// Listener evento: si attiva quando scatta l'evento e aggiorna UI o stato.
   document.addEventListener('components:loaded', function() {
     applyTheme(getCurrentTheme());
   });

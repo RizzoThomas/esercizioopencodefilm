@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- Pagina CineBase: struttura principale con sezioni statiche e contenuti dinamici gestiti da JavaScript. -->
 <html lang="it-IT">
 
 <head>
@@ -20,131 +21,23 @@
 
 <body class="bg-canvas text-ink font-sans cinematic-enter-page">
   <!-- Contenitore dinamico: navbar-container viene popolato o mostrato da JavaScript. -->
+<!-- Contenitore dinamico: quest'area viene popolata o mostrata da JavaScript. -->
   <div id="navbar-container"></div>
 
   <!-- Hero Section — Cinematic Elevation v2: Letterbox + Ken Burns + Film Grain -->
-  <section class="hero-cinema dust-particles">
-    <!-- Film grain overlay (fixed, subtle analog texture) -->
-    <div class="hero-film-grain" aria-hidden="true"></div>
-
-    <!-- Dust particles layer (above bg, below content) -->
-    <div id="dust-layer" class="absolute inset-0 z-[4] pointer-events-none overflow-hidden" aria-hidden="true"></div>
-
-    <!-- Iconic cinema background — fixed, Ken Burns animation -->
-    <div id="hero-bg" class="hero-cinema-bg hero-cinema-bg-active"
-         style="background-image: url('https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?w=1920&q=80');">
-    </div>
-
-    <!-- Hero content -->
-    <div class="hero-cinema-content">
-      <p class="hero-eyebrow">In programmazione ora</p>
-      <h1 class="hero-cinema-title">
-        CineBase,
-        <span class="shimmer-text">la tua rete cinematografica</span>
-      </h1>
-      <p class="hero-cinema-subtitle">
-        Catalogo film, gestione sale, programmazione e biglietteria &mdash;
-        tutto in un ecosistema integrato progettato per il cinema di oggi.
-      </p>
-      <div class="hero-cinema-ctas">
-        <a href="/programmazione.html" class="btn-primary group ripple-container magnetic-btn btn-primary-glow">
-          Esplora la programmazione
-          <span class="inline-flex items-center justify-center w-7 h-7 -mr-1
-                       rounded-full bg-white/10
-                       transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]
-                       group-hover:bg-white/15 group-hover:translate-x-0.5 group-hover:-translate-y-px">
-            <i class="fa-solid fa-arrow-right text-[11px]"></i>
-          </span>
-        </a>
-        <a href="/registrazione.html" class="btn-outline">Registrati</a>
-      </div>
-    </div>
-  </section>
+<!-- Sezione principale: blocco UI dedicato a un contenuto specifico della pagina. -->
+  <!-- Sezione principale: blocco UI dedicato a un contenuto specifico della pagina. -->
+  <section $$$> $$$ </section>
 
   <!-- Film in Evidenza — Cinematic Bento Grid -->
-  <section id="featured" class="py-24 bg-canvas orb-bg light-beams">
-    <div class="container mx-auto px-4">
-      <div class="flex items-center gap-4 mb-10 lamp-header reveal-cinematic">
-        <h2 class="ferrari-display-lg">
-          <span class="lamp-text">In Evidenza Questa Settimana</span>
-        </h2>
-        <div class="h-0.5 flex-1 bg-ferrari-primary"></div>
-      </div>
-
-      <div class="mb-10 flex flex-wrap items-center justify-between gap-4 reveal-cinematic reveal-cinematic-delay-1">
-        <p class="page-header-subtitle mt-0">
-          Una selezione dei titoli pi&ugrave; rilevanti del momento, scelti in base alla programmazione della settimana e alle nuove uscite.
-        </p>
-        <a href="/programmazione.html" class="btn-outline">
-          <i class="fa-solid fa-calendar-days mr-2"></i>Vai alla Programmazione
-        </a>
-      </div>
-
-      <!-- Featured Skeleton Loader -->
-      <div id="featured-skeleton" class="focus-cards-container grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-4">
-        <div class="lg:col-span-2">
-          <div class="card-ferrari overflow-hidden h-[118vw] min-h-[420px] max-h-[780px] lg:h-[930px]">
-            <div class="skeleton skeleton-poster w-full h-full"></div>
-          </div>
-        </div>
-        <div class="lg:col-span-1 flex flex-col gap-4 lg:gap-[18px]">
-          <div class="card-ferrari flex overflow-hidden h-[180px] sm:h-[198px] lg:h-[213px]">
-            <div class="skeleton w-[28%] lg:w-[32%] h-full"></div>
-            <div class="p-3 lg:p-4 flex flex-col justify-center flex-1 gap-3">
-              <div class="skeleton skeleton-text w-[40%]"></div>
-              <div class="skeleton skeleton-title w-[75%]"></div>
-              <div class="skeleton skeleton-text w-[55%]"></div>
-            </div>
-          </div>
-          <div class="card-ferrari flex overflow-hidden h-[180px] sm:h-[198px] lg:h-[213px]">
-            <div class="skeleton w-[28%] lg:w-[32%] h-full"></div>
-            <div class="p-3 lg:p-4 flex flex-col justify-center flex-1 gap-3">
-              <div class="skeleton skeleton-text w-[35%]"></div>
-              <div class="skeleton skeleton-title w-[70%]"></div>
-              <div class="skeleton skeleton-text w-[50%]"></div>
-            </div>
-          </div>
-          <div class="card-ferrari flex overflow-hidden h-[180px] sm:h-[198px] lg:h-[213px]">
-            <div class="skeleton w-[28%] lg:w-[32%] h-full"></div>
-            <div class="p-3 lg:p-4 flex flex-col justify-center flex-1 gap-3">
-              <div class="skeleton skeleton-text w-[45%]"></div>
-              <div class="skeleton skeleton-title w-[65%]"></div>
-              <div class="skeleton skeleton-text w-[40%]"></div>
-            </div>
-          </div>
-          <div class="card-ferrari flex overflow-hidden h-[180px] sm:h-[198px] lg:h-[213px]">
-            <div class="skeleton w-[28%] lg:w-[32%] h-full"></div>
-            <div class="p-3 lg:p-4 flex flex-col justify-center flex-1 gap-3">
-              <div class="skeleton skeleton-text w-[30%]"></div>
-              <div class="skeleton skeleton-title w-[72%]"></div>
-              <div class="skeleton skeleton-text w-[48%]"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Featured Content (hidden until loaded) -->
-      <div id="featured-grid" class="focus-cards-container grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-4 hidden"></div>
-    </div>
-  </section>
+<!-- Sezione principale: blocco UI dedicato a un contenuto specifico della pagina. -->
+  <!-- Sezione principale: blocco UI dedicato a un contenuto specifico della pagina. -->
+  <section $$$> $$$ </section>
 
   <!-- AI Recommendations "Per Te" -->
-  <section id="recommendations-section" class="hidden py-12 bg-canvas-elevated/30">
-    <div class="container mx-auto px-4">
-      <div class="flex items-center gap-4 mb-8">
-        <i class="fa-solid fa-robot text-ferrari-primary text-2xl"></i>
-        <h2 class="text-2xl md:text-3xl font-bold text-ink">Per Te <span class="text-ferrari-primary">✦</span></h2>
-      </div>
-      <p class="text-body mb-6" id="recommendations-subtitle">Suggerimenti basati sui tuoi gusti</p>
-  <!-- Contenitore dinamico: recommendations-grid viene popolato o mostrato da JavaScript. -->
-      <div id="recommendations-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-        <div class="text-center text-body col-span-full py-8">
-          <i class="fa-solid fa-spinner fa-spin text-2xl mb-2"></i>
-          <p class="text-sm">L'AI sta analizzando i tuoi gusti...</p>
-        </div>
-      </div>
-    </div>
-  </section>
+<!-- Sezione principale: blocco UI dedicato a un contenuto specifico della pagina. -->
+  <!-- Sezione principale: blocco UI dedicato a un contenuto specifico della pagina. -->
+  <section $$$> $$$ </section>
 
   <div class="section-divider-glow"></div>
 
@@ -212,9 +105,11 @@
   </script>
 
   <!-- Contenitore dinamico: footer-container viene popolato o mostrato da JavaScript. -->
+<!-- Contenitore dinamico: quest'area viene popolata o mostrata da JavaScript. -->
   <div id="footer-container"></div>
 
   <!-- Toast Container -->
+<!-- Contenitore dinamico: quest'area viene popolata o mostrata da JavaScript. -->
   <div id="toast-container" class="fixed bottom-4 right-4 z-50"></div>
 
   <script src="/js/utils.js"></script>

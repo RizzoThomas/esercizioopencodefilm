@@ -5,6 +5,9 @@
 namespace FilmAPI.Migrations
 {
     /// <inheritdoc />
+    /// <summary>
+    /// Migrazione che aggiunge DeviceId ai refresh token, aggiorna i dati esistenti e crea l'indice composito utente-dispositivo.
+    /// </summary>
     public partial class AddRefreshTokenDeviceId : Migration
     {
         /// <inheritdoc />

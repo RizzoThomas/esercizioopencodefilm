@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 
@@ -6,10 +6,17 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace FilmAPI.Migrations
 {
-    /// <inheritdoc />
+    /// <summary>
+    ///     Aggiunge la tabella UserSubscriptions per la gestione degli abbonamenti utente. Include: data inizio, data fine, tipo abbonamento, stato (attivo/scaduto/cancellato).
+    /// </summary>
+    /// <summary>
+    /// Migrazione che crea la tabella UserSubscriptions con i relativi indici per abbonamenti, utenti e stato.
+    /// </summary>
     public partial class AddUserSubscription : Migration
     {
-        /// <inheritdoc />
+        /// <summary>
+    ///     Aggiunge la tabella UserSubscriptions per la gestione degli abbonamenti utente. Include: data inizio, data fine, tipo abbonamento, stato (attivo/scaduto/cancellato).
+    /// </summary>
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
@@ -63,7 +70,9 @@ namespace FilmAPI.Migrations
                 columns: new[] { "UserId", "Stato" });
         }
 
-        /// <inheritdoc />
+        /// <summary>
+    ///     Aggiunge la tabella UserSubscriptions per la gestione degli abbonamenti utente. Include: data inizio, data fine, tipo abbonamento, stato (attivo/scaduto/cancellato).
+    /// </summary>
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(

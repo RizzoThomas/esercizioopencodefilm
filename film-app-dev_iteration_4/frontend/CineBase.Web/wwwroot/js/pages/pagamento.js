@@ -90,6 +90,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   setupActions();
 
   // Detect back-button return from Stripe: cancel abandoned checkout
+// Listener evento: si attiva quando scatta l'evento e aggiorna UI o stato.
   window.addEventListener('pageshow', async (e) => {
     if (paymentFlowMode !== 'order') return;
     if (e.persisted) {
@@ -778,6 +779,7 @@ function showError(message) {
 }
 
 // Reset button state when returning from Stripe via browser back
+// Listener evento: si attiva quando scatta l'evento e aggiorna UI o stato.
 window.addEventListener('pageshow', (event) => {
   if (paymentFlowMode !== 'order') return;
   if (event.persisted) {
