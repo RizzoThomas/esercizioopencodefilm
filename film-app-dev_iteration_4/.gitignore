@@ -8,6 +8,9 @@
 .env.*
 !.env.example
 
+# Docker env
+.env.docker
+
 # Claude
 .claude/settings.json
 
