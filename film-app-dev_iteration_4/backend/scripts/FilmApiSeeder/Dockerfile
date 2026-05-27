@@ -1,10 +1,19 @@
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /source
-COPY ["backend/scripts/FilmApiSeeder/FilmApiSeeder.csproj", "."]
-RUN dotnet restore
-COPY backend/scripts/FilmApiSeeder/ .
-RUN dotnet build -c Release -o /app/build
-RUN dotnet publish -c Release -o /app/publish
+
+# Copy both project files (seeder references FilmAPI)
+COPY ["backend/FilmAPI/FilmAPI.csproj", "backend/FilmAPI/"]
+COPY ["backend/scripts/FilmApiSeeder/FilmApiSeeder.csproj", "backend/scripts/FilmApiSeeder/"]
+
+# Restore seeder (restores FilmAPI as dependency)
+RUN dotnet restore backend/scripts/FilmApiSeeder/FilmApiSeeder.csproj
+
+# Copy all source code for both projects
+COPY backend/ backend/
+
+# Build and publish only the seeder
+RUN dotnet build backend/scripts/FilmApiSeeder/FilmApiSeeder.csproj -c Release -o /app/build
+RUN dotnet publish backend/scripts/FilmApiSeeder/FilmApiSeeder.csproj -c Release -o /app/publish
 
 FROM mcr.microsoft.com/dotnet/runtime:9.0
 WORKDIR /app
