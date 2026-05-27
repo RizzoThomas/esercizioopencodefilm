@@ -147,3 +147,11 @@ Before creating backend Dockerfile:
 **Adaptation for Dockerfile:**
 - COPY `.env.docker` → `.env` in WORKDIR (or rely on docker-compose `environment:` section)
 - Backend multi-stage: build with SDK 9.0, runtime with aspnet:9.0
+
+---
+
+## 8. FASE 1 updates
+
+- `backend/Dockerfile` creato con build stage SDK 9.0 e runtime stage aspnet:9.0, con caching csproj→restore e HEALTHCHECK su `/health`.
+- `backend/FilmAPI/Program.cs` ora espone `GET /health` prima di `app.Run()` con risposta 200 JSON semplice.
+- `frontend/CineBase.Web/wwwroot/js/pages/films.js` ora usa `window.API_BASE_URL || 'http://localhost:5000'` per le immagini da `/media/`.

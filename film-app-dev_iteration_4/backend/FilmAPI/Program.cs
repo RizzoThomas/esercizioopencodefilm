@@ -367,6 +367,9 @@ app.MapGet("/config/frontend", (FrontendRuntimeConfig config) => Results.Ok(new
     stripePublishableKey = config.StripePublishableKey
 })).AllowAnonymous();
 
+// Health Check endpoint per docker-compose
+app.MapGet("/health", () => Results.Ok(new { status = "healthy", timestamp = DateTime.UtcNow }));
+
 // ─── MIGRATION E SEED ALL'AVVIO ─────────────────────────────────────────────
 using (var scope = app.Services.CreateScope())
 {

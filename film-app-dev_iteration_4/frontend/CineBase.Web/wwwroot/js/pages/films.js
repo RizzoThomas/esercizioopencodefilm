@@ -151,7 +151,7 @@ if (!films.length) {
             <td class="px-6 py-4 whitespace-nowrap text-sm text-body">${film.id}</td>
             <td class="px-6 py-4 whitespace-nowrap">
                 <div class="h-10 w-8 flex-shrink-0 bg-canvas-elevated rounded overflow-hidden">
-                    <img class="h-full w-full object-cover" src="${film.copertinaPath?.startsWith('/media/') ? `http://localhost:5000${film.copertinaPath}` : (film.copertinaPath || '/assets/images/defaults/cover-default.jpg')}" alt="${film.titolo}">
+                    <img class="h-full w-full object-cover" src="${film.copertinaPath?.startsWith('/media/') ? `${window.API_BASE_URL || 'http://localhost:5000'}${film.copertinaPath}` : (film.copertinaPath || '/assets/images/defaults/cover-default.jpg')}" alt="${film.titolo}">
                 </div>
             </td>
       <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-ink">${film.titolo}</td>
