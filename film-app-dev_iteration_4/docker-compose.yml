@@ -1,0 +1,140 @@
+version: '3.8'
+
+services:
+  db:
+    image: mariadb:11.4
+    container_name: cinebase-db
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD:-Dev@12345}
+      MYSQL_DATABASE: ${MARIADB_DATABASE:-film-api-db}
+    volumes:
+      - mariadb-data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    networks:
+      - cinebase
+    healthcheck:
+      test: ["CMD", "mariadb-admin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 10s
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: cinebase-backend
+    image: cinebase-backend:latest
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Development}
+      ASPNETCORE_URLS: http://+:5000
+      DB_HOST: db
+      DB_PORT: ${DB_PORT:-3306}
+      DB_NAME: ${DB_NAME:-film-api-db}
+      DB_USER: ${DB_USER:-root}
+      DB_PASSWORD: ${DB_PASSWORD:-Dev@12345}
+      DB_USE_AUTODETECT: ${DB_USE_AUTODETECT:-true}
+      DB_SERVER_VERSION: ${DB_SERVER_VERSION:-10.11.0-mariadb}
+      JWT_SECRET: ${JWT_SECRET:-dev-secret-change-in-production}
+      JWT_ISSUER: ${JWT_ISSUER:-CineBaseAPI}
+      JWT_AUDIENCE: ${JWT_AUDIENCE:-CineBaseWeb}
+      JWT_ACCESS_TOKEN_EXPIRY_MINUTES: ${JWT_ACCESS_TOKEN_EXPIRY_MINUTES:-15}
+      JWT_REFRESH_TOKEN_EXPIRY_DAYS: ${JWT_REFRESH_TOKEN_EXPIRY_DAYS:-7}
+      ADMIN_SEED_EMAIL: ${ADMIN_SEED_EMAIL:-admin@cinebase.it}
+      ADMIN_SEED_PASSWORD: ${ADMIN_SEED_PASSWORD:-Admin123!}
+      FRONTEND_BASE_URL: http://localhost:5001
+      TICKET_VALIDATION_BASE_URL: http://localhost:5001/validazione-biglietti.html
+      GOOGLE_OAUTH_CLIENT_ID: ${GOOGLE_OAUTH_CLIENT_ID}
+      GOOGLE_OAUTH_CLIENT_SECRET: ${GOOGLE_OAUTH_CLIENT_SECRET}
+      GOOGLE_OAUTH_REDIRECT_URI: http://localhost:5000/auth/external/google/callback
+      MICROSOFT_OAUTH_CLIENT_ID: ${MICROSOFT_OAUTH_CLIENT_ID}
+      MICROSOFT_OAUTH_CLIENT_SECRET: ${MICROSOFT_OAUTH_CLIENT_SECRET}
+      MICROSOFT_OAUTH_REDIRECT_URI: http://localhost:5000/auth/external/microsoft/callback
+      MICROSOFT_TENANT_ID: ${MICROSOFT_TENANT_ID}
+      MICROSOFT_ALLOWED_TENANT_ID: ${MICROSOFT_ALLOWED_TENANT_ID}
+      MICROSOFT_ALLOWED_DOMAIN: ${MICROSOFT_ALLOWED_DOMAIN:-issgreppi.it}
+      STRIPE_SECRET_API_KEY: ${STRIPE_SECRET_API_KEY}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET}
+      STRIPE_PUBLISHABLE_API_KEY: ${STRIPE_PUBLISHABLE_API_KEY}
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER}
+      SMTP_PASSWORD: ${SMTP_PASSWORD}
+      SMTP_FROM_EMAIL: ${SMTP_FROM_EMAIL:-noreply@cinebase.it}
+      SMTP_FROM_NAME: ${SMTP_FROM_NAME:-CineBase}
+      DEFAULT_TICKET_PRICE: ${DEFAULT_TICKET_PRICE:-8.50}
+      HOLD_TTL_MINUTES: ${HOLD_TTL_MINUTES:-10}
+      MAX_SEATS_PER_ORDER: ${MAX_SEATS_PER_ORDER:-10}
+      PASSWORD_RESET_TOKEN_TTL_MINUTES: ${PASSWORD_RESET_TOKEN_TTL_MINUTES:-30}
+      SET_PASSWORD_TOKEN_TTL_MINUTES: ${SET_PASSWORD_TOKEN_TTL_MINUTES:-60}
+      ADMIN_INVITE_TOKEN_TTL_HOURS: ${ADMIN_INVITE_TOKEN_TTL_HOURS:-24}
+      AUTH_EXTERNAL_STATE_TTL_MINUTES: ${AUTH_EXTERNAL_STATE_TTL_MINUTES:-10}
+      AUTH_EXTERNAL_EXCHANGE_TTL_MINUTES: ${AUTH_EXTERNAL_EXCHANGE_TTL_MINUTES:-2}
+      DEFAULT_COVER_IMAGE_PATH: /media/defaults/cover-default.jpg
+      TMDB_BEARER_TOKEN: ${TMDB_BEARER_TOKEN}
+    ports:
+      - "5000:5000"
+    networks:
+      - cinebase
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    container_name: cinebase-frontend
+    image: cinebase-frontend:latest
+    environment:
+      ASPNETCORE_URLS: http://+:5001
+    ports:
+      - "5001:5001"
+    networks:
+      - cinebase
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5001/"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    restart: unless-stopped
+
+  seeder:
+    build:
+      context: .
+      dockerfile: backend/scripts/FilmApiSeeder/Dockerfile
+    image: cinebase-seeder:latest
+    container_name: cinebase-seeder
+    depends_on:
+      backend:
+        condition: service_healthy
+    environment:
+      DB_HOST: db
+      DB_PORT: ${DB_PORT:-3306}
+      DB_NAME: ${DB_NAME:-film-api-db}
+      DB_USER: ${DB_USER:-root}
+      DB_PASSWORD: ${DB_PASSWORD:-Dev@12345}
+      DB_USE_AUTODETECT: ${DB_USE_AUTODETECT:-true}
+      DB_SERVER_VERSION: ${DB_SERVER_VERSION:-10.11.0-mariadb}
+      TMDB_BEARER_TOKEN: ${TMDB_BEARER_TOKEN}
+      ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Development}
+    networks:
+      - cinebase
+    restart: "no"
+
+networks:
+  cinebase:
+    driver: bridge
+
+volumes:
+  mariadb-data:
+    driver: local
