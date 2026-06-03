@@ -1,0 +1,92 @@
+name: Deploy CineBase su ACA
+
+on:
+  workflow_dispatch:
+    inputs:
+      deploy-aca:
+        description: 'Esegue anche il deploy ACA dopo il build+push'
+        type: boolean
+        default: false
+  push:
+    branches: [main]
+    paths:
+      - 'film-app-dev_iteration_4/backend/**'
+      - 'film-app-dev_iteration_4/frontend/CineBase.Web/**'
+
+env:
+  ACR_LOGIN_SERVER: ${{ secrets.ACR_LOGIN_SERVER }}
+  ACR_USERNAME: ${{ secrets.ACR_USERNAME }}
+  ACR_PASSWORD: ${{ secrets.ACR_PASSWORD }}
+  PROJECT_DIR: film-app-dev_iteration_4
+
+jobs:
+  build-api:
+    name: Build & Push cinebase-api
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Login to ACR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.ACR_LOGIN_SERVER }}
+          username: ${{ env.ACR_USERNAME }}
+          password: ${{ env.ACR_PASSWORD }}
+
+      - name: Build and Push API
+        uses: docker/build-push-action@v5
+        with:
+          context: ${{ env.PROJECT_DIR }}/backend
+          file: ${{ env.PROJECT_DIR }}/backend/Dockerfile
+          push: true
+          tags: ${{ env.ACR_LOGIN_SERVER }}/cinebase-api:latest
+          platforms: linux/amd64
+
+  build-web:
+    name: Build & Push cinebase-web
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Login to ACR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.ACR_LOGIN_SERVER }}
+          username: ${{ env.ACR_USERNAME }}
+          password: ${{ env.ACR_PASSWORD }}
+
+      - name: Build and Push Frontend
+        uses: docker/build-push-action@v5
+        with:
+          context: ${{ env.PROJECT_DIR }}/frontend/CineBase.Web
+          file: ${{ env.PROJECT_DIR }}/frontend/CineBase.Web/Dockerfile
+          push: true
+          tags: ${{ env.ACR_LOGIN_SERVER }}/cinebase-web:latest
+          platforms: linux/amd64
+
+  build-seeder:
+    name: Build & Push cinebase-seeder
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Login to ACR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.ACR_LOGIN_SERVER }}
+          username: ${{ env.ACR_USERNAME }}
+          password: ${{ env.ACR_PASSWORD }}
+
+      - name: Build and Push Seeder
+        uses: docker/build-push-action@v5
+        with:
+          context: ${{ env.PROJECT_DIR }}/backend
+          file: ${{ env.PROJECT_DIR }}/backend/scripts/FilmApiSeeder/Dockerfile
+          push: true
+          tags: ${{ env.ACR_LOGIN_SERVER }}/cinebase-seeder:latest
+          platforms: linux/amd64
+
+  # Nota: il deploy ACA viene eseguito localmente dopo che le immagini sono su ACR
+  # Per eseguire il deploy locale, dopo il completamento dei job di build:
+  #   cd film-app-dev_iteration_4
+  #   pwsh .\infra\azure\aca-deploy.ps1 -TmdbToken \$token -AcrName acrcinebasethomr
