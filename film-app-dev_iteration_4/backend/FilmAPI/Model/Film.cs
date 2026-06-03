@@ -53,9 +53,40 @@ public class Film
     /// <summary>Data di rilascio pubblica del film; opzionale.</summary>
     public DateOnly? DataRilascio { get; set; }
 
+    /// <summary>ID TMDB (The Movie Database) per importazione dati.</summary>
+    public int? TmdbId { get; set; }
+
+    /// <summary>ID IMDb del film.</summary>
+    [MaxLength(20)]
+    public string? ImdbId { get; set; }
+
+    /// <summary>Voto medio TMDB (0-10).</summary>
+    public double? VoteAverage { get; set; }
+
+    /// <summary>Numero voti su TMDB.</summary>
+    public int? VoteCount { get; set; }
+
+    /// <summary>Popolarità TMDB.</summary>
+    public double? Popularity { get; set; }
+
+    /// <summary>Path relativo dello sfondo TMDB.</summary>
+    [MaxLength(500)]
+    public string? BackdropPath { get; set; }
+
+    /// <summary>Lingua originale del film (codice ISO).</summary>
+    [MaxLength(10)]
+    public string? OriginalLanguage { get; set; }
+
+    /// <summary>Sito web ufficiale del film.</summary>
+    [MaxLength(500)]
+    public string? Homepage { get; set; }
+
     /// <summary>Associazioni ponte con le categorie del film.</summary>
     public ICollection<FilmCategoria> FilmCategorie { get; set; } = new List<FilmCategoria>();
 
-    /// <summary>Proiezioni programmate per il film.</summary>
+    /// <summary>Proiezioni programmate per il film (entità Proiezione legacy).</summary>
+    public ICollection<Proiezione> Proiezioni { get; set; } = new List<Proiezione>();
+
+    /// <summary>Proiezioni programmate per il film (entità Show).</summary>
     public ICollection<Show> Shows { get; set; } = new List<Show>();
 }

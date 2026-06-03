@@ -44,6 +44,14 @@ public class User
     [Required]
     public int AuthVersion { get; set; } = 0;
 
+    /// <summary>Indica se l'autenticazione a due fattori è abilitata.</summary>
+    [Required]
+    public bool TwoFactorEnabled { get; set; } = false;
+
+    /// <summary>Secret TOTP per l'autenticazione a due fattori; massimo 128 caratteri.</summary>
+    [MaxLength(128)]
+    public string? TwoFactorSecret { get; set; }
+
     /// <summary>Data/ora UTC dell'ultimo login; nulla se l'utente non ha ancora effettuato accessi.</summary>
     public DateTime? LastLoginAtUtc { get; set; }
 

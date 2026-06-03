@@ -19,7 +19,6 @@
 
 <body class="bg-canvas text-ink font-sans cinematic-enter-page">
   <!-- Contenitore dinamico: navbar-container viene popolato o mostrato da JavaScript. -->
-<!-- Contenitore dinamico: quest'area viene popolata o mostrata da JavaScript. -->
   <div id="navbar-container"></div>
 
   <!-- Contenuto principale: area centrale che ospita il flusso della pagina. -->
@@ -60,20 +59,27 @@
     </div>
 
   <!-- Contenitore dinamico: offers-grid viene popolato o mostrato da JavaScript. -->
-<!-- Contenitore dinamico: quest'area viene popolata o mostrata da JavaScript. -->
     <div id="offers-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 hidden"></div>
 
-  <!-- Sezione principale: blocco UI dedicato a un contenuto funzionale della pagina. -->
-<!-- Sezione principale: blocco UI dedicato a un contenuto specifico della pagina. -->
-    <!-- Sezione principale: blocco UI dedicato a un contenuto specifico della pagina. -->
-    <section $$$> $$$ </section>
+    <section class="mt-16 orb-bg">
+      <div class="orb-overlay" aria-hidden="true"></div>
+      <div class="flex items-end justify-between gap-4 mb-8">
+        <div>
+          <p class="page-header-eyebrow mb-3">Abbonamenti</p>
+          <h2 class="page-header-title">Piani mensili e annuali</h2>
+        </div>
+      </div>
+      <div id="subscriptions-loading" class="text-center py-12 card-ferrari">
+        <i class="fa-solid fa-spinner fa-spin text-3xl mb-3 text-ferrari-primary"></i>
+        <p class="text-body">Caricamento abbonamenti...</p>
+      </div>
+      <div id="subscriptions-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 hidden"></div>
+    </section>
   </main>
 
   <!-- Contenitore dinamico: footer-container viene popolato o mostrato da JavaScript. -->
-<!-- Contenitore dinamico: quest'area viene popolata o mostrata da JavaScript. -->
   <div id="footer-container"></div>
   <!-- Contenitore dinamico: toast-container viene popolato o mostrato da JavaScript. -->
-<!-- Contenitore dinamico: quest'area viene popolata o mostrata da JavaScript. -->
   <div id="toast-container" class="fixed bottom-4 right-4 z-50"></div>
 
   <script src="/js/utils.js?v=2"></script>
