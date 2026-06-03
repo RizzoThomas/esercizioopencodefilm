@@ -129,7 +129,10 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowCineBaseFrontend", policy =>
     {
-        policy.WithOrigins("http://localhost:5001", "http://127.0.0.1:5001")
+        var corsOrigins = (Environment.GetEnvironmentVariable("ALLOWED_CORS_ORIGINS")
+                           ?? "http://localhost:5001,http://127.0.0.1:5001")
+                          .Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+        policy.WithOrigins(corsOrigins)
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials()
