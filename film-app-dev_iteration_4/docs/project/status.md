@@ -1,9 +1,9 @@
 # Stato Progetto
 
-Data aggiornamento: 2026-04-19
+Data aggiornamento: 2026-06-04
 
 ## Branch di lavoro
-- `dev_iteration_4` (iterazione 4 - cinema multisala e ticketing)
+- `dev_iteration_6` (iterazione 6 - containerizzazione e deploy ACA)
 
 ## Stato Iterazione 4
 
@@ -24,6 +24,22 @@ Data aggiornamento: 2026-04-19
 | FASE 11.1 - Migrazione da Stripe Elements a Stripe Checkout hosted | **Completata** | 2026-04-19 | Checkout Session hosted con webhook come source of truth, supporto robusto a credito piattaforma, pagamento misto con credito riservato/rilasciato, cleanup automatico ordini hosted scaduti, riconciliazione backend al ritorno da Stripe e 13 test integrazione dedicati |
 | FASE 12 - Frontend admin: sale, show, ricarica credito, validazione ticket | Pending | - | - |
 | FASE 13 - Test finali, cleanup legacy, hardening e documentazione | Pending | - | - |
+
+## Stato Iterazione 6
+
+| Fase | Stato | Data | Note |
+| --- | --- | --- | --- |
+| FASE 1 — Refinement Dockerfile multistage e docker-compose | **Completata** | 2026-06-04 | Dockerfile ottimizzati con labels, USER app, HEALTHCHECK, curl. Seeder passa a `runtime:9.0`. docker-compose esteso con MailDev, variabili complete (OAuth, SMTP, Stripe), restart policy e rete esplicita |
+| FASE 2 — Configurazione .env.example completo per Clone & Run | **Completata** | 2026-06-04 | `.env.example` radice e `backend/.env.example` riscritti con tutte le variabili documentate e commentate |
+| FASE 3 — Healthcheck endpoint /health e startup robusta | **Completata** | 2026-06-04 | Endpoint `GET /health` aggiunto a `Program.cs` con verifica connessione DB. Retry con backoff (5 tentativi) aggiunto al seeder per connessione DB |
+| FASE 4 — ACA Infrastructure as Code | **Completata** | 2026-06-04 | `aca-deploy.ps1` rifattorizzato con error handling, WhatIf, health probe. Template Bicep `main.bicep` creato con tutte le risorse. `README.md` e `parameters.json` creati |
+| FASE 5 — Build e Push immagini su ACR | **Completata** | 2026-06-04 | 3 immagini buildate e pushati su ACR `acrcinebasethomr`: cinebase-api, cinebase-web, cinebase-seeder |
+| FASE 6 — Deploy MariaDB su ACA | **Completata** | 2026-06-04 | MariaDB 11.4 deployato su ACA con ingress interno e volume Azure Files |
+| FASE 7 — Deploy Backend API su ACA | **Completata** | 2026-06-04 | Backend API deployato con secrets (JWT, DB, TMDB), health probe configurati, ingress interno |
+| FASE 8 — Deploy Seeder come ACA Job | **Completata** | 2026-06-04 | ACA Job `cinebase-seeder` creato e aggiornato con nuova immagine. Esecuzione manuale: `az containerapp job start -n cinebase-seeder -g rg-cinebase-prod` |
+| FASE 9 — Deploy Frontend su ACA | **Completata** | 2026-06-04 | Frontend deployato con ingress esterno, session affinity, env vars fixate (`--replace-env-vars`). Bug fix middleware `Program.cs`: ContentType controllato DOPO `await next()` |
+| FASE 10 — Configurazione OAuth, SMTP, Dominio Personalizzato | **In corso** | 2026-06-04 | DNS `cinebase.shop` verificato. CNAME + TXT asuid pronti da configurare. Istruzioni fornite all'utente |
+| FASE 11 — Documentazione finale | **Completata** | 2026-06-04 | `status.md` e `changelog.md` aggiornati. ACA-DEPLOY-GUIDE.md allineata |
 
 ## Stato generale
 - Iterazione 2.1 media upload: **completata**

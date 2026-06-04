@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="300" height="450" viewBox="0 0 300 450">
+  <rect width="300" height="450" fill="#1a1a2e"/>
+  <rect x="60" y="120" width="180" height="210" rx="8" fill="none" stroke="#d4af37" stroke-width="3" opacity="0.5"/>
+  <circle cx="150" cy="200" r="35" fill="none" stroke="#d4af37" stroke-width="2" opacity="0.6"/>
+  <polygon points="140,185 140,215 165,200" fill="#d4af37" opacity="0.6"/>
+  <text x="150" y="380" text-anchor="middle" font-family="Inter, sans-serif" font-size="14" fill="#666">CineBase</text>
+</svg>

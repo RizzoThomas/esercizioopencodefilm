@@ -42,7 +42,31 @@ internal static class Program
             }
 
             await using var dbContext = CreateDbContext();
-            await dbContext.Database.MigrateAsync(cancellationToken);
+
+            // Retry con backoff per la connessione al DB (utile in Docker quando
+            // MariaDB è appena diventato healthy ma non accetta ancora connessioni)
+            var maxRetries = 5;
+            var retryDelay = TimeSpan.FromSeconds(3);
+            for (var attempt = 1; attempt <= maxRetries; attempt++)
+            {
+                try
+                {
+                    await dbContext.Database.MigrateAsync(cancellationToken);
+                    Console.WriteLine($"Connessione DB stabilita al tentativo {attempt}.");
+                    break;
+                }
+                catch (Exception ex) when (attempt < maxRetries)
+                {
+                    Console.WriteLine($"Tentativo {attempt}/{maxRetries} connessione DB fallito: {ex.Message}");
+                    Console.WriteLine($"Nuovo tentativo tra {retryDelay.TotalSeconds}s...");
+                    await Task.Delay(retryDelay, cancellationToken);
+                }
+                catch (Exception ex) when (attempt >= maxRetries)
+                {
+                    Console.Error.WriteLine($"Impossibile connettersi al DB dopo {maxRetries} tentativi: {ex.Message}");
+                    throw;
+                }
+            }
 
             if (options.ResetAll)
             {
@@ -782,7 +806,7 @@ internal static class Program
         return TimeZoneInfo.Local;
     }
 
-    private static string FindRepositoryRoot()
+    private static string? FindRepositoryRoot()
     {
         var directory = new DirectoryInfo(AppContext.BaseDirectory);
         while (directory is not null)
@@ -793,18 +817,21 @@ internal static class Program
                 return directory.FullName;
             }
 
+            var csprojFiles = directory.GetFiles("*.csproj", SearchOption.TopDirectoryOnly);
+            if (csprojFiles.Length > 0)
+                return directory.FullName;
+
             directory = directory.Parent;
         }
 
-        throw new DirectoryNotFoundException("Repository root non trovata.");
+        return null; // In container o ambiente senza repository root
     }
 
-    private static void LoadEnvFiles(string repoRoot)
+    private static void LoadEnvFiles(string? repoRoot)
     {
-        var envFiles = new[]
-        {
-            Path.Combine(repoRoot, "backend", ".env")
-        };
+        var envFiles = repoRoot != null
+            ? new[] { Path.Combine(repoRoot, "backend", ".env") }
+            : Array.Empty<string>();
 
         foreach (var envFile in envFiles.Where(File.Exists))
         {

@@ -1,5 +1,40 @@
 # Changelog Progetto
 
+## 2026-06-04
+
+### Iterazione 6 — Containerizzazione Completa e Deploy su Azure Container Apps
+
+#### Dockerfile e docker-compose
+- `backend/Dockerfile`: aggiunti labels OCI, USER app per sicurezza non-root, HEALTHCHECK con curl su /health
+- `frontend/CineBase.Web/Dockerfile`: aggiunti labels, USER app, HEALTHCHECK, ASPNETCORE_FORWARDEDHEADERS_ENABLED per proxy
+- `backend/scripts/FilmApiSeeder/Dockerfile`: passato da `aspnet:9.0` a `runtime:9.0` (console app), labels, USER app
+- `docker-compose.yml`: aggiunto servizio MailDev per email fittizie sviluppo, variabili mancanti (OAuth, SMTP, Stripe, Facebook), restart policy `unless-stopped`, rete esplicita `cinebase-network`
+
+#### Configurazione ambiente
+- `.env.example` (radice): riscritto con tutte le variabili documentate, sezioni ordinate, commenti per obbligatorietà
+- `backend/.env.example`: allineato con variabili lette da Program.cs e seeder
+
+#### Backend
+- `Program.cs`: aggiunto endpoint `GET /health` con verifica connessione database
+- `backend/scripts/FilmApiSeeder/Program.cs`: aggiunto retry con backoff (5 tentativi) per connessione DB all'avvio
+- `frontend/CineBase.Web/Program.cs`: **bug fix** middleware API_BASE_URL — ContentType ora controllato DOPO `await next()` (prima era sempre null perché i file statici non avevano ancora processato la richiesta)
+
+#### Infrastruttura Azure
+- `infra/azure/aca-deploy.ps1`: rifattorizzato con error handling, WhatIf support, health probe per backend, Invoke-AzCommand helper, retry logic
+- `infra/azure/main.bicep`: template Bicep dichiarativo per tutte le risorse ACA (RG, ACR, ACA Env, Storage, Container Apps, Job)
+- `infra/azure/parameters.json`: file parametri per Bicep
+- `infra/azure/README.md`: documentazione procedure deploy
+
+#### Deploy ACA (eseguito)
+- Resource Group: `rg-cinebase-prod` (italynorth) / `rg-cinebase-acr` (westeurope)
+- ACR: `acrcinebasethomr` (germanywestcentral) — 3 immagini: cinebase-api, cinebase-web, cinebase-seeder
+- ACA Environment: `aca-env-cinebase` (germanywestcentral)
+- MariaDB: `cinebase-db` con volume persistente, ingress interno
+- Backend API: `cinebase-api` con health probe, secrets, ingress interno
+- Frontend: `cinebase-web` con ingress esterno, session affinity, env vars fixate
+- Seeder Job: `cinebase-seeder` con trigger manuale, immagine aggiornata
+- URL frontend: `https://cinebase-web.gentlegrass-423c9d87.germanywestcentral.azurecontainerapps.io`
+
 ## 2026-04-19
 
 ### Iterazione 4 - Fase 11.1: migrazione da Stripe Elements a Stripe Checkout hosted
