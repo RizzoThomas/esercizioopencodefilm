@@ -11,7 +11,10 @@
 // ============================================================================
 
 // URL base del backend (configurabile, default localhost:5000)
-var API_BASE_URL = window.API_BASE_URL || 'http://localhost:5000';
+// NOTA: window.API_BASE_URL può essere '' (vuoto = stessa origine, con proxy frontend)
+// Usiamo una stringa nulla-safe per non cadere su localhost quando è vuoto
+var API_BASE_URL = (window.API_BASE_URL !== undefined && window.API_BASE_URL !== null)
+    ? window.API_BASE_URL : 'http://localhost:5000';
 
 // ─── GESTIONE REFRESH TOKEN ──────────────────────────────────────────────
 // Quando una richiesta riceve 401, apiFetch tenta automaticamente il refresh.

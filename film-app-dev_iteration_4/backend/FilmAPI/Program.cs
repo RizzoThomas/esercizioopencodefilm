@@ -15,6 +15,7 @@ using DotNetEnv;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.Security.Claims;
@@ -48,6 +49,17 @@ else
 
 // ─── BUILDER: INIZIO CONFIGURAZIONE ─────────────────────────────────────────
 var builder = WebApplication.CreateBuilder(args);
+
+// ─── FORWARDED HEADERS (necessario per ACA / proxy) ────────────────────────
+// ACA e load balancer inoltrano le richieste con header X-Forwarded-*.
+// Senza ForwardedHeaders, il backend vede solo http://cinebase-api:8080
+// e genera redirect URI OAuth errati invece di https://dominio.reale/signin-google).
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto | ForwardedHeaders.XForwardedHost;
+    options.KnownNetworks.Clear();
+    options.KnownProxies.Clear();
+});
 
 // === SERVIZI DI CONFIGURAZIONE RUNTIME ===
 // FrontendRuntimeConfig è un record che espone la Stripe publishable key
@@ -306,16 +318,37 @@ var app = builder.Build();
 
 // ─── MIDDLEWARE PIPELINE (ORDINE IMPORTANTE!) ───────────────────────────────
 // L'ordine dei middleware è fondamentale:
-// 1. CORS        → permette richieste cross-origin
-// 2. RateLimiter → limita il numero di richieste (antiflood)
-// 3. Authentication → legge il JWT e identifica l'utente
-// 4. Authorization  → controlla i permessi (RBAC)
-// 5. StaticFiles    → serve i file statici (frontend)
+// 1. ForwardedHeaders → ripristina schema/host originale dietro proxy/ACA
+// 2. CORS            → permette richieste cross-origin
+// 3. RateLimiter     → limita il numero di richieste (antiflood)
+// 4. Authentication  → legge il JWT e identifica l'utente
+// 5. Authorization   → controlla i permessi (RBAC)
+// 6. StaticFiles     → serve i file statici (frontend)
+app.UseForwardedHeaders();
 app.UseCors("AllowCineBaseFrontend");
 app.UseMiddleware<FilmAPI.Middleware.RateLimiterMiddleware>();
 app.UseAuthentication();
 app.UseAuthorization();
+// Servi i file statici dalla wwwroot (frontend)
 app.UseStaticFiles();
+
+// Servi i file media (copertine, immagini) dalla cartella Media
+// Nel container Docker: /app/Media (copiata dal Dockerfile)
+// In sviluppo locale: ./backend/FilmAPI/Media
+var mediaPath = Path.Combine(Directory.GetCurrentDirectory(), "Media");
+if (!Directory.Exists(mediaPath))
+    mediaPath = Path.Combine(AppContext.BaseDirectory, "Media");
+if (!Directory.Exists(mediaPath))
+    mediaPath = Path.Combine(Directory.GetCurrentDirectory(), "..", "..", "backend", "FilmAPI", "Media");
+Console.WriteLine($"[STARTUP] Media path: {mediaPath} (exists: {Directory.Exists(mediaPath)})");
+if (Directory.Exists(mediaPath))
+{
+    app.UseStaticFiles(new StaticFileOptions
+    {
+        FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(mediaPath),
+        RequestPath = "/media"
+    });
+}
 
 // === SWAGGER (solo in sviluppo) ===
 if (app.Environment.IsDevelopment())
@@ -362,6 +395,22 @@ app.MapNewsletterEndpoints();
 app.MapWatchlistEndpoints();
 app.MapRecommendationsEndpoints();
 app.MapNotificheEndpoints();
+
+// Endpoint di health check: usato dai container healthcheck e dai probe ACA
+// Restituisce 200 OK se l'applicazione è in esecuzione e il DB è raggiungibile
+app.MapGet("/health", async (FilmDbContext dbContext) =>
+{
+    try
+    {
+        // Verifica che il DB sia raggiungibile
+        await dbContext.Database.CanConnectAsync();
+        return Results.Ok(new { status = "Healthy", database = "Connected" });
+    }
+    catch (Exception ex)
+    {
+        return Results.Ok(new { status = "Degraded", database = $"Unreachable: {ex.Message}" });
+    }
+}).AllowAnonymous();
 
 // Endpoint pubblico: espone la publishable key di Stripe al frontend
 // (necessario per inizializzare Stripe.js senza hardcodare la chiave)

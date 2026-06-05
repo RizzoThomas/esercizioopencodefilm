@@ -25,6 +25,10 @@ public static class SocialAuthEndpoints
         // ─── Google ──────────────────────────────────────────────────
         app.MapGet("/auth/login-google", (string? redirect) =>
         {
+            var googleId = Environment.GetEnvironmentVariable("GOOGLE_CLIENT_ID");
+            if (string.IsNullOrEmpty(googleId))
+                return Results.Content("<html><body style='font-family:sans-serif;background:#1a1a2e;color:white;display:flex;align-items:center;justify-content:center;height:100vh'><div style='text-align:center'><h2>⚙️ Google OAuth non configurato</h2><p>Contatta l'amministratore per abilitare l'accesso con Google.</p><a href='https://www.cinebase.shop/login.html' style='color:#d4af37'>← Torna al login</a></div></body></html>", "text/html");
+
             var props = new AuthenticationProperties();
             props.Items["redirect"] = redirect ?? "/index.html";
             return Results.Challenge(props, ["Google"]);
@@ -33,6 +37,10 @@ public static class SocialAuthEndpoints
         // ─── Facebook ────────────────────────────────────────────────
         app.MapGet("/auth/login-facebook", (string? redirect) =>
         {
+            var fbId = Environment.GetEnvironmentVariable("FACEBOOK_APP_ID");
+            if (string.IsNullOrEmpty(fbId))
+                return Results.Content("<html><body style='font-family:sans-serif;background:#1a1a2e;color:white;display:flex;align-items:center;justify-content:center;height:100vh'><div style='text-align:center'><h2>⚙️ Facebook OAuth non configurato</h2><p>Contatta l'amministratore per abilitare l'accesso con Facebook.</p><a href='https://www.cinebase.shop/login.html' style='color:#d4af37'>← Torna al login</a></div></body></html>", "text/html");
+
             var props = new AuthenticationProperties();
             props.Items["redirect"] = redirect ?? "/index.html";
             return Results.Challenge(props, ["Facebook"]);
@@ -41,9 +49,11 @@ public static class SocialAuthEndpoints
         // ─── Microsoft ───────────────────────────────────────────────
         app.MapGet("/auth/login-microsoft", (string? redirect) =>
         {
+            var msId = Environment.GetEnvironmentVariable("MICROSOFT_CLIENT_ID");
+            if (string.IsNullOrEmpty(msId))
+                return Results.Content("<html><body style='font-family:sans-serif;background:#1a1a2e;color:white;display:flex;align-items:center;justify-content:center;height:100vh'><div style='text-align:center'><h2>⚙️ Microsoft OAuth non configurato</h2><p>Contatta l'amministratore per abilitare l'accesso con Microsoft.</p><a href='https://www.cinebase.shop/login.html' style='color:#d4af37'>← Torna al login</a></div></body></html>", "text/html");
+
             Console.WriteLine($"[AUTH] Microsoft login requested, redirect={redirect}");
-            Console.WriteLine($"[AUTH] Microsoft: ClientId={Environment.GetEnvironmentVariable("MICROSOFT_CLIENT_ID")?[..Math.Min(8, Environment.GetEnvironmentVariable("MICROSOFT_CLIENT_ID")?.Length ?? 0)]}...");
-            Console.WriteLine($"[AUTH] Microsoft: TenantId={Environment.GetEnvironmentVariable("MICROSOFT_TENANT_ID") ?? "organizations"}");
             var props = new AuthenticationProperties();
             props.Items["redirect"] = redirect ?? "/index.html";
             return Results.Challenge(props, ["Microsoft"]);
