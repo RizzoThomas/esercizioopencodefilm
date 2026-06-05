@@ -4,8 +4,26 @@ namespace FilmAPI.Services;
 
 public class EmailSendResult
 {
+    /// <summary>
+    /// Rappresenta la dipendenza o il dato esposto tramite la proprietà Success.
+    /// </summary>
+    /// <remarks>
+    /// Serve al servizio per completare le sue operazioni di lettura, validazione, persistenza o integrazione esterna.
+    /// </remarks>
     public bool Success { get; set; }
+    /// <summary>
+    /// Rappresenta la dipendenza o il dato esposto tramite la proprietà SentAtUtc.
+    /// </summary>
+    /// <remarks>
+    /// Serve al servizio per completare le sue operazioni di lettura, validazione, persistenza o integrazione esterna.
+    /// </remarks>
     public DateTime? SentAtUtc { get; set; }
+    /// <summary>
+    /// Rappresenta la dipendenza o il dato esposto tramite la proprietà ErrorMessage.
+    /// </summary>
+    /// <remarks>
+    /// Serve al servizio per completare le sue operazioni di lettura, validazione, persistenza o integrazione esterna.
+    /// </remarks>
     public string? ErrorMessage { get; set; }
 }
 

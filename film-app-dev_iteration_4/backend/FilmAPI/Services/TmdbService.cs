@@ -2,14 +2,40 @@ using System.Text.Json;
 
 namespace FilmAPI.Services;
 
+/// <summary>
+///     Servizio per l'integrazione con l'API TMDB (The Movie Database).
+///     Recupera dati cinematografici: film popolari, ricerca film,
+///     dettagli film, immagini, cast. Usato per arricchire il catalogo
+///     CineBase con dati esterni e importare film tramite API.
+///     Chiave API configurata via TMDB_API_KEY o TMDB:ApiKey.
+/// </summary>
 public class TmdbService : ITmdbService
 {
+    /// <summary>HttpClient per chiamate REST all'API TMDB.</summary>
     private readonly HttpClient _httpClient;
+
+    /// <summary>Logger per errori e debug.</summary>
     private readonly ILogger<TmdbService> _logger;
+
+    /// <summary>URL base dell'API TMDB v3.</summary>
     private readonly string _baseUrl = "https://api.themoviedb.org/3";
+
+    /// <summary>URL base per le immagini TMDB.</summary>
     private readonly string _imageBaseUrl = "https://image.tmdb.org/t/p";
+
+    /// <summary>Chiave API per autenticazione TMDB.</summary>
     private readonly string _apiKey;
 
+    /// <summary>
+    /// Esegue l''operazione TmdbService del servizio.
+    /// </summary>
+    /// <param name="httpClient">Parametro necessario per l'operazione: httpClient.</param>
+    /// <param name="configuration">Parametro necessario per l'operazione: configuration.</param>
+    /// <param name="logger">Parametro necessario per l'operazione: logger.</param>
+    /// <returns>Restituisce il risultato dell'operazione quando questa ha esito positivo; altrimenti il chiamante riceve un'eccezione o un risultato nullo/booleano secondo il contratto del metodo.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database. può effettuare chiamate a servizi esterni o API HTTP.
+    /// </remarks>
     public TmdbService(HttpClient httpClient, IConfiguration configuration, ILogger<TmdbService> logger)
     {
         _httpClient = httpClient;
@@ -23,6 +49,15 @@ public class TmdbService : ITmdbService
         _httpClient.DefaultRequestHeaders.Add("Accept", "application/json");
     }
 
+    /// <summary>
+    /// Esegue l''operazione SearchMoviesAsync del servizio.
+    /// </summary>
+    /// <param name="query">Parametro necessario per l'operazione: query.</param>
+    /// <param name="page">Parametro necessario per l'operazione: page.</param>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: può effettuare chiamate a servizi esterni o API HTTP.
+    /// </remarks>
     public async Task<TmdbSearchResult> SearchMoviesAsync(string query, int page = 1)
     {
         try
@@ -50,6 +85,14 @@ public class TmdbService : ITmdbService
         }
     }
 
+    /// <summary>
+    /// Recupera o legge i dati tramite l''operazione GetMovieDetailsAsync del servizio.
+    /// </summary>
+    /// <param name="tmdbId">Identificativo necessario per individuare l'entità o il contesto di lavoro: tmdbId.</param>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: può effettuare chiamate a servizi esterni o API HTTP.
+    /// </remarks>
     public async Task<TmdbMovieDetails?> GetMovieDetailsAsync(int tmdbId)
     {
         try
@@ -76,6 +119,14 @@ public class TmdbService : ITmdbService
         }
     }
 
+    /// <summary>
+    /// Recupera o legge i dati tramite l''operazione GetMovieDetailsAsync del servizio.
+    /// </summary>
+    /// <param name="imdbId">Identificativo necessario per individuare l'entità o il contesto di lavoro: imdbId.</param>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: può effettuare chiamate a servizi esterni o API HTTP.
+    /// </remarks>
     public async Task<TmdbMovieDetails?> GetMovieDetailsAsync(string imdbId)
     {
         try
@@ -108,6 +159,15 @@ public class TmdbService : ITmdbService
         }
     }
 
+    /// <summary>
+    /// Recupera o legge i dati tramite l''operazione GetPosterUrlAsync del servizio.
+    /// </summary>
+    /// <param name="posterPath">Parametro necessario per l'operazione: posterPath.</param>
+    /// <param name="size">Parametro necessario per l'operazione: size.</param>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: può effettuare chiamate a servizi esterni o API HTTP.
+    /// </remarks>
     public Task<string?> GetPosterUrlAsync(string posterPath, string size = "w500")
     {
         if (string.IsNullOrEmpty(posterPath))
@@ -117,6 +177,15 @@ public class TmdbService : ITmdbService
         return Task.FromResult<string?>($"{_imageBaseUrl}/{size}/{cleanPath}");
     }
 
+    /// <summary>
+    /// Recupera o legge i dati tramite l''operazione GetBackdropUrlAsync del servizio.
+    /// </summary>
+    /// <param name="backdropPath">Parametro necessario per l'operazione: backdropPath.</param>
+    /// <param name="size">Parametro necessario per l'operazione: size.</param>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: può effettuare chiamate a servizi esterni o API HTTP.
+    /// </remarks>
     public Task<string?> GetBackdropUrlAsync(string backdropPath, string size = "w1280")
     {
         if (string.IsNullOrEmpty(backdropPath))
@@ -126,6 +195,14 @@ public class TmdbService : ITmdbService
         return Task.FromResult<string?>($"{_imageBaseUrl}/{size}/{cleanPath}");
     }
 
+    /// <summary>
+    /// Recupera o legge i dati tramite l''operazione GetPopularMoviesAsync del servizio.
+    /// </summary>
+    /// <param name="page">Parametro necessario per l'operazione: page.</param>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: può effettuare chiamate a servizi esterni o API HTTP.
+    /// </remarks>
     public async Task<TmdbSearchResult> GetPopularMoviesAsync(int page = 1)
     {
         try
@@ -152,6 +229,14 @@ public class TmdbService : ITmdbService
         }
     }
 
+    /// <summary>
+    /// Recupera o legge i dati tramite l''operazione GetUpcomingMoviesAsync del servizio.
+    /// </summary>
+    /// <param name="page">Parametro necessario per l'operazione: page.</param>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: può effettuare chiamate a servizi esterni o API HTTP.
+    /// </remarks>
     public async Task<TmdbSearchResult> GetUpcomingMoviesAsync(int page = 1)
     {
         try
@@ -178,6 +263,14 @@ public class TmdbService : ITmdbService
         }
     }
 
+    /// <summary>
+    /// Recupera o legge i dati tramite l''operazione GetNowPlayingMoviesAsync del servizio.
+    /// </summary>
+    /// <param name="page">Parametro necessario per l'operazione: page.</param>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: può effettuare chiamate a servizi esterni o API HTTP.
+    /// </remarks>
     public async Task<TmdbSearchResult> GetNowPlayingMoviesAsync(int page = 1)
     {
         try
@@ -204,6 +297,14 @@ public class TmdbService : ITmdbService
         }
     }
 
+    /// <summary>
+    /// Recupera o legge i dati tramite l''operazione GetYoutubeTrailerUrl del servizio.
+    /// </summary>
+    /// <param name="movie">Parametro necessario per l'operazione: movie.</param>
+    /// <returns>Restituisce il risultato dell'operazione quando questa ha esito positivo; altrimenti il chiamante riceve un'eccezione o un risultato nullo/booleano secondo il contratto del metodo.</returns>
+    /// <remarks>
+    /// Effetti collaterali: non introduce effetti collaterali esterni evidenti oltre alla logica di lettura o validazione.
+    /// </remarks>
     public string? GetYoutubeTrailerUrl(TmdbMovieDetails movie)
     {
         if (movie?.Videos?.Results == null || !movie.Videos.Results.Any())
@@ -233,12 +334,36 @@ public class TmdbFindResult
 
 public class TmdbTvResult
 {
+    /// <summary>
+    /// Rappresenta la dipendenza o il dato esposto tramite la proprietà Id.
+    /// </summary>
+    /// <remarks>
+    /// Serve al servizio per completare le sue operazioni di lettura, validazione, persistenza o integrazione esterna.
+    /// </remarks>
     public int Id { get; set; }
+    /// <summary>
+    /// Rappresenta la dipendenza o il dato esposto tramite la proprietà Name.
+    /// </summary>
+    /// <remarks>
+    /// Serve al servizio per completare le sue operazioni di lettura, validazione, persistenza o integrazione esterna.
+    /// </remarks>
     public string Name { get; set; } = string.Empty;
 }
 
 public class TmdbPersonResult
 {
+    /// <summary>
+    /// Rappresenta la dipendenza o il dato esposto tramite la proprietà Id.
+    /// </summary>
+    /// <remarks>
+    /// Serve al servizio per completare le sue operazioni di lettura, validazione, persistenza o integrazione esterna.
+    /// </remarks>
     public int Id { get; set; }
+    /// <summary>
+    /// Rappresenta la dipendenza o il dato esposto tramite la proprietà Name.
+    /// </summary>
+    /// <remarks>
+    /// Serve al servizio per completare le sue operazioni di lettura, validazione, persistenza o integrazione esterna.
+    /// </remarks>
     public string Name { get; set; } = string.Empty;
 }

@@ -1,23 +1,42 @@
+// Listener evento: si attiva quando scatta l'evento sulla pagina e aggiorna la UI o lo stato.
 document.addEventListener('DOMContentLoaded', () => {
   if (!window.Auth) return;
 
+  // Variabile form: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const form = document.getElementById('register-form');
+  // Variabile nomeInput: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const nomeInput = document.getElementById('nome');
+  // Variabile cognomeInput: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const cognomeInput = document.getElementById('cognome');
+  // Variabile emailInput: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const emailInput = document.getElementById('email');
+  // Variabile telefonoInput: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const telefonoInput = document.getElementById('telefono');
+  // Variabile passwordInput: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const passwordInput = document.getElementById('password');
+  // Variabile confirmPasswordInput: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const confirmPasswordInput = document.getElementById('confirm-password');
+  // Variabile submitBtn: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const submitBtn = document.getElementById('submit-btn');
+  // Variabile btnText: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const btnText = document.getElementById('btn-text');
+  // Variabile btnLoader: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const btnLoader = document.getElementById('btn-loader');
+  // Variabile errorAlert: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const errorAlert = document.getElementById('error-alert');
+  // Variabile errorMessage: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const errorMessage = document.getElementById('error-message');
+  // Variabile successAlert: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const successAlert = document.getElementById('success-alert');
+  // Variabile togglePasswordBtn: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const togglePasswordBtn = document.getElementById('toggle-password');
+  // Variabile toggleConfirmPasswordBtn: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const toggleConfirmPasswordBtn = document.getElementById('toggle-confirm-password');
+  // Variabile strengthBar: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const strengthBar = document.getElementById('strength-bar');
+  // Variabile strengthText: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const strengthText = document.getElementById('strength-text');
+  // Variabile confirmError: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const confirmError = document.getElementById('confirm-error');
 
   if (Auth.isLoggedIn()) {
@@ -27,28 +46,36 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (!form) return;
 
+  // Funzione togglePasswordVisibility: commuta uno stato visivo o funzionale tra due modalità. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
   function togglePasswordVisibility(input, btn) {
     if (!input || !btn) return;
+    // Variabile type: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const type = input.type === 'password' ? 'text' : 'password';
     input.type = type;
+    // Variabile icon: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const icon = btn.querySelector('i');
     if (icon) icon.className = type === 'password' ? 'fa-solid fa-eye' : 'fa-solid fa-eye-slash';
   }
 
   if (togglePasswordBtn && passwordInput) {
+    // Listener evento: si attiva quando scatta l'evento sulla pagina e aggiorna la UI o lo stato.
     togglePasswordBtn.addEventListener('click', () => {
       togglePasswordVisibility(passwordInput, togglePasswordBtn);
     });
   }
 
   if (toggleConfirmPasswordBtn && confirmPasswordInput) {
+    // Listener evento: si attiva quando scatta l'evento sulla pagina e aggiorna la UI o lo stato.
     toggleConfirmPasswordBtn.addEventListener('click', () => {
       togglePasswordVisibility(confirmPasswordInput, toggleConfirmPasswordBtn);
     });
   }
 
+  // Funzione checkPasswordStrength: gestisce la logica prevista e restituisce il risultato atteso. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
   function checkPasswordStrength(password) {
+    // Variabile strength: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     let strength = 0;
+    // Variabile feedback: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     let feedback = [];
 
     if (password.length >= 8) {
@@ -78,6 +105,7 @@ document.addEventListener('DOMContentLoaded', () => {
     return { strength, feedback };
   }
 
+  // Funzione updatePasswordStrength: aggiorna lo stato o il DOM in base ai dati correnti. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
   function updatePasswordStrength() {
     if (!strengthBar || !strengthText || !passwordInput) return;
     const { strength, feedback } = checkPasswordStrength(passwordInput.value);
@@ -103,9 +131,11 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   if (passwordInput) {
+    // Listener evento: si attiva quando scatta l'evento sulla pagina e aggiorna la UI o lo stato.
     passwordInput.addEventListener('input', updatePasswordStrength);
   }
 
+  // Funzione showError: gestisce la logica prevista e restituisce il risultato atteso. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
   function showError(message) {
     if (errorAlert && errorMessage) {
       errorMessage.textContent = message;
@@ -113,33 +143,44 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  // Funzione hideError: gestisce la logica prevista e restituisce il risultato atteso. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
   function hideError() {
     if (errorAlert) {
       errorAlert.classList.add('hidden');
     }
   }
 
+  // Funzione setLoading: gestisce la logica prevista e restituisce il risultato atteso. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
   function setLoading(loading) {
     if (submitBtn) submitBtn.disabled = loading;
     if (btnText) btnText.classList.toggle('hidden', loading);
     if (btnLoader) btnLoader.classList.toggle('hidden', !loading);
   }
 
+  // Funzione validateEmail: gestisce la logica prevista e restituisce il risultato atteso. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
   function validateEmail(email) {
+    // Variabile emailRegex: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
   }
 
+  // Listener evento: si attiva quando scatta l'evento sulla pagina e aggiorna la UI o lo stato.
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     hideError();
     if (confirmError) confirmError.classList.add('hidden');
 
+    // Variabile nome: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const nome = nomeInput?.value.trim();
+    // Variabile cognome: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const cognome = cognomeInput?.value.trim();
+    // Variabile email: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const email = emailInput?.value.trim();
+    // Variabile telefono: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const telefono = telefonoInput?.value.trim();
+    // Variabile password: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const password = passwordInput?.value;
+    // Variabile confirmPassword: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const confirmPassword = confirmPasswordInput?.value;
 
     if (!nome) {
@@ -190,6 +231,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setLoading(true);
 
     try {
+      // Variabile registerData: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
       const registerData = {
         email,
         password,

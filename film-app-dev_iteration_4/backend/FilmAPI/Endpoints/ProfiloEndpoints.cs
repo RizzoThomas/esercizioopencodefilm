@@ -5,8 +5,18 @@ using FilmAPI.Services;
 
 namespace FilmAPI.Endpoints;
 
+/// <summary>
+/// Raggruppa gli endpoint autenticati per la gestione del profilo utente.
+/// </summary>
 public static class ProfiloEndpoints
 {
+    /// <summary>
+    /// Mappa il gruppo <c>/profilo</c> per leggere e aggiornare i dati del profilo dell'utente autenticato.
+    /// Richiede <c>RequireAuthorization("Authenticated")</c>.
+    /// Esegue letture e aggiornamenti dei dati utente nel database con possibili effetti sul profilo salvato.
+    /// </summary>
+    /// <param name="app">Applicazione web su cui registrare gli endpoint.</param>
+    /// <returns>Non restituisce valori.</returns>
     public static void MapProfiloEndpoints(this WebApplication app)
     {
         var group = app.MapGroup("/profilo");

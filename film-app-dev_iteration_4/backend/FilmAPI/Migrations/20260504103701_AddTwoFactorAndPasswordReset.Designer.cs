@@ -11,6 +11,9 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace FilmAPI.Migrations
 {
+    /// <summary>
+    /// Classe generata da EF Core per la migrazione AddTwoFactorAndPasswordReset.
+    /// </summary>
     [DbContext(typeof(FilmDbContext))]
     [Migration("20260504103701_AddTwoFactorAndPasswordReset")]
     partial class AddTwoFactorAndPasswordReset

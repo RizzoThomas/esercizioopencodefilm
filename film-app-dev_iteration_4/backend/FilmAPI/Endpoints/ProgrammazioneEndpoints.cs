@@ -3,8 +3,18 @@ using FilmAPI.Services;
 
 namespace FilmAPI.Endpoints;
 
+/// <summary>
+/// Raggruppa gli endpoint pubblici per la consultazione della programmazione.
+/// </summary>
 public static class ProgrammazioneEndpoints
 {
+    /// <summary>
+    /// Mappa il gruppo <c>/programmazione</c> per consultare la programmazione dei contenuti.
+    /// Le rotte sono pubbliche con <c>AllowAnonymous</c>.
+    /// Esegue sole letture sul database senza effetti collaterali.
+    /// </summary>
+    /// <param name="app">Applicazione web su cui registrare gli endpoint.</param>
+    /// <returns>Non restituisce valori.</returns>
     public static void MapProgrammazioneEndpoints(this WebApplication app)
     {
         MapProgrammazioneFilms(app);

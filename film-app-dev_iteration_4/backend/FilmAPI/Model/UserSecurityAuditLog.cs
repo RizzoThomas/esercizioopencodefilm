@@ -4,45 +4,51 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace FilmAPI.Model;
 
 /// <summary>
-/// Log di audit per operazioni sensibili su account e credenziali.
-/// Eventi: PasswordChanged, PasswordResetRequested, PasswordResetCompleted,
-/// ExternalLoginSucceeded, ExternalLoginRejected*, RoleChanged, etc.
+/// Log di audit sicurezza dell'utente nella piattaforma CineBase.
+/// È usato dai servizi di sicurezza e compliance per tracciare eventi sensibili nel database.
 /// </summary>
 public class UserSecurityAuditLog
 {
+    /// <summary>Identificativo univoco del log di audit.</summary>
     [Key]
     public int Id { get; set; }
 
-    /// <summary>Utente target dell'operazione.</summary>
+    /// <summary>Utente a cui si riferisce l'evento, se noto.</summary>
     public int? UserId { get; set; }
 
-    [ForeignKey(nameof(UserId))]
-    public User? User { get; set; }
-
-    /// <summary>Utente che ha eseguito l'operazione (null per azioni anonime o self-service).</summary>
+    /// <summary>Utente attore che ha eseguito l'azione, se noto.</summary>
     public int? ActorUserId { get; set; }
 
-    [ForeignKey(nameof(ActorUserId))]
-    public User? ActorUser { get; set; }
-
-    /// <summary>Tipo evento (es. 'PasswordChanged', 'RoleChanged', 'ExternalLoginSucceeded').</summary>
+    /// <summary>Tipo di evento di sicurezza; massimo 80 caratteri.</summary>
     [Required]
     [MaxLength(80)]
     public string EventType { get; set; } = string.Empty;
 
-    /// <summary>Provider esterno se applicabile ('Google', 'Microsoft', 'Facebook').</summary>
+    /// <summary>Provider coinvolto nell'evento, se applicabile; massimo 30 caratteri.</summary>
     [MaxLength(30)]
     public string? Provider { get; set; }
 
+    /// <summary>Indirizzo IP associato all'evento; massimo 64 caratteri.</summary>
     [MaxLength(64)]
     public string? IpAddress { get; set; }
 
+    /// <summary>User-Agent del client che ha generato l'evento; massimo 512 caratteri.</summary>
     [MaxLength(512)]
     public string? UserAgent { get; set; }
 
-    /// <summary>JSON opzionale con metadati aggiuntivi (es. ruolo precedente/nuovo).</summary>
+    /// <summary>Dati aggiuntivi in formato JSON per il contesto di audit; massimo 4000 caratteri.</summary>
     [MaxLength(4000)]
     public string? MetadataJson { get; set; }
 
-    public DateTime CreatedAtUtc { get; set; } = DateTime.UtcNow;
+    /// <summary>Data/ora UTC di creazione del log.</summary>
+    [Required]
+    public DateTime CreatedAtUtc { get; set; }
+
+    /// <summary>Relazione con l'utente soggetto dell'audit.</summary>
+    [ForeignKey(nameof(UserId))]
+    public User? User { get; set; }
+
+    /// <summary>Relazione con l'utente attore che ha compiuto l'evento.</summary>
+    [ForeignKey(nameof(ActorUserId))]
+    public User? ActorUser { get; set; }
 }

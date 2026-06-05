@@ -396,6 +396,21 @@ public class FilmDbContext : DbContext
                   .WithMany(u => u.Biglietti)
                   .HasForeignKey(b => b.UserId)
                   .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(b => b.ValidatoDaUser)
+                  .WithMany()
+                  .HasForeignKey(b => b.ValidatoDaUserId)
+                  .OnDelete(DeleteBehavior.SetNull);
+
+            entity.HasOne(b => b.CancelledByUser)
+                  .WithMany()
+                  .HasForeignKey(b => b.CancelledByUserId)
+                  .OnDelete(DeleteBehavior.SetNull);
+
+            entity.HasOne(b => b.ValidatoCinema)
+                  .WithMany()
+                  .HasForeignKey(b => b.ValidatoCinemaId)
+                  .OnDelete(DeleteBehavior.SetNull);
         });
 
         // --- VOUCHER: codice univoco ---

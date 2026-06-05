@@ -4,12 +4,27 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FilmAPI.Services;
 
+/// <summary>
+/// Fornisce il servizio  per le operazioni di dominio esposte da questo modulo.
+/// </summary>
+/// <remarks>
+/// Usato dai controller o endpoint che gestiscono le funzioni di . Dipendenze iniettate nel costruttore: nessuna dichiarata esplicitamente.
+/// </remarks>
 public class ExpiredHoldCleanupService : BackgroundService
 {
     private readonly IServiceScopeFactory _scopeFactory;
     private readonly ILogger<ExpiredHoldCleanupService> _logger;
     private readonly TimeSpan _cleanupInterval;
 
+    /// <summary>
+    /// Esegue l''operazione ExpiredHoldCleanupService del servizio.
+    /// </summary>
+    /// <param name="scopeFactory">Parametro necessario per l'operazione: scopeFactory.</param>
+    /// <param name="logger">Parametro necessario per l'operazione: logger.</param>
+    /// <returns>Restituisce il risultato dell'operazione quando questa ha esito positivo; altrimenti il chiamante riceve un'eccezione o un risultato nullo/booleano secondo il contratto del metodo.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database.
+    /// </remarks>
     public ExpiredHoldCleanupService(IServiceScopeFactory scopeFactory, ILogger<ExpiredHoldCleanupService> logger)
     {
         _scopeFactory = scopeFactory;

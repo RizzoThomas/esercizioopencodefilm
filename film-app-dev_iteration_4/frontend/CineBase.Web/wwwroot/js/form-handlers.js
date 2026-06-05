@@ -1,5 +1,7 @@
 // Popola select da dati API
+// Funzione populateSelect: descrive l'azione eseguita, i parametri in ingresso e il valore restituito.
 function populateSelect(selectId, data, valueField = 'id', labelFields = ['nome'], placeholder = 'Seleziona...') {
+  // Variabile select: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const select = document.getElementById(selectId);
   if (!select) return;
   
@@ -7,24 +9,30 @@ function populateSelect(selectId, data, valueField = 'id', labelFields = ['nome'
   select.innerHTML = `<option value="">${placeholder}</option>`;
   
   data.forEach(item => {
+    // Variabile label: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const label = labelFields.map(field => item[field]).join(' ');
     select.innerHTML += `<option value="${item[valueField]}">${label}</option>`;
   });
 }
 
 // Prepara form per creazione
+// Funzione setupCreateForm: descrive l'azione eseguita, i parametri in ingresso e il valore restituito.
 function setupCreateForm(modalId, formId, fields) {
+  // Variabile form: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const form = document.getElementById(formId);
   form.reset();
   form.dataset.editId = '';
 }
 
 // Prepara form per modifica
+// Funzione setupEditForm: descrive l'azione eseguita, i parametri in ingresso e il valore restituito.
 function setupEditForm(modalId, formId, data, fields) {
+  // Variabile form: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const form = document.getElementById(formId);
   form.dataset.editId = data.id;
   
   fields.forEach(field => {
+    // Variabile input: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const input = form.querySelector(`[name="${field}"]`);
     if (input) {
       input.value = data[field] ?? '';
@@ -33,9 +41,13 @@ function setupEditForm(modalId, formId, data, fields) {
 }
 
 // Serializza form in oggetto
+// Funzione serializeForm: descrive l'azione eseguita, i parametri in ingresso e il valore restituito.
 function serializeForm(formId) {
+  // Variabile form: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const form = document.getElementById(formId);
+  // Variabile formData: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const formData = new FormData(form);
+  // Variabile data: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const data = {};
   
   for (let [key, value] of formData.entries()) {
@@ -46,9 +58,12 @@ function serializeForm(formId) {
 }
 
 // Setup submit handler
+// Funzione setupFormSubmit: descrive l'azione eseguita, i parametri in ingresso e il valore restituito.
 function setupFormSubmit(formId, apiCreate, apiUpdate, onSuccess) {
+  // Variabile form: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const form = document.getElementById(formId);
   
+  // Listener evento: si attiva quando scatta l'evento sulla pagina e aggiorna la UI o lo stato.
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     
@@ -57,7 +72,9 @@ function setupFormSubmit(formId, apiCreate, apiUpdate, onSuccess) {
       return;
     }
     
+    // Variabile data: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const data = serializeForm(formId);
+    // Variabile editId: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const editId = form.dataset.editId;
     
     try {

@@ -11,6 +11,9 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace FilmAPI.Migrations
 {
+    /// <summary>
+    /// Classe generata da EF Core per la migrazione AddScontiAbbonamenti.
+    /// </summary>
     [DbContext(typeof(FilmDbContext))]
     [Migration("20260507072356_AddScontiAbbonamenti")]
     partial class AddScontiAbbonamenti

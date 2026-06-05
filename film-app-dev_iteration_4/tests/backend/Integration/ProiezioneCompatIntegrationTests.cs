@@ -5,6 +5,7 @@ using FilmAPI.Model;
 
 namespace FilmAPI.Tests.Integration;
 
+/// <summary>Suite di test per ProiezioneCompatIntegrationTests.</summary>
 public class ProiezioneCompatIntegrationTests : IClassFixture<CustomWebApplicationFactory>
 {
     private readonly CustomWebApplicationFactory _factory;
@@ -14,6 +15,7 @@ public class ProiezioneCompatIntegrationTests : IClassFixture<CustomWebApplicati
         _factory = factory;
     }
 
+    /// <summary>Verifica lo scenario di PC1_GetProiezioni_ReadsFromShows: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task PC1_GetProiezioni_ReadsFromShows()
     {
@@ -30,6 +32,7 @@ public class ProiezioneCompatIntegrationTests : IClassFixture<CustomWebApplicati
         Assert.Equal(1, payload[0].FilmId);
     }
 
+    /// <summary>Verifica lo scenario di PC2_GetProiezioneById_ReadsFromShows: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task PC2_GetProiezioneById_ReadsFromShows()
     {
@@ -44,6 +47,7 @@ public class ProiezioneCompatIntegrationTests : IClassFixture<CustomWebApplicati
         Assert.Equal(1, payload.Id);
     }
 
+    /// <summary>Verifica lo scenario di PC3_GetProiezioneById_NotFound: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task PC3_GetProiezioneById_NotFound()
     {
@@ -55,6 +59,7 @@ public class ProiezioneCompatIntegrationTests : IClassFixture<CustomWebApplicati
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
 
+    /// <summary>Verifica lo scenario di PC4_CreateProiezione_CreatesShowViaBridge: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task PC4_CreateProiezione_CreatesShowViaBridge()
     {
@@ -78,6 +83,7 @@ public class ProiezioneCompatIntegrationTests : IClassFixture<CustomWebApplicati
         Assert.Equal(1, payload.FilmId);
     }
 
+    /// <summary>Verifica lo scenario di PC5_CreateProiezione_FailsIfNoSala: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task PC5_CreateProiezione_FailsIfNoSala()
     {
@@ -97,6 +103,7 @@ public class ProiezioneCompatIntegrationTests : IClassFixture<CustomWebApplicati
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
 
+    /// <summary>Verifica lo scenario di PC6_CreateProiezione_ConflictOnOverlap: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task PC6_CreateProiezione_ConflictOnOverlap()
     {
@@ -116,6 +123,7 @@ public class ProiezioneCompatIntegrationTests : IClassFixture<CustomWebApplicati
         Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
     }
 
+    /// <summary>Verifica lo scenario di PC7_UpdateProiezione_UpdatesShowViaBridge: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task PC7_UpdateProiezione_UpdatesShowViaBridge()
     {
@@ -139,6 +147,7 @@ public class ProiezioneCompatIntegrationTests : IClassFixture<CustomWebApplicati
         Assert.Equal(1, payload.FilmId);
     }
 
+    /// <summary>Verifica lo scenario di PC8_DeleteProiezione_DeletesShowViaBridge: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task PC8_DeleteProiezione_DeletesShowViaBridge()
     {
@@ -153,6 +162,7 @@ public class ProiezioneCompatIntegrationTests : IClassFixture<CustomWebApplicati
         Assert.Equal(HttpStatusCode.NotFound, getResponse.StatusCode);
     }
 
+    /// <summary>Verifica lo scenario di PC9_CreateProiezione_ForbiddenForUser: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task PC9_CreateProiezione_ForbiddenForUser()
     {
@@ -172,6 +182,7 @@ public class ProiezioneCompatIntegrationTests : IClassFixture<CustomWebApplicati
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
     }
 
+    /// <summary>Verifica lo scenario di PC10_GetProiezioniPaged_ReadsFromShows: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task PC10_GetProiezioniPaged_ReadsFromShows()
     {

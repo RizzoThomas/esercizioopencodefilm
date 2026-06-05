@@ -1,23 +1,18 @@
+# syntax=docker/dockerfile:1.7
+
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
-WORKDIR /source
+WORKDIR /src
 
-# Copy both project files (seeder references FilmAPI)
-COPY ["backend/FilmAPI/FilmAPI.csproj", "backend/FilmAPI/"]
-COPY ["backend/scripts/FilmApiSeeder/FilmApiSeeder.csproj", "backend/scripts/FilmApiSeeder/"]
+COPY scripts/FilmApiSeeder/FilmApiSeeder.csproj scripts/FilmApiSeeder/
+RUN dotnet restore scripts/FilmApiSeeder/FilmApiSeeder.csproj
 
-# Restore seeder (restores FilmAPI as dependency)
-RUN dotnet restore backend/scripts/FilmApiSeeder/FilmApiSeeder.csproj
+COPY FilmAPI/ FilmAPI/
+COPY scripts/FilmApiSeeder/ scripts/FilmApiSeeder/
+RUN dotnet publish scripts/FilmApiSeeder/FilmApiSeeder.csproj -c Release -o /app/publish /p:UseAppHost=false
 
-# Copy all source code for both projects
-COPY backend/ backend/
-
-# Build and publish only the seeder
-RUN dotnet build backend/scripts/FilmApiSeeder/FilmApiSeeder.csproj -c Release -o /app/build
-RUN dotnet publish backend/scripts/FilmApiSeeder/FilmApiSeeder.csproj -c Release -o /app/publish
-
-FROM mcr.microsoft.com/dotnet/runtime:9.0
+FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS runtime
 WORKDIR /app
+
 COPY --from=build /app/publish .
-LABEL org.opencontainers.image.title="CineBase Film API Seeder"
-LABEL org.opencontainers.image.version="iteration-6"
+
 ENTRYPOINT ["dotnet", "FilmApiSeeder.dll"]

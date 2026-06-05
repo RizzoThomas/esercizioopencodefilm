@@ -7,6 +7,7 @@ using FilmAPI.Model;
 
 namespace FilmAPI.Tests.Integration;
 
+/// <summary>Suite di test per ApiIntegrationTests.</summary>
 public class ApiIntegrationTests : IClassFixture<CustomWebApplicationFactory>
 {
     private readonly CustomWebApplicationFactory _factory;
@@ -16,6 +17,7 @@ public class ApiIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         _factory = factory;
     }
 
+    /// <summary>Verifica lo scenario di R1_GetRegisti_ReturnsEmptyList: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task R1_GetRegisti_ReturnsEmptyList()
     {
@@ -30,6 +32,7 @@ public class ApiIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Empty(payload);
     }
 
+    /// <summary>Verifica lo scenario di R2_PostRegisti_CreatesEntity_AndReturnsCreated: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task R2_PostRegisti_CreatesEntity_AndReturnsCreated()
     {
@@ -52,6 +55,7 @@ public class ApiIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Equal("Christopher", payload.Nome);
     }
 
+    /// <summary>Verifica lo scenario di R3_GetRegistiById_ReturnsEntity_WhenExists: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task R3_GetRegistiById_ReturnsEntity_WhenExists()
     {
@@ -68,6 +72,7 @@ public class ApiIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Equal("Martin", payload.Nome);
     }
 
+    /// <summary>Verifica lo scenario di R4_GetRegistiById_ReturnsNotFound_WhenMissing: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task R4_GetRegistiById_ReturnsNotFound_WhenMissing()
     {
@@ -79,6 +84,7 @@ public class ApiIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
 
+    /// <summary>Verifica lo scenario di R5_PutRegisti_UpdatesEntity_WhenExists: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task R5_PutRegisti_UpdatesEntity_WhenExists()
     {
@@ -101,6 +107,7 @@ public class ApiIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Equal("Statunitense", payload.Nazionalita);
     }
 
+    /// <summary>Verifica lo scenario di R6_PutRegisti_ReturnsNotFound_WhenMissing: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task R6_PutRegisti_ReturnsNotFound_WhenMissing()
     {
@@ -119,6 +126,7 @@ public class ApiIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
 
+    /// <summary>Verifica lo scenario di R7_DeleteRegisti_DeletesEntity_WhenExists: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task R7_DeleteRegisti_DeletesEntity_WhenExists()
     {
@@ -133,6 +141,7 @@ public class ApiIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Equal(HttpStatusCode.NotFound, getResponse.StatusCode);
     }
 
+    /// <summary>Verifica lo scenario di R8_DeleteRegisti_ReturnsNotFound_WhenMissing: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task R8_DeleteRegisti_ReturnsNotFound_WhenMissing()
     {
@@ -144,6 +153,7 @@ public class ApiIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
 
+    /// <summary>Verifica lo scenario di R9_PostRegisti_ReturnsBadRequest_WhenDataIsMissing: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task R9_PostRegisti_ReturnsBadRequest_WhenDataIsMissing()
     {
@@ -160,6 +170,7 @@ public class ApiIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
 
+    /// <summary>Verifica lo scenario di R10_GetRegisti_WithPaginationAndSearch_ReturnsPagedResult: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task R10_GetRegisti_WithPaginationAndSearch_ReturnsPagedResult()
     {
@@ -183,6 +194,7 @@ public class ApiIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Equal("Italia", payload.Items[0].Nazionalita);
     }
 
+    /// <summary>Verifica lo scenario di R11_GetRegisti_WithoutPaginationParams_ReturnsLegacyArrayPayload: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task R11_GetRegisti_WithoutPaginationParams_ReturnsLegacyArrayPayload()
     {
@@ -206,6 +218,7 @@ public class ApiIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Single(payload);
     }
 
+    /// <summary>Verifica lo scenario di F1_GetFilms_ReturnsEmptyList: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task F1_GetFilms_ReturnsEmptyList()
     {
@@ -220,6 +233,7 @@ public class ApiIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Empty(payload);
     }
 
+    /// <summary>Verifica lo scenario di F2_PostFilms_CreatesEntity_WhenInputIsValid: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task F2_PostFilms_CreatesEntity_WhenInputIsValid()
     {
@@ -244,6 +258,7 @@ public class ApiIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Equal("Inception", payload.Titolo);
     }
 
+    /// <summary>Verifica lo scenario di F3_PostFilms_UsesDefaultCoverPath_WhenCopertinaPathIsMissing: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task F3_PostFilms_UsesDefaultCoverPath_WhenCopertinaPathIsMissing()
     {
@@ -267,6 +282,7 @@ public class ApiIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Equal("/media/defaults/cover-default.jpg", payload.CopertinaPath);
     }
 
+    /// <summary>Verifica lo scenario di F4_PostFilms_ReturnsBadRequest_WhenRegistaDoesNotExist: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task F4_PostFilms_ReturnsBadRequest_WhenRegistaDoesNotExist()
     {
@@ -286,6 +302,7 @@ public class ApiIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
 
+    /// <summary>Verifica lo scenario di F5_GetFilmsById_ReturnsEntity_WhenExists: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task F5_GetFilmsById_ReturnsEntity_WhenExists()
     {
@@ -303,6 +320,7 @@ public class ApiIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Equal("Spirited Away", payload.Titolo);
     }
 
+    /// <summary>Verifica lo scenario di F6_PutFilms_UpdatesEntity_WhenExists: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task F6_PutFilms_UpdatesEntity_WhenExists()
     {
@@ -328,6 +346,7 @@ public class ApiIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Equal("New Title", payload.Titolo);
     }
 
+    /// <summary>Verifica lo scenario di F7_PutFilms_ReturnsBadRequest_WhenRegistaDoesNotExist: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task F7_PutFilms_ReturnsBadRequest_WhenRegistaDoesNotExist()
     {
@@ -351,6 +370,7 @@ public class ApiIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
 
+    /// <summary>Verifica lo scenario di F8_DeleteFilms_DeletesEntity_WhenExists: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task F8_DeleteFilms_DeletesEntity_WhenExists()
     {
@@ -366,6 +386,7 @@ public class ApiIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Equal(HttpStatusCode.NotFound, getResponse.StatusCode);
     }
 
+    /// <summary>Verifica lo scenario di C1_GetCinemas_ReturnsEmptyList: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task C1_GetCinemas_ReturnsEmptyList()
     {
@@ -380,6 +401,7 @@ public class ApiIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Empty(payload);
     }
 
+    /// <summary>Verifica lo scenario di C2_PostCinemas_CreatesEntity_WhenInputIsValid: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task C2_PostCinemas_CreatesEntity_WhenInputIsValid()
     {
@@ -402,6 +424,7 @@ public class ApiIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Equal("Cinema Odeon", payload.Nome);
     }
 
+    /// <summary>Verifica lo scenario di C3_GetCinemasById_ReturnsEntity_WhenExists: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task C3_GetCinemasById_ReturnsEntity_WhenExists()
     {
@@ -417,6 +440,7 @@ public class ApiIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Equal(cinema.Id, payload.Id);
     }
 
+    /// <summary>Verifica lo scenario di C4_PutCinemas_UpdatesEntity_WhenExists: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task C4_PutCinemas_UpdatesEntity_WhenExists()
     {
@@ -439,6 +463,7 @@ public class ApiIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Equal("Cinema Nuovo", payload.Nome);
     }
 
+    /// <summary>Verifica lo scenario di C5_DeleteCinemas_DeletesEntity_WhenExists: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task C5_DeleteCinemas_DeletesEntity_WhenExists()
     {
@@ -453,6 +478,7 @@ public class ApiIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Equal(HttpStatusCode.NotFound, getResponse.StatusCode);
     }
 
+    /// <summary>Verifica lo scenario di C6_GetCinemas_WithPaginationAndSearch_ReturnsPagedResult: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task C6_GetCinemas_WithPaginationAndSearch_ReturnsPagedResult()
     {
@@ -477,6 +503,7 @@ public class ApiIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Contains("Roma", payload.Items[0].Nome);
     }
 
+    /// <summary>Verifica lo scenario di C7_GetCinemas_WithoutPaginationParams_ReturnsLegacyArrayPayload: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task C7_GetCinemas_WithoutPaginationParams_ReturnsLegacyArrayPayload()
     {
@@ -501,6 +528,7 @@ public class ApiIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Single(payload);
     }
 
+    /// <summary>Verifica lo scenario di P1_GetProiezioni_ReturnsEmptyList: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task P1_GetProiezioni_ReturnsEmptyList()
     {
@@ -515,6 +543,7 @@ public class ApiIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Empty(payload);
     }
 
+    /// <summary>Verifica lo scenario di P2_PostProiezioni_CreatesEntity_WhenInputIsValid: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task P2_PostProiezioni_CreatesEntity_WhenInputIsValid()
     {
@@ -551,6 +580,7 @@ public class ApiIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Equal(film.Id, payload.FilmId);
     }
 
+    /// <summary>Verifica lo scenario di P3_PostProiezioni_ReturnsBadRequest_WhenCinemaDoesNotExist: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task P3_PostProiezioni_ReturnsBadRequest_WhenCinemaDoesNotExist()
     {
@@ -572,6 +602,7 @@ public class ApiIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
 
+    /// <summary>Verifica lo scenario di P4_PostProiezioni_ReturnsBadRequest_WhenFilmDoesNotExist: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task P4_PostProiezioni_ReturnsBadRequest_WhenFilmDoesNotExist()
     {
@@ -592,6 +623,7 @@ public class ApiIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
 
+    /// <summary>Verifica lo scenario di P5_PostProiezioni_ReturnsConflict_ForDuplicateUniqueTuple: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task P5_PostProiezioni_ReturnsConflict_ForDuplicateUniqueTuple()
     {
@@ -618,6 +650,7 @@ public class ApiIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
     }
 
+    /// <summary>Verifica lo scenario di P6_GetProiezioniById_ReturnsEntity_WhenExists: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task P6_GetProiezioniById_ReturnsEntity_WhenExists()
     {
@@ -636,6 +669,7 @@ public class ApiIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Equal(proiezione.Id, payload.Id);
     }
 
+    /// <summary>Verifica lo scenario di P7_PutProiezioni_UpdatesEntity_WhenExists: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task P7_PutProiezioni_UpdatesEntity_WhenExists()
     {
@@ -676,6 +710,7 @@ public class ApiIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Equal(film2.Id, payload.FilmId);
     }
 
+    /// <summary>Verifica lo scenario di P8_DeleteProiezioni_DeletesEntity_WhenExists: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task P8_DeleteProiezioni_DeletesEntity_WhenExists()
     {
@@ -693,6 +728,7 @@ public class ApiIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Equal(HttpStatusCode.NotFound, getResponse.StatusCode);
     }
 
+    /// <summary>Verifica lo scenario di P9_GetProiezioni_WithPaginationAndSearch_ReturnsPagedResult: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task P9_GetProiezioni_WithPaginationAndSearch_ReturnsPagedResult()
     {
@@ -719,6 +755,7 @@ public class ApiIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Single(payload.Items);
     }
 
+    /// <summary>Verifica lo scenario di P10_GetProiezioni_WithoutPaginationParams_ReturnsLegacyArrayPayload: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task P10_GetProiezioni_WithoutPaginationParams_ReturnsLegacyArrayPayload()
     {
@@ -745,6 +782,7 @@ public class ApiIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Single(payload);
     }
 
+    /// <summary>Verifica lo scenario di E1_DeleteRegista_WithRelatedFilm_IsHandledByConfiguredFkBehavior: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task E1_DeleteRegista_WithRelatedFilm_IsHandledByConfiguredFkBehavior()
     {
@@ -762,6 +800,7 @@ public class ApiIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Single(films);
     }
 
+    /// <summary>Verifica lo scenario di E2_DeleteFilm_WithRelatedProiezione_IsHandledByConfiguredFkBehavior: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task E2_DeleteFilm_WithRelatedProiezione_IsHandledByConfiguredFkBehavior()
     {
@@ -781,6 +820,7 @@ public class ApiIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Single(proiezioni);
     }
 
+    /// <summary>Verifica lo scenario di E3_FullCrudFlow_CreatesReadsAndDeletesInOrder: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task E3_FullCrudFlow_CreatesReadsAndDeletesInOrder()
     {
@@ -819,6 +859,7 @@ public class ApiIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Equal(HttpStatusCode.NotFound, (await client.GetAsync($"/registi/{regista.Id}")).StatusCode);
     }
 
+    /// <summary>Verifica lo scenario di M1_UploadCover_ReturnsOk_WithValidImage: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task M1_UploadCover_ReturnsOk_WithValidImage()
     {
@@ -840,6 +881,7 @@ public class ApiIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Equal("image/jpeg", result.ContentType);
     }
 
+    /// <summary>Verifica lo scenario di M2_UploadCover_ReturnsBadRequest_WhenNoFile: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task M2_UploadCover_ReturnsBadRequest_WhenNoFile()
     {
@@ -852,6 +894,7 @@ public class ApiIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
 
+    /// <summary>Verifica lo scenario di M3_UploadCover_ReturnsBadRequest_WhenUnsupportedMimeType: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task M3_UploadCover_ReturnsBadRequest_WhenUnsupportedMimeType()
     {
@@ -868,6 +911,7 @@ public class ApiIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
 
+    /// <summary>Verifica lo scenario di F9_PostFilms_ReturnsBadRequest_WhenFilmatoPathIsInvalidUrl: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task F9_PostFilms_ReturnsBadRequest_WhenFilmatoPathIsInvalidUrl()
     {
@@ -889,6 +933,7 @@ public class ApiIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
 
+    /// <summary>Verifica lo scenario di F10_PostFilms_AcceptsValidFilmatoUrl: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task F10_PostFilms_AcceptsValidFilmatoUrl()
     {

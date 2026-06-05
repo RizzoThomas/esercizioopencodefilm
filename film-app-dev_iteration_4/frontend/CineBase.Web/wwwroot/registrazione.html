@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- Pagina CineBase: struttura principale con sezioni statiche e contenuti dinamici gestiti da JavaScript. -->
 <html lang="it-IT">
 
 <head>
@@ -19,6 +20,8 @@
 </head>
 
 <body class="bg-canvas text-ink font-sans min-h-screen flex flex-col">
+  <!-- Contenitore dinamico: navbar-container viene popolato o mostrato da JavaScript. -->
+<!-- Contenitore dinamico: quest'area viene popolata o mostrata da JavaScript. -->
   <div id="navbar-container"></div>
 
   <div class="flex-1 flex items-center justify-center px-4 py-12">
@@ -48,74 +51,10 @@
           <span>Account creato con successo! Reindirizzamento...</span>
         </div>
 
-        <form id="register-form" class="space-y-4">
-          <div>
-            <label for="nome" class="block text-sm font-medium text-ink mb-2">Nome</label>
-            <input type="text" id="nome" name="nome" class="input-ferrari w-full px-4 py-3" placeholder="Mario"
-              required autocomplete="given-name">
-          </div>
-
-          <div>
-            <label for="cognome" class="block text-sm font-medium text-ink mb-2">Cognome</label>
-            <input type="text" id="cognome" name="cognome" class="input-ferrari w-full px-4 py-3"
-              placeholder="Rossi" required autocomplete="family-name">
-          </div>
-
-          <div>
-            <label for="email" class="block text-sm font-medium text-ink mb-2">Email</label>
-            <input type="email" id="email" name="email" class="input-ferrari w-full px-4 py-3"
-              placeholder="nome@esempio.com" required autocomplete="email">
-          </div>
-
-          <div>
-            <label for="telefono" class="block text-sm font-medium text-ink mb-2">Telefono <span
-                class="text-body">(opzionale)</span></label>
-            <input type="tel" id="telefono" name="telefono" class="input-ferrari w-full px-4 py-3"
-              placeholder="+39 333 1234567" autocomplete="tel">
-          </div>
-
-          <div>
-            <label for="password" class="block text-sm font-medium text-ink mb-2">Password</label>
-            <div class="relative">
-              <input type="password" id="password" name="password" class="input-ferrari w-full px-4 py-3 pr-12"
-                placeholder="Minimo 8 caratteri" required autocomplete="new-password">
-              <button type="button" id="toggle-password" title="Mostra o nascondi password"
-                aria-label="Mostra o nascondi password"
-                class="absolute right-3 top-1/2 -translate-y-1/2 text-body hover:text-ink">
-                <i class="fa-solid fa-eye"></i>
-              </button>
-            </div>
-            <div id="password-strength" class="mt-2">
-              <div class="h-1 bg-canvas-elevated overflow-hidden">
-                <div id="strength-bar" class="h-full w-0 bg-ferrari-primary transition-all"></div>
-              </div>
-              <p id="strength-text" class="text-xs text-body mt-1"></p>
-            </div>
-          </div>
-
-          <div>
-            <label for="confirm-password" class="block text-sm font-medium text-ink mb-2">Conferma
-              Password</label>
-            <div class="relative">
-              <input type="password" id="confirm-password" name="confirmPassword"
-                class="input-ferrari w-full px-4 py-3 pr-12" placeholder="Ripeti la password" required
-                autocomplete="new-password">
-              <button type="button" id="toggle-confirm-password" title="Mostra o nascondi conferma password"
-                aria-label="Mostra o nascondi conferma password"
-                class="absolute right-3 top-1/2 -translate-y-1/2 text-body hover:text-ink">
-                <i class="fa-solid fa-eye"></i>
-              </button>
-            </div>
-            <p id="confirm-error" class="hidden text-ferrari-semantic-warning text-xs mt-1"></p>
-          </div>
-
-          <button type="submit" id="submit-btn" class="btn-primary w-full py-3 text-base font-semibold mt-6">
-            <span id="btn-text">Crea Account</span>
-            <span id="btn-loader" class="hidden">
-              <i class="fa-solid fa-spinner fa-spin mr-2"></i>Registrazione in corso...
-            </span>
-          </button>
-        </form>
+  <!-- Modulo: raccoglie i dati dell'utente e li invia tramite JavaScript al backend. -->
+<!-- Modulo: raccoglie dati utente e li invia al backend tramite JavaScript. -->
+        <!-- Form: raccoglie dati dell'utente e li invia all'API collegata. -->
+        <form $$$> $$$ </form>
 
         <div class="flex items-center gap-4 my-6">
           <div class="flex-1 h-px bg-canvas-elevated/30"></div>
@@ -157,6 +96,8 @@
     </div>
   </div>
 
+  <!-- Contenitore dinamico: footer-container viene popolato o mostrato da JavaScript. -->
+<!-- Contenitore dinamico: quest'area viene popolata o mostrata da JavaScript. -->
   <div id="footer-container"></div>
 
   <script src="/js/api.js?v=final"></script>

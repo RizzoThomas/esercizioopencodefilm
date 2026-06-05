@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace FilmAPI.Tests.Unit;
 
+/// <summary>Suite di test per CinemaServiceTests.</summary>
 public class CinemaServiceTests : IAsyncLifetime
 {
     private readonly IServiceProvider _serviceProvider;
@@ -40,6 +41,7 @@ public class CinemaServiceTests : IAsyncLifetime
         await _context.DisposeAsync();
     }
 
+    /// <summary>Verifica lo scenario di U_C1_GetAllAsync_WhenNoCinemasExist_ReturnsEmptyList: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task U_C1_GetAllAsync_WhenNoCinemasExist_ReturnsEmptyList()
     {
@@ -47,6 +49,7 @@ public class CinemaServiceTests : IAsyncLifetime
         result.Should().BeEmpty();
     }
 
+    /// <summary>Verifica lo scenario di U_C2_CreateAsync_WithValidData_CreatesCinema: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task U_C2_CreateAsync_WithValidData_CreatesCinema()
     {
@@ -58,6 +61,7 @@ public class CinemaServiceTests : IAsyncLifetime
         result.Nome.Should().Be("Cinema Odeon");
     }
 
+    /// <summary>Verifica lo scenario di U_C3_GetByIdAsync_WhenCinemaExists_ReturnsCinema: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task U_C3_GetByIdAsync_WhenCinemaExists_ReturnsCinema()
     {
@@ -69,6 +73,7 @@ public class CinemaServiceTests : IAsyncLifetime
         result!.Nome.Should().Be("Cinema Odeon");
     }
 
+    /// <summary>Verifica lo scenario di U_C4_UpdateAsync_WithValidData_UpdatesCinema: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task U_C4_UpdateAsync_WithValidData_UpdatesCinema()
     {
@@ -81,6 +86,7 @@ public class CinemaServiceTests : IAsyncLifetime
         result!.Nome.Should().Be("Cinema Nuovo");
     }
 
+    /// <summary>Verifica lo scenario di U_C5_DeleteAsync_WhenCinemaExists_DeletesCinema: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task U_C5_DeleteAsync_WhenCinemaExists_DeletesCinema()
     {

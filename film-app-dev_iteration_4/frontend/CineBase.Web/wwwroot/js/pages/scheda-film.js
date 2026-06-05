@@ -4,6 +4,7 @@ const CinemaManager = {
   STORAGE_KEY: 'cb_selected_cinema',
 
   getLocalCinemaId() {
+    // Variabile val: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const val = localStorage.getItem(this.STORAGE_KEY);
     return val ? parseInt(val, 10) : null;
   },
@@ -17,14 +18,18 @@ const CinemaManager = {
   },
 
   async syncCinemaPreferito() {
+    // Variabile auth: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const auth = getAuthSafe();
     if (!auth || !auth.isLoggedIn()) {
       return this.getLocalCinemaId();
     }
 
     try {
+      // Variabile result: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
       const result = await API.getCinemaPreferito();
+      // Variabile backendCinemaId: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
       const backendCinemaId = result?.cinemaId ? parseInt(result.cinemaId, 10) : null;
+      // Variabile localCinemaId: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
       const localCinemaId = this.getLocalCinemaId();
 
       if (backendCinemaId != null) {
@@ -52,6 +57,7 @@ const CinemaManager = {
   async setCinema(cinemaId) {
     this.setLocalCinemaId(cinemaId);
 
+    // Variabile auth: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const auth = getAuthSafe();
     if (auth && auth.isLoggedIn()) {
       try {
@@ -67,10 +73,12 @@ const CinemaManager = {
   }
 };
 
+// Funzione getAuthSafe: recupera un valore derivato e lo restituisce al chiamante. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 function getAuthSafe() {
   return typeof window !== 'undefined' && window.Auth ? window.Auth : null;
 }
 
+// Funzione normalizeCollection: normalizza il valore in ingresso per confronti stabili. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 function normalizeCollection(data) {
   if (Array.isArray(data)) return data;
   if (Array.isArray(data?.$values)) return data.$values;
@@ -78,7 +86,9 @@ function normalizeCollection(data) {
   return [];
 }
 
+// Funzione formatTipoSalaLabel: gestisce la logica prevista e restituisce il risultato atteso. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 function formatTipoSalaLabel(tipoSala) {
+  // Variabile normalized: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const normalized = String(tipoSala || '').trim().toUpperCase();
   if (normalized === 'TRED' || normalized === '3D') return '3D';
   if (normalized === 'DUED' || normalized === '2D') return '2D';
@@ -87,6 +97,7 @@ function formatTipoSalaLabel(tipoSala) {
   return tipoSala || '';
 }
 
+// Funzione localDateKey: gestisce la logica prevista e restituisce il risultato atteso. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 function localDateKey(date) {
   const y = date.getFullYear();
   const m = String(date.getMonth() + 1).padStart(2, '0');
@@ -96,18 +107,29 @@ function localDateKey(date) {
 
 // State
 let filmId = null;
+// Variabile selectedCinemaId: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
 let selectedCinemaId = null;
+// Variabile filmData: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
 let filmData = null;
+// Variabile allCinemas: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
 let allCinemas = [];
+// Variabile userLocation: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
 let userLocation = null;
+// Variabile dateRail: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
 let dateRail = null;
+// Variabile showCalendar: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
 let showCalendar = [];
+// Variabile cinemasLoaded: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
 let cinemasLoaded = false;
+// Variabile modalSearchTerm: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
 let modalSearchTerm = '';
 
+// Listener evento: si attiva quando scatta l'evento sulla pagina e aggiorna la UI o lo stato.
 document.addEventListener('DOMContentLoaded', async () => {
+  // Variabile params: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const params = new URLSearchParams(window.location.search);
   filmId = params.get('id');
+  // Variabile cinemaParam: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const cinemaParam = params.get('cinema');
 
   if (!filmId) {
@@ -119,7 +141,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   setupCinemaModal();
 
+  // Variabile filmPromise: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const filmPromise = loadFilm();
+  // Variabile cinemasPromise: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const cinemasPromise = loadCinemas().then(() => {
     cinemasLoaded = true;
     renderCinemaInfo();
@@ -130,8 +154,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   await Promise.all([filmPromise, cinemasPromise]);
 });
 
+// Funzione loadCinemas: carica i dati iniziali o aggiorna il contenuto visibile della pagina. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 async function loadCinemas() {
   try {
+    // Variabile params: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const params = {};
     if (userLocation) {
       params.lat = userLocation.lat;
@@ -143,6 +169,7 @@ async function loadCinemas() {
   }
 }
 
+// Funzione loadFilm: carica i dati iniziali o aggiorna il contenuto visibile della pagina. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 async function loadFilm() {
   showLoading();
 
@@ -163,9 +190,11 @@ async function loadFilm() {
   }
 }
 
+// Funzione renderFilm: costruisce markup o componenti UI a partire dai dati in ingresso. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 function renderFilm() {
   hideLoading();
 
+  // Variabile content: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const content = document.getElementById('film-content');
   if (content) content.classList.remove('hidden');
 
@@ -187,6 +216,7 @@ function renderFilm() {
   // Duration
   const duration = document.getElementById('film-duration');
   if (duration) {
+    // Variabile span: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const span = duration.querySelector('span');
     if (span) span.textContent = `${filmData.durata || '-'} min`;
   }
@@ -195,6 +225,7 @@ function renderFilm() {
   const release = document.getElementById('film-release');
   if (release && filmData.dataRilascio) {
     release.classList.remove('hidden');
+    // Variabile span: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const span = release.querySelector('span');
     if (span) span.textContent = formatDateOnly(filmData.dataRilascio);
   }
@@ -202,6 +233,7 @@ function renderFilm() {
   // Categories
   const categories = document.getElementById('film-categories');
   if (categories) {
+    // Variabile cats: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const cats = filmData.categorie || [];
     categories.innerHTML = cats.map(c =>
       `<span class="inline-block bg-canvas-elevated text-ink text-xs px-2 py-0.5 rounded-full">${c.nome}</span>`
@@ -211,7 +243,9 @@ function renderFilm() {
   // Director
   const director = document.getElementById('film-director');
   if (director) {
+    // Variabile nome: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const nome = filmData.registaNome || '';
+    // Variabile cognome: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const cognome = filmData.registaCognome || '';
     if (nome || cognome) {
       director.classList.remove('hidden');
@@ -239,7 +273,9 @@ function renderFilm() {
   // Go to shows button
   const goToShowsBtn = document.getElementById('go-to-shows-btn');
   if (goToShowsBtn) {
+    // Listener evento: si attiva quando scatta l'evento sulla pagina e aggiorna la UI o lo stato.
     goToShowsBtn.addEventListener('click', () => {
+      // Variabile showsSection: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
       const showsSection = document.getElementById('shows-section');
       if (showsSection) {
         showsSection.scrollIntoView({ behavior: 'smooth' });
@@ -254,9 +290,13 @@ function renderFilm() {
   showCalendar = filmData.showCalendar || [];
 }
 
+// Funzione renderCinemaInfo: costruisce markup o componenti UI a partire dai dati in ingresso. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 function renderCinemaInfo() {
+  // Variabile cinemaInfo: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const cinemaInfo = document.getElementById('cinema-info');
+  // Variabile noCinemaWarning: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const noCinemaWarning = document.getElementById('no-cinema-warning');
+  // Variabile dateRailContainer: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const dateRailContainer = document.getElementById('date-rail-container');
 
   if (selectedCinemaId == null) {
@@ -270,24 +310,32 @@ function renderCinemaInfo() {
   if (cinemaInfo) cinemaInfo.classList.remove('hidden');
   if (dateRailContainer) dateRailContainer.classList.remove('hidden');
 
+  // Variabile cinema: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const cinema = allCinemas.find(c => Number(c.id) === Number(selectedCinemaId)) || filmData.cinemaSelezionato;
   if (cinema) {
+    // Variabile nameEl: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const nameEl = document.getElementById('cinema-name');
+    // Variabile detailEl: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const detailEl = document.getElementById('cinema-detail');
     if (nameEl) nameEl.textContent = cinema.nome;
     if (detailEl) detailEl.textContent = `${cinema.citta}${cinema.indirizzo ? ` - ${cinema.indirizzo}` : ''}`;
   }
 }
 
+// Funzione setupDateRail: gestisce la logica prevista e restituisce il risultato atteso. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 function setupDateRail() {
+  // Variabile container: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const container = document.getElementById('date-rail-container');
   if (!container) return;
 
   // Calculate how many days of shows we have
   let days = 14;
   if (showCalendar.length > 0) {
+    // Variabile firstDate: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const firstDate = new Date(showCalendar[0].data + 'T00:00:00');
+    // Variabile lastDate: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const lastDate = new Date(showCalendar[showCalendar.length - 1].data + 'T00:00:00');
+    // Variabile span: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const span = Math.ceil((lastDate - firstDate) / (1000 * 60 * 60 * 24)) + 1;
     days = Math.max(span, 7);
   }
@@ -300,9 +348,13 @@ function setupDateRail() {
   });
 }
 
+// Funzione renderShows: costruisce markup o componenti UI a partire dai dati in ingresso. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 function renderShows() {
+  // Variabile showsSection: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const showsSection = document.getElementById('shows-section');
+  // Variabile noShowsState: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const noShowsState = document.getElementById('no-shows-state');
+  // Variabile container: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const container = document.getElementById('shows-container');
 
   if (!container || selectedCinemaId == null) {
@@ -311,6 +363,7 @@ function renderShows() {
     return;
   }
 
+  // Variabile selectedDate: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const selectedDate = dateRail?.getSelectedDate();
   if (!selectedDate) {
     if (showsSection) showsSection.classList.add('hidden');
@@ -318,6 +371,7 @@ function renderShows() {
     return;
   }
 
+  // Variabile selectedKey: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const selectedKey = localDateKey(selectedDate);
 
   // Match backend DateOnly string directly (backend returns "YYYY-MM-DD" as local date)
@@ -332,17 +386,24 @@ function renderShows() {
   if (noShowsState) noShowsState.classList.add('hidden');
   if (showsSection) showsSection.classList.remove('hidden');
 
+  // Variabile tipoSalaOrder: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const tipoSalaOrder = ['2D', '3D', 'ISENSE', 'XL'];
+  // Variabile gruppiOrdinati: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const gruppiOrdinati = [...dayGroup.gruppiPerTipoSala].sort((a, b) => {
+    // Variabile idxA: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const idxA = tipoSalaOrder.indexOf(a.tipoSala);
+    // Variabile idxB: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const idxB = tipoSalaOrder.indexOf(b.tipoSala);
     return (idxA === -1 ? 999 : idxA) - (idxB === -1 ? 999 : idxB);
   });
 
+  // Variabile html: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   let html = '';
 
   gruppiOrdinati.forEach(gruppo => {
+    // Variabile tipoSala: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const tipoSala = gruppo.tipoSala;
+    // Variabile shows: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const shows = gruppo.shows || [];
 
     if (shows.length === 0) return;
@@ -350,6 +411,7 @@ function renderShows() {
     // Group by local time, aggregate sala badges for same-time shows
     const timeGroups = {};
     shows.forEach(show => {
+      // Variabile time: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
       const time = formatLocalTime(show.startAtUtc);
       if (!timeGroups[time]) {
         timeGroups[time] = [];
@@ -366,9 +428,11 @@ function renderShows() {
     `;
 
     Object.keys(timeGroups).sort().forEach(time => {
+      // Variabile showsAtTime: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
       const showsAtTime = timeGroups[time];
 
       if (showsAtTime.length === 1) {
+        // Variabile show: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
         const show = showsAtTime[0];
         html += renderTimeButton(time, show);
       } else {
@@ -387,17 +451,23 @@ function renderShows() {
   container.innerHTML = html;
 
   container.querySelectorAll('.show-time-btn').forEach(btn => {
+    // Listener evento: si attiva quando scatta l'evento sulla pagina e aggiorna la UI o lo stato.
     btn.addEventListener('click', () => {
+      // Variabile showId: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
       const showId = btn.dataset.showId;
       handleShowClick(parseInt(showId, 10));
     });
   });
 }
 
+// Funzione renderTimeButton: costruisce markup o componenti UI a partire dai dati in ingresso. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 function renderTimeButton(time, show, showSalaBadge = false) {
+  // Variabile showId: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const showId = show.showId;
+  // Variabile salaNumero: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const salaNumero = show.salaNumeroProgressivo;
 
+  // Variabile badgeHtml: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   let badgeHtml = '';
   if (showSalaBadge) {
     badgeHtml = `<span class="sala-badge">Sala ${salaNumero}</span>`;
@@ -410,17 +480,22 @@ function renderTimeButton(time, show, showSalaBadge = false) {
   `;
 }
 
+// Funzione handleShowClick: gestisce un evento o una risposta utente. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 function handleShowClick(showId) {
+  // Variabile auth: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const auth = getAuthSafe();
   if (auth && auth.isLoggedIn()) {
     window.location.href = `/acquista.html?showId=${showId}`;
   } else {
+    // Variabile targetUrl: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const targetUrl = `/acquista.html?showId=${showId}`;
     window.location.href = `/login.html?redirect=${encodeURIComponent(targetUrl)}`;
   }
 }
 
+// Funzione getTipoSalaClass: recupera un valore derivato e lo restituisce al chiamante. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 function getTipoSalaClass(tipoSala) {
+  // Variabile normalized: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const normalized = (tipoSala || '').toUpperCase();
   if (normalized === 'TRED' || normalized === '3D') return 'tipo-sala-badge-3d';
   if (normalized === 'ISENSE') return 'tipo-sala-badge-isense';
@@ -429,17 +504,24 @@ function getTipoSalaClass(tipoSala) {
 }
 
 // Cinema Modal
+// Funzione setupCinemaModal: descrive l'azione eseguita, i parametri in ingresso e il valore restituito.
 function setupCinemaModal() {
+  // Variabile modal: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const modal = document.getElementById('cinema-modal');
+  // Variabile closeBtn: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const closeBtn = document.getElementById('cinema-modal-close');
+  // Variabile ctaBtn: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const ctaBtn = document.getElementById('select-cinema-cta');
+  // Variabile searchInput: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const searchInput = document.getElementById('cinema-search-input');
 
+  // Variabile/funzione openModal: supporto non ovvio per stato, callback o logica della pagina.
   const openModal = () => {
     if (modal) {
       modal.classList.remove('hidden');
       document.body.style.overflow = 'hidden';
       if (!cinemasLoaded) {
+        // Variabile list: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
         const list = document.getElementById('cinema-list');
         if (list) {
           list.innerHTML = `
@@ -455,6 +537,7 @@ function setupCinemaModal() {
     }
   };
 
+  // Variabile/funzione closeModal: supporto non ovvio per stato, callback o logica della pagina.
   const closeModal = () => {
     if (modal) {
       modal.classList.add('hidden');
@@ -462,20 +545,26 @@ function setupCinemaModal() {
     }
   };
 
+  // Listener evento: si attiva quando scatta l'evento sulla pagina e aggiorna la UI o lo stato.
   ctaBtn?.addEventListener('click', openModal);
+  // Listener evento: si attiva quando scatta l'evento sulla pagina e aggiorna la UI o lo stato.
   closeBtn?.addEventListener('click', closeModal);
 
+  // Listener evento: si attiva quando scatta l'evento sulla pagina e aggiorna la UI o lo stato.
   modal?.addEventListener('click', (e) => {
     if (e.target === modal) closeModal();
   });
 
+  // Listener evento: si attiva quando scatta l'evento sulla pagina e aggiorna la UI o lo stato.
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && modal && !modal.classList.contains('hidden')) {
       closeModal();
     }
   });
 
+  // Variabile debounceTimer: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   let debounceTimer;
+  // Listener evento: si attiva quando scatta l'evento sulla pagina e aggiorna la UI o lo stato.
   searchInput?.addEventListener('input', (e) => {
     clearTimeout(debounceTimer);
     debounceTimer = setTimeout(() => {
@@ -486,6 +575,7 @@ function setupCinemaModal() {
     }, 200);
   });
 
+  // Listener evento: si attiva quando scatta l'evento sulla pagina e aggiorna la UI o lo stato.
   window.addEventListener('cinema:changed', (e) => {
     selectedCinemaId = e.detail?.cinemaId ?? selectedCinemaId;
     renderCinemaInfo();
@@ -493,6 +583,7 @@ function setupCinemaModal() {
   });
 }
 
+// Funzione requestUserLocationInBackground: gestisce la logica prevista e restituisce il risultato atteso. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 async function requestUserLocationInBackground() {
   try {
     userLocation = await getUserLocation();
@@ -500,6 +591,7 @@ async function requestUserLocationInBackground() {
     cinemasLoaded = true;
     renderCinemaInfo();
 
+    // Variabile modal: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const modal = document.getElementById('cinema-modal');
     if (modal && !modal.classList.contains('hidden')) {
       renderCinemaList(modalSearchTerm);
@@ -509,10 +601,13 @@ async function requestUserLocationInBackground() {
   }
 }
 
+// Funzione renderCinemaList: costruisce markup o componenti UI a partire dai dati in ingresso. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 function renderCinemaList(search = '') {
+  // Variabile list: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const list = document.getElementById('cinema-list');
   if (!list) return;
 
+  // Variabile cinemas: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   let cinemas = [...allCinemas];
 
   if (search) {
@@ -535,8 +630,11 @@ function renderCinemaList(search = '') {
   }
 
   list.innerHTML = cinemas.map(cinema => {
+    // Variabile isSelected: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const isSelected = Number(cinema.id) === Number(selectedCinemaId);
+    // Variabile distance: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const distance = cinema.distanzaKm != null ? `${cinema.distanzaKm.toFixed(1)} km` : '';
+    // Variabile tipologie: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const tipologie = (cinema.tipologieSalePresenti || []).slice(0, 4).map(t =>
       `<span class="inline-block bg-canvas-elevated text-ink text-xs px-2 py-0.5 rounded-full">${formatTipoSalaLabel(t)}</span>`
     ).join('');
@@ -563,10 +661,12 @@ function renderCinemaList(search = '') {
   }).join('');
 }
 
+// Funzione selectCinema: gestisce la logica prevista e restituisce il risultato atteso. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 function selectCinema(cinemaId) {
   CinemaManager.setCinema(cinemaId);
   selectedCinemaId = cinemaId;
 
+  // Variabile modal: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const modal = document.getElementById('cinema-modal');
   if (modal) {
     modal.classList.add('hidden');
@@ -578,24 +678,35 @@ function selectCinema(cinemaId) {
 }
 
 // Utilities
+// Funzione showLoading: descrive l'azione eseguita, i parametri in ingresso e il valore restituito.
 function showLoading() {
+  // Variabile loading: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const loading = document.getElementById('loading-state');
+  // Variabile error: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const error = document.getElementById('error-state');
+  // Variabile content: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const content = document.getElementById('film-content');
   if (loading) loading.classList.remove('hidden');
   if (error) error.classList.add('hidden');
   if (content) content.classList.add('hidden');
 }
 
+// Funzione hideLoading: gestisce la logica prevista e restituisce il risultato atteso. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 function hideLoading() {
+  // Variabile loading: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const loading = document.getElementById('loading-state');
   if (loading) loading.classList.add('hidden');
 }
 
+// Funzione showError: gestisce la logica prevista e restituisce il risultato atteso. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 function showError(message) {
+  // Variabile loading: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const loading = document.getElementById('loading-state');
+  // Variabile error: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const error = document.getElementById('error-state');
+  // Variabile content: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const content = document.getElementById('film-content');
+  // Variabile msgEl: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const msgEl = document.getElementById('error-message');
   if (loading) loading.classList.add('hidden');
   if (error) error.classList.remove('hidden');
@@ -604,23 +715,29 @@ function showError(message) {
 }
 
 
+// Funzione formatLocalTime: gestisce la logica prevista e restituisce il risultato atteso. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 function formatLocalTime(dateTimeStr) {
   if (!dateTimeStr) return '';
   const d = new Date(dateTimeStr);
+  // Variabile hours: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const hours = String(d.getHours()).padStart(2, '0');
+  // Variabile minutes: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const minutes = String(d.getMinutes()).padStart(2, '0');
   return `${hours}:${minutes}`;
 }
 
+// Funzione formatDateOnly: gestisce la logica prevista e restituisce il risultato atteso. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 function formatDateOnly(dateStr) {
   if (!dateStr) return '';
   if (typeof dateStr === 'string' && dateStr.includes('-')) {
+    // Variabile parts: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const parts = dateStr.split('-');
     return `${parts[2]}/${parts[1]}/${parts[0]}`;
   }
   return dateStr;
 }
 
+// Funzione getUserLocation: recupera un valore derivato e lo restituisce al chiamante. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 function getUserLocation() {
   return new Promise((resolve, reject) => {
     if (!navigator.geolocation) {
@@ -648,11 +765,14 @@ window.selectCinema = selectCinema;
 // ─── Watchlist ──────────────────────────────────────────
 let isWatchlistSaved = false;
 
+// Funzione checkWatchlistStatus: gestisce la logica prevista e restituisce il risultato atteso. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 async function checkWatchlistStatus() {
+  // Variabile auth: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const auth = getAuthSafe();
   if (!auth || !auth.isLoggedIn()) return;
 
   try {
+    // Variabile result: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const result = await API.checkWatchlist(parseInt(filmId, 10));
     isWatchlistSaved = result.isSaved;
     updateWatchlistIcon();
@@ -661,7 +781,9 @@ async function checkWatchlistStatus() {
   }
 }
 
+// Funzione updateWatchlistIcon: aggiorna lo stato o il DOM in base ai dati correnti. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 function updateWatchlistIcon() {
+  // Variabile icon: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const icon = document.getElementById('watchlist-icon');
   if (!icon) return;
   if (isWatchlistSaved) {
@@ -671,7 +793,9 @@ function updateWatchlistIcon() {
   }
 }
 
+// Funzione toggleWatchlist: commuta uno stato visivo o funzionale tra due modalità. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 async function toggleWatchlist() {
+  // Variabile auth: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const auth = getAuthSafe();
   if (!auth || !auth.isLoggedIn()) {
     window.location.href = '/login.html?redirect=' + encodeURIComponent(window.location.href);

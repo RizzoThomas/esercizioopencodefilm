@@ -5,15 +5,33 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FilmAPI.Services;
 
+/// <summary>
+///     Servizio per la gestione delle prenotazioni.
+///     Recupera le prenotazioni effettuate dall'utente, con dettagli
+///     su proiezione, film, cinema, posti e stato del pagamento.
+///     Ogni prenotazione è legata a un utente e a una proiezione.
+/// </summary>
 public class PrenotazioneService : IPrenotazioneService
 {
+    /// <summary>DbContext per accesso a prenotazioni, proiezioni e utenti.</summary>
     private readonly FilmDbContext _context;
 
+    /// <summary>
+    ///     Inizializza il servizio con il contesto del database.
+    /// </summary>
     public PrenotazioneService(FilmDbContext context)
     {
         _context = context;
     }
 
+    /// <summary>
+    /// Recupera o legge i dati tramite l''operazione GetPrenotazioniAsync del servizio.
+    /// </summary>
+    /// <param name="userId">Identificativo necessario per individuare l'entità o il contesto di lavoro: userId.</param>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database.
+    /// </remarks>
     public async Task<List<PrenotazioneDTO>> GetPrenotazioniAsync(int userId)
     {
         return await _context.Prenotazioni
@@ -26,6 +44,13 @@ public class PrenotazioneService : IPrenotazioneService
             .ToListAsync();
     }
 
+    /// <summary>
+    /// Recupera o legge i dati tramite l''operazione GetAllPrenotazioniAsync del servizio.
+    /// </summary>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database.
+    /// </remarks>
     public async Task<List<PrenotazioneDTO>> GetAllPrenotazioniAsync()
     {
         return await _context.Prenotazioni
@@ -37,6 +62,15 @@ public class PrenotazioneService : IPrenotazioneService
             .ToListAsync();
     }
 
+    /// <summary>
+    /// Esegue l''operazione di business CreatePrenotazioneAsync del servizio.
+    /// </summary>
+    /// <param name="userId">Identificativo necessario per individuare l'entità o il contesto di lavoro: userId.</param>
+    /// <param name="dto">Oggetto DTO di input necessario per eseguire l'operazione.</param>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database.
+    /// </remarks>
     public async Task<PrenotazioneDTO?> CreatePrenotazioneAsync(int userId, PrenotazioneCreateDTO dto)
     {
         var proiezione = await _context.Proiezioni
@@ -75,6 +109,15 @@ public class PrenotazioneService : IPrenotazioneService
         };
     }
 
+    /// <summary>
+    /// Esegue l''operazione di business DeletePrenotazioneAsync del servizio.
+    /// </summary>
+    /// <param name="userId">Identificativo necessario per individuare l'entità o il contesto di lavoro: userId.</param>
+    /// <param name="prenotazioneId">Identificativo necessario per individuare l'entità o il contesto di lavoro: prenotazioneId.</param>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database.
+    /// </remarks>
     public async Task<bool> DeletePrenotazioneAsync(int userId, int prenotazioneId)
     {
         var prenotazione = await _context.Prenotazioni

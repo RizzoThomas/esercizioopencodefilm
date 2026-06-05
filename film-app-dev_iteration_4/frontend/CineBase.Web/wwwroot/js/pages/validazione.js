@@ -6,6 +6,7 @@
 (function () {
   'use strict';
 
+  // Variabile Validazione: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const Validazione = {
     scanner: null,
     scanning: false,
@@ -34,17 +35,23 @@
        EVENT BINDING
        ================================================================ */
     bindEvents() {
+      // Listener evento: si attiva quando scatta l'evento sulla pagina e aggiorna la UI o lo stato.
       document.getElementById('start-scan-btn')?.addEventListener('click', () => this.startScan());
+      // Listener evento: si attiva quando scatta l'evento sulla pagina e aggiorna la UI o lo stato.
       document.getElementById('stop-scan-btn')?.addEventListener('click', () => this.stopScan());
+      // Listener evento: si attiva quando scatta l'evento sulla pagina e aggiorna la UI o lo stato.
       document.getElementById('manual-form')?.addEventListener('submit', (e) => {
         e.preventDefault();
         this.handleManualValidation();
       });
+      // Listener evento: si attiva quando scatta l'evento sulla pagina e aggiorna la UI o lo stato.
       document.getElementById('codice-input')?.addEventListener('paste', () => {
         // Auto-validate on paste after short delay
         setTimeout(() => this.handleManualValidation(), 100);
       });
+      // Listener evento: si attiva quando scatta l'evento sulla pagina e aggiorna la UI o lo stato.
       document.getElementById('clear-history-btn')?.addEventListener('click', () => this.clearHistory());
+      // Listener evento: si attiva quando scatta l'evento sulla pagina e aggiorna la UI o lo stato.
       document.getElementById('camera-select')?.addEventListener('change', (e) => {
         if (this.scanning) {
           this.stopScan();
@@ -58,7 +65,9 @@
        ================================================================ */
     async populateCameraList() {
       try {
+        // Variabile devices: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
         const devices = await Html5Qrcode.getCameras();
+        // Variabile select: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
         const select = document.getElementById('camera-select');
         if (!devices.length) {
           document.getElementById('no-camera-msg')?.classList.remove('hidden');
@@ -83,6 +92,7 @@
           this.scanner = new Html5Qrcode('reader');
         }
 
+        // Variabile config: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
         const config = {
           fps: 10,
           qrbox: { width: 250, height: 250 },
@@ -103,6 +113,7 @@
           ],
         };
 
+        // Variabile deviceId: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
         const deviceId = cameraId || undefined;
         // Use the first available camera if none specified
         const targetCamera = deviceId ? { deviceId: { exact: deviceId } } : { facingMode: 'environment' };
@@ -153,7 +164,9 @@
       // If it's a URL, extract the 'codice' query parameter
       if (codice.startsWith('http://') || codice.startsWith('https://')) {
         try {
+          // Variabile url: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
           const url = new URL(codice);
+          // Variabile codeParam: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
           const codeParam = url.searchParams.get('codice') || url.searchParams.get('code') || url.searchParams.get('ticket');
           if (codeParam) {
             codice = codeParam;
@@ -172,7 +185,9 @@
 
       // Also handle plain query strings like "codice=ABC123"
       if (codice.includes('=') && !codice.includes('/')) {
+        // Variabile params: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
         const params = new URLSearchParams(codice);
+        // Variabile codeParam: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
         const codeParam = params.get('codice') || params.get('code') || params.get('ticket');
         if (codeParam) codice = codeParam;
       }
@@ -199,13 +214,16 @@
        MANUAL VALIDATION — Entered or scanned code
        ================================================================ */
     async handleManualValidation() {
+      // Variabile codice: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
       const codice = document.getElementById('codice-input')?.value?.trim();
       if (!codice) {
         showToast('Inserisci un codice biglietto', 'warning');
         return;
       }
 
+      // Variabile validateBtn: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
       const validateBtn = document.getElementById('validate-btn');
+      // Variabile originalText: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
       const originalText = validateBtn.innerHTML;
       validateBtn.disabled = true;
       validateBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i>Validazione...';
@@ -248,6 +266,7 @@
 
       } catch (err) {
         console.error('Validation error:', err);
+        // Variabile msg: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
         const msg = err?.message || 'Errore di connessione al server';
         this.showResult('error', 'Errore', null, msg);
         this.addToHistory(codice, 'error', null);
@@ -264,10 +283,13 @@
        ================================================================ */
     async lookupTicket(codice) {
       try {
+        // Variabile url: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
         const url = `${API.baseUrl}/admin/tickets/validate/${encodeURIComponent(codice)}`;
+        // Chiamata API: contatta il backend con i dati previsti e usa la risposta per aggiornare l'interfaccia.
         const res = await fetch(url, { headers: API.getAuthHeaders() });
         if (res.status === 404) return null;
         if (!res.ok) {
+          // Variabile err: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
           const err = await res.json().catch(() => ({}));
           throw new Error(err.message || `Errore server (${res.status})`);
         }
@@ -279,14 +301,18 @@
     },
 
     async validateTicket(codice, cinemaId = 0) {
+      // Variabile body: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
       const body = { CodiceBiglietto: codice, CinemaId: cinemaId };
+      // Variabile url: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
       const url = `${API.baseUrl}/admin/tickets/validate`;
+      // Chiamata API: contatta il backend con i dati previsti e usa la risposta per aggiornare l'interfaccia.
       const res = await fetch(url, {
         method: 'POST',
         headers: { ...API.getAuthHeaders(), 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
       });
       if (!res.ok) {
+        // Variabile err: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
         const err = await res.json().catch(() => ({}));
         throw new Error(err.message || `Errore validazione (${res.status})`);
       }
@@ -297,10 +323,13 @@
        RESULT DISPLAY
        ================================================================ */
     showResult(type, title, ticketInfo, errorMsg) {
+      // Variabile card: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
       const card = document.getElementById('result-card');
+      // Variabile content: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
       const content = document.getElementById('result-content');
       card.classList.remove('hidden');
 
+      // Variabile colors: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
       const colors = {
         success: { bg: 'rgba(3,144,74,0.1)', border: 'border-ferrari-semantic-success', icon: 'fa-circle-check text-ferrari-semantic-success' },
         already: { bg: 'rgba(76,152,185,0.1)', border: 'border-ferrari-semantic-info', icon: 'fa-circle-info text-ferrari-semantic-info' },
@@ -333,6 +362,7 @@
 
     buildTicketInfo(ticket) {
       if (!ticket) return '';
+      // Variabile statusBadge: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
       const statusBadge = ticket.stato === 'Validated'
         ? '<span class="badge-ferrari text-xs" style="background:rgba(3,144,74,0.15);color:#03904a">Validato</span>'
         : ticket.stato === 'Cancelled'
@@ -388,6 +418,7 @@
     },
 
     renderHistory() {
+      // Variabile list: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
       const list = document.getElementById('history-list');
       if (!list) return;
 
@@ -402,9 +433,13 @@
       }
 
       list.innerHTML = this.history.map((h, i) => {
+        // Variabile time: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
         const time = new Date(h.timestamp);
+        // Variabile timeStr: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
         const timeStr = time.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
+        // Variabile dateStr: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
         const dateStr = time.toLocaleDateString('it-IT', { day: '2-digit', month: 'short' });
+        // Variabile icon: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
         const icon = h.status === 'success' ? 'fa-circle-check text-ferrari-semantic-success'
           : h.status === 'already' ? 'fa-circle-info text-ferrari-semantic-info'
           : h.status === 'cancelled' ? 'fa-ban text-ferrari-semantic-warning'
@@ -428,9 +463,13 @@
        UI STATE MANAGEMENT
        ================================================================ */
     updateUIState(state) {
+      // Variabile startBtn: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
       const startBtn = document.getElementById('start-scan-btn');
+      // Variabile stopBtn: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
       const stopBtn = document.getElementById('stop-scan-btn');
+      // Variabile statusEl: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
       const statusEl = document.getElementById('scan-status');
+      // Variabile overlay: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
       const overlay = document.getElementById('scan-overlay');
 
       if (state === 'scanning') {
@@ -464,6 +503,7 @@
 
     escapeHtml(str) {
       if (!str) return '';
+      // Variabile div: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
       const div = document.createElement('div');
       div.textContent = str;
       return div.innerHTML;
@@ -472,6 +512,7 @@
 
   // Initialize on DOM ready
   if (document.readyState === 'loading') {
+    // Listener evento: si attiva quando scatta l'evento sulla pagina e aggiorna la UI o lo stato.
     document.addEventListener('DOMContentLoaded', () => Validazione.init());
   } else {
     Validazione.init();

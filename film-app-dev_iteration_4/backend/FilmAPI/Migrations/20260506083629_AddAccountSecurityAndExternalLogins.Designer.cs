@@ -11,6 +11,9 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace FilmAPI.Migrations
 {
+    /// <summary>
+    /// Classe generata da EF Core per la migrazione AddAccountSecurityAndExternalLogins.
+    /// </summary>
     [DbContext(typeof(FilmDbContext))]
     [Migration("20260506083629_AddAccountSecurityAndExternalLogins")]
     partial class AddAccountSecurityAndExternalLogins

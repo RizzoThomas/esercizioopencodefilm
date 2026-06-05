@@ -5,8 +5,18 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FilmAPI.Endpoints;
 
+/// <summary>
+/// Raggruppa gli endpoint protetti per la gestione dei registi.
+/// </summary>
 public static class RegistiEndpoints
 {
+    /// <summary>
+    /// Mappa il gruppo <c>/registi</c> per elenco, dettaglio, creazione, aggiornamento ed eliminazione dei registi.
+    /// Richiede <c>RequireAuthorization("PowerUserOrAdmin")</c>.
+    /// Esegue operazioni CRUD sui registi con effetti sul database.
+    /// </summary>
+    /// <param name="app">Applicazione web su cui registrare gli endpoint.</param>
+    /// <returns>Non restituisce valori.</returns>
     public static void MapRegistiEndpoints(this WebApplication app)
     {
         var group = app.MapGroup("/registi").RequireAuthorization("PowerUserOrAdmin");

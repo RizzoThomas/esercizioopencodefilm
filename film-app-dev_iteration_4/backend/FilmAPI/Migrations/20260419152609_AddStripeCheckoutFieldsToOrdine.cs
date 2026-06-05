@@ -6,6 +6,9 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace FilmAPI.Migrations
 {
     /// <inheritdoc />
+    /// <summary>
+    /// Migrazione che aggiunge al dato Ordine i campi per il checkout Stripe e rimuove i vecchi campi obsoleti.
+    /// </summary>
     public partial class AddStripeCheckoutFieldsToOrdine : Migration
     {
         /// <inheritdoc />

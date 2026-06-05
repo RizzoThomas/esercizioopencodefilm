@@ -11,6 +11,9 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace FilmAPI.Migrations
 {
+    /// <summary>
+    /// Classe generata da EF Core per la migrazione AddTmdbFieldsToFilm.
+    /// </summary>
     [DbContext(typeof(FilmDbContext))]
     [Migration("20260427110234_AddTmdbFieldsToFilm")]
     partial class AddTmdbFieldsToFilm

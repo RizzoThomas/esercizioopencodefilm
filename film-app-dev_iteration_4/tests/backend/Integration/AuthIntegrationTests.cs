@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FilmAPI.Tests.Integration;
 
+/// <summary>Suite di test per AuthIntegrationTests.</summary>
 public class AuthIntegrationTests : IClassFixture<CustomWebApplicationFactory>
 {
     private readonly CustomWebApplicationFactory _factory;
@@ -16,6 +17,7 @@ public class AuthIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         _factory = factory;
     }
 
+    /// <summary>Verifica lo scenario di A1_Register_ReturnsAuthResponse_WithValidData: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task A1_Register_ReturnsAuthResponse_WithValidData()
     {
@@ -44,6 +46,7 @@ public class AuthIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Equal("User", payload.User.Ruolo);
     }
 
+    /// <summary>Verifica lo scenario di A2_Register_ReturnsConflict_WhenEmailAlreadyExists: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task A2_Register_ReturnsConflict_WhenEmailAlreadyExists()
     {
@@ -64,6 +67,7 @@ public class AuthIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
     }
 
+    /// <summary>Verifica lo scenario di A3_Login_ReturnsAuthResponse_WithValidCredentials: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task A3_Login_ReturnsAuthResponse_WithValidCredentials()
     {
@@ -95,6 +99,7 @@ public class AuthIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Equal("login@test.com", payload.User.Email);
     }
 
+    /// <summary>Verifica lo scenario di A4_Login_ReturnsUnauthorized_WithInvalidCredentials: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task A4_Login_ReturnsUnauthorized_WithInvalidCredentials()
     {
@@ -121,6 +126,7 @@ public class AuthIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
     }
 
+    /// <summary>Verifica lo scenario di A5_Refresh_ReturnsNewTokens_AndRevokesOldRefreshToken: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task A5_Refresh_ReturnsNewTokens_AndRevokesOldRefreshToken()
     {
@@ -158,6 +164,7 @@ public class AuthIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Equal(HttpStatusCode.Unauthorized, reuseResponse.StatusCode);
     }
 
+    /// <summary>Verifica lo scenario di A6_Refresh_ReturnsUnauthorized_WithInvalidToken: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task A6_Refresh_ReturnsUnauthorized_WithInvalidToken()
     {
@@ -174,6 +181,7 @@ public class AuthIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
     }
 
+    /// <summary>Verifica lo scenario di A7_Logout_RevokesRefreshToken: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task A7_Logout_RevokesRefreshToken()
     {
@@ -207,6 +215,7 @@ public class AuthIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Equal(HttpStatusCode.Unauthorized, reuseResponse.StatusCode);
     }
 
+    /// <summary>Verifica lo scenario di A8_Me_ReturnsUserInfo_WhenAuthenticated: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task A8_Me_ReturnsUserInfo_WhenAuthenticated()
     {

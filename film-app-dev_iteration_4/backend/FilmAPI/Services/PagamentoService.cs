@@ -7,6 +7,12 @@ using Microsoft.Extensions.Logging;
 
 namespace FilmAPI.Services;
 
+/// <summary>
+/// Fornisce il servizio  per le operazioni di dominio esposte da questo modulo.
+/// </summary>
+/// <remarks>
+/// Usato dai controller o endpoint che gestiscono le funzioni di . Dipendenze iniettate nel costruttore: nessuna dichiarata esplicitamente.
+/// </remarks>
 public class PagamentoService : IPagamentoService
 {
     private readonly FilmDbContext _db;
@@ -41,6 +47,17 @@ public class PagamentoService : IPagamentoService
         _logger = logger;
     }
 
+    /// <summary>
+    /// Esegue l''operazione PayOrdineAsync del servizio.
+    /// </summary>
+    /// <param name="userId">Identificativo necessario per individuare l'entità o il contesto di lavoro: userId.</param>
+    /// <param name="orderId">Identificativo necessario per individuare l'entità o il contesto di lavoro: orderId.</param>
+    /// <param name="dto">Oggetto DTO di input necessario per eseguire l'operazione.</param>
+    /// <param name="idempotencyKey">Parametro necessario per l'operazione: idempotencyKey.</param>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database. può inviare email di notifica.
+    /// </remarks>
     public async Task<PayOrdineResponseDTO> PayOrdineAsync(int userId, int orderId, PayOrdineRequestDTO dto, string? idempotencyKey)
     {
         var metodo = NormalizePaymentMethod(dto.MetodoPagamento);
@@ -218,6 +235,15 @@ public class PagamentoService : IPagamentoService
         };
     }
 
+    /// <summary>
+    /// Esegue l''operazione HandleStripeWebhookAsync del servizio.
+    /// </summary>
+    /// <param name="payload">Parametro necessario per l'operazione: payload.</param>
+    /// <param name="signatureHeader">Parametro necessario per l'operazione: signatureHeader.</param>
+    /// <returns>Completa l'operazione in modo asincrono senza restituire un valore, lasciando al chiamante la sola gestione dell'esito tramite eccezioni.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database. può inviare email di notifica.
+    /// </remarks>
     public async Task HandleStripeWebhookAsync(string payload, string? signatureHeader)
     {
         var stripeEvent = _stripeGateway.ParseWebhookEvent(payload, signatureHeader);
@@ -374,6 +400,15 @@ public class PagamentoService : IPagamentoService
         await _db.SaveChangesAsync();
     }
 
+    /// <summary>
+    /// Esegue l''operazione di business CancelPendingOrdineAsync del servizio.
+    /// </summary>
+    /// <param name="userId">Identificativo necessario per individuare l'entità o il contesto di lavoro: userId.</param>
+    /// <param name="orderId">Identificativo necessario per individuare l'entità o il contesto di lavoro: orderId.</param>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database.
+    /// </remarks>
     public async Task<OrdineSummaryDTO> CancelPendingOrdineAsync(int userId, int orderId)
     {
         await using var transaction = await _db.Database.BeginTransactionAsync();
@@ -708,6 +743,17 @@ public class PagamentoService : IPagamentoService
         return normalized.Length <= 1000 ? normalized : normalized[..1000];
     }
 
+    /// <summary>
+    /// Esegue l''operazione di business CreateCheckoutSessionAsync del servizio.
+    /// </summary>
+    /// <param name="userId">Identificativo necessario per individuare l'entità o il contesto di lavoro: userId.</param>
+    /// <param name="orderId">Identificativo necessario per individuare l'entità o il contesto di lavoro: orderId.</param>
+    /// <param name="dto">Oggetto DTO di input necessario per eseguire l'operazione.</param>
+    /// <param name="idempotencyKey">Parametro necessario per l'operazione: idempotencyKey.</param>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database.
+    /// </remarks>
     public async Task<CreateCheckoutSessionResponseDTO> CreateCheckoutSessionAsync(int userId, int orderId, CreateCheckoutSessionRequestDTO dto, string? idempotencyKey)
     {
         await using var transaction = await _db.Database.BeginTransactionAsync();
@@ -811,6 +857,15 @@ public class PagamentoService : IPagamentoService
         };
     }
 
+    /// <summary>
+    /// Recupera o legge i dati tramite l''operazione GetCheckoutStatusAsync del servizio.
+    /// </summary>
+    /// <param name="userId">Identificativo necessario per individuare l'entità o il contesto di lavoro: userId.</param>
+    /// <param name="orderId">Identificativo necessario per individuare l'entità o il contesto di lavoro: orderId.</param>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database.
+    /// </remarks>
     public async Task<CheckoutStatusDTO> GetCheckoutStatusAsync(int userId, int orderId)
     {
         var ordine = await _db.Ordini
@@ -837,6 +892,15 @@ public class PagamentoService : IPagamentoService
         return MapCheckoutStatus(ordine);
     }
 
+    /// <summary>
+    /// Esegue l''operazione ReconcileCheckoutSessionAsync del servizio.
+    /// </summary>
+    /// <param name="userId">Identificativo necessario per individuare l'entità o il contesto di lavoro: userId.</param>
+    /// <param name="orderId">Identificativo necessario per individuare l'entità o il contesto di lavoro: orderId.</param>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database. può inviare email di notifica.
+    /// </remarks>
     public async Task<CheckoutStatusDTO> ReconcileCheckoutSessionAsync(int userId, int orderId)
     {
         var ordine = await LoadOrderAsync(orderId);

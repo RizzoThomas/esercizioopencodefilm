@@ -59,12 +59,16 @@ var RouteGuard = (function () {
     '/utenti-detail.html':      { roles: ['admin'], authRequired: true }
   };
 
+  // Variabile ACCESS_TOKEN_KEY: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   var ACCESS_TOKEN_KEY = 'cb_access_token';
+  // Variabile REFRESH_TOKEN_KEY: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   var REFRESH_TOKEN_KEY = 'cb_refresh_token';
 
   // Normalizza il ruolo da vari formati (numero, stringa) a stringa
+// Funzione normalizeRole: descrive l'azione eseguita, i parametri in ingresso e il valore restituito.
   function normalizeRole(role) {
     if (role == null) return 'anonimo';
+    // Variabile value: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     var value = String(role).trim().toLowerCase();
     if (value === '2' || value === 'admin') return 'admin';
     if (value === '1' || value === 'poweruser') return 'poweruser';
@@ -73,6 +77,7 @@ var RouteGuard = (function () {
   }
 
   // Previene redirect a URL esterni (sicurezza)
+// Funzione sanitizeRedirectPath: descrive l'azione eseguita, i parametri in ingresso e il valore restituito.
   function sanitizeRedirectPath(path) {
     if (!path || typeof path !== 'string') return '/index.html';
     if (path.indexOf('://') !== -1 || path.indexOf('//') === 0) return '/index.html';
@@ -82,11 +87,15 @@ var RouteGuard = (function () {
   }
 
   // Decodifica JWT senza verificare la firma (solo per leggere ruolo e scadenza)
+// Funzione parseJwt: descrive l'azione eseguita, i parametri in ingresso e il valore restituito.
   function parseJwt(token) {
     try {
+      // Variabile parts: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
       var parts = token.split('.');
       if (parts.length < 2) return null;
+      // Variabile base64: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
       var base64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');
+      // Variabile jsonPayload: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
       var jsonPayload = decodeURIComponent(
         atob(base64)
           .split('')
@@ -97,20 +106,25 @@ var RouteGuard = (function () {
     } catch (e) { return null; }
   }
 
+  // Funzione getAccessToken: recupera un valore derivato e lo restituisce al chiamante. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
   function getAccessToken() {
     try { return localStorage.getItem(ACCESS_TOKEN_KEY); } catch (e) { return null; }
   }
 
+  // Funzione getRefreshToken: recupera un valore derivato e lo restituisce al chiamante. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
   function getRefreshToken() {
     try { return localStorage.getItem(REFRESH_TOKEN_KEY); } catch (e) { return null; }
   }
 
+  // Funzione getAuthSafe: recupera un valore derivato e lo restituisce al chiamante. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
   function getAuthSafe() {
     if (typeof window === 'undefined') return null;
     return window.Auth || null;
   }
 
+  // Funzione tryProactiveRefresh: gestisce la logica prevista e restituisce il risultato atteso. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
   async function tryProactiveRefresh() {
+    // Variabile auth: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     var auth = getAuthSafe();
     if (!auth || typeof auth.refreshAccessToken !== 'function') return false;
     if (!getRefreshToken()) return false;
@@ -123,47 +137,62 @@ var RouteGuard = (function () {
     }
   }
 
+  // Funzione isTokenValid: gestisce la logica prevista e restituisce il risultato atteso. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
   function isTokenValid() {
+    // Variabile token: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     var token = getAccessToken();
     if (!token) return false;
+    // Variabile payload: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     var payload = parseJwt(token);
     if (!payload) return false;
     return payload.exp > Math.ceil(Date.now() / 1000);
   }
 
+  // Funzione getRoleFromToken: recupera un valore derivato e lo restituisce al chiamante. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
   function getRoleFromToken() {
+    // Variabile token: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     var token = getAccessToken();
     if (!token) return null;
+    // Variabile payload: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     var payload = parseJwt(token);
     if (!payload) return null;
     return payload.role || null;
   }
 
+  // Funzione check: gestisce la logica prevista e restituisce il risultato atteso. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
   async function check() {
+    // Variabile pathname: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     var pathname = window.location.pathname;
+    // Variabile pageKey: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     var pageKey = pathname.toLowerCase();
+    // Variabile permission: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     var permission = PAGE_PERMISSIONS[pageKey];
     if (!permission) return true;
 
     // On anonymousOnly pages (login, register), NEVER refresh — let user log in fresh
     var isLoggedIn = isTokenValid();
     if (!isLoggedIn && !permission.anonymousOnly) {
+      // Variabile refreshed: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
       var refreshed = await tryProactiveRefresh();
       if (refreshed) {
         isLoggedIn = isTokenValid();
       }
     }
 
+    // Variabile role: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     var role = normalizeRole(isLoggedIn ? getRoleFromToken() : null);
 
     if (permission.anonymousOnly && isLoggedIn) {
+      // Variabile params: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
       var params = new URLSearchParams(window.location.search);
+      // Variabile redirect: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
       var redirect = sanitizeRedirectPath(params.get('redirect'));
       window.location.replace(redirect || '/index.html');
       return false;
     }
 
     if (permission.authRequired && !isLoggedIn) {
+      // Variabile redirectUrl: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
       var redirectUrl = pathname + window.location.search;
       window.location.replace('/login.html?redirect=' + encodeURIComponent(redirectUrl));
       return false;
@@ -178,6 +207,7 @@ var RouteGuard = (function () {
   }
 
   if (document.readyState === 'loading') {
+    // Listener evento: si attiva quando scatta l'evento sulla pagina e aggiorna la UI o lo stato.
     document.addEventListener('DOMContentLoaded', function () {
       check();
     });

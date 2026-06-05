@@ -10,6 +10,12 @@ using System.Globalization;
 
 namespace FilmAPI.Services;
 
+/// <summary>
+/// Fornisce il servizio  per le operazioni di dominio esposte da questo modulo.
+/// </summary>
+/// <remarks>
+/// Usato dai controller o endpoint che gestiscono le funzioni di . Dipendenze iniettate nel costruttore: nessuna dichiarata esplicitamente.
+/// </remarks>
 public class EmailService : IEmailService
 {
     private readonly ILogger<EmailService> _logger;
@@ -20,6 +26,14 @@ public class EmailService : IEmailService
     private readonly string? _fromEmail;
     private readonly string? _fromName;
 
+    /// <summary>
+    /// Esegue l''operazione EmailService del servizio.
+    /// </summary>
+    /// <param name="logger">Parametro necessario per l'operazione: logger.</param>
+    /// <returns>Restituisce il risultato dell'operazione quando questa ha esito positivo; altrimenti il chiamante riceve un'eccezione o un risultato nullo/booleano secondo il contratto del metodo.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database. può inviare email di notifica.
+    /// </remarks>
     public EmailService(ILogger<EmailService> logger)
     {
         _logger = logger;
@@ -48,6 +62,17 @@ public class EmailService : IEmailService
         }
     }
 
+    /// <summary>
+    /// Esegue l''operazione di business SendOrderTicketsAsync del servizio.
+    /// </summary>
+    /// <param name="orderDocument">Parametro necessario per l'operazione: orderDocument.</param>
+    /// <param name="pdfBytes">Parametro necessario per l'operazione: pdfBytes.</param>
+    /// <param name="fileName">Parametro necessario per l'operazione: fileName.</param>
+    /// <param name="cancellationToken">Token necessario per validare, rinnovare o revocare l'operazione richiesta.</param>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database. può inviare email di notifica.
+    /// </remarks>
     public async Task<EmailSendResult> SendOrderTicketsAsync(OrdineTicketDocumentDTO orderDocument, byte[] pdfBytes, string fileName, CancellationToken cancellationToken = default)
     {
         if (!HasCompleteConfiguration())
@@ -207,6 +232,19 @@ public class EmailService : IEmailService
 """;
     }
 
+    /// <summary>
+    /// Esegue l''operazione di business SendVoucherPurchaseAsync del servizio.
+    /// </summary>
+    /// <param name="recipientEmail">Parametro necessario per l'operazione: recipientEmail.</param>
+    /// <param name="recipientName">Parametro necessario per l'operazione: recipientName.</param>
+    /// <param name="voucherCode">Parametro necessario per l'operazione: voucherCode.</param>
+    /// <param name="importo">Parametro necessario per l'operazione: importo.</param>
+    /// <param name="scadenzaUtc">Parametro necessario per l'operazione: scadenzaUtc.</param>
+    /// <param name="cancellationToken">Token necessario per validare, rinnovare o revocare l'operazione richiesta.</param>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database. può inviare email di notifica.
+    /// </remarks>
     public async Task<EmailSendResult> SendVoucherPurchaseAsync(string recipientEmail, string recipientName, string voucherCode, decimal importo, DateTime? scadenzaUtc, CancellationToken cancellationToken = default)
     {
         if (!HasCompleteConfiguration())
@@ -333,6 +371,19 @@ public class EmailService : IEmailService
         return value.StartsWith('<') && value.EndsWith('>');
     }
 
+    /// <summary>
+    /// Esegue l''operazione di business SendTopupConfirmationAsync del servizio.
+    /// </summary>
+    /// <param name="recipientEmail">Parametro necessario per l'operazione: recipientEmail.</param>
+    /// <param name="recipientName">Parametro necessario per l'operazione: recipientName.</param>
+    /// <param name="amount">Parametro necessario per l'operazione: amount.</param>
+    /// <param name="newBalance">Parametro necessario per l'operazione: newBalance.</param>
+    /// <param name="transactionId">Identificativo necessario per individuare l'entità o il contesto di lavoro: transactionId.</param>
+    /// <param name="cancellationToken">Token necessario per validare, rinnovare o revocare l'operazione richiesta.</param>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database. può inviare email di notifica.
+    /// </remarks>
     public async Task<EmailSendResult> SendTopupConfirmationAsync(string recipientEmail, string recipientName, decimal amount, decimal newBalance, string transactionId, CancellationToken cancellationToken = default)
     {
         if (!HasCompleteConfiguration())
@@ -479,6 +530,17 @@ public class EmailService : IEmailService
         return amount.ToString("0.00", CultureInfo.GetCultureInfo("it-IT"));
     }
 
+    /// <summary>
+    /// Esegue l''operazione di business SendPasswordResetAsync del servizio.
+    /// </summary>
+    /// <param name="recipientEmail">Parametro necessario per l'operazione: recipientEmail.</param>
+    /// <param name="recipientName">Parametro necessario per l'operazione: recipientName.</param>
+    /// <param name="resetLink">Parametro necessario per l'operazione: resetLink.</param>
+    /// <param name="cancellationToken">Token necessario per validare, rinnovare o revocare l'operazione richiesta.</param>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database. può inviare email di notifica.
+    /// </remarks>
     public async Task<EmailSendResult> SendPasswordResetAsync(string recipientEmail, string recipientName, string resetLink, CancellationToken cancellationToken = default)
     {
         if (!HasCompleteConfiguration())
@@ -568,6 +630,16 @@ public class EmailService : IEmailService
 
     // ── Newsletter ─────────────────────────────────────────
 
+    /// <summary>
+    /// Esegue l''operazione di business SendNewsletterWelcomeAsync del servizio.
+    /// </summary>
+    /// <param name="recipientEmail">Parametro necessario per l'operazione: recipientEmail.</param>
+    /// <param name="recipientName">Parametro necessario per l'operazione: recipientName.</param>
+    /// <param name="cancellationToken">Token necessario per validare, rinnovare o revocare l'operazione richiesta.</param>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database. può inviare email di notifica.
+    /// </remarks>
     public async Task<EmailSendResult> SendNewsletterWelcomeAsync(string recipientEmail, string? recipientName, CancellationToken cancellationToken = default)
     {
         if (!HasCompleteConfiguration())
@@ -628,6 +700,17 @@ public class EmailService : IEmailService
         }
     }
 
+    /// <summary>
+    /// Esegue l''operazione di business SendNewOffersNotificationAsync del servizio.
+    /// </summary>
+    /// <param name="recipientEmail">Parametro necessario per l'operazione: recipientEmail.</param>
+    /// <param name="recipientName">Parametro necessario per l'operazione: recipientName.</param>
+    /// <param name="offersHtml">Parametro necessario per l'operazione: offersHtml.</param>
+    /// <param name="cancellationToken">Token necessario per validare, rinnovare o revocare l'operazione richiesta.</param>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database. può inviare email di notifica.
+    /// </remarks>
     public async Task<EmailSendResult> SendNewOffersNotificationAsync(string recipientEmail, string? recipientName, string offersHtml, CancellationToken cancellationToken = default)
     {
         if (!HasCompleteConfiguration())

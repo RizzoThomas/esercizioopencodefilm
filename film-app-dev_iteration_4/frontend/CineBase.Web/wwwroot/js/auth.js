@@ -43,6 +43,7 @@ const Auth = {
   //   3. Altrimenti → genera UUID con crypto.randomUUID()
   // ====================================================================
   getOrCreateDeviceId() {
+    // Variabile deviceId: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     let deviceId = localStorage.getItem(this.STORAGE_KEYS.DEVICE_ID);
     if (deviceId) return deviceId;
 
@@ -85,6 +86,7 @@ const Auth = {
 
   // Recupera i dati utente salvati
   getUser() {
+    // Variabile userStr: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const userStr = localStorage.getItem(this.STORAGE_KEYS.USER);
     if (!userStr) return null;
     try { return JSON.parse(userStr); } catch { return null; }
@@ -99,11 +101,14 @@ const Auth = {
   // NOTA: non verifica la firma (quella la fa il backend)
   // ====================================================================
   isLoggedIn() {
+    // Variabile token: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const token = this.getAccessToken();
     if (!token) return false;
     try {
+      // Variabile payload: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
       const payload = this.parseJwt(token);
       if (!payload) return false;
+      // Variabile now: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
       const now = Math.ceil(Date.now() / 1000);
       return payload.exp > now;  // Confronta timestamp UNIX
     } catch (e) {
@@ -113,10 +118,13 @@ const Auth = {
 
   // Legge il ruolo dell'utente dal JWT o dai dati salvati
   getUserRole() {
+    // Variabile user: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const user = this.getUser();
     if (user?.ruolo != null) return user.ruolo;
 
+    // Variabile token: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const token = this.getAccessToken();
+    // Variabile payload: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const payload = token ? this.parseJwt(token) : null;
     return payload?.role || null;
   },
@@ -129,9 +137,12 @@ const Auth = {
   // ====================================================================
   parseJwt(token) {
     try {
+      // Variabile base64Url: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
       const base64Url = token.split('.')[1];  // Il payload è la seconda parte
       if (!base64Url) return null;
+      // Variabile base64: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
       const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      // Variabile jsonPayload: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
       const jsonPayload = decodeURIComponent(
         atob(base64)
           .split('')
@@ -146,13 +157,16 @@ const Auth = {
 
   async login(email, password) {
     try {
+      // Variabile headers: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
       const headers = { 'Content-Type': 'application/json' };
+      // Variabile trustedDevice: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
       const trustedDevice = localStorage.getItem('cb_trusted_device');
       if (trustedDevice) {
         headers['X-Trusted-Device'] = trustedDevice;
         console.log('[auth] login: invio header X-Trusted-Device');
       }
 
+      // Chiamata API: contatta il backend con i dati previsti e usa la risposta per aggiornare l'interfaccia.
       const response = await fetch(`${API_BASE_URL}/auth/login`, {
         method: 'POST',
         headers,
@@ -161,14 +175,17 @@ const Auth = {
       });
 
       if (!response.ok) {
+        // Variabile message: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
         let message = 'Credenziali non valide';
         if (response.status === 401) {
+          // Variabile err: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
           const err = await response.json().catch(() => null);
           message = err?.message || message;
         }
         throw { status: response.status, message };
       }
 
+      // Variabile data: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
       const data = await response.json();
 
       // Se richiede 2FA, restituisci il temp token senza salvare
@@ -189,6 +206,7 @@ const Auth = {
 
   async loginWith2Fa(tempToken, code, trustDevice) {
     try {
+      // Chiamata API: contatta il backend con i dati previsti e usa la risposta per aggiornare l'interfaccia.
       const response = await fetch(`${API_BASE_URL}/auth/login-2fa`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -202,12 +220,15 @@ const Auth = {
       });
 
       if (!response.ok) {
+        // Variabile message: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
         let message = 'Codice 2FA non valido';
+        // Variabile err: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
         const err = await response.json().catch(() => null);
         message = err?.error || err?.message || message;
         throw { status: response.status, message };
       }
 
+      // Variabile data: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
       const data = await response.json();
       this.saveTokens(data.accessToken, data.refreshToken);
       this.saveUser(data.user);
@@ -225,6 +246,7 @@ const Auth = {
 
   async register(registerData) {
     try {
+      // Chiamata API: contatta il backend con i dati previsti e usa la risposta per aggiornare l'interfaccia.
       const response = await fetch(`${API_BASE_URL}/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -232,12 +254,16 @@ const Auth = {
       });
 
       if (!response.ok) {
+        // Variabile message: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
         let message = 'Errore durante la registrazione';
+        // Variabile errors: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
         let errors;
         if (response.status === 409) {
+          // Variabile err: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
           const err = await response.json().catch(() => null);
           message = err?.message || 'Email gia registrata';
         } else if (response.status === 400) {
+          // Variabile err: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
           const err = await response.json().catch(() => null);
           message = err?.message || message;
           errors = err?.errors;
@@ -245,6 +271,7 @@ const Auth = {
         throw { status: response.status, message, errors };
       }
 
+      // Variabile data: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
       const data = await response.json();
       this.saveTokens(data.accessToken, data.refreshToken);
       this.saveUser(data.user);
@@ -257,11 +284,13 @@ const Auth = {
 
   async refreshAccessToken() {
     try {
+      // Variabile refreshToken: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
       const refreshToken = this.getRefreshToken();
       if (!refreshToken) {
         throw { status: 401, message: 'Nessun refresh token disponibile' };
       }
 
+      // Chiamata API: contatta il backend con i dati previsti e usa la risposta per aggiornare l'interfaccia.
       const response = await fetch(`${API_BASE_URL}/auth/refresh`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -273,6 +302,7 @@ const Auth = {
         throw { status: response.status, message: 'Sessione scaduta' };
       }
 
+      // Variabile data: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
       const data = await response.json();
       this.saveTokens(data.accessToken, data.refreshToken);
       if (data.user) {
@@ -287,6 +317,7 @@ const Auth = {
 
   async logout() {
     try {
+      // Chiamata API: contatta il backend con i dati previsti e usa la risposta per aggiornare l'interfaccia.
       await fetch(`${API_BASE_URL}/auth/logout`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -303,6 +334,7 @@ const Auth = {
   },
 
   redirectToLogin(redirectUrl) {
+    // Variabile url: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const url = new URL('/login.html', window.location.origin);
     if (redirectUrl) {
       url.searchParams.set('redirect', redirectUrl);
@@ -311,7 +343,9 @@ const Auth = {
   },
 
   redirectAfterLogin() {
+    // Variabile params: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const params = new URLSearchParams(window.location.search);
+    // Variabile redirect: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const redirect = params.get('redirect');
     // Usa sanitizeRedirectPath se disponibile (da route-guard), altrimenti fallback safe
     var safe = '/index.html';
@@ -327,23 +361,29 @@ const Auth = {
    * Avvia il flusso di login esterno (Google, Microsoft, Facebook).
    */
   startExternalLogin(provider, redirectPath) {
+    // Variabile safe: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     var safe = '/index.html';
     if (typeof window.RouteGuard !== 'undefined' && window.RouteGuard.sanitizeRedirectPath) {
       safe = window.RouteGuard.sanitizeRedirectPath(redirectPath);
     }
+    // Variabile providerMap: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     var providerMap = { google: 'login-google', microsoft: 'login-microsoft', facebook: 'login-facebook' };
+    // Variabile endpoint: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     var endpoint = providerMap[provider.toLowerCase()] || 'login-google';
     window.location.href = API_BASE_URL + '/auth/' + endpoint + '?redirect=' + encodeURIComponent(safe);
   },
 
   async changePassword(currentPassword, newPassword) {
+    // Variabile accessToken: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     var accessToken = this.getAccessToken();
+    // Chiamata API: contatta il backend con i dati previsti e usa la risposta per aggiornare l'interfaccia.
     var response = await fetch(API_BASE_URL + '/auth/change-password', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + accessToken },
       body: JSON.stringify({ currentPassword, newPassword })
     });
     if (!response.ok) {
+      // Variabile err: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
       var err = await response.json().catch(function() { return {}; });
       throw { status: response.status, message: err.error || err.message || 'Errore cambio password' };
     }
@@ -351,12 +391,15 @@ const Auth = {
   },
 
   async requestSetPassword() {
+    // Variabile accessToken: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     var accessToken = this.getAccessToken();
+    // Chiamata API: contatta il backend con i dati previsti e usa la risposta per aggiornare l'interfaccia.
     var response = await fetch(API_BASE_URL + '/auth/set-password/request', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + accessToken }
     });
     if (!response.ok) {
+      // Variabile err: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
       var err = await response.json().catch(function() { return {}; });
       throw { status: response.status, message: err.error || 'Errore richiesta setup password' };
     }
@@ -364,7 +407,9 @@ const Auth = {
   },
 
   async getAccountSecurity() {
+    // Variabile accessToken: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     var accessToken = this.getAccessToken();
+    // Chiamata API: contatta il backend con i dati previsti e usa la risposta per aggiornare l'interfaccia.
     var response = await fetch(API_BASE_URL + '/auth/security/me', {
       method: 'GET',
       headers: { 'Authorization': 'Bearer ' + accessToken }
@@ -374,6 +419,7 @@ const Auth = {
   },
 
   async forgotPassword(email) {
+    // Chiamata API: contatta il backend con i dati previsti e usa la risposta per aggiornare l'interfaccia.
     var response = await fetch(API_BASE_URL + '/auth/forgot-password', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -384,11 +430,13 @@ const Auth = {
   },
 
   async resetPassword(token, newPassword) {
+    // Chiamata API: contatta il backend con i dati previsti e usa la risposta per aggiornare l'interfaccia.
     var response = await fetch(API_BASE_URL + '/auth/reset-password', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ token, newPassword })
     });
+    // Variabile data: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     var data = await response.json();
     if (!response.ok) throw { status: response.status, message: data.error || 'Token non valido o scaduto' };
     return data;

@@ -10,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace FilmAPI.Tests.Integration;
 
+/// <summary>Suite di test per CheckoutHostedIntegrationTests.</summary>
 public class CheckoutHostedIntegrationTests : IClassFixture<CustomWebApplicationFactory>
 {
     private readonly CustomWebApplicationFactory _factory;
@@ -123,6 +124,7 @@ public class CheckoutHostedIntegrationTests : IClassFixture<CustomWebApplication
         return (await orderResponse.Content.ReadFromJsonAsync<OrdineSummaryDTO>())!;
     }
 
+    /// <summary>Verifica lo scenario di CH8A_CreateCheckoutSession_Carta_RedirectsToStripe: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task CH8A_CreateCheckoutSession_Carta_RedirectsToStripe()
     {
@@ -152,6 +154,7 @@ public class CheckoutHostedIntegrationTests : IClassFixture<CustomWebApplication
         Assert.NotNull(ordine.CheckoutExpiresAtUtc);
     }
 
+    /// <summary>Verifica lo scenario di CH8B_GetCheckoutStatus_ReturnsCheckoutInProgress: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task CH8B_GetCheckoutStatus_ReturnsCheckoutInProgress()
     {
@@ -176,6 +179,7 @@ public class CheckoutHostedIntegrationTests : IClassFixture<CustomWebApplication
         Assert.NotNull(status.StripeCheckoutSessionId);
     }
 
+    /// <summary>Verifica lo scenario di CH8C_CheckoutSessionCompleted_WebhookFinalizesOrder: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task CH8C_CheckoutSessionCompleted_WebhookFinalizesOrder()
     {
@@ -214,6 +218,7 @@ public class CheckoutHostedIntegrationTests : IClassFixture<CustomWebApplication
         Assert.All(postoStati, ps => Assert.Equal(ShowPostoState.Sold, ps.Stato));
     }
 
+    /// <summary>Verifica lo scenario di CH8D_CheckoutSessionExpired_WebhookReleasesHolds: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task CH8D_CheckoutSessionExpired_WebhookReleasesHolds()
     {
@@ -249,6 +254,7 @@ public class CheckoutHostedIntegrationTests : IClassFixture<CustomWebApplication
         Assert.Empty(postoStati);
     }
 
+    /// <summary>Verifica lo scenario di CH8E_ReconcileCheckoutSession_UpdatesStateFromStripe: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task CH8E_ReconcileCheckoutSession_UpdatesStateFromStripe()
     {
@@ -279,6 +285,7 @@ public class CheckoutHostedIntegrationTests : IClassFixture<CustomWebApplication
         Assert.Equal(OrdineState.Paid, ordine.Stato);
     }
 
+    /// <summary>Verifica lo scenario di CH8F_DuplicateWebhook_DoesNotDuplicateTickets: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task CH8F_DuplicateWebhook_DoesNotDuplicateTickets()
     {
@@ -318,6 +325,7 @@ public class CheckoutHostedIntegrationTests : IClassFixture<CustomWebApplication
         Assert.Single(ordine.Biglietti);
     }
 
+    /// <summary>Verifica lo scenario di CH8G_CancelPendingOrdine_WhileCheckoutInProgress: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task CH8G_CancelPendingOrdine_WhileCheckoutInProgress()
     {
@@ -344,6 +352,7 @@ public class CheckoutHostedIntegrationTests : IClassFixture<CustomWebApplication
         Assert.Empty(postoStati);
     }
 
+    /// <summary>Verifica lo scenario di CH8H_CreateCheckoutSession_Mixed_ReservesCreditAndChargesOnlyResidualCard: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task CH8H_CreateCheckoutSession_Mixed_ReservesCreditAndChargesOnlyResidualCard()
     {
@@ -378,6 +387,7 @@ public class CheckoutHostedIntegrationTests : IClassFixture<CustomWebApplication
         Assert.Equal(-7m, reserveMovement.Importo);
     }
 
+    /// <summary>Verifica lo scenario di CH8I_ExpiredMixedCheckout_ReleasesReservedCredit: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task CH8I_ExpiredMixedCheckout_ReleasesReservedCredit()
     {
@@ -416,6 +426,7 @@ public class CheckoutHostedIntegrationTests : IClassFixture<CustomWebApplication
         Assert.Equal(7m, releaseMovement.Importo);
     }
 
+    /// <summary>Verifica lo scenario di CH8J_CompletedMixedCheckout_FinalizesOrderWithoutDoubleDebitingCredit: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task CH8J_CompletedMixedCheckout_FinalizesOrderWithoutDoubleDebitingCredit()
     {
@@ -460,6 +471,7 @@ public class CheckoutHostedIntegrationTests : IClassFixture<CustomWebApplication
         Assert.Equal(2, ordine.Biglietti.Count);
     }
 
+    /// <summary>Verifica lo scenario di CH8K_PaymentIntentFailed_DuringHostedCheckout_DoesNotReleaseSeatsOrExpireOrder: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task CH8K_PaymentIntentFailed_DuringHostedCheckout_DoesNotReleaseSeatsOrExpireOrder()
     {
@@ -506,6 +518,7 @@ public class CheckoutHostedIntegrationTests : IClassFixture<CustomWebApplication
         Assert.All(postoStati, ps => Assert.Equal(ShowPostoState.Hold, ps.Stato));
     }
 
+    /// <summary>Verifica lo scenario di CH8L_PaymentIntentCanceled_DuringHostedCheckout_DoesNotReleaseSeatsOrExpireOrder: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task CH8L_PaymentIntentCanceled_DuringHostedCheckout_DoesNotReleaseSeatsOrExpireOrder()
     {
@@ -552,6 +565,7 @@ public class CheckoutHostedIntegrationTests : IClassFixture<CustomWebApplication
         Assert.All(postoStati, ps => Assert.Equal(ShowPostoState.Hold, ps.Stato));
     }
 
+    /// <summary>Verifica lo scenario di CH8M_CreateCheckoutSession_WithInvalidPayload_ReturnsBadRequest: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task CH8M_CreateCheckoutSession_WithInvalidPayload_ReturnsBadRequest()
     {

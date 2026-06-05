@@ -1,14 +1,21 @@
-﻿using System;
+using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
 namespace FilmAPI.Migrations
 {
-    /// <inheritdoc />
+    /// <summary>
+    ///     Aggiunge il supporto per l'autenticazione a due fattori (2FA/TOTP) e il reset password. Aggiunge campi: TwoFactorEnabled, TwoFactorSecret, ResetPasswordToken, ResetPasswordExpiresAt alla tabella Users.
+    /// </summary>
+    /// <summary>
+    /// Migrazione che introduce il reset password e l'autenticazione a due fattori aggiungendo i relativi campi su Users.
+    /// </summary>
     public partial class AddTwoFactorAndPasswordReset : Migration
     {
-        /// <inheritdoc />
+        /// <summary>
+    ///     Aggiunge il supporto per l'autenticazione a due fattori (2FA/TOTP) e il reset password. Aggiunge campi: TwoFactorEnabled, TwoFactorSecret, ResetPasswordToken, ResetPasswordExpiresAt alla tabella Users.
+    /// </summary>
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<string>(
@@ -41,7 +48,9 @@ namespace FilmAPI.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
         }
 
-        /// <inheritdoc />
+        /// <summary>
+    ///     Aggiunge il supporto per l'autenticazione a due fattori (2FA/TOTP) e il reset password. Aggiunge campi: TwoFactorEnabled, TwoFactorSecret, ResetPasswordToken, ResetPasswordExpiresAt alla tabella Users.
+    /// </summary>
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(

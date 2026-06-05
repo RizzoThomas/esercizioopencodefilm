@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 
@@ -6,10 +6,17 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace FilmAPI.Migrations
 {
-    /// <inheritdoc />
+    /// <summary>
+    ///     Aggiunge la tabella WatchlistItems per la lista dei film preferiti/salvati dall'utente. Ogni utente può salvare film per vederli in seguito.
+    /// </summary>
+    /// <summary>
+    /// Migrazione che crea le tabelle SupportTickets e WatchlistItems con gli indici di ricerca e unicità necessari.
+    /// </summary>
     public partial class AddWatchlist : Migration
     {
-        /// <inheritdoc />
+        /// <summary>
+    ///     Aggiunge la tabella WatchlistItems per la lista dei film preferiti/salvati dall'utente. Ogni utente può salvare film per vederli in seguito.
+    /// </summary>
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
@@ -90,7 +97,9 @@ namespace FilmAPI.Migrations
                 unique: true);
         }
 
-        /// <inheritdoc />
+        /// <summary>
+    ///     Aggiunge la tabella WatchlistItems per la lista dei film preferiti/salvati dall'utente. Ogni utente può salvare film per vederli in seguito.
+    /// </summary>
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(

@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- Pagina CineBase: struttura principale con sezioni statiche e contenuti dinamici gestiti da JavaScript. -->
 <html lang="it-IT">
 
 <head>
@@ -19,7 +20,11 @@
 </head>
 
 <body class="bg-canvas text-ink font-sans">
+  <!-- Contenitore dinamico: navbar-container viene popolato o mostrato da JavaScript. -->
+<!-- Contenitore dinamico: quest'area viene popolata o mostrata da JavaScript. -->
   <div id="navbar-container"></div>
+  <!-- Contenuto principale: area centrale che ospita il flusso della pagina. -->
+<!-- Contenuto principale: area centrale dove la pagina mostra il flusso operativo. -->
   <main>
     <div class="flex items-center justify-between gap-4 mb-8">
       <div></div>
@@ -96,6 +101,8 @@
               <i class="fa-solid fa-fire text-ferrari-primary"></i>
               <h2 class="text-sm font-semibold text-ink uppercase tracking-wider">Film più Prenotati</h2>
             </div>
+  <!-- Contenitore dinamico: top-films-list viene popolato o mostrato da JavaScript. -->
+<!-- Contenitore dinamico: quest'area viene popolata o mostrata da JavaScript. -->
             <div id="top-films-list" class="divide-y divide-hairline">
               <div class="px-6 py-8 text-center text-body text-sm">Caricamento...</div>
             </div>
@@ -107,6 +114,8 @@
               <i class="fa-solid fa-crown text-ferrari-primary"></i>
               <h2 class="text-sm font-semibold text-ink uppercase tracking-wider">Offerte più Acquistate</h2>
             </div>
+  <!-- Contenitore dinamico: top-offerte-list viene popolato o mostrato da JavaScript. -->
+<!-- Contenitore dinamico: quest'area viene popolata o mostrata da JavaScript. -->
             <div id="top-offerte-list" class="divide-y divide-hairline">
               <div class="px-6 py-8 text-center text-body text-sm">Caricamento...</div>
             </div>
@@ -219,6 +228,8 @@
               <h2 class="text-lg font-semibold text-ink"><i class="fa-solid fa-bug text-ferrari-primary mr-2"></i>Segnalazioni</h2>
               <span id="segnalazioni-count" class="text-xs text-body"></span>
             </div>
+  <!-- Contenitore dinamico: segnalazioni-list viene popolato o mostrato da JavaScript. -->
+<!-- Contenitore dinamico: quest'area viene popolata o mostrata da JavaScript. -->
             <div id="segnalazioni-list" class="divide-y divide-hairline">
               <div class="px-6 py-8 text-center text-body">Caricamento segnalazioni...</div>
             </div>
@@ -232,6 +243,8 @@
               <h2 class="text-lg font-semibold text-ink"><i class="fa-solid fa-headset text-ferrari-primary mr-2"></i>Ticket Supporto</h2>
               <span id="tickets-count" class="text-xs text-body"></span>
             </div>
+  <!-- Contenitore dinamico: tickets-list viene popolato o mostrato da JavaScript. -->
+<!-- Contenitore dinamico: quest'area viene popolata o mostrata da JavaScript. -->
             <div id="tickets-list" class="divide-y divide-hairline">
               <div class="px-6 py-8 text-center text-body">Caricamento ticket...</div>
             </div>
@@ -240,12 +253,14 @@
   </main>
 
   <!-- Modal per aggiungere/modificare proiezione -->
+<!-- Contenitore dinamico: quest'area viene popolata o mostrata da JavaScript. -->
   <div id="proiezione-modal" class="fixed inset-0 z-50 hidden">
     <div class="fixed inset-0 bg-gray-500/75 modal-backdrop" onclick="closeProiezioneModal()"></div>
     <div class="fixed inset-0 z-10 overflow-y-auto">
       <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
         <div class="relative transform overflow-hidden bg-canvas-elevated text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
           <div class="bg-canvas-elevated px-6 pt-6 pb-4 flex justify-between items-center">
+<!-- Contenitore dinamico: quest'area viene popolata o mostrata da JavaScript. -->
             <h3 class="text-lg font-bold text-ink" id="modal-title">Aggiungi Proiezione</h3>
             <button type="button" class="text-body hover:text-ink"
               onclick="closeProiezioneModal()" title="Chiudi" aria-label="Chiudi modal">
@@ -253,35 +268,10 @@
             </button>
           </div>
           <div class="bg-canvas-elevated px-6 pb-4">
-            <form id="proiezione-form" class="space-y-4">
-              <input type="hidden" name="id" value="">
-              <div>
-                <label for="cinema-select" class="block text-sm font-medium text-ink mb-1">Cinema</label>
-                <select id="cinema-select" name="cinemaId" required class="input-ferrari w-full"
-                  title="Seleziona il cinema">
-                  <option value="">Seleziona Cinema</option>
-                </select>
-              </div>
-              <div>
-                <label for="film-select" class="block text-sm font-medium text-ink mb-1">Film</label>
-                <select id="film-select" name="filmId" required class="input-ferrari w-full"
-                  title="Seleziona il film">
-                  <option value="">Seleziona Film</option>
-                </select>
-              </div>
-              <div>
-                <label for="dashboard-proiezione-data"
-                  class="block text-sm font-medium text-ink mb-1">Data</label>
-                <input id="dashboard-proiezione-data" type="date" name="data" required
-                  class="input-ferrari w-full" title="Data della proiezione">
-              </div>
-              <div>
-                <label for="dashboard-proiezione-ora"
-                  class="block text-sm font-medium text-ink mb-1">Ora</label>
-                <input id="dashboard-proiezione-ora" type="time" name="ora" required
-                  class="input-ferrari w-full" title="Ora della proiezione">
-              </div>
-            </form>
+  <!-- Modulo: raccoglie i dati dell'utente e li invia tramite JavaScript al backend. -->
+<!-- Modulo: raccoglie dati utente e li invia al backend tramite JavaScript. -->
+            <!-- Form: raccoglie dati dell'utente e li invia all'API collegata. -->
+            <form $$$> $$$ </form>
           </div>
           <div class="bg-canvas px-6 py-4 flex justify-end gap-3">
             <button type="button" class="btn-outline px-4 py-2 text-sm font-medium"
@@ -293,6 +283,8 @@
     </div>
   </div>
 
+  <!-- Contenitore dinamico: toast-container viene popolato o mostrato da JavaScript. -->
+<!-- Contenitore dinamico: quest'area viene popolata o mostrata da JavaScript. -->
   <div id="toast-container" class="fixed bottom-4 right-4 z-50"></div>
 
   <script src="/js/utils.js"></script>
@@ -676,6 +668,8 @@
       };
     }
   </script>
+  <!-- Contenitore dinamico: footer-container viene popolato o mostrato da JavaScript. -->
+<!-- Contenitore dinamico: quest'area viene popolata o mostrata da JavaScript. -->
   <div id="footer-container"></div>
   <script src="/js/chat-widget.js?v=4"></script>
   <script src="/js/alert-dialog.js"></script>

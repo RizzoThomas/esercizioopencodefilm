@@ -11,6 +11,9 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace FilmAPI.Migrations
 {
+    /// <summary>
+    /// Classe generata da EF Core per la migrazione AddNotifiche.
+    /// </summary>
     [DbContext(typeof(FilmDbContext))]
     [Migration("20260513115408_AddNotifiche")]
     partial class AddNotifiche

@@ -129,7 +129,10 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowCineBaseFrontend", policy =>
     {
-        policy.WithOrigins("http://localhost:5001", "http://127.0.0.1:5001")
+        var corsOrigins = (Environment.GetEnvironmentVariable("ALLOWED_CORS_ORIGINS")
+                           ?? "http://localhost:5001,http://127.0.0.1:5001")
+                          .Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+        policy.WithOrigins(corsOrigins)
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials()
@@ -394,9 +397,13 @@ using (var scope = app.Services.CreateScope())
 // ─── AVVIO APPLICAZIONE ────────────────────────────────────────────────────
 app.Run();
 
-// Classe necessaria per i test di integrazione (xUnit)
+/// <summary>
+/// Classe parziale usata dai test di integrazione.
+/// </summary>
 public partial class Program;
 
-// Record per la configurazione runtime esposta al frontend
-// Attualmente contiene solo StripePublishableKey
+/// <summary>
+/// Configurazione runtime esposta al frontend.
+/// </summary>
+/// <param name="StripePublishableKey">Chiave pubblicabile Stripe esposta al frontend.</param>
 public sealed record FrontendRuntimeConfig(string StripePublishableKey);

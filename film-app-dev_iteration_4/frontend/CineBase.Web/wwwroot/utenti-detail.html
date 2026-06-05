@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- Pagina CineBase: struttura principale con sezioni statiche e contenuti dinamici gestiti da JavaScript. -->
 <html lang="it-IT">
 
 <head>
@@ -17,6 +18,8 @@
 </head>
 
 <body class="bg-canvas text-ink font-sans">
+  <!-- Contenuto principale: area centrale che ospita il flusso della pagina. -->
+<!-- Contenuto principale: area centrale dove la pagina mostra il flusso operativo. -->
   <main>
     <!-- Header: torna a utenti -->
     <a href="/utenti.html" class="inline-flex items-center gap-2 text-body hover:text-ink mb-6 transition-colors">
@@ -65,23 +68,10 @@
     <div id="tab-profilo" class="tab-content">
       <div class="card-ferrari p-6">
         <h2 class="text-lg font-bold text-ink mb-4">Modifica Dati</h2>
-        <form id="profilo-form" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label class="block text-sm font-medium text-ink mb-1">Ruolo</label>
-            <select id="edit-ruolo" class="input-ferrari w-full">
-              <option value="User">User</option>
-              <option value="PowerUser">PowerUser</option>
-              <option value="Admin">Admin</option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-ink mb-1">Credito (€)</label>
-            <input type="number" id="edit-credito" class="input-ferrari w-full" step="0.01" min="0">
-          </div>
-          <div class="sm:col-span-2 flex gap-3">
-            <button type="button" onclick="saveProfilo()" class="btn-primary"><i class="fa-solid fa-floppy-disk mr-1"></i>Salva Modifiche</button>
-          </div>
-        </form>
+  <!-- Modulo: raccoglie i dati dell'utente e li invia tramite JavaScript al backend. -->
+<!-- Modulo: raccoglie dati utente e li invia al backend tramite JavaScript. -->
+        <!-- Form: raccoglie dati dell'utente e li invia all'API collegata. -->
+        <form $$$> $$$ </form>
       </div>
     </div>
 
@@ -89,6 +79,8 @@
     <div id="tab-credito" class="tab-content hidden">
       <div class="card-ferrari p-6">
         <h2 class="text-lg font-bold text-ink mb-4">Movimenti Credito</h2>
+  <!-- Contenitore dinamico: movimenti-list viene popolato o mostrato da JavaScript. -->
+<!-- Contenitore dinamico: quest'area viene popolata o mostrata da JavaScript. -->
         <div id="movimenti-list" class="space-y-3">
           <p class="text-body text-center py-4">Caricamento...</p>
         </div>
@@ -99,6 +91,8 @@
     <div id="tab-biglietti" class="tab-content hidden">
       <div class="card-ferrari p-6">
         <h2 class="text-lg font-bold text-ink mb-4">Biglietti dell'utente</h2>
+  <!-- Contenitore dinamico: biglietti-list viene popolato o mostrato da JavaScript. -->
+<!-- Contenitore dinamico: quest'area viene popolata o mostrata da JavaScript. -->
         <div id="biglietti-list" class="space-y-3">
           <p class="text-body text-center py-4">Caricamento...</p>
         </div>
@@ -109,6 +103,8 @@
     <div id="tab-ordini" class="tab-content hidden">
       <div class="card-ferrari p-6">
         <h2 class="text-lg font-bold text-ink mb-4">Ordini dell'utente</h2>
+  <!-- Contenitore dinamico: ordini-list viene popolato o mostrato da JavaScript. -->
+<!-- Contenitore dinamico: quest'area viene popolata o mostrata da JavaScript. -->
         <div id="ordini-list" class="space-y-3">
           <p class="text-body text-center py-4">Caricamento...</p>
         </div>
@@ -145,6 +141,8 @@
     </div>
   </div>
 
+  <!-- Contenitore dinamico: toast-container viene popolato o mostrato da JavaScript. -->
+<!-- Contenitore dinamico: quest'area viene popolata o mostrata da JavaScript. -->
   <div id="toast-container" class="fixed bottom-4 left-4 z-50"></div>
 
   <script src="/js/utils.js"></script>

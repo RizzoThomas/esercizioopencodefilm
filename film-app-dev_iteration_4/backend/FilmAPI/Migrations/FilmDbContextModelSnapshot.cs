@@ -135,12 +135,25 @@ namespace FilmAPI.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("varchar(100)");
 
+                    b.Property<string>("CancellationReason")
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)");
+
+                    b.Property<DateTime?>("CancelledAtUtc")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int?>("CancelledByUserId")
+                        .HasColumnType("int");
+
                     b.Property<string>("CodiceBiglietto")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("varchar(50)");
 
                     b.Property<int>("OrdineId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("OrdineRefundId")
                         .HasColumnType("int");
 
                     b.Property<decimal>("PrezzoBase")
@@ -175,10 +188,14 @@ namespace FilmAPI.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CancelledByUserId");
+
                     b.HasIndex("CodiceBiglietto")
                         .IsUnique();
 
                     b.HasIndex("OrdineId");
+
+                    b.HasIndex("OrdineRefundId");
 
                     b.HasIndex("SalaPostoId");
 
@@ -402,8 +419,8 @@ namespace FilmAPI.Migrations
                         .HasColumnType("varchar(500)");
 
                     b.Property<string>("ImdbId")
-                        .HasMaxLength(50)
-                        .HasColumnType("varchar(50)");
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)");
 
                     b.Property<string>("OriginalLanguage")
                         .HasMaxLength(10)
@@ -727,6 +744,44 @@ namespace FilmAPI.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Ordini");
+                });
+
+            modelBuilder.Entity("FilmAPI.Model.OrdineRefund", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime?>("CompletedAtUtc")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("ExternalRefundId")
+                        .HasMaxLength(120)
+                        .HasColumnType("varchar(120)");
+
+                    b.Property<decimal>("Importo")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<string>("Motivo")
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)");
+
+                    b.Property<int>("OrdineId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Stato")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrdineId");
+
+                    b.ToTable("OrdineRefund");
                 });
 
             modelBuilder.Entity("FilmAPI.Model.Prenotazione", b =>
@@ -1080,6 +1135,9 @@ namespace FilmAPI.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<DateTime?>("AnonymizedAtUtc")
+                        .HasColumnType("datetime(6)");
+
                     b.Property<int>("AuthVersion")
                         .HasColumnType("int");
 
@@ -1135,12 +1193,18 @@ namespace FilmAPI.Migrations
                         .HasColumnType("datetime(6)");
 
                     b.Property<string>("PasswordHash")
-                        .HasMaxLength(255)
-                        .HasColumnType("varchar(255)");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("PasswordResetToken")
                         .HasMaxLength(128)
                         .HasColumnType("varchar(128)");
+
+                    b.Property<DateTime?>("PrivacyPolicyAcceptedAtUtc")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("PrivacyPolicyVersion")
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)");
 
                     b.Property<DateTime?>("ResetTokenExpiry")
                         .HasColumnType("datetime(6)");
@@ -1152,12 +1216,19 @@ namespace FilmAPI.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("varchar(20)");
 
+                    b.Property<DateTime?>("TermsAcceptedAtUtc")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("TermsAcceptedVersion")
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)");
+
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("tinyint(1)");
 
                     b.Property<string>("TwoFactorSecret")
-                        .HasMaxLength(64)
-                        .HasColumnType("varchar(64)");
+                        .HasMaxLength(128)
+                        .HasColumnType("varchar(128)");
 
                     b.HasKey("Id");
 
@@ -1377,8 +1448,6 @@ namespace FilmAPI.Migrations
 
                     b.HasIndex("FilmId");
 
-                    b.HasIndex("UserId");
-
                     b.HasIndex("UserId", "FilmId")
                         .IsUnique();
 
@@ -1389,8 +1458,7 @@ namespace FilmAPI.Migrations
                 {
                     b.HasOne("FilmAPI.Model.User", "CreatedByUser")
                         .WithMany()
-                        .HasForeignKey("CreatedByUserId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .HasForeignKey("CreatedByUserId");
 
                     b.HasOne("FilmAPI.Model.User", "User")
                         .WithMany("ActionTokens")
@@ -1405,11 +1473,20 @@ namespace FilmAPI.Migrations
 
             modelBuilder.Entity("FilmAPI.Model.Biglietto", b =>
                 {
+                    b.HasOne("FilmAPI.Model.User", "CancelledByUser")
+                        .WithMany()
+                        .HasForeignKey("CancelledByUserId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.HasOne("FilmAPI.Model.Ordine", "Ordine")
                         .WithMany("Biglietti")
                         .HasForeignKey("OrdineId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("FilmAPI.Model.OrdineRefund", "OrdineRefund")
+                        .WithMany()
+                        .HasForeignKey("OrdineRefundId");
 
                     b.HasOne("FilmAPI.Model.SalaPosto", "SalaPosto")
                         .WithMany()
@@ -1432,14 +1509,18 @@ namespace FilmAPI.Migrations
                     b.HasOne("FilmAPI.Model.Cinema", "ValidatoCinema")
                         .WithMany()
                         .HasForeignKey("ValidatoCinemaId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.HasOne("FilmAPI.Model.User", "ValidatoDaUser")
                         .WithMany()
                         .HasForeignKey("ValidatoDaUserId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("CancelledByUser");
 
                     b.Navigation("Ordine");
+
+                    b.Navigation("OrdineRefund");
 
                     b.Navigation("SalaPosto");
 
@@ -1597,6 +1678,17 @@ namespace FilmAPI.Migrations
                     b.Navigation("Show");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("FilmAPI.Model.OrdineRefund", b =>
+                {
+                    b.HasOne("FilmAPI.Model.Ordine", "Ordine")
+                        .WithMany()
+                        .HasForeignKey("OrdineId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Ordine");
                 });
 
             modelBuilder.Entity("FilmAPI.Model.Prenotazione", b =>
@@ -1765,13 +1857,11 @@ namespace FilmAPI.Migrations
                 {
                     b.HasOne("FilmAPI.Model.User", "ActorUser")
                         .WithMany()
-                        .HasForeignKey("ActorUserId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .HasForeignKey("ActorUserId");
 
                     b.HasOne("FilmAPI.Model.User", "User")
                         .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .HasForeignKey("UserId");
 
                     b.Navigation("ActorUser");
 
@@ -1783,7 +1873,7 @@ namespace FilmAPI.Migrations
                     b.HasOne("FilmAPI.Model.Abbonamento", "Abbonamento")
                         .WithMany()
                         .HasForeignKey("AbbonamentoId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("FilmAPI.Model.User", "User")

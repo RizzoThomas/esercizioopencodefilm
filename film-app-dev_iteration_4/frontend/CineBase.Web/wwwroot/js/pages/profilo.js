@@ -1,8 +1,13 @@
+// Variabile profiloData: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
 let profiloData = null;
+// Variabile creditoData: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
 let creditoData = null;
+// Variabile cinemaPreferito: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
 let cinemaPreferito = null;
+// Variabile userSubscriptionData: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
 let userSubscriptionData = null;
 
+// Listener evento: si attiva quando scatta l'evento sulla pagina e aggiorna la UI o lo stato.
 document.addEventListener('DOMContentLoaded', async () => {
   if (!Auth?.isLoggedIn?.()) {
     window.location.replace('/login.html?redirect=' + encodeURIComponent(window.location.pathname + window.location.search));
@@ -12,18 +17,21 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Check return from Stripe topup
   const topupParams = new URLSearchParams(window.location.search);
   if (topupParams.get('topup') === 'success') {
+    // Variabile sessionId: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     let sessionId = topupParams.get('session_id') || sessionStorage.getItem('pendingTopupSessionId');
     sessionStorage.removeItem('pendingTopupSessionId');
     if (sessionId) {
       try { await API.reconcileTopup(sessionId); } catch { /* non-critical topup reconciliation */ }
     }
     showToast('Ricarica credito effettuata con successo!', 'success');
+    // Variabile url: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const url = new URL(window.location.href);
     url.searchParams.delete('topup');
     url.searchParams.delete('session_id');
     window.history.replaceState({}, '', url);
   } else if (topupParams.get('topup') === 'cancelled') {
     showToast('Ricarica annullata', 'info');
+    // Variabile url: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const url = new URL(window.location.href);
     url.searchParams.delete('topup');
     window.history.replaceState({}, '', url);
@@ -45,15 +53,19 @@ document.addEventListener('DOMContentLoaded', async () => {
   setupProfiloForm();
 });
 
+// Funzione loadUserSubscription: carica i dati iniziali o aggiorna il contenuto visibile della pagina. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 async function loadUserSubscription() {
   try {
+    // Variabile sub: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const sub = await API.getUserSubscription();
     if (!sub) return;
 
     userSubscriptionData = sub;
+    // Variabile section: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const section = document.getElementById('subscription-section');
     if (!section) return;
     section.classList.remove('hidden');
+    // Variabile content: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const content = document.getElementById('subscription-content');
     if (!content) return;
 
@@ -85,14 +97,18 @@ async function loadUserSubscription() {
   }
 }
 
+// Funzione loadUserVouchers: carica i dati iniziali o aggiorna il contenuto visibile della pagina. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 async function loadUserVouchers() {
   try {
+    // Variabile vouchers: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const vouchers = await API.getUserVouchers();
     if (!vouchers?.length) return;
 
+    // Variabile section: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const section = document.getElementById('vouchers-section');
     if (!section) return;
     section.classList.remove('hidden');
+    // Variabile content: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const content = document.getElementById('vouchers-content');
     if (!content) return;
 
@@ -111,9 +127,12 @@ async function loadUserVouchers() {
   }
 }
 
+// Funzione toggleAutoRenew: commuta uno stato visivo o funzionale tra due modalità. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 async function toggleAutoRenew() {
   try {
+    // Variabile autoRinnovo: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const autoRinnovo = !userSubscriptionData?.autoRinnovo;
+    // Variabile res: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const res = await API.toggleAutoRenew(autoRinnovo);
     if (res) {
       await loadUserSubscription();
@@ -124,6 +143,7 @@ async function toggleAutoRenew() {
   }
 }
 
+// Funzione fermaAbbonamento: gestisce la logica prevista e restituisce il risultato atteso. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 async function fermaAbbonamento() {
   if (!confirm('Sei sicuro di voler fermare questo abbonamento? Non verra\' piu\' rinnovato e perderai i benefici alla scadenza.')) return;
   try {
@@ -135,6 +155,7 @@ async function fermaAbbonamento() {
   }
 }
 
+// Funzione loadProfilo: carica i dati iniziali o aggiorna il contenuto visibile della pagina. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 async function loadProfilo() {
   try {
     profiloData = await API.getProfilo();
@@ -144,6 +165,7 @@ async function loadProfilo() {
   }
 }
 
+// Funzione fillProfiloForm: gestisce la logica prevista e restituisce il risultato atteso. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 function fillProfiloForm() {
   if (!profiloData) return;
   document.getElementById('profilo-email').value = profiloData.email || '';
@@ -152,10 +174,14 @@ function fillProfiloForm() {
   document.getElementById('profilo-telefono').value = profiloData.telefono || '';
 }
 
+// Funzione setupProfiloForm: gestisce la logica prevista e restituisce il risultato atteso. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 function setupProfiloForm() {
+  // Variabile form: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const form = document.getElementById('profilo-form');
+  // Listener evento: si attiva quando scatta l'evento sulla pagina e aggiorna la UI o lo stato.
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
+    // Variabile data: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const data = {
       nome: document.getElementById('profilo-nome').value.trim(),
       cognome: document.getElementById('profilo-cognome').value.trim(),
@@ -165,6 +191,7 @@ function setupProfiloForm() {
     try {
       profiloData = await API.updateProfilo(data);
       fillProfiloForm();
+      // Variabile user: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
       const user = Auth.getUser();
       if (user) {
         user.nome = profiloData.nome;
@@ -173,6 +200,7 @@ function setupProfiloForm() {
       }
       showToast('Profilo aggiornato con successo');
       if (typeof window.updateAuthUI === 'function') window.updateAuthUI();
+      // Variabile savedEl: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
       const savedEl = document.getElementById('profilo-saved');
       if (savedEl) {
         savedEl.classList.remove('hidden');
@@ -184,9 +212,12 @@ function setupProfiloForm() {
   });
 }
 
+// Funzione loadCinemaPreferito: carica i dati iniziali o aggiorna il contenuto visibile della pagina. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 async function loadCinemaPreferito() {
+  // Variabile container: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const container = document.getElementById('cinema-preferito-content');
   try {
+    // Variabile result: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const result = await API.getCinemaPreferito();
     cinemaPreferito = result;
 
@@ -201,6 +232,7 @@ async function loadCinemaPreferito() {
       return;
     }
 
+    // Variabile cinema: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const cinema = result.cinema;
     container.innerHTML = `
       <div class="flex items-start gap-4">
@@ -221,14 +253,19 @@ async function loadCinemaPreferito() {
   }
 }
 
+// Funzione loadCredito: carica i dati iniziali o aggiorna il contenuto visibile della pagina. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 async function loadCredito() {
+  // Variabile container: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const container = document.getElementById('credito-content');
   try {
     creditoData = await API.getCreditoMe();
 
+    // Variabile saldo: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const saldo = creditoData.saldoAttuale || 0;
+    // Variabile movimenti: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const movimenti = creditoData.movimenti || [];
 
+    // Variabile html: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     let html = `
       <div class="flex items-center justify-between mb-4">
         <div>
@@ -241,18 +278,25 @@ async function loadCredito() {
       </div>`;
 
     if (movimenti.length > 0) {
+      // Variabile recentMov: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
       const recentMov = movimenti.slice(0, 5);
       html += `<div class="pt-3 mt-3">
         <p class="text-xs font-semibold text-body uppercase tracking-wider mb-2">Ultimi movimenti</p>
         <div class="space-y-2">`;
 
       recentMov.forEach(m => {
+        // Variabile isPositive: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
         const isPositive = m.tipo === 'TopUp' || m.tipo === 'Refund';
+        // Variabile sign: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
         const sign = isPositive ? '+' : '';
+        // Variabile date: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
         const date = new Date(m.createdAtUtc);
+        // Variabile dateStr: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
         const dateStr = date.toLocaleDateString('it-IT', { day: 'numeric', month: 'short' });
+        // Variabile timeStr: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
         const timeStr = date.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
 
+        // Variabile icon: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
         let icon, color, label, detail;
         if (m.tipo === 'TopUp') {
           icon = 'fa-arrow-down';
@@ -307,13 +351,19 @@ async function loadCredito() {
   }
 }
 
+// Variabile allOrdini: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
 let allOrdini = [];
+// Variabile ORDINI_PER_PAGE: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
 const ORDINI_PER_PAGE = 5;
+// Variabile ordiniShown: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
 let ordiniShown = ORDINI_PER_PAGE;
 
+// Funzione loadOrdini: carica i dati iniziali o aggiorna il contenuto visibile della pagina. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 async function loadOrdini() {
+  // Variabile container: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const container = document.getElementById('ordini-list');
   try {
+    // Variabile data: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const data = await API.getOrdini();
     allOrdini = normalizeCollection(data);
 
@@ -334,13 +384,19 @@ async function loadOrdini() {
   }
 }
 
+// Funzione renderOrdini: costruisce markup o componenti UI a partire dai dati in ingresso. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 function renderOrdini() {
+  // Variabile container: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const container = document.getElementById('ordini-list');
+  // Variabile visible: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const visible = allOrdini.slice(0, ordiniShown);
 
   container.innerHTML = visible.map(o => {
+    // Variabile startDate: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const startDate = new Date(o.startAtUtc);
+    // Variabile dateStr: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const dateStr = startDate.toLocaleDateString('it-IT', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+    // Variabile statoBadge: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const statoBadge = getStatoBadge(o.stato);
 
     return `
@@ -374,6 +430,7 @@ function renderOrdini() {
   }).join('');
 
   if (ordiniShown < allOrdini.length) {
+    // Variabile remaining: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const remaining = allOrdini.length - ordiniShown;
     container.innerHTML += `
       <div class="text-center mt-3">
@@ -384,18 +441,25 @@ function renderOrdini() {
   }
 }
 
+// Funzione caricaAltriOrdini: gestisce la logica prevista e restituisce il risultato atteso. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 function caricaAltriOrdini() {
   ordiniShown += ORDINI_PER_PAGE;
   renderOrdini();
 }
 
+// Variabile allBiglietti: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
 let allBiglietti = [];
+// Variabile BIGLIETTI_PER_PAGE: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
 const BIGLIETTI_PER_PAGE = 5;
+// Variabile bigliettiShown: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
 let bigliettiShown = BIGLIETTI_PER_PAGE;
 
+// Funzione loadBiglietti: carica i dati iniziali o aggiorna il contenuto visibile della pagina. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 async function loadBiglietti() {
+  // Variabile container: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const container = document.getElementById('biglietti-list');
   try {
+    // Variabile data: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const data = await API.getBiglietti();
     allBiglietti = normalizeCollection(data);
 
@@ -416,14 +480,21 @@ async function loadBiglietti() {
   }
 }
 
+// Funzione renderBiglietti: costruisce markup o componenti UI a partire dai dati in ingresso. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 function renderBiglietti() {
+  // Variabile container: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const container = document.getElementById('biglietti-list');
+  // Variabile visible: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const visible = allBiglietti.slice(0, bigliettiShown);
 
   container.innerHTML = visible.map(b => {
+    // Variabile startDate: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const startDate = new Date(b.startAtUtc);
+    // Variabile dateStr: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const dateStr = startDate.toLocaleDateString('it-IT', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+    // Variabile statoClass: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const statoClass = b.stato === 'Issued' ? 'text-emerald-500' : b.stato === 'Validated' ? 'text-blue-500' : 'text-body';
+    // Variabile statoLabel: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const statoLabel = b.stato === 'Issued' ? 'Emesso' : b.stato === 'Validated' ? 'Validato' : b.stato === 'Cancelled' ? 'Annullato' : b.stato;
 
     return `
@@ -460,6 +531,7 @@ function renderBiglietti() {
   }).join('');
 
   if (bigliettiShown < allBiglietti.length) {
+    // Variabile remaining: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const remaining = allBiglietti.length - bigliettiShown;
     container.innerHTML += `
       <div class="text-center mt-3">
@@ -470,24 +542,30 @@ function renderBiglietti() {
   }
 }
 
+// Funzione caricaAltriBiglietti: gestisce la logica prevista e restituisce il risultato atteso. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 function caricaAltriBiglietti() {
   bigliettiShown += BIGLIETTI_PER_PAGE;
   renderBiglietti();
 }
 
+// Funzione visualizzaBiglietto: gestisce la logica prevista e restituisce il risultato atteso. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 async function visualizzaBiglietto(codiceBiglietto) {
   const b = allBiglietti.find(t => t.codiceBiglietto === codiceBiglietto);
   if (!b) return;
 
+  // Variabile dettaglioHtml: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   let dettaglioHtml = '';
   try {
+    // Variabile detail: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const detail = await API.getBiglietto(b.id);
     dettaglioHtml = buildBigliettoDetailHtml(detail);
   } catch {
     dettaglioHtml = buildBigliettoDetailHtml(b);
   }
 
+  // Variabile modal: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const modal = document.getElementById('biglietto-modal');
+  // Variabile content: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const content = document.getElementById('biglietto-modal-content');
   if (modal && content) {
     content.innerHTML = dettaglioHtml;
@@ -495,10 +573,15 @@ async function visualizzaBiglietto(codiceBiglietto) {
   }
 }
 
+// Funzione buildBigliettoDetailHtml: costruisce una struttura dati o una selezione ordinata per la UI. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 function buildBigliettoDetailHtml(b) {
+  // Variabile startDate: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const startDate = new Date(b.startAtUtc);
+  // Variabile dateStr: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const dateStr = startDate.toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+  // Variabile statoClass: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const statoClass = b.stato === 'Issued' ? 'text-emerald-500' : b.stato === 'Validated' ? 'text-blue-500' : 'text-body';
+  // Variabile statoLabel: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const statoLabel = b.stato === 'Issued' ? 'Emesso' : b.stato === 'Validated' ? 'Validato' : b.stato === 'Cancelled' ? 'Annullato' : b.stato;
 
   return `
@@ -541,15 +624,21 @@ function buildBigliettoDetailHtml(b) {
     </div>`;
 }
 
+// Funzione chiudiBigliettoModal: gestisce la logica prevista e restituisce il risultato atteso. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 function chiudiBigliettoModal() {
+  // Variabile modal: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const modal = document.getElementById('biglietto-modal');
   if (modal) modal.classList.add('hidden');
 }
 
+// Funzione loadPrenotazioniLegacy: carica i dati iniziali o aggiorna il contenuto visibile della pagina. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 async function loadPrenotazioniLegacy() {
+  // Variabile container: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const container = document.getElementById('prenotazioni-list');
   try {
+    // Variabile data: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const data = await API.getPrenotazioni();
+    // Variabile prenotazioni: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const prenotazioni = normalizeCollection(data);
 
     if (!prenotazioni.length) {
@@ -561,6 +650,7 @@ async function loadPrenotazioniLegacy() {
     }
 
     container.innerHTML = prenotazioni.map(p => {
+      // Variabile oraDisplay: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
       const oraDisplay = formatTime(p.oraProiezione);
       return `
         <div class="border border-hairline p-3 mb-2">
@@ -581,6 +671,7 @@ async function loadPrenotazioniLegacy() {
   }
 }
 
+// Funzione deletePrenotazione: gestisce la logica prevista e restituisce il risultato atteso. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 async function deletePrenotazione(id) {
   if (!confirm('Sei sicuro di voler annullare questa prenotazione?')) return;
   try {
@@ -592,9 +683,12 @@ async function deletePrenotazione(id) {
   }
 }
 
+// Funzione downloadPdf: gestisce la logica prevista e restituisce il risultato atteso. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 async function downloadPdf(orderId) {
   try {
+    // Variabile blob: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const blob = await API.getOrdinePdf(orderId);
+    // Variabile url: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
@@ -608,6 +702,7 @@ async function downloadPdf(orderId) {
   }
 }
 
+// Funzione normalizeCollection: normalizza il valore in ingresso per confronti stabili. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 function normalizeCollection(data) {
   if (Array.isArray(data)) return data;
   if (Array.isArray(data?.$values)) return data.$values;
@@ -615,6 +710,7 @@ function normalizeCollection(data) {
   return [];
 }
 
+// Funzione getStatoBadge: recupera un valore derivato e lo restituisce al chiamante. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 function getStatoBadge(stato) {
   switch (stato) {
     case 'Paid':
@@ -633,14 +729,17 @@ function getStatoBadge(stato) {
 }
 
 // --- Top-up (ricarica credito) ---
+// Funzione reconcileTopup: descrive l'azione eseguita, i parametri in ingresso e il valore restituito.
 async function reconcileTopup(sessionId) {
   try {
     await API.reconcileTopup(sessionId);
   } catch { /* non-critical reconciliation retry */ }
 }
 
+// Variabile selectedTopupAmount: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
 let selectedTopupAmount = 0;
 
+// Funzione openTopupModal: gestisce la logica prevista e restituisce il risultato atteso. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 function openTopupModal() {
   selectedTopupAmount = 0;
   document.getElementById('selected-topup-amount').textContent = '0,00 €';
@@ -650,10 +749,12 @@ function openTopupModal() {
   document.getElementById('topup-modal').classList.remove('hidden');
 }
 
+// Funzione closeTopupModal: gestisce la logica prevista e restituisce il risultato atteso. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 function closeTopupModal() {
   document.getElementById('topup-modal')?.classList.add('hidden');
 }
 
+// Funzione selectTopupAmount: gestisce la logica prevista e restituisce il risultato atteso. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 function selectTopupAmount(amount) {
   selectedTopupAmount = amount;
   document.querySelectorAll('.topup-amount-btn').forEach(b => b.classList.remove('selected'));
@@ -663,8 +764,10 @@ function selectTopupAmount(amount) {
   document.getElementById('btn-topup-pay').disabled = false;
 }
 
+// Funzione onCustomTopupChange: gestisce la logica prevista e restituisce il risultato atteso. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 function onCustomTopupChange() {
   document.querySelectorAll('.topup-amount-btn').forEach(b => b.classList.remove('selected'));
+  // Variabile val: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const val = parseFloat(document.getElementById('custom-topup-amount').value);
   if (val && val > 0) {
     selectedTopupAmount = val;
@@ -677,12 +780,15 @@ function onCustomTopupChange() {
   }
 }
 
+// Funzione payTopup: gestisce la logica prevista e restituisce il risultato atteso. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 async function payTopup() {
   if (selectedTopupAmount <= 0) return;
+  // Variabile btn: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const btn = document.getElementById('btn-topup-pay');
   btn.disabled = true;
   btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i>Reindirizzamento...';
   try {
+    // Variabile result: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const result = await API.createTopupStripeSession(selectedTopupAmount);
     if (result?.stripeCheckoutUrl) {
       if (result.stripeCheckoutSessionId) {
@@ -701,17 +807,24 @@ async function payTopup() {
   }
 }
 
+// Funzione caricaStato2FA: gestisce la logica prevista e restituisce il risultato atteso. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 async function caricaStato2FA() {
+  // Variabile statusBadge: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const statusBadge = document.getElementById('2fa-status-badge');
+  // Variabile enableBtn: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const enableBtn = document.getElementById('2fa-enable-btn');
+  // Variabile disableBtn: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const disableBtn = document.getElementById('2fa-disable-btn');
 
   try {
+    // Chiamata API: contatta il backend con i dati previsti e usa la risposta per aggiornare l'interfaccia.
     const response = await fetch(`${API.baseUrl}/auth/me`, {
       headers: API.getAuthHeaders()
     });
     if (!response.ok) return;
+    // Variabile user: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const user = await response.json();
+    // Variabile twoFactorEnabled: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const twoFactorEnabled = user?.twoFactorEnabled === true;
 
     if (statusBadge) {
@@ -727,10 +840,12 @@ async function caricaStato2FA() {
   }
 }
 
+// Funzione disable2FA: gestisce la logica prevista e restituisce il risultato atteso. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 async function disable2FA() {
   if (!confirm('Sei sicuro di voler disattivare l\'autenticazione a due fattori?')) return;
 
   try {
+    // Chiamata API: contatta il backend con i dati previsti e usa la risposta per aggiornare l'interfaccia.
     const response = await fetch(`${API.baseUrl}/auth/2fa/disable`, {
       method: 'POST',
       headers: API.getAuthHeaders()
@@ -758,11 +873,14 @@ window.submitSetPasswordRequest = submitSetPasswordRequest;
 
 // ─── Account Security (Iteration 5) ────────────────────────────────
 
+// Funzione loadAccountSecurity: descrive l'azione eseguita, i parametri in ingresso e il valore restituito.
 async function loadAccountSecurity() {
+  // Variabile container: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   var container = document.getElementById('account-security-content');
   if (!container || !Auth.isLoggedIn()) return;
 
   try {
+    // Variabile security: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     var security = await Auth.getAccountSecurity();
     renderAccountSecurity(container, security);
   } catch (err) {
@@ -770,13 +888,16 @@ async function loadAccountSecurity() {
   }
 }
 
+// Funzione renderAccountSecurity: costruisce markup o componenti UI a partire dai dati in ingresso. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 function renderAccountSecurity(container, security) {
+  // Variabile html: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   var html = '';
 
   // Provider collegati
   if (security.linkedProviders && security.linkedProviders.length > 0) {
     html += '<div class="mb-4"><p class="text-sm font-medium text-ink mb-2">Provider collegati:</p>';
     security.linkedProviders.forEach(function(p) {
+      // Variabile icon: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
       var icon = p.provider === 'Google' ? 'fa-google' : p.provider === 'Microsoft' ? 'fa-microsoft' : 'fa-facebook';
       html += '<span class="inline-flex items-center gap-2 mr-3 mb-2 px-3 py-1 text-xs bg-white/5 border border-hairline"><i class="fa-brands ' + icon + '"></i>' + p.name + '</span>';
     });
@@ -785,6 +906,7 @@ function renderAccountSecurity(container, security) {
 
   // Stato password
   if (security.hasLocalPassword) {
+    // Variabile lastChanged: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     var lastChanged = security.passwordChangedAtUtc
       ? new Date(security.passwordChangedAtUtc).toLocaleDateString('it-IT')
       : 'mai';
@@ -815,9 +937,12 @@ function renderAccountSecurity(container, security) {
   container.innerHTML = html;
 }
 
+// Funzione submitChangePassword: gestisce la logica prevista e restituisce il risultato atteso. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 async function submitChangePassword(event) {
   event.preventDefault();
+  // Variabile currentPwd: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   var currentPwd = document.getElementById('sec-current-pwd').value;
+  // Variabile newPwd: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   var newPwd = document.getElementById('sec-new-pwd').value;
 
   if (newPwd.length < 8) {
@@ -837,7 +962,9 @@ async function submitChangePassword(event) {
   }
 }
 
+// Funzione submitSetPasswordRequest: gestisce la logica prevista e restituisce il risultato atteso. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 async function submitSetPasswordRequest() {
+  // Variabile btn: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   var btn = document.getElementById('btn-setup-pwd');
   if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>Invio in corso...'; }
 

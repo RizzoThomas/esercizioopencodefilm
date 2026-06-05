@@ -8,8 +8,18 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FilmAPI.Endpoints;
 
+/// <summary>
+/// Raggruppa gli endpoint pubblici per login social esterno.
+/// </summary>
 public static class SocialAuthEndpoints
 {
+    /// <summary>
+    /// Mappa le rotte per avviare e completare il login tramite provider social esterni.
+    /// Le rotte sono pubbliche con <c>AllowAnonymous</c>.
+    /// Esegue scambio codici e creazione token con possibili effetti sui record utente collegati ai provider.
+    /// </summary>
+    /// <param name="app">Applicazione web su cui registrare gli endpoint.</param>
+    /// <returns>Non restituisce valori.</returns>
     public static void MapSocialAuthEndpoints(this WebApplication app)
     {
         // ─── Google ──────────────────────────────────────────────────

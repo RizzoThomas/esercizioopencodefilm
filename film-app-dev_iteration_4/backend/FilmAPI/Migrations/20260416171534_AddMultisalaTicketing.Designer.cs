@@ -11,6 +11,9 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace FilmAPI.Migrations
 {
+    /// <summary>
+    /// Classe generata da EF Core per la migrazione AddMultisalaTicketing.
+    /// </summary>
     [DbContext(typeof(FilmDbContext))]
     [Migration("20260416171534_AddMultisalaTicketing")]
     partial class AddMultisalaTicketing

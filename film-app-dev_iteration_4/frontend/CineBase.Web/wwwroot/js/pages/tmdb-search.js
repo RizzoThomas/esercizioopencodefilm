@@ -1,6 +1,7 @@
 /**
  * Ricerca Film — TMDB (admin/poweruser) o Catalogo Locale (utenti normali)
  */
+// Variabile TMDBSearch: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
 const TMDBSearch = {
     currentPage: 1,
     totalPages: 1,
@@ -11,6 +12,7 @@ const TMDBSearch = {
     _activeFilterBtn: null,
 
     init() {
+        // Variabile rawRole: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
         const rawRole = (window.Auth?.getUserRole?.() || '');
         // Normalizza: stringhe 'admin'/'poweruser' o numeri 2/1
         const role = String(rawRole).trim().toLowerCase();
@@ -24,7 +26,9 @@ const TMDBSearch = {
     },
 
     bindEvents() {
+        // Listener evento: si attiva quando scatta l'evento sulla pagina e aggiorna la UI o lo stato.
         document.getElementById('search-btn')?.addEventListener('click', () => this.handleSearch());
+        // Listener evento: si attiva quando scatta l'evento sulla pagina e aggiorna la UI o lo stato.
         document.getElementById('search-input')?.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') this.handleSearch();
         });
@@ -32,6 +36,7 @@ const TMDBSearch = {
         document.getElementById('search-input')?.addEventListener('input', (e) => {
             clearTimeout(this._searchTimer);
             this._searchTimer = setTimeout(() => {
+                // Variabile query: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
                 const query = e.target.value.trim();
                 if (query.length >= 2 || query.length === 0) {
                     this.handleLiveSearch(query);
@@ -39,26 +44,36 @@ const TMDBSearch = {
             }, 300);
         });
 
+        // Listener evento: si attiva quando scatta l'evento sulla pagina e aggiorna la UI o lo stato.
         document.getElementById('btn-popular')?.addEventListener('click', () => {
             if (this.isAdmin) this.loadPopular(); else this.loadLocalPopular();
         });
+        // Listener evento: si attiva quando scatta l'evento sulla pagina e aggiorna la UI o lo stato.
         document.getElementById('btn-upcoming')?.addEventListener('click', () => {
             if (this.isAdmin) this.loadUpcoming(); else this.loadLocalUpcoming();
         });
+        // Listener evento: si attiva quando scatta l'evento sulla pagina e aggiorna la UI o lo stato.
         document.getElementById('btn-now-playing')?.addEventListener('click', () => {
             if (this.isAdmin) this.loadNowPlaying(); else this.loadLocalNowPlaying();
         });
 
+        // Listener evento: si attiva quando scatta l'evento sulla pagina e aggiorna la UI o lo stato.
         document.getElementById('prev-page')?.addEventListener('click', () => this.prevPage());
+        // Listener evento: si attiva quando scatta l'evento sulla pagina e aggiorna la UI o lo stato.
         document.getElementById('next-page')?.addEventListener('click', () => this.nextPage());
 
+        // Listener evento: si attiva quando scatta l'evento sulla pagina e aggiorna la UI o lo stato.
         document.getElementById('close-modal')?.addEventListener('click', () => this.closeModal());
+        // Listener evento: si attiva quando scatta l'evento sulla pagina e aggiorna la UI o lo stato.
         document.getElementById('cancel-btn')?.addEventListener('click', () => this.closeModal());
+        // Listener evento: si attiva quando scatta l'evento sulla pagina e aggiorna la UI o lo stato.
         document.getElementById('import-btn')?.addEventListener('click', () => this.importMovie());
+        // Listener evento: si attiva quando scatta l'evento sulla pagina e aggiorna la UI o lo stato.
         document.getElementById('movie-modal')?.addEventListener('click', (e) => {
             if (e.target === document.getElementById('movie-modal')) this.closeModal();
         });
 
+        // Listener evento: si attiva quando scatta l'evento sulla pagina e aggiorna la UI o lo stato.
         document.getElementById('continue-search')?.addEventListener('click', () => {
             document.getElementById('success-modal').classList.add('hidden');
         });
@@ -67,6 +82,7 @@ const TMDBSearch = {
     // ─── Ricerca (determina TMDB vs locale) ──────────────────────────
 
     async handleSearch() {
+        // Variabile query: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
         const query = document.getElementById('search-input').value.trim();
         if (!query) return;
         this.currentQuery = query;
@@ -110,8 +126,10 @@ const TMDBSearch = {
     // Evidenzia il pulsante filtro attivo
     highlightFilterButton(mode) {
         this._activeFilterBtn = mode;
+        // Variabile btns: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
         const btns = ['btn-popular', 'btn-upcoming', 'btn-now-playing'];
         btns.forEach(id => {
+            // Variabile btn: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
             const btn = document.getElementById(id);
             if (!btn) return;
             if (mode && id === `btn-${mode === 'now_playing' ? 'now-playing' : mode}`) {
@@ -128,6 +146,7 @@ const TMDBSearch = {
         this.showLoading();
         this.hideError();
         try {
+            // Variabile url: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
             let url;
             switch (this.currentMode) {
                 case 'popular':
@@ -142,8 +161,10 @@ const TMDBSearch = {
                 default:
                     url = `${API.baseUrl}/tmdb/search?query=${encodeURIComponent(this.currentQuery)}&page=${this.currentPage}`;
             }
+            // Chiamata API: contatta il backend con i dati previsti e usa la risposta per aggiornare l'interfaccia.
             const response = await fetch(url, { headers: API.getAuthHeaders() });
             if (!response.ok) throw new Error('Errore nella ricerca');
+            // Variabile data: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
             const data = await response.json();
             this.renderResults(data);
         } catch (error) {
@@ -184,14 +205,17 @@ const TMDBSearch = {
         this.showLoading();
         this.hideError();
         try {
+            // Variabile filter: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
             let filter = null;
             if (this.currentMode === 'upcoming') filter = 'upcoming';
             else if (this.currentMode === 'now_playing') filter = 'now-playing';
 
+            // Variabile params: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
             const params = { page: this.currentPage, pageSize: 12 };
             if (this.currentQuery) params.search = this.currentQuery;
             if (filter) params.filter = filter;
 
+            // Variabile data: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
             let data;
             if (this.currentQuery || filter) {
                 data = await API.getFilms(params);
@@ -199,6 +223,7 @@ const TMDBSearch = {
                 data = await API.getFilms({ page: this.currentPage, pageSize: 12 });
             }
 
+            // Variabile normalized: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
             const normalized = {
                 results: (data.items || data).map(f => this.normalizeLocalFilm(f)),
                 totalPages: data.totalPages || 1,
@@ -261,8 +286,11 @@ const TMDBSearch = {
     // ═══════════════════ Rendering ════════════════════════════════════
 
     renderResults(data) {
+        // Variabile grid: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
         const grid = document.getElementById('results-grid');
+        // Variabile noResults: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
         const noResults = document.getElementById('no-results');
+        // Variabile pagination: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
         const pagination = document.getElementById('pagination');
         this.totalPages = data.totalPages || 1;
 
@@ -276,13 +304,17 @@ const TMDBSearch = {
         grid.innerHTML = data.results.map(movie => this.createMovieCard(movie)).join('');
 
         document.querySelectorAll('.view-details-btn').forEach(btn => {
+            // Listener evento: si attiva quando scatta l'evento sulla pagina e aggiorna la UI o lo stato.
             btn.addEventListener('click', (e) => {
+                // Variabile id: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
                 const id = parseInt(e.currentTarget.dataset.id);
                 this.loadMovieDetails(id);
             });
         });
         document.querySelectorAll('.quick-import-btn').forEach(btn => {
+            // Listener evento: si attiva quando scatta l'evento sulla pagina e aggiorna la UI o lo stato.
             btn.addEventListener('click', (e) => {
+                // Variabile tmdbId: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
                 const tmdbId = parseInt(e.currentTarget.dataset.id);
                 this.importMovie(tmdbId);
             });
@@ -291,8 +323,11 @@ const TMDBSearch = {
     },
 
     renderLocalResults(data) {
+        // Variabile grid: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
         const grid = document.getElementById('results-grid');
+        // Variabile noResults: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
         const noResults = document.getElementById('no-results');
+        // Variabile pagination: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
         const pagination = document.getElementById('pagination');
         this.totalPages = data.totalPages || 1;
 
@@ -306,7 +341,9 @@ const TMDBSearch = {
         grid.innerHTML = data.results.map(movie => this.createLocalMovieCard(movie)).join('');
 
         document.querySelectorAll('.view-details-btn').forEach(btn => {
+            // Listener evento: si attiva quando scatta l'evento sulla pagina e aggiorna la UI o lo stato.
             btn.addEventListener('click', (e) => {
+                // Variabile id: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
                 const id = parseInt(e.currentTarget.dataset.id);
                 this.showLocalFilmModal(id);
             });
@@ -326,10 +363,13 @@ const TMDBSearch = {
     },
 
     createMovieCard(movie) {
+        // Variabile posterUrl: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
         const posterUrl = movie.posterPath
             ? `https://image.tmdb.org/t/p/w500${movie.posterPath}`
             : '/images/no-poster.jpg';
+        // Variabile year: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
         const year = movie.releaseDate ? new Date(movie.releaseDate).getFullYear() : 'N/A';
+        // Variabile rating: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
         const rating = movie.voteAverage ? movie.voteAverage.toFixed(1) : 'N/A';
 
         return `
@@ -357,15 +397,19 @@ const TMDBSearch = {
     },
 
     createLocalMovieCard(movie) {
+        // Variabile posterUrl: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
         const posterUrl = movie.posterPath && movie.posterPath.startsWith('http')
             ? movie.posterPath
             : movie.posterPath
                 ? `/media/covers/${movie.posterPath}`
                 : '/images/no-poster.jpg';
+        // Variabile year: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
         const year = movie.releaseDate
             ? new Date(movie.releaseDate + 'T00:00:00').getFullYear()
             : 'N/A';
+        // Variabile rating: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
         const rating = movie.voteAverage ? movie.voteAverage.toFixed(1) : null;
+        // Variabile director: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
         const director = movie.registaNome
             ? `${movie.registaNome} ${movie.registaCognome || ''}`.trim()
             : '';
@@ -396,10 +440,12 @@ const TMDBSearch = {
 
     async loadMovieDetails(tmdbId) {
         try {
+            // Chiamata API: contatta il backend con i dati previsti e usa la risposta per aggiornare l'interfaccia.
             const response = await fetch(`${API.baseUrl}/tmdb/movie/${tmdbId}`, {
                 headers: API.getAuthHeaders()
             });
             if (!response.ok) throw new Error('Film non trovato');
+            // Variabile movie: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
             const movie = await response.json();
             this.currentMovie = movie;
             // Mostra bottone importa solo per admin
@@ -412,17 +458,26 @@ const TMDBSearch = {
     },
 
     showModal(movie) {
+        // Variabile posterUrl: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
         const posterUrl = movie.posterPath
             ? `https://image.tmdb.org/t/p/w500${movie.posterPath}`
             : '/images/no-poster.jpg';
+        // Variabile year: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
         const year = movie.releaseDate ? new Date(movie.releaseDate).getFullYear() : 'N/A';
+        // Variabile runtime: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
         const runtime = movie.runtime ? `${movie.runtime} min` : 'N/A';
+        // Variabile rating: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
         const rating = movie.voteAverage ? `${movie.voteAverage.toFixed(1)}/10` : 'N/A';
+        // Variabile genres: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
         const genres = movie.genres?.map(g => g.name).join(', ') || 'N/A';
+        // Variabile director: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
         const director = movie.credits?.crew?.find(c => c.job === 'Director')?.name || 'N/A';
+        // Variabile cast: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
         const cast = movie.credits?.cast?.slice(0, 5).map(c => c.name).join(', ') || 'N/A';
 
+        // Variabile trailer: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
         const trailer = movie.videos?.results?.find(v => v.type === 'Trailer' && v.site === 'YouTube');
+        // Variabile trailerContainer: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
         const trailerContainer = document.getElementById('modal-trailer');
         if (trailer) {
             trailerContainer.classList.remove('hidden');
@@ -450,22 +505,29 @@ const TMDBSearch = {
 
     async showLocalFilmModal(filmId) {
         try {
+            // Variabile film: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
             const film = await API.getFilm(filmId);
             if (!film) throw new Error('Film non trovato');
             this.currentMovie = null; // non è TMDB
             document.getElementById('import-btn').classList.add('hidden'); // niente import per local
 
+            // Variabile posterUrl: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
             const posterUrl = film.copertinaPath && film.copertinaPath.startsWith('http')
                 ? film.copertinaPath
                 : film.copertinaPath
                     ? `/media/covers/${film.copertinaPath}`
                     : '/images/no-poster.jpg';
+            // Variabile year: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
             const year = film.dataRilascio
                 ? new Date(film.dataRilascio + 'T00:00:00').getFullYear()
                 : 'N/A';
+            // Variabile runtime: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
             const runtime = film.durata ? `${film.durata} min` : 'N/A';
+            // Variabile rating: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
             const rating = film.voteAverage ? `${film.voteAverage.toFixed(1)}/10` : 'N/A';
+            // Variabile genres: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
             const genres = film.categorie?.map(c => c.nome).join(', ') || 'N/A';
+            // Variabile director: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
             const director = film.registaNome
                 ? `${film.registaNome} ${film.registaCognome || ''}`.trim()
                 : 'N/A';
@@ -494,20 +556,24 @@ const TMDBSearch = {
 
     async importMovie(tmdbId = null) {
         if (!this.isAdmin) return;
+        // Variabile id: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
         const id = tmdbId || this.currentMovie?.id;
         if (!id) return;
         document.getElementById('import-loading').classList.remove('hidden');
         try {
+            // Chiamata API: contatta il backend con i dati previsti e usa la risposta per aggiornare l'interfaccia.
             const response = await fetch(`${API.baseUrl}/tmdb/import/${id}`, {
                 method: 'POST',
                 headers: API.getAuthHeaders()
             });
             if (response.status === 409) {
+                // Variabile data: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
                 const data = await response.json();
                 this.showError(data.message || 'Film già importato');
                 return;
             }
             if (!response.ok) throw new Error('Errore durante l\'importazione');
+            // Variabile data: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
             const data = await response.json();
             this.showSuccess(data.message, data.filmId);
         } catch (error) {
@@ -559,6 +625,7 @@ const TMDBSearch = {
     },
 
     showError(message) {
+        // Variabile errorEl: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
         const errorEl = document.getElementById('error-state');
         document.getElementById('error-message').textContent = message;
         errorEl.classList.remove('hidden');
@@ -571,12 +638,14 @@ const TMDBSearch = {
 
     escHtml(str) {
         if (!str) return '';
+        // Variabile div: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
         const div = document.createElement('div');
         div.textContent = str;
         return div.innerHTML;
     }
 };
 
+// Listener evento: si attiva quando scatta l'evento sulla pagina e aggiorna la UI o lo stato.
 document.addEventListener('DOMContentLoaded', () => {
     TMDBSearch.init();
 });

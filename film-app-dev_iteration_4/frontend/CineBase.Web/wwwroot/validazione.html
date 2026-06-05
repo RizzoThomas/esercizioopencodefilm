@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- Pagina CineBase: struttura principale con sezioni statiche e contenuti dinamici gestiti da JavaScript. -->
 <html lang="it-IT">
 
 <head>
@@ -19,6 +20,8 @@
 </head>
 
 <body class="bg-canvas text-ink font-sans">
+  <!-- Contenuto principale: area centrale che ospita il flusso della pagina. -->
+<!-- Contenuto principale: area centrale dove la pagina mostra il flusso operativo. -->
   <main>
     <div class="flex items-center justify-between gap-4 mb-6">
       <p class="text-sm text-body">Scansiona QR code / barcode con la fotocamera o inserisci il codice manualmente</p>
@@ -42,6 +45,8 @@
         </div>
         <div class="relative" style="min-height:320px">
           <div id="reader" class="w-full" style="min-height:320px"></div>
+  <!-- Contenitore dinamico: scan-overlay viene popolato o mostrato da JavaScript. -->
+<!-- Contenitore dinamico: quest'area viene popolata o mostrata da JavaScript. -->
           <div id="scan-overlay" class="absolute inset-0 flex items-center justify-center bg-canvas/80 hidden">
             <div class="text-center">
               <i class="fa-solid fa-qrcode text-5xl text-ferrari-primary mb-4 block"></i>
@@ -64,22 +69,18 @@
           <h2 class="ferrari-title-md text-ink flex items-center gap-2 mb-4">
             <i class="fa-solid fa-keyboard text-ferrari-primary"></i>Inserimento Manuale
           </h2>
-          <form id="manual-form" class="space-y-4">
-            <div>
-              <label for="codice-input" class="block text-sm font-medium text-ink mb-1">Codice Biglietto</label>
-              <div class="flex gap-2">
-                <input type="text" id="codice-input" class="input-ferrari flex-1 font-mono tracking-wider text-lg text-center" placeholder="es. CB-20260505-ABCDEF12" autocomplete="off" autofocus>
-                <button type="submit" id="validate-btn" class="btn-primary whitespace-nowrap"><i class="fa-solid fa-check mr-1"></i>Valida</button>
-              </div>
-            </div>
-            <p class="text-muted text-xs"><i class="fa-solid fa-info-circle mr-1"></i>Inserisci il codice alfanumerico del biglietto e premi Invio</p>
-          </form>
+  <!-- Modulo: raccoglie i dati dell'utente e li invia tramite JavaScript al backend. -->
+<!-- Modulo: raccoglie dati utente e li invia al backend tramite JavaScript. -->
+          <!-- Form: raccoglie dati dell'utente e li invia all'API collegata. -->
+          <form $$$> $$$ </form>
         </div>
 
         <div id="result-card" class="card-ferrari p-6 hidden">
           <h2 class="ferrari-title-md text-ink flex items-center gap-2 mb-4">
             <i class="fa-solid fa-clipboard-check text-ferrari-primary"></i>Risultato Validazione
           </h2>
+  <!-- Contenitore dinamico: result-content viene popolato o mostrato da JavaScript. -->
+<!-- Contenitore dinamico: quest'area viene popolata o mostrata da JavaScript. -->
           <div id="result-content"></div>
         </div>
       </div>
@@ -92,6 +93,8 @@
         </h2>
         <button id="clear-history-btn" class="btn-tertiary text-xs"><i class="fa-solid fa-trash mr-1"></i>Cancella cronologia</button>
       </div>
+  <!-- Contenitore dinamico: history-list viene popolato o mostrato da JavaScript. -->
+<!-- Contenitore dinamico: quest'area viene popolata o mostrata da JavaScript. -->
       <div id="history-list" class="divide-y divide-hairline">
         <div class="px-6 py-8 text-center text-body">
           <i class="fa-solid fa-ticket-simple text-3xl mb-2 block opacity-30"></i>
@@ -102,6 +105,8 @@
     </div>
   </main>
 
+  <!-- Contenitore dinamico: toast-container viene popolato o mostrato da JavaScript. -->
+<!-- Contenitore dinamico: quest'area viene popolata o mostrata da JavaScript. -->
   <div id="toast-container" class="fixed bottom-4 right-4 z-50"></div>
 
   <script src="/js/utils.js"></script>

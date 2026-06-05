@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace FilmAPI.Tests.Unit;
 
+/// <summary>Suite di test per RegistaServiceTests.</summary>
 public class RegistaServiceTests : IAsyncLifetime
 {
     private readonly IServiceProvider _serviceProvider;
@@ -41,6 +42,7 @@ public class RegistaServiceTests : IAsyncLifetime
         await _context.DisposeAsync();
     }
 
+    /// <summary>Verifica lo scenario di U_R1_GetAllAsync_WhenNoRegistiExist_ReturnsEmptyList: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task U_R1_GetAllAsync_WhenNoRegistiExist_ReturnsEmptyList()
     {
@@ -48,6 +50,7 @@ public class RegistaServiceTests : IAsyncLifetime
         result.Should().BeEmpty();
     }
 
+    /// <summary>Verifica lo scenario di U_R2_GetAllAsync_WhenRegistiExist_ReturnsAllRegisti: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task U_R2_GetAllAsync_WhenRegistiExist_ReturnsAllRegisti()
     {
@@ -59,6 +62,7 @@ public class RegistaServiceTests : IAsyncLifetime
         result.Should().HaveCount(2);
     }
 
+    /// <summary>Verifica lo scenario di U_R3_GetByIdAsync_WhenRegistaExists_ReturnsRegista: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task U_R3_GetByIdAsync_WhenRegistaExists_ReturnsRegista()
     {
@@ -71,6 +75,7 @@ public class RegistaServiceTests : IAsyncLifetime
         result.Nome.Should().Be("Christopher");
     }
 
+    /// <summary>Verifica lo scenario di U_R4_GetByIdAsync_WhenRegistaNotExists_ReturnsNull: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task U_R4_GetByIdAsync_WhenRegistaNotExists_ReturnsNull()
     {
@@ -79,6 +84,7 @@ public class RegistaServiceTests : IAsyncLifetime
         result.Should().BeNull();
     }
 
+    /// <summary>Verifica lo scenario di U_R5_CreateAsync_WithValidData_CreatesRegista: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task U_R5_CreateAsync_WithValidData_CreatesRegista()
     {
@@ -92,6 +98,7 @@ public class RegistaServiceTests : IAsyncLifetime
         result.Nazionalita.Should().Be("UK");
     }
 
+    /// <summary>Verifica lo scenario di U_R6_CreateAsync_WithInvalidData_ThrowsArgumentException: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task U_R6_CreateAsync_WithInvalidData_ThrowsArgumentException()
     {
@@ -102,6 +109,7 @@ public class RegistaServiceTests : IAsyncLifetime
         await act.Should().ThrowAsync<ArgumentException>();
     }
 
+    /// <summary>Verifica lo scenario di U_R7_UpdateAsync_WhenRegistaExists_UpdatesRegista: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task U_R7_UpdateAsync_WhenRegistaExists_UpdatesRegista()
     {
@@ -114,6 +122,7 @@ public class RegistaServiceTests : IAsyncLifetime
         result!.Nazionalita.Should().Be("American");
     }
 
+    /// <summary>Verifica lo scenario di U_R8_UpdateAsync_WhenRegistaNotExists_ReturnsNull: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task U_R8_UpdateAsync_WhenRegistaNotExists_ReturnsNull()
     {
@@ -124,6 +133,7 @@ public class RegistaServiceTests : IAsyncLifetime
         result.Should().BeNull();
     }
 
+    /// <summary>Verifica lo scenario di U_R9_DeleteAsync_WhenRegistaExists_DeletesRegista: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task U_R9_DeleteAsync_WhenRegistaExists_DeletesRegista()
     {
@@ -136,6 +146,7 @@ public class RegistaServiceTests : IAsyncLifetime
         deleted.Should().BeNull();
     }
 
+    /// <summary>Verifica lo scenario di U_R10_DeleteAsync_WhenRegistaNotExists_ReturnsFalse: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task U_R10_DeleteAsync_WhenRegistaNotExists_ReturnsFalse()
     {
@@ -144,6 +155,7 @@ public class RegistaServiceTests : IAsyncLifetime
         result.Should().BeFalse();
     }
 
+    /// <summary>Verifica lo scenario di U_R11_GetFilmsByRegistaIdAsync_WhenRegistaHasFilms_ReturnsFilms: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task U_R11_GetFilmsByRegistaIdAsync_WhenRegistaHasFilms_ReturnsFilms()
     {
@@ -166,6 +178,7 @@ public class RegistaServiceTests : IAsyncLifetime
         result[0].Titolo.Should().Be("Inception");
     }
 
+    /// <summary>Verifica lo scenario di U_R12_GetFilmsByRegistaIdAsync_WhenRegistaHasNoFilms_ReturnsEmptyList: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task U_R12_GetFilmsByRegistaIdAsync_WhenRegistaHasNoFilms_ReturnsEmptyList()
     {

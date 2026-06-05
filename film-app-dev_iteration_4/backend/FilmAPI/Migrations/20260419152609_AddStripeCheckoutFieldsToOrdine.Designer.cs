@@ -11,6 +11,9 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace FilmAPI.Migrations
 {
+    /// <summary>
+    /// Classe generata da EF Core per la migrazione AddStripeCheckoutFieldsToOrdine.
+    /// </summary>
     [DbContext(typeof(FilmDbContext))]
     [Migration("20260419152609_AddStripeCheckoutFieldsToOrdine")]
     partial class AddStripeCheckoutFieldsToOrdine

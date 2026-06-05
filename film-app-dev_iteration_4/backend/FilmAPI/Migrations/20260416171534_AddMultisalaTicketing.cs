@@ -8,6 +8,9 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace FilmAPI.Migrations
 {
     /// <inheritdoc />
+    /// <summary>
+    /// Migrazione che abilita il ticketing multisala, aggiunge campi alle entità esistenti, crea nuove tabelle e relativi indici.
+    /// </summary>
     public partial class AddMultisalaTicketing : Migration
     {
         /// <inheritdoc />

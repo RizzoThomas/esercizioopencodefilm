@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FilmAPI.Tests.Integration;
 
+/// <summary>Suite di test per ShowIntegrationTests.</summary>
 public class ShowIntegrationTests : IClassFixture<CustomWebApplicationFactory>
 {
     private readonly CustomWebApplicationFactory _factory;
@@ -15,6 +16,7 @@ public class ShowIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         _factory = factory;
     }
 
+    /// <summary>Verifica lo scenario di SH1_GetShows_ReturnsEmptyList: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task SH1_GetShows_ReturnsEmptyList()
     {
@@ -29,6 +31,7 @@ public class ShowIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Empty(payload);
     }
 
+    /// <summary>Verifica lo scenario di SH2_GetShows_ReturnsAllShows: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task SH2_GetShows_ReturnsAllShows()
     {
@@ -46,6 +49,7 @@ public class ShowIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Equal("Sala 1", payload[0].SalaNome);
     }
 
+    /// <summary>Verifica lo scenario di SH3_GetShowsPaged_ReturnsPagedResult: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task SH3_GetShowsPaged_ReturnsPagedResult()
     {
@@ -62,6 +66,7 @@ public class ShowIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Single(payload.Items);
     }
 
+    /// <summary>Verifica lo scenario di SH4_GetShowsByCinema_FiltersByCinemaId: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task SH4_GetShowsByCinema_FiltersByCinemaId()
     {
@@ -77,6 +82,7 @@ public class ShowIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.All(payload.Items, s => Assert.Equal(1, s.CinemaId));
     }
 
+    /// <summary>Verifica lo scenario di SH5_GetShowsByFilm_FiltersByFilmId: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task SH5_GetShowsByFilm_FiltersByFilmId()
     {
@@ -92,6 +98,7 @@ public class ShowIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.All(payload.Items, s => Assert.Equal(1, s.FilmId));
     }
 
+    /// <summary>Verifica lo scenario di SH6_GetShowById_ReturnsShow: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task SH6_GetShowById_ReturnsShow()
     {
@@ -109,6 +116,7 @@ public class ShowIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Equal(1, payload.FilmId);
     }
 
+    /// <summary>Verifica lo scenario di SH7_GetShowById_NotFound: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task SH7_GetShowById_NotFound()
     {
@@ -120,6 +128,7 @@ public class ShowIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
 
+    /// <summary>Verifica lo scenario di SH8_CreateShow_ReturnsCreated: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task SH8_CreateShow_ReturnsCreated()
     {
@@ -147,6 +156,7 @@ public class ShowIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Equal("Film Test", payload.FilmTitolo);
     }
 
+    /// <summary>Verifica lo scenario di SH8B_CreateShow_NormalizesCentBasedPrezzoBase: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task SH8B_CreateShow_NormalizesCentBasedPrezzoBase()
     {
@@ -170,6 +180,7 @@ public class ShowIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Equal(8.50m, payload.PrezzoBase);
     }
 
+    /// <summary>Verifica lo scenario di SH9_CreateShow_UsesFilmDurataWhenNotSpecified: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task SH9_CreateShow_UsesFilmDurataWhenNotSpecified()
     {
@@ -192,6 +203,7 @@ public class ShowIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Equal(120, payload.DurataMinutiSnapshot);
     }
 
+    /// <summary>Verifica lo scenario di SH10_CreateShow_BadRequestOnInvalidCinema: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task SH10_CreateShow_BadRequestOnInvalidCinema()
     {
@@ -211,6 +223,7 @@ public class ShowIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
 
+    /// <summary>Verifica lo scenario di SH11_CreateShow_BadRequestOnInvalidSala: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task SH11_CreateShow_BadRequestOnInvalidSala()
     {
@@ -230,6 +243,7 @@ public class ShowIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
 
+    /// <summary>Verifica lo scenario di SH12_CreateShow_BadRequestOnInvalidFilm: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task SH12_CreateShow_BadRequestOnInvalidFilm()
     {
@@ -249,6 +263,7 @@ public class ShowIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
 
+    /// <summary>Verifica lo scenario di SH13_CreateShow_BadRequestOnSalaNotInCinema: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task SH13_CreateShow_BadRequestOnSalaNotInCinema()
     {
@@ -268,6 +283,7 @@ public class ShowIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
 
+    /// <summary>Verifica lo scenario di SH14_CreateShow_ConflictOnOverlap: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task SH14_CreateShow_ConflictOnOverlap()
     {
@@ -287,6 +303,7 @@ public class ShowIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
     }
 
+    /// <summary>Verifica lo scenario di SH15_CreateShow_AllowedInDifferentSala: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task SH15_CreateShow_AllowedInDifferentSala()
     {
@@ -306,6 +323,7 @@ public class ShowIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
     }
 
+    /// <summary>Verifica lo scenario di SH16_CreateShow_ForbiddenForUser: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task SH16_CreateShow_ForbiddenForUser()
     {
@@ -325,6 +343,7 @@ public class ShowIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
     }
 
+    /// <summary>Verifica lo scenario di SH17_UpdateShow_UpdatesFields: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task SH17_UpdateShow_UpdatesFields()
     {
@@ -346,6 +365,7 @@ public class ShowIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Equal(130, payload.DurataMinutiSnapshot);
     }
 
+    /// <summary>Verifica lo scenario di SH18_UpdateShow_NotFound: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task SH18_UpdateShow_NotFound()
     {
@@ -359,6 +379,7 @@ public class ShowIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
 
+    /// <summary>Verifica lo scenario di SH19_UpdateShow_ConflictOnOverlap: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task SH19_UpdateShow_ConflictOnOverlap()
     {
@@ -375,6 +396,7 @@ public class ShowIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
     }
 
+    /// <summary>Verifica lo scenario di SH20_DeleteShow_DeletesEntity: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task SH20_DeleteShow_DeletesEntity()
     {
@@ -389,6 +411,7 @@ public class ShowIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Equal(HttpStatusCode.NotFound, getResponse.StatusCode);
     }
 
+    /// <summary>Verifica lo scenario di SH21_DeleteShow_NotFound: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task SH21_DeleteShow_NotFound()
     {
@@ -400,6 +423,7 @@ public class ShowIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
 
+    /// <summary>Verifica lo scenario di SH22_DeleteShow_BlockedByIssuedTickets: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task SH22_DeleteShow_BlockedByIssuedTickets()
     {
@@ -411,6 +435,7 @@ public class ShowIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
     }
 
+    /// <summary>Verifica lo scenario di SH23_CreateShow_ExactBoundaryNoOverlap: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task SH23_CreateShow_ExactBoundaryNoOverlap()
     {
@@ -430,6 +455,7 @@ public class ShowIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
     }
 
+    /// <summary>Verifica lo scenario di SH24_GetShowsByDate_FiltersByDate: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task SH24_GetShowsByDate_FiltersByDate()
     {
@@ -444,6 +470,7 @@ public class ShowIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Single(payload.Items);
     }
 
+    /// <summary>Verifica lo scenario di SH25_GetShowsByDate_NoResultsForDifferentDate: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task SH25_GetShowsByDate_NoResultsForDifferentDate()
     {
@@ -458,6 +485,7 @@ public class ShowIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Empty(payload.Items);
     }
 
+    /// <summary>Verifica lo scenario di SH26_CreateShow_PowerUserAllowed: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task SH26_CreateShow_PowerUserAllowed()
     {
@@ -477,6 +505,7 @@ public class ShowIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
     }
 
+    /// <summary>Verifica lo scenario di SH27_UpdateShow_PowerUserAllowed: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task SH27_UpdateShow_PowerUserAllowed()
     {
@@ -490,6 +519,7 @@ public class ShowIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         response.EnsureSuccessStatusCode();
     }
 
+    /// <summary>Verifica lo scenario di SH28_DeleteShow_PowerUserAllowed: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task SH28_DeleteShow_PowerUserAllowed()
     {

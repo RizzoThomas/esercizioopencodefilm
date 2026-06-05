@@ -1,13 +1,20 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
 namespace FilmAPI.Migrations
 {
-    /// <inheritdoc />
+    /// <summary>
+    ///     Aggiunge il campo CinemaId alla tabella Offerte per permettere offerte specifiche per cinema. Aggiorna i dati esistenti con valore null (offerta valida per tutti i cinema).
+    /// </summary>
+    /// <summary>
+    /// Migrazione che aggiunge CinemaId alle offerte e crea l'indice collegato, poi rimuove la struttura al rollback.
+    /// </summary>
     public partial class AddCinemaIdToOfferte : Migration
     {
-        /// <inheritdoc />
+        /// <summary>
+    ///     Aggiunge il campo CinemaId alla tabella Offerte per permettere offerte specifiche per cinema. Aggiorna i dati esistenti con valore null (offerta valida per tutti i cinema).
+    /// </summary>
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<int>(
@@ -29,7 +36,9 @@ namespace FilmAPI.Migrations
                 principalColumn: "Id");
         }
 
-        /// <inheritdoc />
+        /// <summary>
+    ///     Aggiunge il campo CinemaId alla tabella Offerte per permettere offerte specifiche per cinema. Aggiorna i dati esistenti con valore null (offerta valida per tutti i cinema).
+    /// </summary>
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropForeignKey(

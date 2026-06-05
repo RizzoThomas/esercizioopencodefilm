@@ -6,6 +6,12 @@ using MimeKit;
 
 namespace FilmAPI.Services;
 
+/// <summary>
+/// Fornisce il servizio  per le operazioni di dominio esposte da questo modulo.
+/// </summary>
+/// <remarks>
+/// Usato dai controller o endpoint che gestiscono le funzioni di . Dipendenze iniettate nel costruttore: nessuna dichiarata esplicitamente.
+/// </remarks>
 public class AccountEmailService : IAccountEmailService
 {
     private readonly ILogger<AccountEmailService> _logger;
@@ -17,6 +23,14 @@ public class AccountEmailService : IAccountEmailService
     private readonly string? _fromEmail;
     private readonly string? _fromName;
 
+    /// <summary>
+    /// Esegue l''operazione AccountEmailService del servizio.
+    /// </summary>
+    /// <param name="logger">Parametro necessario per l'operazione: logger.</param>
+    /// <returns>Restituisce il risultato dell'operazione quando questa ha esito positivo; altrimenti il chiamante riceve un'eccezione o un risultato nullo/booleano secondo il contratto del metodo.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database. può inviare email di notifica.
+    /// </remarks>
     public AccountEmailService(ILogger<AccountEmailService> logger)
     {
         _logger = logger;
@@ -42,6 +56,16 @@ public class AccountEmailService : IAccountEmailService
         }
     }
 
+    /// <summary>
+    /// Esegue l''operazione di business SendPasswordResetAsync del servizio.
+    /// </summary>
+    /// <param name="email">Indirizzo email usato per autenticazione, notifica o identificazione dell'utente.</param>
+    /// <param name="nome">Parametro necessario per l'operazione: nome.</param>
+    /// <param name="resetUrl">Parametro necessario per l'operazione: resetUrl.</param>
+    /// <returns>Completa l'operazione in modo asincrono senza restituire un valore, lasciando al chiamante la sola gestione dell'esito tramite eccezioni.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database. può inviare email di notifica.
+    /// </remarks>
     public async Task SendPasswordResetAsync(string email, string nome, string resetUrl)
     {
         if (!HasCompleteConfiguration())
@@ -64,6 +88,16 @@ public class AccountEmailService : IAccountEmailService
         }
     }
 
+    /// <summary>
+    /// Esegue l''operazione di business SendSetPasswordAsync del servizio.
+    /// </summary>
+    /// <param name="email">Indirizzo email usato per autenticazione, notifica o identificazione dell'utente.</param>
+    /// <param name="nome">Parametro necessario per l'operazione: nome.</param>
+    /// <param name="setupUrl">Parametro necessario per l'operazione: setupUrl.</param>
+    /// <returns>Completa l'operazione in modo asincrono senza restituire un valore, lasciando al chiamante la sola gestione dell'esito tramite eccezioni.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database. può inviare email di notifica.
+    /// </remarks>
     public async Task SendSetPasswordAsync(string email, string nome, string setupUrl)
     {
         if (!HasCompleteConfiguration())
@@ -86,6 +120,17 @@ public class AccountEmailService : IAccountEmailService
         }
     }
 
+    /// <summary>
+    /// Esegue l''operazione di business SendAdminInviteAsync del servizio.
+    /// </summary>
+    /// <param name="email">Indirizzo email usato per autenticazione, notifica o identificazione dell'utente.</param>
+    /// <param name="nome">Parametro necessario per l'operazione: nome.</param>
+    /// <param name="role">Parametro necessario per l'operazione: role.</param>
+    /// <param name="inviteUrl">Parametro necessario per l'operazione: inviteUrl.</param>
+    /// <returns>Completa l'operazione in modo asincrono senza restituire un valore, lasciando al chiamante la sola gestione dell'esito tramite eccezioni.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database. può inviare email di notifica.
+    /// </remarks>
     public async Task SendAdminInviteAsync(string email, string nome, string role, string inviteUrl)
     {
         if (!HasCompleteConfiguration())
@@ -108,6 +153,15 @@ public class AccountEmailService : IAccountEmailService
         }
     }
 
+    /// <summary>
+    /// Esegue l''operazione di business SendPasswordChangedAsync del servizio.
+    /// </summary>
+    /// <param name="email">Indirizzo email usato per autenticazione, notifica o identificazione dell'utente.</param>
+    /// <param name="nome">Parametro necessario per l'operazione: nome.</param>
+    /// <returns>Completa l'operazione in modo asincrono senza restituire un valore, lasciando al chiamante la sola gestione dell'esito tramite eccezioni.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database. può inviare email di notifica.
+    /// </remarks>
     public async Task SendPasswordChangedAsync(string email, string nome)
     {
         if (!HasCompleteConfiguration())

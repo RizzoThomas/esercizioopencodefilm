@@ -3,8 +3,18 @@ using FilmAPI.Services;
 
 namespace FilmAPI.Endpoints;
 
+/// <summary>
+/// Raggruppa gli endpoint pubblici e protetti per la gestione delle sale e delle sale per cinema.
+/// </summary>
 public static class SaleEndpoints
 {
+    /// <summary>
+    /// Mappa le rotte <c>/cinemas/{cinemaId}/sale</c> e <c>/sale</c> per consultare e gestire le sale.
+    /// Alcune rotte sono pubbliche con <c>AllowAnonymous</c>; le operazioni di modifica richiedono <c>RequireAuthorization("PowerUserOrAdmin")</c>.
+    /// Esegue operazioni CRUD sulle sale con effetti sul database e sulla configurazione delle sale per cinema.
+    /// </summary>
+    /// <param name="app">Applicazione web su cui registrare gli endpoint.</param>
+    /// <returns>Non restituisce valori.</returns>
     public static void MapSaleEndpoints(this WebApplication app)
     {
         var group = app.MapGroup("/cinemas/{cinemaId}/sale");

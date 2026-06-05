@@ -68,6 +68,8 @@
   --rounded-full: 9999px;
 }
 
+/* Stili base: impostano font, colori di sfondo e transizioni globali del documento. */
+/* Stili base: impostano font, sfondo e colore del documento. */
 /* ========================================================================
    Base Styles
    ======================================================================== */
@@ -78,6 +80,8 @@ body {
   color: var(--ferrari-ink);
 }
 
+/* Scrollbar personalizzata: uniforma l'aspetto della barra di scorrimento nel tema. */
+/* Scrollbar personalizzata: armonizza la barra di scorrimento col tema. */
 /* ========================================================================
    Scrollbar
    ======================================================================== */
@@ -100,6 +104,8 @@ body {
   background: var(--ferrari-hairline);
 }
 
+/* Animazioni globali: gestiscono fade, rotazione e micro-movimenti dell'interfaccia. */
+/* Animazioni globali: definiscono fade, rotazione e micro-movimenti. */
 /* ========================================================================
    Animations
    ======================================================================== */
@@ -481,6 +487,8 @@ input[type='password']::-webkit-textfield-decoration-container {
   color: var(--ferrari-body);
 }
 
+/* Validazione form: evidenzia i campi con errore e lo stato focus. */
+/* Validazione form: segnala errori e stato focus. */
 /* ========================================================================
    Form Validation
    ======================================================================== */
@@ -509,6 +517,8 @@ img {
   .no-print { display: none !important; }
 }
 
+/* Tab della programmazione: gestisce stato attivo e interazione tra categorie. */
+/* Tab della programmazione: gestiscono stato attivo e navigazione. */
 /* ========================================================================
    Programmazione v2 - Tabs
    ======================================================================== */
@@ -530,6 +540,8 @@ img {
   filter: brightness(1.05);
 }
 
+/* Clamp delle righe: limita il testo su due righe per una griglia ordinata. */
+/* Clamp del testo: limita i contenuti a due righe. */
 /* ========================================================================
    Programmazione v2 - Line Clamp
    ======================================================================== */
@@ -541,6 +553,8 @@ img {
   overflow: hidden;
 }
 
+/* Scrollbar della lista cinema: ottimizza lo scroll verticale dell'elenco. */
+/* Scrollbar della lista cinema: ottimizza lo scorrimento verticale. */
 /* ========================================================================
    Programmazione v2 - Modal Scrollbar
    ======================================================================== */
@@ -671,6 +685,8 @@ img {
   padding: 0.125rem 0.375rem; margin-left: 0.375rem;
 }
 
+/* Intestazioni tipologia sala: raggruppano badge e metadati delle sale. */
+/* Intestazioni tipo sala: raggruppano badge e metadata. */
 /* ========================================================================
    FASE 10 - Tipo Sala Group Headers
    ======================================================================== */
@@ -723,6 +739,8 @@ img {
   object-fit: cover; flex-shrink: 0;
 }
 
+/* Mappa posti: gestisce layout, stati dei posti e controlli di zoom. */
+/* Mappa posti: gestisce layout, stato e zoom dei posti. */
 /* ========================================================================
    FASE 11 - Seat Map
    ======================================================================== */
@@ -1129,6 +1147,8 @@ img {
   .seat-level-cols-2, .seat-level-cols-3 { grid-template-columns: max-content; }
 }
 
+/* Opzioni di pagamento: definisce card selezionabili e stato pagamento. */
+/* Opzioni di pagamento: gestiscono scelta metodo e stato. */
 /* ========================================================================
    FASE 11 - Payment Options
    ======================================================================== */

@@ -18,6 +18,12 @@ public interface ICreditoService
     Task<ReconcileTopupResponseDTO> ReconcileTopupSessionAsync(int userId, string sessionId);
 }
 
+/// <summary>
+/// Fornisce il servizio  per le operazioni di dominio esposte da questo modulo.
+/// </summary>
+/// <remarks>
+/// Usato dai controller o endpoint che gestiscono le funzioni di . Dipendenze iniettate nel costruttore: nessuna dichiarata esplicitamente.
+/// </remarks>
 public class CreditoService : ICreditoService
 {
     private readonly FilmDbContext _db;
@@ -25,6 +31,17 @@ public class CreditoService : ICreditoService
     private readonly IEmailService _emailService;
     private readonly ILogger<CreditoService> _logger;
 
+    /// <summary>
+    /// Esegue l''operazione CreditoService del servizio.
+    /// </summary>
+    /// <param name="db">Parametro necessario per l'operazione: db.</param>
+    /// <param name="stripeGateway">Parametro necessario per l'operazione: stripeGateway.</param>
+    /// <param name="emailService">Parametro necessario per l'operazione: emailService.</param>
+    /// <param name="logger">Parametro necessario per l'operazione: logger.</param>
+    /// <returns>Restituisce il risultato dell'operazione quando questa ha esito positivo; altrimenti il chiamante riceve un'eccezione o un risultato nullo/booleano secondo il contratto del metodo.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database. può inviare email di notifica.
+    /// </remarks>
     public CreditoService(FilmDbContext db, IStripePaymentGateway stripeGateway, IEmailService emailService, ILogger<CreditoService> logger)
     {
         _db = db;
@@ -33,6 +50,14 @@ public class CreditoService : ICreditoService
         _logger = logger;
     }
 
+    /// <summary>
+    /// Recupera o legge i dati tramite l''operazione GetCreditoMeAsync del servizio.
+    /// </summary>
+    /// <param name="userId">Identificativo necessario per individuare l'entità o il contesto di lavoro: userId.</param>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database. può inviare email di notifica.
+    /// </remarks>
     public async Task<CreditoMeDTO?> GetCreditoMeAsync(int userId)
     {
         var user = await _db.Users.FindAsync(userId);
@@ -57,6 +82,14 @@ public class CreditoService : ICreditoService
         };
     }
 
+    /// <summary>
+    /// Esegue l''operazione SearchUsersAsync del servizio.
+    /// </summary>
+    /// <param name="email">Indirizzo email usato per autenticazione, notifica o identificazione dell'utente.</param>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database. può inviare email di notifica.
+    /// </remarks>
     public async Task<List<CreditoUserLookupDTO>> SearchUsersAsync(string? email)
     {
         var query = _db.Users.AsQueryable();
@@ -80,6 +113,14 @@ public class CreditoService : ICreditoService
             .ToListAsync();
     }
 
+    /// <summary>
+    /// Recupera o legge i dati tramite l''operazione GetTopUpsAsync del servizio.
+    /// </summary>
+    /// <param name="email">Indirizzo email usato per autenticazione, notifica o identificazione dell'utente.</param>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database. può inviare email di notifica.
+    /// </remarks>
     public async Task<List<MovimentoCreditoDTO>> GetTopUpsAsync(string? email)
     {
         var query = _db.MovimentiCredito
@@ -104,6 +145,15 @@ public class CreditoService : ICreditoService
         return movimenti.Select(MapMovimento).ToList();
     }
 
+    /// <summary>
+    /// Esegue l''operazione TopUpAsync del servizio.
+    /// </summary>
+    /// <param name="operatorUserId">Identificativo necessario per individuare l'entità o il contesto di lavoro: operatorUserId.</param>
+    /// <param name="dto">Oggetto DTO di input necessario per eseguire l'operazione.</param>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database. può inviare email di notifica.
+    /// </remarks>
     public async Task<CreditoTopUpResultDTO> TopUpAsync(int operatorUserId, CreditoTopUpRequestDTO dto)
     {
         if (dto.Importo <= 0)
@@ -167,6 +217,17 @@ public class CreditoService : ICreditoService
         };
     }
 
+    /// <summary>
+    /// Esegue l''operazione ApplyOrderDebitAsync del servizio.
+    /// </summary>
+    /// <param name="userId">Identificativo necessario per individuare l'entità o il contesto di lavoro: userId.</param>
+    /// <param name="orderId">Identificativo necessario per individuare l'entità o il contesto di lavoro: orderId.</param>
+    /// <param name="importo">Parametro necessario per l'operazione: importo.</param>
+    /// <param name="note">Parametro necessario per l'operazione: note.</param>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database.
+    /// </remarks>
     public async Task<MovimentoCredito> ApplyOrderDebitAsync(int userId, int orderId, decimal importo, string? note = null)
     {
         if (importo <= 0)
@@ -205,6 +266,17 @@ public class CreditoService : ICreditoService
         return movimento;
     }
 
+    /// <summary>
+    /// Esegue l''operazione ReserveOrderCreditAsync del servizio.
+    /// </summary>
+    /// <param name="userId">Identificativo necessario per individuare l'entità o il contesto di lavoro: userId.</param>
+    /// <param name="orderId">Identificativo necessario per individuare l'entità o il contesto di lavoro: orderId.</param>
+    /// <param name="importo">Parametro necessario per l'operazione: importo.</param>
+    /// <param name="note">Parametro necessario per l'operazione: note.</param>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database. può inviare email di notifica.
+    /// </remarks>
     public async Task<MovimentoCredito> ReserveOrderCreditAsync(int userId, int orderId, decimal importo, string? note = null)
     {
         if (importo <= 0)
@@ -243,6 +315,16 @@ public class CreditoService : ICreditoService
         return movimento;
     }
 
+    /// <summary>
+    /// Esegue l''operazione ReleaseReservedOrderCreditAsync del servizio.
+    /// </summary>
+    /// <param name="userId">Identificativo necessario per individuare l'entità o il contesto di lavoro: userId.</param>
+    /// <param name="orderId">Identificativo necessario per individuare l'entità o il contesto di lavoro: orderId.</param>
+    /// <param name="note">Parametro necessario per l'operazione: note.</param>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database. può inviare email di notifica.
+    /// </remarks>
     public async Task<MovimentoCredito?> ReleaseReservedOrderCreditAsync(int userId, int orderId, string? note = null)
     {
         var reserveMovement = await _db.MovimentiCredito
@@ -306,6 +388,15 @@ public class CreditoService : ICreditoService
         };
     }
 
+    /// <summary>
+    /// Esegue l''operazione di business CreateTopupSessionAsync del servizio.
+    /// </summary>
+    /// <param name="userId">Identificativo necessario per individuare l'entità o il contesto di lavoro: userId.</param>
+    /// <param name="amount">Parametro necessario per l'operazione: amount.</param>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: può inviare email di notifica. avvia lavoro asincrono in background.
+    /// </remarks>
     public async Task<CreateTopupSessionResponseDTO> CreateTopupSessionAsync(int userId, decimal amount)
     {
         if (amount <= 0)
@@ -347,6 +438,15 @@ public class CreditoService : ICreditoService
         };
     }
 
+    /// <summary>
+    /// Esegue l''operazione ReconcileTopupSessionAsync del servizio.
+    /// </summary>
+    /// <param name="userId">Identificativo necessario per individuare l'entità o il contesto di lavoro: userId.</param>
+    /// <param name="sessionId">Identificativo necessario per individuare l'entità o il contesto di lavoro: sessionId.</param>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: può inviare email di notifica. avvia lavoro asincrono in background.
+    /// </remarks>
     public async Task<ReconcileTopupResponseDTO> ReconcileTopupSessionAsync(int userId, string sessionId)
     {
         var session = await _stripeGateway.GetCheckoutSessionAsync(sessionId);

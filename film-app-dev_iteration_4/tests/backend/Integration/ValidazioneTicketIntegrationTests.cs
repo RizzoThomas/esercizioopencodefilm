@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace FilmAPI.Tests.Integration;
 
+/// <summary>Suite di test per ValidazioneTicketIntegrationTests.</summary>
 public class ValidazioneTicketIntegrationTests : IClassFixture<CustomWebApplicationFactory>
 {
     private readonly CustomWebApplicationFactory _factory;
@@ -17,6 +18,7 @@ public class ValidazioneTicketIntegrationTests : IClassFixture<CustomWebApplicat
         _factory = factory;
     }
 
+    /// <summary>Verifica lo scenario di VT1_GetTicketValidationLookup_ReturnsTicketDetails: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task VT1_GetTicketValidationLookup_ReturnsTicketDetails()
     {
@@ -34,6 +36,7 @@ public class ValidazioneTicketIntegrationTests : IClassFixture<CustomWebApplicat
         Assert.Equal("Issued", payload.Stato);
     }
 
+    /// <summary>Verifica lo scenario di VT2_ValidateTicket_Twice_SecondCallReturnsConflict: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task VT2_ValidateTicket_Twice_SecondCallReturnsConflict()
     {
@@ -72,6 +75,7 @@ public class ValidazioneTicketIntegrationTests : IClassFixture<CustomWebApplicat
         Assert.NotNull(ticket.ValidatoAtUtc);
     }
 
+    /// <summary>Verifica lo scenario di VT3_ValidateTicket_WithCinemaMismatch_ReturnsConflict: predispone i dati e le condizioni previste dal caso di test e controlla che l'esito atteso venga restituito.</summary>
     [Fact]
     public async Task VT3_ValidateTicket_WithCinemaMismatch_ReturnsConflict()
     {

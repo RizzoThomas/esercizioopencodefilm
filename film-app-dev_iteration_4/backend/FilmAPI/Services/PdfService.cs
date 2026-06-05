@@ -11,8 +11,22 @@ using ZXing.Rendering;
 
 namespace FilmAPI.Services;
 
+/// <summary>
+/// Fornisce il servizio  per le operazioni di dominio esposte da questo modulo.
+/// </summary>
+/// <remarks>
+/// Usato dai controller o endpoint che gestiscono le funzioni di . Dipendenze iniettate nel costruttore: nessuna dichiarata esplicitamente.
+/// </remarks>
 public class PdfService : IPdfService
 {
+    /// <summary>
+    /// Esegue l''operazione di business GenerateOrderTicketsPdf del servizio.
+    /// </summary>
+    /// <param name="orderDocument">Parametro necessario per l'operazione: orderDocument.</param>
+    /// <returns>Restituisce il risultato dell'operazione quando questa ha esito positivo; altrimenti il chiamante riceve un'eccezione o un risultato nullo/booleano secondo il contratto del metodo.</returns>
+    /// <remarks>
+    /// Effetti collaterali: non introduce effetti collaterali esterni evidenti oltre alla logica di lettura o validazione.
+    /// </remarks>
     public byte[] GenerateOrderTicketsPdf(OrdineTicketDocumentDTO orderDocument)
     {
         if (orderDocument.Tickets.Count == 0)

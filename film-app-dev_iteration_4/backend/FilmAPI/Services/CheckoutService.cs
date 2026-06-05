@@ -5,15 +5,38 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FilmAPI.Services;
 
+/// <summary>
+/// Fornisce il servizio  per le operazioni di dominio esposte da questo modulo.
+/// </summary>
+/// <remarks>
+/// Usato dai controller o endpoint che gestiscono le funzioni di . Dipendenze iniettate nel costruttore: nessuna dichiarata esplicitamente.
+/// </remarks>
 public class CheckoutService : ICheckoutService
 {
     private readonly FilmDbContext _db;
 
+    /// <summary>
+    /// Esegue l''operazione di business CheckoutService del servizio.
+    /// </summary>
+    /// <param name="db">Parametro necessario per l'operazione: db.</param>
+    /// <returns>Restituisce il risultato dell'operazione quando questa ha esito positivo; altrimenti il chiamante riceve un'eccezione o un risultato nullo/booleano secondo il contratto del metodo.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database.
+    /// </remarks>
     public CheckoutService(FilmDbContext db)
     {
         _db = db;
     }
 
+    /// <summary>
+    /// Esegue l''operazione di business CreateOrdineAsync del servizio.
+    /// </summary>
+    /// <param name="userId">Identificativo necessario per individuare l'entità o il contesto di lavoro: userId.</param>
+    /// <param name="dto">Oggetto DTO di input necessario per eseguire l'operazione.</param>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database.
+    /// </remarks>
     public async Task<OrdineSummaryDTO> CreateOrdineAsync(int userId, CreateOrdineRequestDTO dto)
     {
         if (string.IsNullOrWhiteSpace(dto.HoldToken))
@@ -102,6 +125,14 @@ public class CheckoutService : ICheckoutService
         return MapToSummary(ordine, show);
     }
 
+    /// <summary>
+    /// Recupera o legge i dati tramite l''operazione GetOrdiniByUserAsync del servizio.
+    /// </summary>
+    /// <param name="userId">Identificativo necessario per individuare l'entità o il contesto di lavoro: userId.</param>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: può inviare email di notifica.
+    /// </remarks>
     public async Task<List<OrdineSummaryDTO>> GetOrdiniByUserAsync(int userId)
     {
         var ordini = await _db.Ordini
@@ -120,6 +151,15 @@ public class CheckoutService : ICheckoutService
         return ordini.Select(o => MapToSummary(o, o.Show!)).ToList();
     }
 
+    /// <summary>
+    /// Recupera o legge i dati tramite l''operazione GetOrdineByIdAsync del servizio.
+    /// </summary>
+    /// <param name="orderId">Identificativo necessario per individuare l'entità o il contesto di lavoro: orderId.</param>
+    /// <param name="userId">Identificativo necessario per individuare l'entità o il contesto di lavoro: userId.</param>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: può inviare email di notifica.
+    /// </remarks>
     public async Task<OrdineSummaryDTO?> GetOrdineByIdAsync(int orderId, int userId)
     {
         var ordine = await _db.Ordini
@@ -139,6 +179,14 @@ public class CheckoutService : ICheckoutService
         return MapToSummary(ordine, ordine.Show!);
     }
 
+    /// <summary>
+    /// Recupera o legge i dati tramite l''operazione GetTicketsByUserAsync del servizio.
+    /// </summary>
+    /// <param name="userId">Identificativo necessario per individuare l'entità o il contesto di lavoro: userId.</param>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: può inviare email di notifica.
+    /// </remarks>
     public async Task<List<BigliettoSummaryDTO>> GetTicketsByUserAsync(int userId)
     {
         var tickets = await _db.Biglietti
@@ -159,6 +207,15 @@ public class CheckoutService : ICheckoutService
         return tickets.Select(MapToTicketSummary).ToList();
     }
 
+    /// <summary>
+    /// Recupera o legge i dati tramite l''operazione GetTicketByIdAsync del servizio.
+    /// </summary>
+    /// <param name="ticketId">Identificativo necessario per individuare l'entità o il contesto di lavoro: ticketId.</param>
+    /// <param name="userId">Identificativo necessario per individuare l'entità o il contesto di lavoro: userId.</param>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: può inviare email di notifica.
+    /// </remarks>
     public async Task<BigliettoDetailDTO?> GetTicketByIdAsync(int ticketId, int userId)
     {
         var ticket = await _db.Biglietti

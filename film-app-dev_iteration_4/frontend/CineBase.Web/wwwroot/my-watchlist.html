@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- Pagina CineBase: struttura principale con sezioni statiche e contenuti dinamici gestiti da JavaScript. -->
 <html lang="it-IT">
 
 <head>
@@ -17,8 +18,12 @@
 </head>
 
 <body class="bg-canvas text-ink font-sans">
+  <!-- Contenitore dinamico: navbar-container viene popolato o mostrato da JavaScript. -->
+<!-- Contenitore dinamico: quest'area viene popolata o mostrata da JavaScript. -->
   <div id="navbar-container"></div>
 
+  <!-- Contenuto principale: area centrale che ospita il flusso della pagina. -->
+<!-- Contenuto principale: area centrale dove la pagina mostra il flusso operativo. -->
   <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-6">
     <h1 class="text-2xl md:text-3xl font-bold text-ink mb-6">
       <i class="fa-solid fa-bookmark text-ferrari-primary mr-2"></i>La Mia Watchlist
@@ -29,6 +34,8 @@
       <p class="text-body">Caricamento...</p>
     </div>
 
+  <!-- Contenitore dinamico: watchlist-grid viene popolato o mostrato da JavaScript. -->
+<!-- Contenitore dinamico: quest'area viene popolata o mostrata da JavaScript. -->
     <div id="watchlist-grid" class="hidden grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
     </div>
 
@@ -47,7 +54,11 @@
     </div>
   </main>
 
+  <!-- Contenitore dinamico: footer-container viene popolato o mostrato da JavaScript. -->
+<!-- Contenitore dinamico: quest'area viene popolata o mostrata da JavaScript. -->
   <div id="footer-container"></div>
+  <!-- Contenitore dinamico: toast-container viene popolato o mostrato da JavaScript. -->
+<!-- Contenitore dinamico: quest'area viene popolata o mostrata da JavaScript. -->
   <div id="toast-container" class="fixed bottom-4 right-4 z-50"></div>
 
   <script src="/js/utils.js"></script>

@@ -3,8 +3,18 @@ using FilmAPI.Services;
 
 namespace FilmAPI.Endpoints;
 
+/// <summary>
+/// Raggruppa gli endpoint pubblici e protetti per la gestione degli spettacoli.
+/// </summary>
 public static class ShowsEndpoints
 {
+    /// <summary>
+    /// Mappa le rotte del gruppo <c>/shows</c> per elenco, dettaglio, creazione, aggiornamento e cancellazione degli spettacoli.
+    /// Le rotte di lettura sono pubbliche con <c>AllowAnonymous</c>; le modifiche richiedono <c>RequireAuthorization("CinemaStaffOrPowerUserOrAdmin")</c>.
+    /// Esegue operazioni sugli spettacoli con effetti su database e programmazione delle proiezioni.
+    /// </summary>
+    /// <param name="app">Applicazione web su cui registrare gli endpoint.</param>
+    /// <returns>Non restituisce valori.</returns>
     public static void MapShowsEndpoints(this WebApplication app)
     {
         var group = app.MapGroup("/shows");

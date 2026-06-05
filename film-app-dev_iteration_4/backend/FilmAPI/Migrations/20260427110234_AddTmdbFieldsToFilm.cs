@@ -1,13 +1,20 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
 namespace FilmAPI.Migrations
 {
-    /// <inheritdoc />
+    /// <summary>
+    ///     Aggiunge i campi TMDB alla tabella Films: TmdbId, ImdbId, TmdbPosterPath, TmdbBackdropPath, TmdbOverview, TmdbVoteAverage, TmdbVoteCount, TmdbPopularity. Permette l'integrazione con The Movie Database per arricchire il catalogo.
+    /// </summary>
+    /// <summary>
+    /// Migrazione che aggiunge ai film i campi TMDB per metadati, popolarità e identificativi esterni.
+    /// </summary>
     public partial class AddTmdbFieldsToFilm : Migration
     {
-        /// <inheritdoc />
+        /// <summary>
+    ///     Aggiunge i campi TMDB alla tabella Films: TmdbId, ImdbId, TmdbPosterPath, TmdbBackdropPath, TmdbOverview, TmdbVoteAverage, TmdbVoteCount, TmdbPopularity. Permette l'integrazione con The Movie Database per arricchire il catalogo.
+    /// </summary>
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<string>(
@@ -67,7 +74,9 @@ namespace FilmAPI.Migrations
                 nullable: true);
         }
 
-        /// <inheritdoc />
+        /// <summary>
+    ///     Aggiunge i campi TMDB alla tabella Films: TmdbId, ImdbId, TmdbPosterPath, TmdbBackdropPath, TmdbOverview, TmdbVoteAverage, TmdbVoteCount, TmdbPopularity. Permette l'integrazione con The Movie Database per arricchire il catalogo.
+    /// </summary>
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(

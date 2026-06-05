@@ -11,6 +11,9 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace FilmAPI.Migrations
 {
+    /// <summary>
+    /// Classe generata da EF Core per la migrazione AddCinemaIdToOfferte.
+    /// </summary>
     [DbContext(typeof(FilmDbContext))]
     [Migration("20260507073056_AddCinemaIdToOfferte")]
     partial class AddCinemaIdToOfferte

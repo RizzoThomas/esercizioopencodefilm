@@ -10,8 +10,18 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FilmAPI.Endpoints;
 
+/// <summary>
+/// Raggruppa gli endpoint di autenticazione, 2FA, login social e gestione account.
+/// </summary>
 public static class AuthEndpoints
 {
+    /// <summary>
+    /// Mappa le rotte del gruppo <c>/auth</c> per registrazione, login, refresh, logout, profilo utente, reset password, scambio codice social, configurazione 2FA, cambio password, richiesta password e sicurezza account.
+    /// Le rotte pubbliche usano <c>AllowAnonymous</c>; le altre richiedono <c>RequireAuthorization("Authenticated")</c>.
+    /// Esegue operazioni su credenziali, token, invio email e stato di sicurezza dell'account con effetti sul database e sui token di accesso.
+    /// </summary>
+    /// <param name="app">Applicazione web su cui registrare gli endpoint.</param>
+    /// <returns>Non restituisce valori.</returns>
     public static void MapAuthEndpoints(this WebApplication app)
     {
         var group = app.MapGroup("/auth");

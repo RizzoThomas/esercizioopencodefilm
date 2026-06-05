@@ -22,12 +22,27 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FilmAPI.Services;
 
+/// <summary>
+/// Fornisce il servizio  per le operazioni di dominio esposte da questo modulo.
+/// </summary>
+/// <remarks>
+/// Usato dai controller o endpoint che gestiscono le funzioni di . Dipendenze iniettate nel costruttore: nessuna dichiarata esplicitamente.
+/// </remarks>
 public class SeatHoldService : ISeatHoldService
 {
     private readonly FilmDbContext _db;
     private readonly TimeSpan _holdTtl;
     private const int MaxSeatsPerOrder = 10;  // Massimo 10 posti acquistabili
 
+    /// <summary>
+    /// Esegue l''operazione SeatHoldService del servizio.
+    /// </summary>
+    /// <param name="db">Parametro necessario per l'operazione: db.</param>
+    /// <param name="configuration">Parametro necessario per l'operazione: configuration.</param>
+    /// <returns>Restituisce il risultato dell'operazione quando questa ha esito positivo; altrimenti il chiamante riceve un'eccezione o un risultato nullo/booleano secondo il contratto del metodo.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database.
+    /// </remarks>
     public SeatHoldService(FilmDbContext db, IConfiguration? configuration = null)
     {
         _db = db;
@@ -47,6 +62,15 @@ public class SeatHoldService : ISeatHoldService
     //   HeldByMe (2)      — Tenuto dall'utente corrente
     //   Sold (3)          — Già venduto
     // ========================================================================
+    /// <summary>
+    /// Recupera o legge i dati tramite l''operazione GetSeatMapAsync del servizio.
+    /// </summary>
+    /// <param name="showId">Identificativo necessario per individuare l'entità o il contesto di lavoro: showId.</param>
+    /// <param name="userId">Identificativo necessario per individuare l'entità o il contesto di lavoro: userId.</param>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database.
+    /// </remarks>
     public async Task<SeatMapDTO> GetSeatMapAsync(int showId, int userId)
     {
         var now = DateTime.UtcNow;
@@ -148,6 +172,16 @@ public class SeatHoldService : ISeatHoldService
     // Se c'è un conflitto → rollback + restituisci 409
     // Se tutto OK → commit + restituisci holdToken
     // ========================================================================
+    /// <summary>
+    /// Esegue l''operazione di business CreateHoldAsync del servizio.
+    /// </summary>
+    /// <param name="showId">Identificativo necessario per individuare l'entità o il contesto di lavoro: showId.</param>
+    /// <param name="userId">Identificativo necessario per individuare l'entità o il contesto di lavoro: userId.</param>
+    /// <param name="salaPostoIds">Parametro necessario per l'operazione: salaPostoIds.</param>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database.
+    /// </remarks>
     public async Task<SeatHoldResponseDTO> CreateHoldAsync(int showId, int userId, List<int> salaPostoIds)
     {
         // Validazioni di base
@@ -280,6 +314,15 @@ public class SeatHoldService : ISeatHoldService
     // REFRESH HOLD — Estende il TTL di un hold esistente (keep-alive)
     // Il frontend chiama questo endpoint ogni 60 secondi
     // ========================================================================
+    /// <summary>
+    /// Esegue l''operazione di business RefreshHoldAsync del servizio.
+    /// </summary>
+    /// <param name="holdToken">Token necessario per validare, rinnovare o revocare l'operazione richiesta.</param>
+    /// <param name="userId">Identificativo necessario per individuare l'entità o il contesto di lavoro: userId.</param>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database.
+    /// </remarks>
     public async Task<SeatHoldResponseDTO> RefreshHoldAsync(string holdToken, int userId)
     {
         var now = DateTime.UtcNow;
@@ -315,6 +358,15 @@ public class SeatHoldService : ISeatHoldService
     // RELEASE HOLD — Rilascia esplicitamente un hold
     // Chiamato quando l'utente deseleziona tutti i posti
     // ========================================================================
+    /// <summary>
+    /// Esegue l''operazione ReleaseHoldAsync del servizio.
+    /// </summary>
+    /// <param name="holdToken">Token necessario per validare, rinnovare o revocare l'operazione richiesta.</param>
+    /// <param name="userId">Identificativo necessario per individuare l'entità o il contesto di lavoro: userId.</param>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database.
+    /// </remarks>
     public async Task<bool> ReleaseHoldAsync(string holdToken, int userId)
     {
         var stati = await _db.ShowPostiStato
@@ -353,6 +405,13 @@ public class SeatHoldService : ISeatHoldService
     // Chiamato dal hosted service ExpiredHoldCleanupService ogni 5 minuti
     // Restituisce il numero di record puliti
     // ========================================================================
+    /// <summary>
+    /// Esegue l''operazione CleanupExpiredHoldsAsync del servizio.
+    /// </summary>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database.
+    /// </remarks>
     public async Task<int> CleanupExpiredHoldsAsync()
     {
         var now = DateTime.UtcNow;

@@ -4,8 +4,18 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FilmAPI.Endpoints;
 
+/// <summary>
+/// Raggruppa gli endpoint per i consigli personalizzati dei contenuti.
+/// </summary>
 public static class RecommendationsEndpoints
 {
+    /// <summary>
+    /// Mappa la rotta <c>/recommendations</c> per generare suggerimenti personalizzati in base alla cronologia dell'utente.
+    /// L'endpoint usa l'identità utente quando disponibile e restituisce una risposta anonima in assenza di login.
+    /// Legge dati da ordini, watchlist e programmazione senza modificare il database.
+    /// </summary>
+    /// <param name="app">Applicazione web su cui registrare gli endpoint.</param>
+    /// <returns>Non restituisce valori.</returns>
     public static void MapRecommendationsEndpoints(this WebApplication app)
     {
         app.MapGet("/recommendations", async (

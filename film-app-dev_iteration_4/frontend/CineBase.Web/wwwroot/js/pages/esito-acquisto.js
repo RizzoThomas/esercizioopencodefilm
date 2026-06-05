@@ -1,14 +1,20 @@
+// Variabile orderId: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
 let orderId = null;
+// Variabile ordine: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
 let ordine = null;
+// Variabile pollingInterval: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
 let pollingInterval = null;
+// Variabile returnFlags: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
 let returnFlags = { success: false, cancelled: false };
 
+// Listener evento: si attiva quando scatta l'evento sulla pagina e aggiorna la UI o lo stato.
 document.addEventListener('DOMContentLoaded', async () => {
   if (!Auth?.isLoggedIn?.()) {
     window.location.replace('/login.html?redirect=' + encodeURIComponent(window.location.pathname + window.location.search));
     return;
   }
 
+  // Variabile params: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const params = new URLSearchParams(window.location.search);
   orderId = parseInt(params.get('orderId'));
   returnFlags = {
@@ -29,6 +35,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   await loadOrdine();
 });
 
+// Funzione reconcileAfterStripeReturn: gestisce la logica prevista e restituisce il risultato atteso. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 async function reconcileAfterStripeReturn() {
   try {
     await API.reconcileCheckoutSession(orderId);
@@ -37,6 +44,7 @@ async function reconcileAfterStripeReturn() {
   }
 }
 
+// Funzione loadOrdine: carica i dati iniziali o aggiorna il contenuto visibile della pagina. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 async function loadOrdine() {
   try {
     ordine = await API.getOrdine(orderId);
@@ -50,6 +58,7 @@ async function loadOrdine() {
   }
 }
 
+// Funzione renderEsito: costruisce markup o componenti UI a partire dai dati in ingresso. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 function renderEsito() {
   document.getElementById('loading-state').classList.add('hidden');
   document.getElementById('main-content').classList.remove('hidden');
@@ -66,10 +75,15 @@ function renderEsito() {
   setupActions();
 }
 
+// Funzione renderHeader: costruisce markup o componenti UI a partire dai dati in ingresso. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 function renderHeader() {
+  // Variabile stato: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const stato = ordine.stato;
+  // Variabile successHeader: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const successHeader = document.getElementById('success-header');
+  // Variabile pendingHeader: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const pendingHeader = document.getElementById('pending-header');
+  // Variabile failedHeader: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const failedHeader = document.getElementById('failed-header');
 
   successHeader.classList.add('hidden');
@@ -84,11 +98,13 @@ function renderHeader() {
     pendingHeader.classList.remove('hidden');
 
     if (stato === 'CheckoutInProgress') {
+      // Variabile h1: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
       const h1 = pendingHeader.querySelector('h1');
       const p = pendingHeader.querySelector('p');
       if (h1) h1.textContent = 'Verifica pagamento in corso...';
       if (p) p.textContent = 'Stiamo verificando il pagamento con Stripe';
     } else {
+      // Variabile h1: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
       const h1 = pendingHeader.querySelector('h1');
       const p = pendingHeader.querySelector('p');
       if (h1) h1.textContent = 'Pagamento in elaborazione';
@@ -97,9 +113,11 @@ function renderHeader() {
 
     pollingInterval = setInterval(async () => {
       try {
+        // Variabile updatedOrdine: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
         let updatedOrdine;
 
         if (returnFlags.success) {
+          // Variabile checkoutStatus: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
           const checkoutStatus = await API.reconcileCheckoutSession(orderId);
           updatedOrdine = checkoutStatus?.ordine || await API.getOrdine(orderId);
         } else {
@@ -120,12 +138,14 @@ function renderHeader() {
     }, 3000);
   } else if (stato === 'Cancelled') {
     failedHeader.classList.remove('hidden');
+    // Variabile h1: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const h1 = failedHeader.querySelector('h1');
     const p = failedHeader.querySelector('p');
     if (h1) h1.textContent = 'Pagamento annullato';
     if (p) p.textContent = 'L\'ordine e stato annullato. Puoi riprovare.';
   } else if (stato === 'Expired') {
     failedHeader.classList.remove('hidden');
+    // Variabile h1: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const h1 = failedHeader.querySelector('h1');
     const p = failedHeader.querySelector('p');
     if (h1) h1.textContent = 'Ordine scaduto';
@@ -135,13 +155,18 @@ function renderHeader() {
   }
 }
 
+// Funzione renderOrderDetails: costruisce markup o componenti UI a partire dai dati in ingresso. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 function renderOrderDetails() {
   document.getElementById('order-code').textContent = ordine.codiceOrdine;
 
+  // Variabile startDate: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const startDate = new Date(ordine.startAtUtc);
+  // Variabile dateOptions: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const dateOptions = { weekday: 'short', day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' };
+  // Variabile dateStr: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const dateStr = startDate.toLocaleDateString('it-IT', dateOptions);
 
+  // Variabile container: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const container = document.getElementById('order-details');
   container.innerHTML = `
     <div class="flex justify-between text-sm">
@@ -175,8 +200,11 @@ function renderOrderDetails() {
   document.getElementById('detail-totale').textContent = formatCurrency(ordine.totaleLordo);
 }
 
+// Funzione renderTickets: costruisce markup o componenti UI a partire dai dati in ingresso. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 function renderTickets() {
+  // Variabile container: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const container = document.getElementById('tickets-list');
+  // Variabile tickets: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const tickets = ordine.biglietti || [];
 
   document.getElementById('tickets-count').textContent = `${tickets.length} bigliett${tickets.length === 1 ? 'o' : 'i'}`;
@@ -207,10 +235,15 @@ function renderTickets() {
   `).join('');
 }
 
+// Funzione renderEmailStatus: costruisce markup o componenti UI a partire dai dati in ingresso. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 function renderEmailStatus() {
+  // Variabile card: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const card = document.getElementById('email-status-card');
+  // Variabile icon: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const icon = document.getElementById('email-status-icon');
+  // Variabile text: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const text = document.getElementById('email-status-text');
+  // Variabile detail: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const detail = document.getElementById('email-status-detail');
 
   if (ordine.stato !== 'Paid') {
@@ -221,6 +254,7 @@ function renderEmailStatus() {
   card.classList.remove('hidden');
 
   if (ordine.ticketEmailSentAtUtc) {
+    // Variabile sentDate: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
     const sentDate = new Date(ordine.ticketEmailSentAtUtc);
     icon.className = 'fa-solid fa-circle-check text-emerald-500 text-lg';
     text.textContent = 'Email di conferma inviata';
@@ -236,14 +270,18 @@ function renderEmailStatus() {
   }
 }
 
+// Funzione setupActions: gestisce la logica prevista e restituisce il risultato atteso. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 function setupActions() {
+  // Variabile btnPdf: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const btnPdf = document.getElementById('btn-download-pdf');
   btnPdf.onclick = async () => {
     btnPdf.disabled = true;
     btnPdf.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>Download in corso...';
 
     try {
+      // Variabile blob: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
       const blob = await API.getOrdinePdf(orderId);
+      // Variabile url: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
@@ -261,6 +299,7 @@ function setupActions() {
   };
 }
 
+// Funzione getStatoBadge: recupera un valore derivato e lo restituisce al chiamante. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 function getStatoBadge(stato) {
   switch (stato) {
     case 'Paid':
@@ -280,6 +319,7 @@ function getStatoBadge(stato) {
   }
 }
 
+// Funzione getStatoBiglietto: recupera un valore derivato e lo restituisce al chiamante. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 function getStatoBiglietto(stato) {
   switch (stato) {
     case 'Issued': return 'Emesso';
@@ -289,15 +329,18 @@ function getStatoBiglietto(stato) {
   }
 }
 
+// Funzione showError: gestisce la logica prevista e restituisce il risultato atteso. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
 function showError(message) {
   document.getElementById('loading-state').classList.add('hidden');
   document.getElementById('error-state').classList.remove('hidden');
   document.getElementById('main-content').classList.add('hidden');
+  // Variabile msgEl: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
   const msgEl = document.getElementById('error-message');
   if (msgEl) msgEl.textContent = message;
 }
 
 // Cleanup intervals on page unload
+// Listener evento: si attiva quando scatta l'evento e aggiorna UI o stato.
 window.addEventListener('beforeunload', () => {
   if (pollingInterval) clearInterval(pollingInterval);
 });

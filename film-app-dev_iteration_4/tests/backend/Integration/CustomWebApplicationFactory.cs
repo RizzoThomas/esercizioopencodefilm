@@ -18,6 +18,7 @@ using Microsoft.Extensions.Options;
 
 namespace FilmAPI.Tests.Integration;
 
+/// <summary>Classe di supporto per i test: CustomWebApplicationFactory.</summary>
 public sealed class CustomWebApplicationFactory : WebApplicationFactory<Program>, IAsyncLifetime
 {
     private readonly SqliteConnection _connection = new("DataSource=:memory:");
@@ -128,6 +129,7 @@ public sealed class CustomWebApplicationFactory : WebApplicationFactory<Program>
     public FakeEmailService EmailService => _emailService;
 }
 
+/// <summary>Classe di supporto per i test: TestAuthHandler.</summary>
 public class TestAuthHandler : AuthenticationHandler<AuthenticationSchemeOptions>
 {
     public TestAuthHandler(
@@ -166,6 +168,7 @@ public class TestAuthHandler : AuthenticationHandler<AuthenticationSchemeOptions
     }
 }
 
+/// <summary>Classe di supporto per i test: FakeStripePaymentGateway.</summary>
 public sealed class FakeStripePaymentGateway : IStripePaymentGateway
 {
     private readonly object _lock = new();
@@ -370,6 +373,7 @@ public sealed class FakeStripePaymentGateway : IStripePaymentGateway
     }
 }
 
+/// <summary>Classe di supporto per i test: FakeEmailService.</summary>
 public sealed class FakeEmailService : IEmailService
 {
     private readonly object _lock = new();
@@ -468,6 +472,7 @@ public sealed class FakeEmailService : IEmailService
     }
 }
 
+/// <summary>Classe di supporto per i test: SentEmailRecord.</summary>
 public sealed class SentEmailRecord
 {
     public int OrderId { get; set; }

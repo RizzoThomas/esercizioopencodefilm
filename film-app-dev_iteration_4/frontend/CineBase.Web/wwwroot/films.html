@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- Pagina CineBase: struttura principale con sezioni statiche e contenuti dinamici gestiti da JavaScript. -->
 <html lang="it-IT">
 
 <head>
@@ -19,8 +20,12 @@
 </head>
 
 <body class="bg-canvas text-ink font-sans">
+  <!-- Contenitore dinamico: navbar-container viene popolato o mostrato da JavaScript. -->
+<!-- Contenitore dinamico: quest'area viene popolata o mostrata da JavaScript. -->
   <div id="navbar-container"></div>
 
+  <!-- Contenuto principale: area centrale che ospita il flusso della pagina. -->
+<!-- Contenuto principale: area centrale dove la pagina mostra il flusso operativo. -->
   <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <!-- Page Header -->
     <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
@@ -161,12 +166,16 @@
     </div>
   </main>
 
+  <!-- Contenitore dinamico: footer-container viene popolato o mostrato da JavaScript. -->
+<!-- Contenitore dinamico: quest'area viene popolata o mostrata da JavaScript. -->
   <div id="footer-container"></div>
 
   <!-- Toast Container -->
+<!-- Contenitore dinamico: quest'area viene popolata o mostrata da JavaScript. -->
   <div id="toast-container" class="fixed bottom-4 right-4 z-50"></div>
 
   <!-- Modal -->
+<!-- Contenitore dinamico: quest'area viene popolata o mostrata da JavaScript. -->
   <div id="film-modal" class="fixed inset-0 z-50 hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
     <div class="fixed inset-0 bg-gray-500/75 transition-opacity modal-backdrop"></div>
     <div class="fixed inset-0 z-10 overflow-y-auto">
@@ -174,6 +183,7 @@
         <div
           class="relative transform overflow-hidden bg-canvas-elevated-lowest text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
           <div class="bg-canvas-elevated-lowest px-6 pt-6 pb-4">
+<!-- Contenitore dinamico: quest'area viene popolata o mostrata da JavaScript. -->
             <h3 class="text-lg font-bold text-ink" id="modal-title">Aggiungi Film</h3>
             <button type="button"
               class="absolute top-4 right-4 text-body hover:text-ink"
@@ -182,49 +192,10 @@
             </button>
           </div>
           <div class="bg-canvas-elevated-lowest px-6 pb-4">
-            <form id="film-form" class="space-y-4">
-              <input type="hidden" name="id" value="">
-              <div>
-                <label class="block text-sm font-medium text-ink mb-1">Titolo</label>
-                <input type="text" name="titolo" required placeholder="Inserisci il titolo del film"
-                  class="input-ferrari w-full px-4 py-2">
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-ink mb-1">Data Produzione</label>
-                <input type="date" name="dataProduzione" required title="Seleziona la data di produzione"
-                  class="input-ferrari w-full px-4 py-2">
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-ink mb-1">Durata (min)</label>
-                <input type="number" name="durata" required placeholder="120" class="input-ferrari w-full px-4 py-2">
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-ink mb-1">Copertina</label>
-                <input type="file" id="copertina-file" name="copertinaFile" accept="image/png,image/jpeg,image/webp"
-                  title="Seleziona file copertina" class="input-ferrari w-full px-4 py-2">
-                <input type="hidden" name="copertinaPath" id="copertina-path" value="">
-                <p class="text-xs text-body mt-1">Formati supportati: JPG, PNG, WebP (max 5MB)</p>
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-ink mb-1">Trailer URL</label>
-                <input type="url" name="filmatoPath" placeholder="https://youtube.com/..."
-                  class="input-ferrari w-full px-4 py-2">
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-ink mb-1">Regista</label>
-                <select id="regista-select" name="registaId" required title="Seleziona regista"
-                  class="input-ferrari w-full px-4 py-2">
-                  <option value="">Seleziona regista</option>
-                </select>
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-ink mb-2">Categorie</label>
-                <div id="categorie-checkboxes" class="flex flex-wrap gap-2">
-                  <span class="text-body text-sm">Caricamento categorie...</span>
-                </div>
-                <input type="hidden" name="categorieIds" id="categorie-ids" value="">
-              </div>
-            </form>
+  <!-- Modulo: raccoglie i dati dell'utente e li invia tramite JavaScript al backend. -->
+<!-- Modulo: raccoglie dati utente e li invia al backend tramite JavaScript. -->
+            <!-- Form: raccoglie dati dell'utente e li invia all'API collegata. -->
+            <form $$$> $$$ </form>
           </div>
           <div class="bg-canvas-elevated-low px-6 py-4 flex justify-end gap-3">
             <button type="button" class="btn-outline px-4 py-2 text-sm font-medium"
@@ -237,6 +208,7 @@
   </div>
 
   <!-- Delete Modal -->
+<!-- Contenitore dinamico: quest'area viene popolata o mostrata da JavaScript. -->
   <div id="delete-modal" class="fixed inset-0 z-50 hidden">
     <div class="fixed inset-0 bg-gray-500/75 modal-backdrop"></div>
     <div class="fixed inset-0 z-10 overflow-y-auto">

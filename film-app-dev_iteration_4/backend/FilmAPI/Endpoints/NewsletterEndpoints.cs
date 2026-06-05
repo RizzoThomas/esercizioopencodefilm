@@ -6,6 +6,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace FilmAPI.Endpoints;
 
+/// <summary>
+/// Raggruppa gli endpoint per iscrizione e gestione newsletter.
+/// </summary>
 public static class NewsletterEndpoints
 {
     // In-memory store for newsletter subscribers (production would use DB)
@@ -19,6 +22,13 @@ public static class NewsletterEndpoints
         public bool IsActive { get; set; } = true;
     }
 
+    /// <summary>
+    /// Mappa le rotte newsletter per iscrizione pubblica, disiscrizione e invio notifiche promozionali.
+    /// Le rotte pubbliche usano <c>AllowAnonymous</c>; l'invio massivo richiede autorizzazione amministrativa.
+    /// Esegue operazioni su iscritti e invii email con effetti sullo store in memoria e sui messaggi inviati.
+    /// </summary>
+    /// <param name="app">Applicazione web su cui registrare gli endpoint.</param>
+    /// <returns>Non restituisce valori.</returns>
     public static void MapNewsletterEndpoints(this WebApplication app)
     {
         // ── Subscribe ────────────────────────────────────────
@@ -175,6 +185,12 @@ public static class NewsletterEndpoints
     }
 }
 
+/// <summary>
+/// Rappresenta il payload usato per inviare una notifica promozionale newsletter.
+/// </summary>
+/// <summary>
+/// Rappresenta il payload usato per inviare una notifica promozionale newsletter.
+/// </summary>
 public class OfferNotificationDTO
 {
     public string? Subject { get; set; }

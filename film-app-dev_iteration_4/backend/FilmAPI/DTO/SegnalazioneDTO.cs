@@ -2,22 +2,35 @@ namespace FilmAPI.DTO;
 
 using System.Text.Json.Serialization;
 
+/// <summary>DTO di una segnalazione/issue utente usata nelle API di supporto.</summary>
 public class SegnalazioneDTO
 {
+    /// <summary>ID univoco della segnalazione.</summary>
     public int Id { get; set; }
+    /// <summary>Titolo sintetico della segnalazione.</summary>
     public string Titolo { get; set; } = string.Empty;
+    /// <summary>Descrizione dettagliata della segnalazione.</summary>
     public string Descrizione { get; set; } = string.Empty;
+    /// <summary>Email dell'utente, se presente.</summary>
     public string? EmailUtente { get; set; }
+    /// <summary>ID utente, se la segnalazione è associata a un account.</summary>
     public int? UserId { get; set; }
+    /// <summary>Stato corrente della segnalazione.</summary>
     public string Stato { get; set; } = "Aperta";
+    /// <summary>Data UTC di creazione.</summary>
     public DateTime CreatedAtUtc { get; set; }
 }
 
+/// <summary>DTO di creazione di una segnalazione.</summary>
 public class CreateSegnalazioneDTO
 {
+    /// <summary>Titolo della segnalazione.</summary>
     public string Titolo { get; set; } = string.Empty;
+    /// <summary>Descrizione della segnalazione.</summary>
     public string Descrizione { get; set; } = string.Empty;
+    /// <summary>Email utente opzionale.</summary>
     public string? EmailUtente { get; set; }
+    /// <summary>ID utente opzionale.</summary>
     public int? UserId { get; set; }
 }
 

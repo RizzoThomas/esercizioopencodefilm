@@ -5,8 +5,18 @@ using System.Text;
 
 namespace FilmAPI.Endpoints;
 
+/// <summary>
+/// Raggruppa gli endpoint amministrativi per analisi e statistiche.
+/// </summary>
 public static class AdminAnalyticsEndpoints
 {
+    /// <summary>
+    /// Mappa il gruppo <c>/admin/analytics</c> per consultare metriche, classifiche e aggregazioni di business.
+    /// Richiede <c>RequireAuthorization("PowerUserOrAdmin")</c>.
+    /// Esegue sole letture aggregate sui dati senza effetti collaterali.
+    /// </summary>
+    /// <param name="app">Applicazione web su cui registrare gli endpoint.</param>
+    /// <returns>Non restituisce valori.</returns>
     public static void MapAdminAnalyticsEndpoints(this WebApplication app)
     {
         var group = app.MapGroup("/admin/analytics").RequireAuthorization("PowerUserOrAdmin");

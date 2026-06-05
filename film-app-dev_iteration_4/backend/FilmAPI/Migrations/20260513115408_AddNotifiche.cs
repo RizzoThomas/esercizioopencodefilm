@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 
@@ -6,10 +6,17 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace FilmAPI.Migrations
 {
-    /// <inheritdoc />
+    /// <summary>
+    ///     Aggiunge le tabelle Notifiche e NotificheSoppresse per il sistema di notifiche push/email. Gestisce: invio, lettura, soppressione silenziosa per tipo notifica.
+    /// </summary>
+    /// <summary>
+    /// Migrazione che crea le tabelle Notifiche e NotificheSoppresse con i relativi indici utente.
+    /// </summary>
     public partial class AddNotifiche : Migration
     {
-        /// <inheritdoc />
+        /// <summary>
+    ///     Aggiunge le tabelle Notifiche e NotificheSoppresse per il sistema di notifiche push/email. Gestisce: invio, lettura, soppressione silenziosa per tipo notifica.
+    /// </summary>
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
@@ -75,7 +82,9 @@ namespace FilmAPI.Migrations
                 column: "UserId");
         }
 
-        /// <inheritdoc />
+        /// <summary>
+    ///     Aggiunge le tabelle Notifiche e NotificheSoppresse per il sistema di notifiche push/email. Gestisce: invio, lettura, soppressione silenziosa per tipo notifica.
+    /// </summary>
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(

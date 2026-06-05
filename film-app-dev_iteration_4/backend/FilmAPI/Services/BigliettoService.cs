@@ -5,15 +5,37 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FilmAPI.Services;
 
+/// <summary>
+/// Fornisce il servizio  per le operazioni di dominio esposte da questo modulo.
+/// </summary>
+/// <remarks>
+/// Usato dai controller o endpoint che gestiscono le funzioni di . Dipendenze iniettate nel costruttore: nessuna dichiarata esplicitamente.
+/// </remarks>
 public class BigliettoService : IBigliettoService
 {
     private readonly FilmDbContext _db;
 
+    /// <summary>
+    /// Esegue l''operazione BigliettoService del servizio.
+    /// </summary>
+    /// <param name="db">Parametro necessario per l'operazione: db.</param>
+    /// <returns>Restituisce il risultato dell'operazione quando questa ha esito positivo; altrimenti il chiamante riceve un'eccezione o un risultato nullo/booleano secondo il contratto del metodo.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database. può inviare email di notifica.
+    /// </remarks>
     public BigliettoService(FilmDbContext db)
     {
         _db = db;
     }
 
+    /// <summary>
+    /// Esegue l''operazione EmitTicketsForOrderAsync del servizio.
+    /// </summary>
+    /// <param name="orderId">Identificativo necessario per individuare l'entità o il contesto di lavoro: orderId.</param>
+    /// <returns>Completa l'operazione in modo asincrono senza restituire un valore, lasciando al chiamante la sola gestione dell'esito tramite eccezioni.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database. può inviare email di notifica.
+    /// </remarks>
     public async Task EmitTicketsForOrderAsync(int orderId)
     {
         var ordine = await _db.Ordini
@@ -68,6 +90,14 @@ public class BigliettoService : IBigliettoService
         await _db.SaveChangesAsync();
     }
 
+    /// <summary>
+    /// Recupera o legge i dati tramite l''operazione GetOrderTicketDocumentAsync del servizio.
+    /// </summary>
+    /// <param name="orderId">Identificativo necessario per individuare l'entità o il contesto di lavoro: orderId.</param>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: può inviare email di notifica.
+    /// </remarks>
     public async Task<OrdineTicketDocumentDTO> GetOrderTicketDocumentAsync(int orderId)
     {
         var ordine = await _db.Ordini
@@ -117,6 +147,14 @@ public class BigliettoService : IBigliettoService
         };
     }
 
+    /// <summary>
+    /// Recupera o legge i dati tramite l''operazione GetTicketValidationLookupAsync del servizio.
+    /// </summary>
+    /// <param name="code">Parametro necessario per l'operazione: code.</param>
+    /// <returns>Restituisce in modo asincrono il risultato dell'operazione indicato dal tipo interno del Task quando la logica termina correttamente.</returns>
+    /// <remarks>
+    /// Effetti collaterali: scrive o aggiorna il database.
+    /// </remarks>
     public async Task<TicketValidationLookupDTO?> GetTicketValidationLookupAsync(string code)
     {
         var normalizedCode = NormalizeCode(code);

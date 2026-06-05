@@ -3,8 +3,18 @@ using FilmAPI.Services;
 
 namespace FilmAPI.Endpoints;
 
+/// <summary>
+/// Raggruppa gli endpoint protetti per la gestione dei media caricati.
+/// </summary>
 public static class MediaEndpoints
 {
+    /// <summary>
+    /// Mappa il gruppo <c>/media</c> per operazioni di upload, consultazione e gestione dei contenuti multimediali.
+    /// Richiede <c>RequireAuthorization("PowerUserOrAdmin")</c>.
+    /// Esegue salvataggio e gestione di file e metadati con effetti sullo storage applicativo.
+    /// </summary>
+    /// <param name="app">Applicazione web su cui registrare gli endpoint.</param>
+    /// <returns>Non restituisce valori.</returns>
     public static void MapMediaEndpoints(this WebApplication app)
     {
         var group = app.MapGroup("/media").RequireAuthorization("PowerUserOrAdmin");
