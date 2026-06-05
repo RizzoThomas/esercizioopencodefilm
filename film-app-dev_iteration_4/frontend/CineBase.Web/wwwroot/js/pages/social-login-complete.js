@@ -7,8 +7,8 @@
     'use strict';
 
     // Variabile API_BASE: mantiene stato, riferimenti DOM o configurazione usata dalla logica della pagina.
-    var API_BASE = (window.API && window.API.getBaseUrl) 
-        ? window.API.getBaseUrl() 
+    var API_BASE = (window.API_BASE_URL !== undefined && window.API_BASE_URL !== null)
+        ? window.API_BASE_URL
         : (window.location.hostname === 'localhost' ? 'http://localhost:5000' : '');
 
     // Funzione sanitizeRedirectPath: gestisce la logica prevista e restituisce il risultato atteso. Parametri: quelli definiti nella firma. Ritorno: valore o Promise previsto.
